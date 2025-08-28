@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import App from "./AppV2";
+import App from "./App";
 
 // Extend the default theme with custom styles
 const theme = extendTheme({
@@ -25,16 +25,9 @@ const theme = extendTheme({
   },
 });
 
-// minimal system: start from defaultSystem and override config
-const system = {
-  ...ChakraProvider.defaultSystem,
-  config,
-};
-
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {/* Chakra v3 uses `value`, not `theme` */}
-    <ChakraProvider value={system}>
+    <ChakraProvider theme={theme}>
       <App />
     </ChakraProvider>
   </React.StrictMode>

@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback } from 'react';
-import type { MouseEvent } from 'react';
 import {
   Input,
   InputGroup,
@@ -8,9 +7,11 @@ import {
   Text,
   Badge,
   Flex,
-  StackDivider
+  StackDivider,
+  InputRightElement,
+  IconButton,
+  Spinner
 } from '@chakra-ui/react';
-import { useColorModeValue } from '@chakra-ui/react';
 import { SearchIcon, CloseIcon } from '@chakra-ui/icons';
 import type { Player } from '../../store/draftStore';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -24,6 +25,18 @@ interface PlayerSearchProps {
   isLoading?: boolean;
 }
 
+type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
+type ColorScheme = 'blue' | 'green' | 'purple' | 'orange' | 'yellow' | 'red' | 'gray';
+
+const POSITION_COLORS: Record<Position, ColorScheme> = {
+  QB: 'blue',
+  RB: 'green',
+  WR: 'purple',
+  TE: 'orange',
+  K: 'yellow',
+  DEF: 'red'
+} as const;
+
 export const PlayerSearch = ({
   players,
   onSelectPlayer,
@@ -36,8 +49,8 @@ export const PlayerSearch = ({
   const [isFocused, setIsFocused] = useState(false);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   
-  const inputBg = useColorModeValue('white', 'gray.700');
-  const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.100');
+  const inputBg = 'transparent';
+  const borderColor = 'transparent';
 
   const filteredPlayers = useMemo(() => {
     if (!debouncedSearchQuery.trim()) return [];
@@ -48,132 +61,127 @@ export const PlayerSearch = ({
           !player.draftedBy &&
           (player.name.toLowerCase().includes(query) ||
             player.pos.toLowerCase().includes(query) ||
-            player.nflTeam?.toLowerCase().includes(query))
+            player.nflTeam?.toLowerCase().includes(query) ||
+            player.id.toLowerCase().includes(query))
       )
+      .sort((a, b) => a.name.localeCompare(b.name))
       .slice(0, 5);
   }, [players, debouncedSearchQuery]);
 
-  const handleClearSearch = useCallback((e: React.MouseEvent<SVGElement>) => {
+  const handleClearSearch = useCallback((e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     setSearchQuery('');
   }, []);
   
-  // Handle starting bid change
+  const handlePlayerClick = useCallback((player: Player) => {
+    onSelectPlayer(player);
+    setSearchQuery('');
+  }, [onSelectPlayer]);
+
   const handleBidChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     onSetStartingBid(e.target.value);
   }, [onSetStartingBid]);
 
-  type ColorScheme = 'blue' | 'green' | 'purple' | 'orange' | 'yellow' | 'red' | 'gray';
-
   const getPositionColor = (position: string): ColorScheme => {
-    switch (position) {
-      case 'QB': return 'blue';
-      case 'RB': return 'green';
-      case 'WR': return 'purple';
-      case 'TE': return 'orange';
-      case 'K': return 'yellow';
-      case 'DEF': return 'red';
-      default: return 'gray';
-    }
+    return POSITION_COLORS[position as Position] || 'gray';
   };
 
   return (
-    <Box position="relative" width="100%" mb={4}>
-      <InputGroup>
-        <Box position="absolute" left="8px" top="50%" transform="translateY(-50%)" zIndex={1}>
-          <SearchIcon color="gray.300" />
-        </Box>
-        {searchQuery && (
-          <Box position="absolute" right="8px" top="50%" transform="translateY(-50%)" zIndex={1}>
-            <CloseIcon
-              color="gray.400"
-              cursor="pointer"
-              onClick={handleClearSearch}
-              _hover={{ color: 'gray.600' }}
-            />
-          </Box>
-        )}
+    <Box position="relative" width="100%" mb={4} bg="transparent">
+      <InputGroup bg="transparent">
         <Input
           type="text"
-          placeholder="Search players..."
+          placeholder="Search players by name, position, or team..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           bg={inputBg}
-          borderColor="gray.300"
-          _hover={{ borderColor: 'gray.400' }}
+          borderColor={borderColor}
+          pl={10}
+          borderBottom="1px solid"
+          borderBottomColor="gray.200"
+          borderRadius={0}
+          _hover={{ borderBottomColor: 'gray.400' }}
           _focus={{
             borderColor: 'blue.500',
             boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)',
           }}
           disabled={isLoading}
+          autoComplete="off"
         />
+        <InputRightElement pointerEvents="none" h="100%" mr={2} bg="transparent">
+          {isLoading ? (
+            <Spinner size="sm" color="gray.500" />
+          ) : searchQuery ? (
+            <IconButton
+              icon={<CloseIcon />}
+              variant="ghost"
+              size="xs"
+              onClick={handleClearSearch}
+              aria-label="Clear search"
+              _hover={{ bg: 'transparent', color: 'gray.500' }}
+              color="gray.400"
+            />
+          ) : (
+            <SearchIcon color="gray.500" />
+          )}
+        </InputRightElement>
       </InputGroup>
 
-      {isFocused && searchQuery && (
-        <Box
+      {isFocused && filteredPlayers.length > 0 && (
+        <VStack
           position="absolute"
           width="100%"
           mt={1}
-          zIndex="dropdown"
-          bg={inputBg}
+          bg="rgba(0, 0, 0, 0.8)"
+          backdropFilter="blur(8px)"
           borderRadius="md"
-          boxShadow="lg"
-          borderWidth="1px"
+          zIndex="dropdown"
           maxH="300px"
           overflowY="auto"
+          p={2}
         >
-          {filteredPlayers.length > 0 ? (
-            <VStack
-              divider={<StackDivider borderColor="gray.200" />}
-              spacing={2}
-              align="stretch"
-              mt={2}
-            >
-              {filteredPlayers.map((player) => (
-                <Flex
-                  key={player.id}
-                  p={3}
-                  _hover={{ bg: hoverBg, cursor: 'pointer' }}
-                  onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
-                    e.preventDefault(); // Prevent input blur
-                    onSelectPlayer(player);
-                    setSearchQuery('');
-                  }}
-                  justifyContent="space-between"
-                  alignItems="center"
-                  tabIndex={0}
-                  role="button"
-                  aria-label={`Select ${player.name}, ${player.pos} - ${player.nflTeam}`}
+          <VStack
+            divider={<StackDivider borderColor={borderColor} />}
+            spacing={0}
+            align="stretch"
+          >
+            {filteredPlayers.map((player) => (
+              <Flex
+                key={player.id}
+                width="100%"
+                p={2}
+                borderRadius="md"
+                _hover={{ bg: 'rgba(255, 255, 255, 0.1)' }}
+                cursor="pointer"
+                onClick={() => handlePlayerClick(player)}
+                alignItems="center"
+                color="white"
+              >
+                <Box flex="1" minW={0}>
+                  <Text isTruncated fontWeight="medium">
+                    {player.name}
+                  </Text>
+                  <Text isTruncated fontSize="sm" color="gray.500">
+                    {player.pos} • {player.nflTeam || 'FA'}
+                  </Text>
+                </Box>
+                <Badge 
+                  colorScheme={getPositionColor(player.pos)}
+                  borderRadius="full"
+                  px={2}
+                  py={1}
+                  variant="subtle"
+                  flexShrink={0}
+                  ml={2}
                 >
-                  <Box>
-                    <Text isTruncated fontWeight="medium">
-                      {player.name}
-                    </Text>
-                    <Text isTruncated fontSize="sm" color="gray.500">
-                      {player.pos} • {player.nflTeam}
-                    </Text>
-                  </Box>
-                  <Badge 
-                    colorScheme={getPositionColor(player.pos)}
-                    borderRadius="full"
-                    px={2}
-                    py={1}
-                  >
-                    {player.pos}
-                  </Badge>
-                </Flex>
-              ))}
-            </VStack>
-          ) : (
-            <Box p={3}>
-              <Text color="gray.500" textAlign="center">
-                {isLoading ? 'Searching...' : 'No players found'}
-              </Text>
-            </Box>
-          )}
-        </Box>
+                  {player.pos}
+                </Badge>
+              </Flex>
+            ))}
+          </VStack>
+        </VStack>
       )}
 
       {selectedPlayer && (
@@ -183,33 +191,43 @@ export const PlayerSearch = ({
           bg={inputBg} 
           borderRadius="md" 
           borderWidth="1px"
+          boxShadow="sm"
         >
-          <Flex justifyContent="space-between" alignItems="center" mb={3}>
-            <Box>
-              <Text isTruncated fontWeight="bold" fontSize="lg">
+          <Flex justifyContent="space-between" alignItems="flex-start" mb={4}>
+            <Box flex="1" minW={0}>
+              <Text isTruncated fontWeight="bold" fontSize="lg" mb={1}>
                 {selectedPlayer.name}
               </Text>
               <Text isTruncated color="gray.500" fontSize="sm">
-                {selectedPlayer.pos} • {selectedPlayer.nflTeam}
+                {selectedPlayer.pos} • {selectedPlayer.nflTeam || 'FA'}
               </Text>
             </Box>
             <Badge 
               colorScheme={getPositionColor(selectedPlayer.pos)}
+              variant="subtle"
               fontSize="0.8em"
               px={2}
               py={1}
+              flexShrink={0}
+              ml={2}
             >
               {selectedPlayer.pos}
             </Badge>
           </Flex>
-          <Input
-            type="number"
-            placeholder="Starting bid"
-            value={startingBid}
-            onChange={handleBidChange}
-            min="1"
-            mt={2}
-          />
+          
+          <Box>
+            <Text fontSize="sm" fontWeight="medium" mb={1}>
+              Starting Bid
+            </Text>
+            <Input
+              type="number"
+              value={startingBid}
+              onChange={handleBidChange}
+              placeholder="Enter starting bid"
+              size="sm"
+              autoFocus
+            />
+          </Box>
         </Box>
       )}
     </Box>

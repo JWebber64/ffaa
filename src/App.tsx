@@ -1,4 +1,4 @@
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useCallback, useMemo, useState } from "react";
 import { useDraftStore } from "./store/draftStore";
@@ -19,7 +19,7 @@ export default function App() {
   const { 
     teams, 
     players, 
-    finalizeSale, 
+    assignPlayer, 
     popNomination, 
     finishProcessingQueue,
     nominationQueue,
@@ -27,7 +27,7 @@ export default function App() {
   } = useDraftStore(state => ({
     teams: state.teams,
     players: state.players,
-    finalizeSale: state.finalizeSale,
+    assignPlayer: state.assignPlayer,
     popNomination: state.popNomination,
     finishProcessingQueue: state.finishProcessingQueue,
     nominationQueue: state.nominationQueue,
@@ -50,22 +50,20 @@ export default function App() {
   }, [players, currentPlayerId]);
 
   // Handle new bids
-  const handleBid = useCallback((teamId: string, amount: number) => {
-    const teamIdNum = Number(teamId);
-    
-    // Validate the bid
-    if (isNaN(teamIdNum) || isNaN(amount) || amount <= 0) {
-      console.error('Invalid bid parameters');
+  const handleBid = useCallback((teamId: number, amount: number) => {
+    // Validate the bid amount
+    if (isNaN(amount) || amount <= 0) {
+      console.error('Invalid bid amount');
       return;
     }
 
     // Check if the bid is higher than current bid
     if (amount > currentBid.amount) {
       setCurrentBid({
-        teamId: teamIdNum,
+        teamId: teamId,
         amount: amount
       });
-      console.log(`New high bid: $${amount} by team ${teamIdNum}`);
+      console.log(`New high bid: $${amount} by team ${teamId}`);
     } else {
       console.warn(`Bid of $${amount} is not higher than current bid of $${currentBid.amount}`);
     }
@@ -73,22 +71,21 @@ export default function App() {
 
   // Handle timer end (sold to highest bidder or passed)
   const handleTimerEnd = useCallback(async () => {
-    if (!currentPlayerId) {
+    if (!currentPlayerId || !currentPlayer) {
       console.log('No player currently being auctioned');
       return;
     }
 
     if (currentBid.teamId !== null) {
-      // Finalize the sale to the highest bidder
-      const success = finalizeSale(currentBid.teamId, currentPlayerId, currentBid.amount);
-      
-      if (success) {
-        console.log(`Sold ${currentPlayer?.name || 'player'} to team ${currentBid.teamId} for $${currentBid.amount}`);
-      } else {
-        console.error('Failed to finalize sale');
+      try {
+        // Assign the player to the winning team
+        assignPlayer(currentPlayerId, currentBid.teamId, currentBid.amount);
+        console.log(`Sold ${currentPlayer.name} to team ${currentBid.teamId} for $${currentBid.amount}`);
+      } catch (error) {
+        console.error('Failed to assign player:', error);
       }
     } else {
-      console.log(`No bids for ${currentPlayer?.name || 'player'}, passing...`);
+      console.log(`No bids for ${currentPlayer.name}, passing...`);
     }
 
     // Reset bid state
@@ -99,10 +96,10 @@ export default function App() {
       finishProcessingQueue();
     }
     popNomination();
-  }, [currentPlayerId, currentBid, finalizeSale, popNomination, finishProcessingQueue, isProcessingQueue, currentPlayer]);
+  }, [currentPlayerId, currentBid, assignPlayer, popNomination, finishProcessingQueue, isProcessingQueue, currentPlayer]);
 
   return (
-    <ChakraProvider value={defaultSystem}>
+    <ChakraProvider>
       <BrowserRouter>
         <Routes>
           <Route element={<Shell />}>
