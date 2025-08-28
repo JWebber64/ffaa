@@ -1,23 +1,33 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { ChakraProvider, defaultSystem, defineConfig } from "@chakra-ui/react";
-import App from "./App";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import App from "./AppV2";
 
-const config = defineConfig({
-  cssVarsRoot: ":root",
-  globalCss: {
-    ":root, html, body, #root": {
-      height: "100%",
-      background: "#181e28",   // dark blue/gray you want
-      color: "white",
-      margin: 0,
+// Extend the default theme with custom styles
+const theme = extendTheme({
+  styles: {
+    global: {
+      ":root, html, body, #root": {
+        height: "100%",
+        background: "#181e28",
+        color: "white",
+        margin: 0,
+      },
+    },
+  },
+  components: {
+    Button: {
+      baseStyle: {
+        fontWeight: 'semibold',
+        borderRadius: 'md',
+      },
     },
   },
 });
 
 // minimal system: start from defaultSystem and override config
 const system = {
-  ...defaultSystem,
+  ...ChakraProvider.defaultSystem,
   config,
 };
 
