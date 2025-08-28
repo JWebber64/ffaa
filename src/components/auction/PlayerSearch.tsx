@@ -140,11 +140,11 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
         </HStack>
       </HStack>
 
-      <Box borderWidth="1px" borderRadius="md" p={2} bg="white">
+      <Box borderWidth="1px" borderRadius="md" p={2} bg="gray.800" borderColor="gray.700">
         {pending ? (
           <HStack p={2} spacing={2}>
-            <Spinner size="sm" />
-            <Text fontSize="sm" color="gray.600">
+            <Spinner size="sm" color="blue.400" />
+            <Text fontSize="sm" color="gray.400">
               Searching…
             </Text>
           </HStack>
@@ -153,11 +153,10 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
             {filtered.map((p, idx) => (
               <ListItem
                 key={p.id}
-                px={2}
-                py={2}
+                p={2}
                 borderRadius="md"
-                bg={idx === focusedIndex ? 'gray.50' : 'transparent'}
-                _hover={{ bg: 'gray.50', cursor: 'pointer' }}
+                _hover={{ bg: 'gray.700' }}
+                cursor="pointer"
                 onClick={() => handleClickResult(p)}
               >
                 <HStack justify="space-between">

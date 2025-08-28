@@ -133,7 +133,7 @@ import {
           {/* Team Names */}
           <Box>
             <Text mb={2}>Team Names</Text>
-            <Grid templateColumns="repeat(2, 1fr)" spacing={3}>
+            <Grid templateColumns="repeat(2, 1fr)" gap={3}>
               {Array.from({ length: teams }).map((_, i) => (
                 <GridItem key={i}>
                   <Input
@@ -149,7 +149,7 @@ import {
           {/* Roster */}
           <Box>
             <Text mb={2}>Roster Composition</Text>
-            <Grid templateColumns="repeat(3, 1fr)" spacing={3}>
+            <Grid templateColumns="repeat(3, 1fr)" gap={3}>
               {POSITIONS.map((p) => (
                 <GridItem key={p}>
                   <HStack spacing={3} alignItems="center">

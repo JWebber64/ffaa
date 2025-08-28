@@ -37,7 +37,7 @@ export const NominationQueue = ({
   
   if (queue.length === 0) {
     return (
-      <Box p={4} bg="whiteAlpha.50" borderRadius="md">
+      <Box p={4} bg="gray.800" borderRadius="md" borderWidth="1px" borderColor="gray.700">
         <Text color="gray.400" textAlign="center">No players in nomination queue</Text>
       </Box>
     );
@@ -48,7 +48,7 @@ export const NominationQueue = ({
       <Text fontWeight="bold">Nomination Queue ({queue.length})</Text>
       
       <VStack gap={2} align="stretch">
-        <Box p={4} bg="whiteAlpha.50" borderRadius="md">
+        <Box p={4} bg="gray.800" borderRadius="md" borderWidth="1px" borderColor="gray.700">
           <Text color="gray.400" textAlign="center">No players in nomination queue</Text>
         </Box>
       ) : (
@@ -63,10 +63,10 @@ export const NominationQueue = ({
               <HStack 
                 key={`${nomination.playerId}-${index}`}
                 p={3} 
-                bg={isCurrent ? 'blue.50' : 'whiteAlpha.50'}
+                bg={isCurrent ? 'blue.900' : 'gray.800'}
                 borderRadius="md"
                 borderWidth={1}
-                borderColor={isCurrent ? 'blue.200' : 'gray.200'}
+                borderColor={isCurrent ? 'blue.500' : 'gray.700'}
                 gap={3}
               >
                 <Box flex={1}>

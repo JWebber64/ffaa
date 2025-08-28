@@ -13,5 +13,9 @@
     "typeRoots": ["./src/types", "./node_modules/@types"]
   },
   "include": ["src", "vite.config.ts"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "src/store/initDraftStore.ts",
+    "src/store/migrateToNewStore.ts"
+  ]
 }

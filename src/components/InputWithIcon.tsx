@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ReactNode, forwardRef } from 'react';
+import React, { ChangeEvent, ReactNode, forwardRef, isValidElement } from 'react';
 import { 
   Input, 
   InputGroup, 
@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { SmallCloseIcon } from '@chakra-ui/icons';
 
+
 type InputVariant = 'outline' | 'filled' | 'flushed' | 'unstyled';
 
 type InputWithIconProps = {
@@ -24,16 +25,16 @@ type InputWithIconProps = {
   placeholder?: string;
   /** Icon to display on the left side of the input */
   leftIcon?: ReactNode;
-  /** Icon to display on the right side of the input */
-  rightIcon?: ReactNode;
+  /** Icon to display on the right side of the input. Must be a valid React element. */
+  rightIcon?: React.ReactElement;
   /** Text to display as left addon */
   leftAddon?: ReactNode;
   /** Text to display as right addon */
   rightAddon?: ReactNode;
   /** Show clear button when input has value */
   showClearButton?: boolean;
-  /** Custom clear button icon */
-  clearButtonIcon?: ReactNode;
+  /** Custom clear button icon. Must be a valid React element. */
+  clearButtonIcon?: React.ReactElement;
   /** Callback when clear button is clicked */
   onClear?: () => void;
   /** Input variant */
@@ -55,7 +56,7 @@ const InputWithIcon = forwardRef<HTMLInputElement, InputWithIconProps>(({
   leftAddon,
   rightAddon,
   showClearButton = true,
-  clearButtonIcon = <SmallCloseIcon />,
+  clearButtonIcon = <SmallCloseIcon /> as React.ReactElement,
   onClear,
   variant = 'outline',
   inputProps = {},
@@ -95,22 +96,23 @@ const InputWithIcon = forwardRef<HTMLInputElement, InputWithIconProps>(({
         {...inputProps}
       />
       
-      {(showClearBtn || rightIcon) && (
+      {showClearBtn && (
         <InputRightElement>
-          {showClearBtn ? (
-            <IconButton
-              aria-label="Clear input"
-              size="xs"
-              variant="ghost"
-              colorScheme="gray"
-              color={clearButtonColor}
-              onClick={handleClear}
-              icon={clearButtonIcon}
-              _hover={{ color: 'gray.600' }}
-            />
-          ) : (
-            rightIcon
-          )}
+          <IconButton
+            aria-label="Clear input"
+            size="xs"
+            variant="ghost"
+            colorScheme="gray"
+            color={clearButtonColor}
+            onClick={handleClear}
+            icon={clearButtonIcon || <SmallCloseIcon />}
+            _hover={{ color: 'gray.600' }}
+          />
+        </InputRightElement>
+      )}
+      {!showClearBtn && rightIcon && (
+        <InputRightElement>
+          {rightIcon}
         </InputRightElement>
       )}
       

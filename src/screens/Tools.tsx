@@ -5,10 +5,10 @@ export default function Tools() {
     <Container maxW="lg" py={8}>
       <Stack spacing={3}>
         <Heading>Tools</Heading>
-        <Button variant="ghost">Undo</Button>
-        <Button variant="ghost">Redo</Button>
+        <Button variant="ghost" isDisabled>Undo</Button>
+        <Button variant="ghost" isDisabled>Redo</Button>
         <Button variant="ghost">Export CSV</Button>
-        <Button colorPalette="red" variant="outline">Reset Draft</Button>
+        <Button colorScheme="red" variant="outline">Reset Draft</Button>
       </Stack>
     </Container>
   );

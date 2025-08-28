@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { produce } from 'immer';
 
 export type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF' | 'FLEX' | 'BENCH';
+export type BasePosition = Exclude<Position, 'FLEX' | 'BENCH'>;
 
 export interface Team {
   id: number;
@@ -27,7 +28,7 @@ export interface Nomination {
   highBidder?: number;
 }
 
-interface DraftState {
+export interface DraftState {
   // state
   players: Player[];
   teams: Team[];
@@ -43,6 +44,14 @@ interface DraftState {
   setTeams: (teams: Team[]) => void;
   setCurrentBidder: (teamId?: number) => void;
   setCurrentNominatedId: (id: string | null) => void;
+  
+  // config helpers
+  setConfig: (config: {
+    teamCount: number;
+    baseBudget: number;
+    templateRoster: Record<Position, number>;
+  }) => void;
+  setTeamNames: (names: string[]) => void;
   nominate: (playerId: string, startingBid?: number) => void;
   placeBid: (playerId: string, byTeamId: number, amount: number) => void;
   assignPlayer: (playerId: string, teamId: number, price: number) => void;
@@ -76,6 +85,42 @@ export const useDraftStore = create<DraftState>()(
         setTeams: (teams: Team[]) => set({ teams }),
         setCurrentNominatedId: (id: string | null) => set({ currentNominatedId: id }),
         setCurrentBidder: (teamId?: number) => set({ currentBidder: teamId }),
+
+      // NEW: set league config (teamCount/baseBudget/templateRoster) and keep teams aligned
+      setConfig: (config) => set(produce((state: DraftState) => {
+        state.teamCount = config.teamCount;
+        state.baseBudget = config.baseBudget;
+        state.templateRoster = { ...config.templateRoster };
+
+        if (state.teams.length !== config.teamCount) {
+          const next: Team[] = [];
+          for (let i = 0; i < config.teamCount; i++) {
+            const existing = state.teams[i];
+            next.push({
+              id: i + 1,
+              name: existing?.name ?? `Team ${i + 1}`,
+              budget: existing?.budget ?? config.baseBudget,
+              roster: existing?.roster ?? {} as Record<Position, number>,
+            });
+          }
+          state.teams = next;
+        }
+      })),
+
+      // NEW: apply team names; create teams first if missing
+      setTeamNames: (names) => set(produce((state: DraftState) => {
+        if (state.teams.length !== state.teamCount) {
+          state.teams = Array.from({ length: state.teamCount }, (_, i) => ({
+            id: i + 1,
+            name: `Team ${i + 1}`,
+            budget: state.baseBudget,
+            roster: {} as Record<Position, number>,
+          }));
+        }
+        names.forEach((name, i) => {
+          if (state.teams[i]) state.teams[i].name = name || `Team ${i + 1}`;
+        });
+      })),
         nominate: (playerId: string, startingBid: number = 1) => {
           const { players, nominationQueue } = get();
           const player = players.find(p => p.id === playerId);

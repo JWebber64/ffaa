@@ -1,5 +1,14 @@
-import { HStack, VStack, Button, Text, Box, Badge, Input, InputGroup } from '@chakra-ui/react';
-import { useToast } from '@chakra-ui/toast';
+import { 
+  HStack, 
+  VStack, 
+  Button, 
+  Text, 
+  Box, 
+  Badge, 
+  Input, 
+  InputGroup,
+  useToast 
+} from '@chakra-ui/react';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 import { Player } from '../../store/draftStore';
 import { useState } from 'react';
@@ -93,21 +102,21 @@ export const AuctionControls = ({
 
   return (
     <VStack gap={4} w="100%">
-      <Box w="100%" p={4} bg="whiteAlpha.100" borderRadius="md">
+      <Box w="100%" p={4} bg="gray.800" borderRadius="md" borderWidth="1px" borderColor="gray.700">
         <HStack justify="space-between" mb={2}>
           <Box>
-            <Text fontSize="xl" fontWeight="bold">{currentPlayer.name}</Text>
+            <Text fontSize="xl" fontWeight="bold" color="white">{currentPlayer.name}</Text>
             <HStack gap={2} alignItems="center">
               <Badge colorScheme={currentPlayer.pos === 'QB' ? 'blue' : currentPlayer.pos === 'RB' ? 'green' : 'purple'}>
                 {currentPlayer.pos}
               </Badge>
-              <Text fontSize="sm" color="gray.400">{currentPlayer.nflTeam || 'FA'}</Text>
+              <Text fontSize="sm" color="gray.300">{currentPlayer.nflTeam || 'FA'}</Text>
             </HStack>
           </Box>
           <Box textAlign="right">
-            <Text fontSize="3xl" fontWeight="bold">${price}</Text>
+            <Text fontSize="3xl" fontWeight="bold" color="white">${price}</Text>
             {currentBidder !== null && (
-              <Text fontSize="sm" color="gray.400">
+              <Text fontSize="sm" color="gray.300">
                 High Bid: Team {currentBidder + 1}
               </Text>
             )}

@@ -15,12 +15,15 @@ import {
   type Team as BaseTeam,
 } from "../store/draftStore";
 
-type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'FLEX' | 'K' | 'DEF' | 'BENCH';
 type RosterPosition = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
+type Position = RosterPosition | 'FLEX' | 'BENCH';
 
-interface Player extends Omit<BasePlayer, 'pos'> {
-  pos: RosterPosition;
+// Extend BasePlayer but keep the original Position type from the store
+interface Player extends Omit<BasePlayer, 'pos' | 'slot'> {
+  pos: Position;
   slot?: Position;
+  draftedBy?: number;
+  price?: number;
 }
 
 interface Team extends Omit<BaseTeam, 'roster'> {
@@ -46,7 +49,7 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
   // Local state: simple on-device claim + rename
   const [claimed, setClaimed] = useState<Record<number, boolean>>({});
   const [editing, setEditing] = useState<number | null>(null);
-  const [nameDraft, setNameDraft] = useState<string>("");
+  const [nameDraft, setNameDraft] = useState("");
 
   const columns = teams.length;
 
@@ -104,7 +107,7 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
       // FLEX accepts RB/WR/TE (or players assigned with slot "FLEX")
       const isFlexEligible = (
         player.slot === 'FLEX' || 
-        ['RB', 'WR', 'TE'].includes(player.pos)
+        (['RB', 'WR', 'TE'] as RosterPosition[]).includes(player.pos as RosterPosition)
       );
       
       if (isFlexEligible) {

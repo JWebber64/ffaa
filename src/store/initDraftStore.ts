@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { produce } from 'immer';
-import { DraftState } from './draftStore.new';
-import { migrateStoreData } from './migrateToNewStore';
+import { DraftState } from './draftStore';
+import { migrateStoreData } from './migrateStore';
 
 // Run migration if needed
-const migratedData = migrateStoreData();
+// Start with version 0 to force migration
+const migratedData = migrateStoreData({}, 0);
 
 // Create the store with proper typing and persistence
 export const useDraftStore = create<DraftState>()(
