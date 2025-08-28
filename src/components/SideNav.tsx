@@ -17,7 +17,7 @@ const itemStyle = ({ isActive }: { isActive: boolean }) => ({
 
 export default function SideNav({ onNavigate }: Props) {
   return (
-    <VStack alignItems="stretch" gap={1} p={2}>
+    <VStack alignItems="stretch" spacing={1} p={2}>
       <NavLink to="/" style={itemStyle} onClick={onNavigate}>🏠 Home</NavLink>
       <NavLink to="/setup" style={itemStyle} onClick={onNavigate}>🛠️ Setup</NavLink>
       <NavLink to="/board" style={itemStyle} onClick={onNavigate}>📋 Draft Board</NavLink>

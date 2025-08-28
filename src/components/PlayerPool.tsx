@@ -67,7 +67,7 @@ const PositionGroup = ({ position, players, onNominate }: PositionGroupProps) =>
       
       <SimpleGrid 
         columns={{ base: 1, md: 2, lg: 3 }}
-        gap={3}
+        spacing={3}
         p={3}
         display={open ? 'grid' : 'none'}
       >
@@ -94,7 +94,7 @@ const PositionGroup = ({ position, players, onNominate }: PositionGroupProps) =>
               >
                 {p.name}
               </Text>
-              <HStack mt={1} gap={2} color="gray.700">
+              <HStack mt={1} spacing={2} color="gray.700">
                 <Badge colorScheme="blue" variant="subtle">{p.pos}</Badge>
                 <Badge variant="outline" colorScheme="gray">{p.nflTeam}</Badge>
               </HStack>
@@ -246,7 +246,7 @@ export default function PlayerPool() {
         </Box>
         
         {/* Position Filters */}
-        <Flex wrap="wrap" gap={2} justifyContent="center" mb={6}>
+        <Flex wrap="wrap" spacing={2} justifyContent="center" mb={6}>
           {['QB', 'RB', 'WR', 'TE'].map(pos => (
             <Button
               key={pos}
@@ -274,7 +274,7 @@ export default function PlayerPool() {
       </Box>
 
       {/* Players Grid */}
-      <VStack gap={6} align="stretch">
+      <VStack spacing={6} align="stretch">
         {Object.entries(playersByPosition)
           .sort(([a], [b]) => {
             const aIndex = POSITION_ORDER.indexOf(a);

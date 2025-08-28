@@ -1,433 +1,505 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Box,
   Button,
+  Card,
+  CardBody,
+  CardHeader,
   Container,
-  Heading,
+  FormControl,
+  FormLabel,
   HStack,
-  Text,
-  VStack,
-  Input,
-  InputGroup,
-  InputElement,
-  useDisclosure,
-  useBreakpointValue,
+  Heading,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
   NumberInput,
   NumberInputField,
+  NumberInputStepper,
+  SimpleGrid,
+  Text,
+  useDisclosure,
   useToast,
-  useColorModeValue
+  VStack,
 } from '@chakra-ui/react';
-import { 
-  FaSearch, 
-  FaPlus, 
-  FaMinus,
-  FaPlay,
-  FaPause,
-  FaStop
-} from 'react-icons/fa';
-import { useDraftStoreV2, type Player, type Team } from '../store/draftStoreV2';
+import { FaPlay, FaMinus, FaPlus } from 'react-icons/fa';
 import { PlayerSearch } from '../components/auction/PlayerSearch';
 
-// Types
+// Import types from the store
+import type { Player as StorePlayer } from '../store/draftStore';
+
+// Re-export the Player type for use in this file
+type Player = StorePlayer;
+
+// Team interface
+interface Team {
+  id: string;
+  name: string;
+  budget: number;
+  players: Player[];
+}
+
+// Auction state interface
 interface AuctionState {
   currentBid: number;
-  currentBidder: number | null;
-  isAuctionActive: boolean;
+  currentBidder: string | null;
   nominatedPlayer: Player | null;
+  isAuctionActive: boolean;
   teams: Team[];
 }
 
 // Constants
 const DEFAULT_TIMER_DURATION = 30; // seconds
 
-// Main component
-export const AuctioneerV2 = () => {
-  // State
+// Import the actual store if available, otherwise use a mock
+type DraftStore = {
+  players: Player[];
+  // Add other store methods as needed
+};
+
+const useDraftStoreV2 = (): DraftStore => {
+  try {
+    const draftStore = require('../store/draftStore');
+    const storeState = draftStore.useDraftStore?.getState?.();
+    return {
+      players: (storeState?.players || []) as Player[],
+      // Add other store methods as needed
+    };
+  } catch (e) {
+    console.warn('Using mock draft store');
+    return {
+      players: [],
+      // Add other required store methods here if needed
+    };
+  }
+};
+
+export const AuctioneerV2: React.FC = () => {
+  const { players } = useDraftStoreV2();
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [bidAmount, setBidAmount] = useState<number>(1);
+  const [startingBid, setStartingBid] = useState<number>(1);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [timerDuration, setTimerDuration] = useState<number>(DEFAULT_TIMER_DURATION);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [timeLeft, setTimeLeft] = useState<number>(DEFAULT_TIMER_DURATION);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
+  const isMounted = useRef(true);
+  
   const [auctionState, setAuctionState] = useState<AuctionState>({
     currentBid: 0,
     currentBidder: null,
-    isAuctionActive: false,
     nominatedPlayer: null,
-    teams: []
+    isAuctionActive: false,
+    teams: [],
   });
+
+  // Destructure auction state for easier access
+  const { currentBid, currentBidder, nominatedPlayer, isAuctionActive } = auctionState;
   
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-  const [startingBid, setStartingBid] = useState('1');
-  const [isSearchLoading, setIsSearchLoading] = useState(false);
-  
-  const [searchQuery, setSearchQuery] = useState('');
-  const [bidAmount, setBidAmount] = useState(1);
-  const [filteredPlayers, setFilteredPlayers] = useState<Player[]>([]);
-  const [timerDuration, setTimerDuration] = useState(DEFAULT_TIMER_DURATION);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  
-  // Hooks
-  const { players, teams } = useDraftStoreV2();
-  const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure({ defaultIsOpen: false });
-  const isMobile = useBreakpointValue({ base: true, md: false });
-  const cardBg = useColorModeValue('white', 'gray.800');
-  
-  // Filter players based on search query
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredPlayers(players);
-      return;
-    }
-    
-    const query = searchQuery.toLowerCase();
-    const filtered = players.filter(
-      (player) =>
-        player.name.toLowerCase().includes(query) ||
-        player.team.toLowerCase().includes(query) ||
-        player.position.toLowerCase().includes(query)
-    );
-    setFilteredPlayers(filtered);
-  }, [searchQuery, players]);
-  
-  // Handler for selecting a player from search
-  const handleSelectPlayer = useCallback((player: Player) => {
-    setSelectedPlayer(player);
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
-  // Handler for nominating a player
-  const handleNominate = useCallback((player: Player) => {
-    setAuctionState(prev => ({
+  // Filter players based on search query
+  const filteredPlayers = useMemo(() => {
+    if (!searchQuery.trim()) return players;
+    const query = searchQuery.toLowerCase();
+    return players.filter(player => 
+      player.name.toLowerCase().includes(query) ||
+      player.team.toLowerCase().includes(query) ||
+      player.pos.toLowerCase().includes(query)
+    );
+  }, [players, searchQuery]);
+  
+  // Calculate time percentage for progress bar
+  const timePercentage = useMemo(() => {
+    return (timeLeft / timerDuration) * 100;
+  }, [timeLeft, timerDuration]);
+
+  const [auctionState, setAuctionState] = useState<AuctionState>({
+    currentBid: 0,
+    currentBidder: null,
+    nominatedPlayer: null,
+    isAuctionActive: false,
+    teams: [],
+  });
+
+  // Initialize teams on component mount
+  useEffect(() => {
+    const initialTeams: Team[] = [
+      { id: '1', name: 'Team 1', budget: 200, players: [] },
+      { id: '2', name: 'Team 2', budget: 200, players: [] },
+      { id: '3', name: 'Team 3', budget: 200, players: [] },
+      { id: '4', name: 'Team 4', budget: 200, players: [] },
+    ];
+    setTeams(initialTeams);
+    setAuctionState((prev) => ({ ...prev, teams: initialTeams }));
+  }, []);
+
+  // Handle completing the auction
+  const handleCompleteAuction = useCallback(() => {
+    setAuctionState((prev) => ({
       ...prev,
-      nominatedPlayer: player,
-      isAuctionActive: true,
-      currentBid: 1,
-      currentBidder: null
+      isAuctionActive: false,
+      currentBid: 0,
+      currentBidder: null,
+      nominatedPlayer: null,
     }));
-    
-    // Show notification
     toast({
-      title: 'Player Nominated',
-      description: `${player.name} has been nominated. Starting bid: $1`,
-      status: 'info',
+      title: 'Auction completed',
+      status: 'success',
       duration: 3000,
       isClosable: true,
     });
   }, [toast]);
-  
+
+  // Toggle settings modal
+  const toggleSettings = useCallback(() => {
+    onOpen();
+  }, [onOpen]);
+
+  // Handle assigning a player to a team
+  const assignPlayer = useCallback((teamId: string, player: Player, bid: number) => {
+    setTeams((prevTeams) =>
+      prevTeams.map((team) =>
+        team.id === teamId
+          ? {
+              ...team,
+              budget: team.budget - bid,
+              players: [...team.players, { ...player, draftedBy: teamId }],
+            }
+          : team
+      )
+    );
+  }, []);
+
+  // Handle player selection
+  const handleSelectPlayer = useCallback((player: Player) => {
+    setSelectedPlayer(player);
+  }, []);
+
+  // Handle nominating a player for auction
+  const handleNominate = useCallback((player: Player) => {
+    setAuctionState((prev) => ({
+      ...prev,
+      nominatedPlayer: player,
+      isAuctionActive: true,
+      currentBid: startingBid,
+      currentBidder: null,
+    }));
+
+    // Show notification
+    toast({
+      title: 'Player Nominated',
+      description: `${player.name} has been nominated. Starting bid: $${startingBid}`,
+      status: 'info',
+      duration: 3000,
+      isClosable: true,
+    });
+  }, [startingBid, toast]);
+
+  // Handle bid amount changes
+  const handleBidAmountChange = useCallback((value: number) => {
+    setBidAmount(value);
+  }, []);
+
   // Handle placing a bid
-  const handlePlaceBid = (teamId: string) => {
-    if (!auctionState.nominatedPlayer) return;
-    
-    const team = auctionState.teams.find(t => t.id === teamId);
-    if (!team || team.budget < bidAmount) {
+  const handlePlaceBid = useCallback((teamId: string) => {
+    if (bidAmount <= auctionState.currentBid) {
       toast({
-        title: 'Bid Failed',
-        description: 'Insufficient budget for this bid',
-        status: 'error',
-        duration: 3000,
+        title: 'Bid too low',
+        description: `Bid must be higher than current bid of $${auctionState.currentBid}`,
+        status: 'warning',
+        duration: 2000,
         isClosable: true,
       });
       return;
     }
-    
-    setAuctionState(prev => ({
+
+    const team = auctionState.teams.find((t) => t.id === teamId);
+    if (!team) return;
+
+    if (bidAmount > team.budget) {
+      toast({
+        title: 'Insufficient funds',
+        description: `${team.name} doesn't have enough budget for this bid`,
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    setAuctionState((prev) => ({
       ...prev,
       currentBid: bidAmount,
-      currentBidder: teamId
+      currentBidder: teamId,
     }));
-    
-    // Update bid in the store
-    // This would be handled by your store's action
-    
-    toast({
-      title: 'Bid Placed',
-      description: `${team.name} bid $${bidAmount} on ${auctionState.nominatedPlayer?.name}`,
-      status: 'success',
-      duration: 2000,
-      isClosable: true,
-    });
-  };
-  
-  // Handle auction completion
-  const handleCompleteAuction = () => {
-    if (!auctionState.nominatedPlayer || !auctionState.currentBidder) {
-      // No bidder, player goes unclaimed
+
+    // Reset timer on new bid
+  }, [auctionState.currentBid, auctionState.teams, bidAmount, toast]);
+
+  // Handle passing on a bid
+  const handlePass = useCallback(() => {
+    if (!auctionState.currentBidder) {
       toast({
-        title: 'Auction Complete',
-        description: `${auctionState.nominatedPlayer?.name} went unclaimed`,
-        status: 'info',
-        duration: 3000,
+        title: 'No active bid',
+        description: 'There is no active bid to pass on',
+        status: 'warning',
+        duration: 2000,
         isClosable: true,
       });
-    } else {
-      // Player was won by a team
-      const winningTeam = auctionState.teams.find(t => t.id === auctionState.currentBidder);
-      toast({
-        title: 'Auction Complete',
-        description: `${auctionState.nominatedPlayer?.name} sold to ${winningTeam?.name} for $${auctionState.currentBid}`,
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
-      
-      // Update team roster and budget
-      // This would be handled by your store's action
+      return;
     }
-    
-    // Reset auction state
-    setAuctionState(prev => ({
+
+    // In a real implementation, you would track which teams have passed
+    // For now, just clear the current bidder
+    setAuctionState((prev) => ({ ...prev, currentBidder: null }));
+  }, [auctionState.currentBidder, toast]);
+
+  // Handle selling the player to the highest bidder
+  const handleSellPlayer = useCallback(() => {
+    if (!auctionState.currentBidder || !auctionState.nominatedPlayer) return;
+
+    const team = teams.find((t) => t.id === auctionState.currentBidder);
+    if (!team) return;
+
+    // Update team's budget and players
+    setTeams((prevTeams) =>
+      prevTeams.map((t) =>
+        t.id === team.id
+          ? {
+              ...t,
+              budget: t.budget - auctionState.currentBid,
+              players: [...t.players, { ...auctionState.nominatedPlayer!, draftedBy: team.id }],
+            }
+          : t
+      )
+    );
+
+    setAuctionState((prev) => ({
       ...prev,
       isAuctionActive: false,
-      nominatedPlayer: null,
-      currentBid: 1,
-      currentBidder: null
-    }));
-    
-    // Reset bid amount
-    setBidAmount(1);
-    
-    // End the auction in the store
-    endAuction();
-  };
-  
-  // Handle pass
-  const handlePass = () => {
-    // This would be handled by your store's action
-    // to move to the next team in the nomination order
-    
-    setAuctionState(prev => ({
-      ...prev,
+      currentBid: 0,
       currentBidder: null,
-      currentBid: 1
+      nominatedPlayer: null,
     }));
-    
-    setBidAmount(1);
-  };
-  
-  // Render
+
+    toast({
+      title: 'Player Sold!',
+      description: `${auctionState.nominatedPlayer.name} sold to ${team.name} for $${auctionState.currentBid}`,
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+  }, [auctionState.currentBidder, auctionState.nominatedPlayer, auctionState.currentBid, teams, toast]);
+
   return (
     <Container maxW="container.xl" py={8}>
       <VStack spacing={6} align="stretch">
         {/* Header */}
-        <Box>
-          <Heading as="h1" size="xl" mb={2}>Fantasy Football Auction</Heading>
-          <Text color="gray.500">Draft your ultimate fantasy football team</Text>
-        </Box>
-        
-        {/* Main Content */}
-        <Stack direction={{ base: 'column', md: 'row' }} spacing={6} align="stretch">
-          {/* Left Panel - Player Search and List */}
+        <HStack justify="space-between" align="center">
+          <Box>
+            <Heading as="h1" size="xl" mb={2}>
+              Fantasy Football Auction
+            </Heading>
+            <Text color="gray.500">Draft your ultimate fantasy football team</Text>
+          </Box>
+          <Button onClick={toggleSettings} colorScheme="blue">
+            Settings
+          </Button>
+        </HStack>
+
+        {/* Main content */}
+        <HStack align="start" spacing={6}>
+          {/* Player search and list */}
           <Box flex={1}>
             <PlayerSearch
               players={players}
               onSelectPlayer={handleSelectPlayer}
+              onNominate={handleNominate}
               selectedPlayer={selectedPlayer}
-              onSetStartingBid={setStartingBid}
               startingBid={startingBid}
-              isLoading={isSearchLoading}
+              onStartingBidChange={setStartingBid}
             />
-            
-            <Card mt={4}>
-              <CardHeader>
-                <Heading size="md">Available Players</Heading>
-              </CardHeader>
-              <CardBody>
-                <Stack spacing={4}>
-                  {filteredPlayers.map((player) => (
-                    <Box 
-                      key={player.id}
-                      p={3} 
-                      borderWidth="1px" 
-                      borderRadius="md"
-                      _hover={{ bg: 'gray.50', cursor: 'pointer' }}
-                      onClick={() => handleNominate(player)}
-                    >
-                      <HStack justify="space-between">
-                        <Box>
-                          <Text fontWeight="bold">{player.name}</Text>
-                          <Text fontSize="sm" color="gray.500">
-                            {player.pos} • {player.nflTeam}
-                          </Text>
-                        </Box>
-                        <Button 
-                          size="sm" 
-                          colorScheme="blue"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedPlayer(player);
-                            onOpen();
-                          }}
-                        >
-                          Nominate
+          </Box>
+
+          {/* Auction controls */}
+          <Box flex={1}>
+            {/* Right Panel - Auction Controls */}
+            <Box w={{ base: '100%', md: '350px' }}>
+              <Card>
+                <CardHeader>
+                  <Heading size="md">Auction Controls</Heading>
+                </CardHeader>
+                <CardBody>
+                  {auctionState.isAuctionActive ? (
+                    <VStack spacing={4}>
+                      <Text fontSize="lg" fontWeight="bold">
+                        {auctionState.nominatedPlayer?.name} - ${auctionState.currentBid}
+                      </Text>
+                      <Text>
+                        {auctionState.currentBidder
+                          ? `Current Bid: ${teams.find((t) => t.id === auctionState.currentBidder)?.name ||
+                              'Team ' + auctionState.currentBidder}`
+                          : 'No bids yet'}
+                      </Text>
+                      <HStack spacing={4} wrap="wrap">
+                        {teams.map((team) => (
+                          <Button
+                            key={team.id}
+                            colorScheme="green"
+                            onClick={() => handlePlaceBid(team.id)}
+                            isDisabled={team.budget < auctionState.currentBid + 1}
+                          >
+                            {team.name} (${team.budget})
+                          </Button>
+                        ))}
+                      </HStack>
+                      <HStack spacing={4} w="100%">
+                        <Button colorScheme="red" onClick={handlePass} flex={1}>
+                          Pass
+                        </Button>
+                        <Button colorScheme="blue" onClick={handleCompleteAuction} flex={1}>
+                          Complete Auction
                         </Button>
                       </HStack>
-                    </Box>
-                  ))}
-                </Stack>
-              </CardBody>
-            </Card>
+                    </VStack>
+                  ) : (
+                    <VStack spacing={4}>
+                      <Text>No active auction. Select a player to nominate.</Text>
+                      <Button leftIcon={<FaPlay />} colorScheme="blue" onClick={toggleSettings}>
+                        Auction Settings
+                      </Button>
+                    </VStack>
+                  )}
+                </CardBody>
+              </Card>
+            </Box>
           </Box>
-          
-          {/* Right Panel - Auction Controls */}
-          <Box w={{ base: '100%', md: '350px' }}>
-            <Card>
-              <CardHeader>
-                <Heading size="md">Auction Controls</Heading>
-            </CardHeader>
-            <CardBody>
-              <Stack spacing={4}>
-                {filteredPlayers.map((player) => (
-                  <Box 
-                    key={player.id}
-                    p={3} 
-                    borderWidth="1px" 
-                    borderRadius="md"
-                    _hover={{ bg: 'gray.50', cursor: 'pointer' }}
-                    onClick={() => handleNominate(player)}
-                  >
-                    <Text fontWeight="bold">{player.name}</Text>
-                    <Text fontSize="sm" color="gray.500">{player.position} • {player.team}</Text>
-                  </Box>
-                ))}
-              </Stack>
-            </CardBody>
-          </Card>
-          
-          {/* Current Auction */}
-          <Card>
-            <CardHeader>
-              <Heading size="md">
-                {auctionState.isAuctionActive 
-                  ? `Auction: ${auctionState.nominatedPlayer?.name}` 
-                  : 'No Active Auction'}
-              </Heading>
-            </CardHeader>
-            <CardBody>
-              {auctionState.isAuctionActive ? (
-                <VStack spacing={4}>
-                  <Box textAlign="center">
-                    <Text fontSize="4xl" fontWeight="bold">
-                      ${auctionState.currentBid}
-                    </Text>
-                    <Text color="gray.500">
-                      {auctionState.currentBidder 
-                        ? `Current Bid: Team ${auctionState.currentBidder}` 
-                        : 'No bids yet'}
-                    </Text>
-                  </Box>
-                  
-                  <HStack spacing={4} justify="center">
-                    <Button 
-                      leftIcon={<FaPlus />} 
-                      colorScheme="green"
-                      onClick={() => setBidAmount(prev => prev + 1)}
+        </HStack>
+
+        {/* Team Rosters */}
+        <Box mt={6}>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
+            {teams.map((team) => (
+              <Card key={team.id}>
+                <CardBody>
+                  <VStack align="stretch" spacing={4}>
+                    <Box>
+                      <Heading size="md">{team.name}</Heading>
+                      <Text>Budget: ${team.budget}</Text>
+                      <Text>{team.players.length} players</Text>
+                    </Box>
+
+                    <HStack>
+                      <Button
+                        leftIcon={<FaMinus />}
+                        size="sm"
+                        onClick={() => setBidAmount((prev) => Math.max(1, prev - 1))}
+                      />
+                      <NumberInput
+                        value={bidAmount}
+                        min={1}
+                        max={200}
+                        onChange={(value) => handleBidAmountChange(Number(value))}
+                        w="100px"
+                      >
+                        <NumberInputField />
+                        <NumberInputStepper>
+                          <NumberIncrementStepper />
+                          <NumberDecrementStepper />
+                        </NumberInputStepper>
+                      </NumberInput>
+                      <Button
+                        leftIcon={<FaPlus />}
+                        size="sm"
+                        onClick={() => setBidAmount((prev) => Math.min(200, prev + 1))}
+                      />
+                    </HStack>
+
+                    <Button
+                      colorScheme="blue"
+                      onClick={() => handlePlaceBid(team.id)}
+                      isDisabled={!auctionState.isAuctionActive || team.budget < bidAmount}
                     >
-                      Raise
+                      Bid ${bidAmount}
                     </Button>
-                    <Button 
-                      leftIcon={<FaMinus />} 
-                      colorScheme="red"
-                      onClick={() => setBidAmount(prev => Math.max(1, prev - 1))}
-                    >
-                      Lower
-                    </Button>
-                  </HStack>
-                  
-                  <Button 
-                    colorScheme="blue" 
-                    w="full"
-                    onClick={() => handlePlaceBid('team1')} // Replace with actual team selection
-                  >
-                    Place Bid (${bidAmount})
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    w="full"
-                    onClick={handlePass}
-                  >
-                    Pass
-                  </Button>
-                  
-                  <Button 
-                    colorScheme="purple" 
-                    w="full"
-                    onClick={handleCompleteAuction}
-                  >
-                    Sell Player
-                  </Button>
-                </VStack>
-              ) : (
-                <Text color="gray.500" textAlign="center">
-                  Nominate a player to start the auction
-                </Text>
-              )}
-            </CardBody>
-          </Card>
-          
-          {/* Team Rosters */}
-          <Card>
-            <CardHeader>
-              <Heading size="md">Team Rosters</Heading>
-            </CardHeader>
-            <CardBody>
-              <VStack spacing={4} align="stretch">
-                {teams.map((team) => (
-                  <Box key={team.id} p={3} borderWidth="1px" borderRadius="md">
-                    <Text fontWeight="bold">{team.name}</Text>
-                    <Text fontSize="sm" color="gray.500">
-                      Budget: ${team.budget} • Players: {team.players?.length || 0}
-                    </Text>
-                  </Box>
-                ))}
-              </VStack>
-            </CardBody>
-          </Card>
-        </Stack>
+
+                    {auctionState.currentBidder === team.id && (
+                      <Text color="green.500" fontWeight="bold">
+                        Current High Bid: ${auctionState.currentBid}
+                      </Text>
+                    )}
+                  </VStack>
+                </CardBody>
+              </Card>
+            ))}
+          </SimpleGrid>
+        </Box>
       </VStack>
-      
-      {/* Settings Modal */}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Auction Settings</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <FormControl>
-              <FormLabel>Timer Duration (seconds)</FormLabel>
-              <NumberInput 
-                min={10} 
-                max={60} 
-                value={timerDuration}
-                onChange={(value) => setTimerDuration(Number(value))}
-              >
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Save
-            </Button>
-            <Button onClick={onClose}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </Container>
-        description: `${player.name} has been nominated for $1`,
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
-      
-      // Start the auction
-      startAuction();
-      startTimer();
-    } else {
-      toast({
-        title: 'Nomination failed',
-        description: result.error,
-        status: 'error',
+
+    {/* Settings Modal */}
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Auction Settings</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody pb={6}>
+          <FormControl>
+            <FormLabel>Starting Bid</FormLabel>
+            <NumberInput
+              value={startingBid}
+              min={1}
+              max={200}
+              onChange={(value) => setStartingBid(Number(value))}
+            >
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </FormControl>
+
+          <FormControl mt={4}>
+            <FormLabel>Timer Duration (seconds)</FormLabel>
+            <NumberInput
+              value={timerDuration}
+              min={10}
+              max={60}
+              onChange={(value) => setTimerDuration(Number(value))}
+            >
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </FormControl>
+        </ModalBody>
+
+        <ModalFooter>
+          <Button colorScheme="blue" mr={3} onClick={onClose}>
+            Save
+          </Button>
+          <Button onClick={onClose}>Cancel</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+};
         duration: 5000,
         isClosable: true,
       });
@@ -435,34 +507,42 @@ export const AuctioneerV2 = () => {
   }, [nominatePlayer, selectedTeamId, startAuction, startTimer, toast]);
   
   // Handle player assignment (winning bid)
-  const handleAssignPlayer = useCallback(async () => {
-    if (!currentPlayer || currentBid === null) return;
+  const handleAssignPlayer = useCallback((teamId: string, player: Player, bidAmount: number) => {
+    if (!isMounted.current) return;
     
-    const winningTeamId = currentBid.teamId;
-    const result = await assignPlayer(currentPlayer.id, winningTeamId, currentBid.amount);
-    
-    if (result.ok) {
+    setAuctionState((prevState: AuctionState) => {
+      if (!player) return prevState;
+      
+      const updatedTeams = prevState.teams.map(team => {
+        if (team.id === teamId) {
+          return {
+            ...team,
+            budget: team.budget - bidAmount,
+            players: [...team.players, player]
+          };
+        }
+        return team;
+      });
+
+      // Show success notification
       toast({
-        title: 'Player assigned',
-        description: `${currentPlayer.name} has been assigned to ${teams.find(t => t.id === winningTeamId)?.name} for $${currentBid.amount}`,
+        title: 'Player Sold!',
+        description: `${player.name} sold to ${updatedTeams.find(t => t.id === teamId)?.name} for $${bidAmount}`,
         status: 'success',
         duration: 5000,
         isClosable: true,
       });
-      
-      // Stop the timer and reset
-      stopTimer();
-      resetTimer();
-    } else {
-      toast({
-        title: 'Assignment failed',
-        description: result.error,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  }, [assignPlayer, currentBid, currentPlayer, resetTimer, stopTimer, teams, toast]);
+
+      return {
+        ...prevState,
+        teams: updatedTeams,
+        currentBid: 0,
+        currentBidder: null,
+        nominatedPlayer: null,
+        isAuctionActive: false
+      };
+    });
+  }, [toast]);
   
   // Set up voice recognition
   const voiceTeams = useMemo(() => 
@@ -498,27 +578,136 @@ export const AuctioneerV2 = () => {
     }
   }, [recognitionError, toast]);
   
+  const [searchQuery, setSearchQuery] = useState('');
+  
   // Filter players based on search query
   const filteredPlayers = useMemo(() => {
-    if (!searchQuery.trim()) return [];
+    if (!searchQuery) return players;
     const query = searchQuery.toLowerCase();
-    return players.filter(
-      player => 
-        player.name.toLowerCase().includes(query) ||
-        player.pos.toLowerCase().includes(query) ||
-        (player.nflTeam?.toLowerCase().includes(query) ?? false)
-    );
+    return players.filter(player => {
+      if (!player) return false;
+      const playerName = player.name?.toLowerCase() || '';
+      const playerPos = (player.pos || player.position || '').toLowerCase();
+      const playerTeam = (player.team || player.nflTeam || '').toLowerCase();
+      
+      return (
+        playerName.includes(query) ||
+        playerPos.includes(query) ||
+        playerTeam.includes(query)
+      );
+    });
   }, [players, searchQuery]);
-  // Calculate time percentage for progress bar
-  const timePercentage = (timeLeft / 60) * 100;
+  // Timer state
+  const [timeLeft, setTimeLeft] = useState(timerDuration);
   
+  // Calculate time percentage for progress bar
+  const timePercentage = useMemo(() => (timeLeft / timerDuration) * 100, [timeLeft, timerDuration]);
+      )
+    );
+  }, []);
+
+  // Handle selling the player to the highest bidder
+  const handleSellPlayer = useCallback(() => {
+    const { currentBidder, nominatedPlayer, currentBid } = auctionState;
+    if (!currentBidder || !nominatedPlayer) return;
+    
+    setTeams(prevTeams => {
+      const teamIndex = prevTeams.findIndex(t => t.id === currentBidder);
+      if (teamIndex === -1) return prevTeams;
+      
+      const updatedTeams = [...prevTeams];
+      const team = { ...updatedTeams[teamIndex] };
+      
+      if (team.budget < currentBid) {
+        toast({
+          title: 'Insufficient Budget',
+          description: `${team.name} doesn't have enough budget for this bid`,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+        return prevTeams;
+      }
+      
+      // Update team's budget and add player
+      team.budget -= currentBid;
+      team.players = [...team.players, { ...nominatedPlayer, draftedBy: currentBidder }];
+      updatedTeams[teamIndex] = team;
+      
+      // Update auction state
+      setAuctionState(prev => ({
+        ...prev,
+        isAuctionActive: false,
+        currentBidder: null,
+        nominatedPlayer: null,
+        currentBid: 0,
+      }));
+      
+      toast({
+        title: 'Player Sold!',
+        description: `${nominatedPlayer.name} sold to ${team.name} for $${currentBid}`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      
+      return updatedTeams;
+    });
+  }, [auctionState, toast]);
+    
+    // Update team's budget and players
+    handleAssignPlayer(team.id, nominatedPlayer, currentBid);
+    
+    toast({
+      title: 'Player Sold!',
+      description: `${nominatedPlayer.name} sold to ${team.name} for $${currentBid}`,
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+    
+    // Reset auction state
+    setAuctionState(prev => ({
+      ...prev,
+      isAuctionActive: false,
+      currentBid: 0,
+      currentBidder: null,
+      nominatedPlayer: null,
+    }));
+  }, [auctionState, teams, handleAssignPlayer, toast]);
+  
+  // Timer effect
+  useEffect(() => {
+    if (!auctionState.isAuctionActive) return;
+    
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          if (auctionState.currentBidder && auctionState.nominatedPlayer) {
+            handleSellPlayer();
+          }
+          return timerDuration;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [auctionState.isAuctionActive, auctionState.currentBidder, auctionState.nominatedPlayer, handleSellPlayer, timerDuration]);
+
   return (
-    <Container maxW="container.xl" py={4}>
+    <Container maxW="container.xl" py={8}>
       <VStack spacing={6} align="stretch">
         {/* Header */}
         <HStack justify="space-between" align="center">
-          <Heading size="lg">Auction Draft</Heading>
-          <HStack>
+          <Box>
+            <Heading size="xl">Fantasy Football Auction</Heading>
+            <Text color="gray.500">Draft your ultimate fantasy football team</Text>
+          </Box>
+          <Button onClick={onOpen} colorScheme="blue">
+            Settings
+          </Button>
             <SettingsButton onClick={onSettingsOpen} />
             <Button
               leftIcon={<FaUndo />}
@@ -603,9 +792,14 @@ export const AuctioneerV2 = () => {
         </Card>
         
         {/* Bid controls */}
+        {/* Auction Controls */}
         <Card>
           <CardHeader>
-            <Heading size="md">Place Bid</Heading>
+            <Heading size="md">
+              {auctionState.isAuctionActive 
+                ? `Auction in Progress - $${auctionState.currentBid}` 
+                : 'Auction Controls'}
+            </Heading>
           </CardHeader>
           <CardBody>
             <VStack spacing={4}>
@@ -730,6 +924,55 @@ export const AuctioneerV2 = () => {
           </CardBody>
         </Card>
       </VStack>
+
+      {/* Settings Modal */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Auction Settings</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl>
+              <FormLabel>Starting Bid</FormLabel>
+              <NumberInput
+                value={startingBid}
+                min={1}
+                max={200}
+                onChange={(value) => setStartingBid(Number(value))}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+            </FormControl>
+
+            <FormControl mt={4}>
+              <FormLabel>Timer Duration (seconds)</FormLabel>
+              <NumberInput
+                value={timerDuration}
+                min={10}
+                max={60}
+                onChange={(value) => setTimerDuration(Number(value))}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+            </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Save
+            </Button>
+            <Button onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Container>
   );
 };

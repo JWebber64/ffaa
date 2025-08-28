@@ -8,9 +8,9 @@ import {
   Text,
   Badge,
   Flex,
-  StackSeparator
+  StackDivider
 } from '@chakra-ui/react';
-import { useColorModeValue } from '@chakra-ui/color-mode';
+import { useColorModeValue } from '@chakra-ui/react';
 import { SearchIcon, CloseIcon } from '@chakra-ui/icons';
 import type { Player } from '../../store/draftStore';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -79,19 +79,20 @@ export const PlayerSearch = ({
 
   return (
     <Box position="relative" width="100%" mb={4}>
-      <InputGroup
-        startElement={<SearchIcon color="gray.300" />}
-        endElement={
-          searchQuery ? (
+      <InputGroup>
+        <Box position="absolute" left="8px" top="50%" transform="translateY(-50%)" zIndex={1}>
+          <SearchIcon color="gray.300" />
+        </Box>
+        {searchQuery && (
+          <Box position="absolute" right="8px" top="50%" transform="translateY(-50%)" zIndex={1}>
             <CloseIcon
               color="gray.400"
               cursor="pointer"
               onClick={handleClearSearch}
               _hover={{ color: 'gray.600' }}
             />
-          ) : undefined
-        }
-      >
+          </Box>
+        )}
         <Input
           type="text"
           placeholder="Search players..."
@@ -125,8 +126,8 @@ export const PlayerSearch = ({
         >
           {filteredPlayers.length > 0 ? (
             <VStack
-              separator={<StackSeparator borderColor="gray.200" />}
-              gap={2}
+              divider={<StackDivider borderColor="gray.200" />}
+              spacing={2}
               align="stretch"
               mt={2}
             >
@@ -147,10 +148,10 @@ export const PlayerSearch = ({
                   aria-label={`Select ${player.name}, ${player.pos} - ${player.nflTeam}`}
                 >
                   <Box>
-                    <Text truncate fontWeight="medium">
+                    <Text isTruncated fontWeight="medium">
                       {player.name}
                     </Text>
-                    <Text truncate fontSize="sm" color="gray.500">
+                    <Text isTruncated fontSize="sm" color="gray.500">
                       {player.pos} • {player.nflTeam}
                     </Text>
                   </Box>
@@ -185,10 +186,10 @@ export const PlayerSearch = ({
         >
           <Flex justifyContent="space-between" alignItems="center" mb={3}>
             <Box>
-              <Text truncate fontWeight="bold" fontSize="lg">
+              <Text isTruncated fontWeight="bold" fontSize="lg">
                 {selectedPlayer.name}
               </Text>
-              <Text color="gray.500" fontSize="sm">
+              <Text isTruncated color="gray.500" fontSize="sm">
                 {selectedPlayer.pos} • {selectedPlayer.nflTeam}
               </Text>
             </Box>

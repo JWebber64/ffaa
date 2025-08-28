@@ -10,7 +10,7 @@ export default function Home() {
         and export results—dark blues & grays theme.
       </Text>
 
-      <Stack gap={3} maxW="sm">
+      <Stack spacing={3} maxW="sm">
         <NavLink to="/setup" style={{ textDecoration: "none" }}>
           <Button bg="#2372b2" width="100%">Start New Draft</Button>
         </NavLink>

@@ -120,7 +120,7 @@ export default function Results({ teams }: ResultsProps) {
     <Container maxW="6xl" py={8}>
       <HStack justifyContent="space-between" alignItems="center" mb={4}>
         <Heading>Draft Results</Heading>
-        <HStack gap={3}>
+        <HStack spacing={3}>
           {/* sort key */}
           <select
             value={sortKey}
@@ -179,7 +179,7 @@ export default function Results({ teams }: ResultsProps) {
         <Heading size="sm" mb={2}>
           Team Summary
         </Heading>
-        <Stack gap={1} fontSize="sm">
+        <Stack spacing={1} fontSize="sm">
           {teams.map((t) => {
             const teamNo = t.id + 1;
             const spent = spendByTeam.get(teamNo) ?? 0;

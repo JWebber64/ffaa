@@ -28,14 +28,14 @@ export default function TopNav({ onMenu }: Props) {
       zIndex={40}
     >
       <HStack height="100%" justifyContent="space-between" px={{ base: 3, md: 6 }}>
-        <HStack gap={3}>
+        <HStack spacing={3}>
           <Button display={{ base: "inline-flex", lg: "none" }} onClick={onMenu} variant="outline" size="sm">
             ☰
           </Button>
 
           <Text fontWeight="bold">🏈 FFAA</Text>
 
-          <HStack gap={2} display={{ base: "none", md: "flex" }}>
+          <HStack spacing={2} display={{ base: "none", md: "flex" }}>
             <NavLink to="/" style={linkStyle}>Home</NavLink>
             <NavLink to="/setup" style={linkStyle}>Setup</NavLink>
             <NavLink to="/board" style={linkStyle}>Board</NavLink>
@@ -45,7 +45,7 @@ export default function TopNav({ onMenu }: Props) {
           </HStack>
         </HStack>
 
-        <HStack gap={2}>
+        <HStack spacing={2}>
           {pathname !== "/auctioneer" && (
             <NavLink to="/auctioneer" style={{ textDecoration: "none" }}>
               <Button size="sm" bg="#2372b2">Start Auction</Button>

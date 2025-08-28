@@ -70,11 +70,11 @@ import {
   
     return (
       <Container maxW="3xl" py={8}>
-        <Stack gap={6}>
+        <Stack spacing={6}>
           <Heading>Draft Setup</Heading>
   
           {/* Row: Managers, Budget, Summary */}
-          <HStack gap={4} alignItems="center" flexWrap="wrap">
+          <HStack spacing={4} alignItems="center" flexWrap="wrap">
             <HStack gap={2} alignItems="center">
               <Text>Managers</Text>
               {/* Use native select to avoid Chakra v3 slot typing */}
@@ -133,7 +133,7 @@ import {
           {/* Team Names */}
           <Box>
             <Text mb={2}>Team Names</Text>
-            <Grid templateColumns="repeat(2, 1fr)" gap={3}>
+            <Grid templateColumns="repeat(2, 1fr)" spacing={3}>
               {Array.from({ length: teams }).map((_, i) => (
                 <GridItem key={i}>
                   <Input
@@ -149,10 +149,10 @@ import {
           {/* Roster */}
           <Box>
             <Text mb={2}>Roster Composition</Text>
-            <Grid templateColumns="repeat(3, 1fr)" gap={3}>
+            <Grid templateColumns="repeat(3, 1fr)" spacing={3}>
               {POSITIONS.map((p) => (
                 <GridItem key={p}>
-                  <HStack gap={3} alignItems="center">
+                  <HStack spacing={3} alignItems="center">
                     <Text w="70px">{p}</Text>
                     <input
                       type="number"

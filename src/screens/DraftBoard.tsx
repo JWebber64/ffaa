@@ -126,7 +126,7 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
     } as const;
 
     return (
-      <Stack gap={3}>
+      <Stack spacing={3}>
         {slotRows.map(({ key, label, count }) =>
           Array.from({ length: count }).map((_, i) => {
             const draftedHere = pile[key]?.[i];
@@ -178,7 +178,7 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
         <Box
           display="grid"
           gridTemplateColumns={`repeat(${columns}, ${COL_WIDTH}px)`}
-          gap="12px"
+          spacing="12px"
           p="12px"
           minW={`${columns * (COL_WIDTH + 12)}px`}
         >
@@ -191,7 +191,7 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
               p={3}
             >
               {/* Column header */}
-              <Stack alignItems="center" mb={2} gap={2}>
+              <Stack alignItems="center" mb={2} spacing={2}>
                 <Button
                   size="sm"
                   bg="#10b3a5"

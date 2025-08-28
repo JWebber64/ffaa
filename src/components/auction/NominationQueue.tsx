@@ -44,7 +44,7 @@ export const NominationQueue = ({
   }
 
   return (
-    <VStack align="stretch" gap={4}>
+    <VStack align="stretch" spacing={4}>
       <Text fontWeight="bold">Nomination Queue ({queue.length})</Text>
       
       <VStack gap={2} align="stretch">
@@ -92,7 +92,7 @@ export const NominationQueue = ({
                     <Button 
                       size="xs" 
                       colorScheme="blue"
-                      disabled={!!currentPlayerId}
+                      isDisabled={!!currentPlayerId}
                       onClick={() => onStartAuction(nomination.playerId)}
                     >
                       Start Auction
