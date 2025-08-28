@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useCallback, useMemo, useState } from "react";
 import { useDraftStore } from "./store/draftStore";
 import Shell from "./layouts/Shell";
+import { useGlobalPlayers } from "./hooks/useGlobalPlayers";
 
 // screens
 import Home from "./screens/Home";
@@ -16,6 +17,9 @@ import PlayerPool from "./components/PlayerPool";
 const Tools = () => <div style={{ padding: 16 }}>Tools coming soon…</div>;
 
 export default function App() {
+  // Load players globally once
+  const { loading: playersLoading } = useGlobalPlayers();
+  
   const { 
     teams, 
     players, 
@@ -102,7 +106,7 @@ export default function App() {
     <ChakraProvider>
       <BrowserRouter>
         <Routes>
-          <Route element={<Shell />}>
+          <Route element={<Shell globalLoading={playersLoading} />}>
             <Route index element={<Home />} />
             <Route path="/setup" element={<Setup />} />
             <Route path="/board" element={<DraftBoard teams={teams} />} />

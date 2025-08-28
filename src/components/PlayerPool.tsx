@@ -1,24 +1,13 @@
-import { useSleeperPlayers } from "../hooks/useSleeperPlayers";
 import { 
-  Spinner, Box, Button, Text, VStack, HStack, 
-  useDisclosure, Input, SimpleGrid, 
-  Badge, Flex
+  Box, Button, Text, VStack, HStack, 
+  Input, InputRightElement, useDisclosure,
+  Badge, SimpleGrid, IconButton
 } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
-import { useDraftStore, Player } from "../store/draftStore";
+import { useDraftStore, Player, BasePosition } from "../store/draftStore";
 import { useState, useMemo, useCallback } from "react";
+import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
 
-const POSITION_ORDER = ['QB', 'RB', 'WR', 'TE'];
-
-// Extend Chakra UI types to include missing props
-declare module '@chakra-ui/react' {
-  interface TextProps {
-    noOfLines?: number;
-  }
-  interface ButtonProps {
-    rightIcon?: React.ReactElement;
-  }
-}
+const POSITION_ORDER: BasePosition[] = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'];
 
 interface PositionGroupProps {
   position: string;
@@ -27,32 +16,22 @@ interface PositionGroupProps {
 }
 
 const PositionGroup = ({ position, players, onNominate }: PositionGroupProps) => {
-  const { open, onToggle } = useDisclosure({ defaultOpen: true });
-  const bgColor = 'white';
-  const headerBg = 'blue.500';
-  const hoverBg = 'blue.600';
+  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: true });
   
   return (
-    <Box 
-      borderWidth="1px" 
-      borderRadius="lg" 
-      overflow="hidden" 
-      mb={4}
-      bg={bgColor}
-      boxShadow="sm"
-    >
+    <Box borderWidth="1px" borderRadius="lg" overflow="hidden" mb={4} bg="white" boxShadow="sm">
       <Box 
         as="button"
         onClick={onToggle}
         p={3}
-        bg={headerBg}
+        bg="blue.500"
         color="white"
         width="100%"
         textAlign="left"
         display="flex"
         justifyContent="space-between"
         alignItems="center"
-        _hover={{ bg: hoverBg }}
+        _hover={{ bg: 'blue.600' }}
       >
         <HStack>
           <Text fontWeight="bold" fontSize="lg">{position}</Text>
@@ -61,254 +40,251 @@ const PositionGroup = ({ position, players, onNominate }: PositionGroupProps) =>
           </Badge>
         </HStack>
         <Box fontSize="sm">
-          {open ? '▲' : '▼'}
+          {isOpen ? '▲' : '▼'}
         </Box>
       </Box>
       
-      <SimpleGrid 
-        columns={{ base: 1, md: 2, lg: 3 }}
-        spacing={3}
-        p={3}
-        display={open ? 'grid' : 'none'}
-      >
-        {players.map((p) => (
-          <HStack
-            key={p.id}
-            p={3}
-            borderWidth="1px"
-            borderRadius="md"
-            justifyContent="space-between"
-            bg="white"
-            _hover={{
-              transform: 'translateY(-2px)',
-              boxShadow: 'md',
-              transition: 'all 0.2s',
-            }}
-          >
-            <Box flex="1" minW={0}>
-              <Text 
-                fontWeight="semibold" 
-                noOfLines={1}
-                title={p.name}
-                color="gray.800"
+      {isOpen && (
+        <Box p={3}>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={3}>
+            {players.map((player) => (
+              <HStack
+                key={player.id}
+                p={3}
+                borderWidth="1px"
+                borderRadius="md"
+                justifyContent="space-between"
+                bg="white"
+                _hover={{
+                  transform: 'translateY(-2px)',
+                  boxShadow: 'md',
+                  transition: 'all 0.2s',
+                }}
               >
-                {p.name}
-              </Text>
-              <HStack mt={1} spacing={2} color="gray.700">
-                <Badge colorScheme="blue" variant="subtle">{p.pos}</Badge>
-                <Badge variant="outline" colorScheme="gray">{p.nflTeam}</Badge>
+                <Box flex="1" minW={0}>
+                  <Text 
+                    fontWeight="semibold" 
+                    noOfLines={1}
+                    title={player.name}
+                    color="gray.800"
+                  >
+                    {player.name}
+                  </Text>
+                  <HStack mt={1} spacing={2} color="gray.700">
+                    <Badge colorScheme="blue" variant="subtle">{player.pos}</Badge>
+                    {player.nflTeam && (
+                      <Badge variant="outline" colorScheme="gray">{player.nflTeam}</Badge>
+                    )}
+                  </HStack>
+                </Box>
+                <Button 
+                  size="sm" 
+                  colorScheme="blue"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onNominate(player.id, player.name);
+                  }}
+                  flexShrink={0}
+                  ml={2}
+                >
+                  Nominate
+                </Button>
               </HStack>
-            </Box>
-            <Button 
-              size="sm" 
-              colorScheme="blue"
-              onClick={(e) => {
-                e.stopPropagation();
-                onNominate(p.id, p.name);
-              }}
-              flexShrink={0}
-              ml={2}
-            >
-              Nominate
-            </Button>
-          </HStack>
-        ))}
-      </SimpleGrid>
+            ))}
+          </SimpleGrid>
+        </Box>
+      )}
     </Box>
   );
 };
 
-export default function PlayerPool() {
-  const { players, loading } = useSleeperPlayers();
-  const nominate = useDraftStore((state) => state.nominate);
-  const [lastNominated, setLastNominated] = useState<string | null>(null);
-  
-  const handleNominate = useCallback((playerId: string, playerName: string) => {
-    nominate(playerId);
-    setLastNominated(playerName);
-    // Clear the message after 3 seconds
-    setTimeout(() => setLastNominated(null), 3000);
-  }, [nominate]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPositions, setSelectedPositions] = useState<string[]>([]);
-  
-  // Color values for light mode
-  const theme = {
-    inputBg: 'white',
-    inputBorder: 'gray.200',
-    inputHoverBorder: 'gray.300',
-    emptyStateBg: 'gray.50',
-    emptyStateText: 'gray.600'
-  };
-  
-  const positionCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    players.forEach(player => {
-      counts[player.pos] = (counts[player.pos] || 0) + 1;
-    });
-    // Add FLEX count
-    counts['FLEX'] = players.filter(p => ['RB', 'WR', 'TE'].includes(p.pos)).length;
-    return counts as Record<string, number>;
-  }, [players]);
+interface PlayerPoolProps {
+  onNominate: (id: string, name: string) => void;
+}
 
+export default function PlayerPool({ onNominate }: PlayerPoolProps) {
+  const { players: allPlayers = [] } = useDraftStore(state => ({
+    players: state.players || []
+  }));
+  
+  // Get drafted player IDs from the store if available
+  const draftedPlayerIds = useMemo(() => {
+    return new Set(
+      allPlayers
+        .filter(p => p.draftedBy)
+        .map(p => p.id)
+    );
+  }, [allPlayers]);
+  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPositions, setSelectedPositions] = useState<BasePosition[]>([]);
+  const [onlyUndrafted, setOnlyUndrafted] = useState(true);
+  
+  // Use the onNominate prop passed from parent
+  
   const filteredPlayers = useMemo(() => {
-    let result = [...players];
+    let result = [...allPlayers];
+    
+    // Filter by draft status
+    if (onlyUndrafted) {
+      result = result.filter(p => !draftedPlayerIds.has(p.id));
+    }
     
     // Filter by search term
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(p => 
-        p.name.toLowerCase().includes(term) || 
+        p.name.toLowerCase().includes(term) ||
         (p.nflTeam || '').toLowerCase().includes(term) ||
         p.pos.toLowerCase().includes(term)
       );
     }
     
-    // Filter by selected positions
+    // Filter by position
     if (selectedPositions.length > 0) {
-      result = result.filter(p => 
-        selectedPositions.includes(p.pos) ||
-        (selectedPositions.includes('FLEX') && ['RB', 'WR', 'TE'].includes(p.pos))
-      );
+      result = result.filter(p => selectedPositions.includes(p.pos as BasePosition));
     }
     
     return result;
-  }, [players, searchTerm, selectedPositions]);
+  }, [allPlayers, searchTerm, selectedPositions, onlyUndrafted, draftedPlayerIds]);
 
   const playersByPosition = useMemo(() => {
     const groups: Record<string, Player[]> = {};
     
-    // Group players by position
     filteredPlayers.forEach(player => {
-      const position = player.pos;
-      if (!groups[position]) {
-        groups[position] = [];
+      if (!groups[player.pos]) {
+        groups[player.pos] = [];
       }
-      groups[position].push(player);
+      groups[player.pos].push(player);
     });
     
-    // No separate FLEX group - players are shown in their native positions
-    
-    return groups;
+    // Sort positions according to POSITION_ORDER
+    return Object.entries(groups)
+      .sort(([a], [b]) => {
+        const aIndex = POSITION_ORDER.indexOf(a as BasePosition);
+        const bIndex = POSITION_ORDER.indexOf(b as BasePosition);
+        return aIndex - bIndex;
+      });
   }, [filteredPlayers]);
 
-  const togglePosition = useCallback((position: string) => {
-    setSelectedPositions((prev: string[]) => 
-      prev.includes(position) 
+  const totalFilteredPlayers = filteredPlayers.length;
+  const totalPlayers = allPlayers.length;
+
+  const togglePosition = (position: BasePosition) => {
+    setSelectedPositions(prev => 
+      prev.includes(position)
         ? prev.filter(p => p !== position)
         : [...prev, position]
     );
+  };
+
+  const clearFilters = useCallback(() => {
+    setSearchTerm('');
+    setSelectedPositions([]);
   }, []);
 
-  if (loading) {
-    return (
-      <Box textAlign="center" py={20}>
-        <Spinner size="xl" colorScheme="blue" />
-        <Text mt={4} color="gray.500">Loading players...</Text>
-      </Box>
-    );
-  }
-
   return (
-    <Box maxW="1400px" mx="auto" p={{ base: 2, md: 4 }}>
-      {/* Search and Filter Bar */}
-      <Box mb={6}>
-        {lastNominated && (
-          <Box 
-            bg="blue.100" 
-            color="blue.800" 
-            p={2} 
-            mb={4} 
-            borderRadius="md"
-            textAlign="center"
-          >
-            {lastNominated} has been nominated!
-          </Box>
-        )}
-        <Box position="relative" maxW="600px" mx="auto" mb={4}>
-          <Input
-            size="lg"
-            placeholder="Search players by name, team, or position..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            bg="white"
-            borderColor="gray.200"
-            color="gray.800"
-            _hover={{
-              borderColor: 'gray.300',
-            }}
-            _placeholder={{ color: 'gray.500' }}
-            pl={10}
-          />
-          <Box position="absolute" left={3} top="50%" transform="translateY(-50%)" pointerEvents="none">
-            <SearchIcon color="gray.400" />
-          </Box>
+    <Box p={4} maxW="1200px" mx="auto">
+      <VStack spacing={4} align="stretch">
+        {/* Search and Filter Controls */}
+        <Box mb={6}>
+          <HStack mb={4}>
+            <Input
+              placeholder="Search players by name, team, or position..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              pr="4.5rem"
+            />
+            {searchTerm && (
+              <InputRightElement width="4.5rem">
+                <IconButton
+                  h="1.75rem"
+                  size="sm"
+                  onClick={() => setSearchTerm('')}
+                  icon={<CloseIcon />}
+                  aria-label="Clear search"
+                  variant="ghost"
+                />
+              </InputRightElement>
+            )}
+          </HStack>
+          
+          <HStack spacing={4} mb={4} wrap="wrap">
+            <HStack spacing={2} mr={4}>
+              <Text fontWeight="bold" whiteSpace="nowrap">Positions:</Text>
+              {POSITION_ORDER.map((pos) => (
+                <Button
+                  key={pos}
+                  size="sm"
+                  variant={selectedPositions.includes(pos) ? 'solid' : 'outline'}
+                  colorScheme={selectedPositions.includes(pos) ? 'blue' : 'gray'}
+                  onClick={() => togglePosition(pos)}
+                  minW="3rem"
+                  px={2}
+                >
+                  {pos}
+                </Button>
+              ))}
+            </HStack>
+            
+            <Button
+              size="sm"
+              variant={onlyUndrafted ? 'solid' : 'outline'}
+              colorScheme={onlyUndrafted ? 'green' : 'gray'}
+              onClick={() => setOnlyUndrafted(!onlyUndrafted)}
+              leftIcon={onlyUndrafted ? <CheckIcon /> : undefined}
+            >
+              Only Undrafted
+            </Button>
+            
+            {(searchTerm || selectedPositions.length > 0) && (
+              <Button
+                size="sm"
+                variant="ghost"
+                colorScheme="blue"
+                onClick={clearFilters}
+                leftIcon={<CloseIcon />}
+              >
+                Clear filters
+              </Button>
+            )}
+          </HStack>
+          
+          <HStack justify="space-between" mb={2}>
+            <Text fontSize="sm" color="gray.600">
+              Showing {totalFilteredPlayers} of {totalPlayers} players
+              {onlyUndrafted && ' (undrafted only)'}
+            </Text>
+          </HStack>
         </Box>
-        
-        {/* Position Filters */}
-        <Flex wrap="wrap" spacing={2} justifyContent="center" mb={6}>
-          {['QB', 'RB', 'WR', 'TE'].map(pos => (
-            <Button
-              key={pos}
-              size="sm"
-              variant={selectedPositions.includes(pos) ? 'solid' : 'outline'}
-              colorScheme={selectedPositions.includes(pos) ? 'blue' : 'gray'}
-              onClick={() => togglePosition(pos)}
-              rightIcon={<Badge colorScheme={selectedPositions.includes(pos) ? 'whiteAlpha' : 'gray'}>{positionCounts[pos] || 0}</Badge>}
-            >
-              {pos}
-            </Button>
-          ))}
-          {selectedPositions.length > 0 && (
-            <Button
-              size="sm"
-              variant="ghost"
-              colorScheme="blue"
-              onClick={() => setSelectedPositions([])}
-              ml={2}
-            >
-              Clear Filters
-            </Button>
-          )}
-        </Flex>
-      </Box>
 
-      {/* Players Grid */}
-      <VStack spacing={6} align="stretch">
-        {Object.entries(playersByPosition)
-          .sort(([a], [b]) => {
-            const aIndex = POSITION_ORDER.indexOf(a);
-            const bIndex = POSITION_ORDER.indexOf(b);
-            return (
-              (aIndex === -1 ? POSITION_ORDER.length : aIndex) - 
-              (bIndex === -1 ? POSITION_ORDER.length : bIndex)
-            );
-          })
-          .map(([position, players]) => (
+        {/* Position Groups */}
+        {playersByPosition.length > 0 ? (
+          playersByPosition.map(([position, players]) => (
             <PositionGroup
               key={position}
               position={position}
               players={players}
-              onNominate={handleNominate}
+              onNominate={onNominate}
             />
-          ))}
-        
-        {Object.keys(playersByPosition).length === 0 && (
-          <Box textAlign="center" py={10} bg={theme.emptyStateBg} borderRadius="lg">
-            <Text fontSize="lg" color={theme.emptyStateText}>
-              No players found matching your filters.
+          ))
+        ) : (
+          <Box textAlign="center" py={10} bg="gray.50" borderRadius="md" p={6}>
+            <Text fontSize="lg" color="gray.500" mb={4}>
+              {allPlayers.length === 0 
+                ? 'No players available. Please check your connection.'
+                : 'No players found matching your criteria'}
             </Text>
-            <Button 
-              mt={4} 
-              colorScheme="blue" 
-              variant="ghost"
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedPositions([]);
-              }}
-            >
-              Clear all filters
-            </Button>
+            {(searchTerm || selectedPositions.length > 0 || onlyUndrafted) && (
+              <Button
+                colorScheme="blue"
+                variant="outline"
+                onClick={clearFilters}
+                leftIcon={<CloseIcon />}
+              >
+                Clear all filters
+              </Button>
+            )}
           </Box>
         )}
       </VStack>

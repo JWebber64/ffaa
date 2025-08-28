@@ -1,191 +1,130 @@
 import { useEffect, useState, useCallback } from "react";
-import { Player, BasePosition } from "../store/draftStore";
+import type { Player, BasePosition } from "../store/draftStore";
+import { PLAYERS as FALLBACK } from "../data/players";
 
-// Define position limits - these are the maximum number of players we'll take per position
-// The actual number of players will be less if there aren't enough ranked players
-const POSITION_LIMITS = {
-  QB: 32,    // 32 starting QBs in the league
-  RB: 96,    // ~3 per team
-  WR: 128,   // ~4 per team
-  TE: 48,    // ~1.5 per team
-  K: 32,     // 32 starting Ks
-  DEF: 32,   // 32 starting DEFs
-  'W/R/T': 0, // This is a flex position, not a primary position
-  'W/R': 0,   // This is a flex position, not a primary position
-  'Q/W/R/T': 0, // This is a superflex position, not a primary position
-  '': 0,       // Handle any empty positions
-} as const satisfies Record<string, number>;
-
-// Cache for player data
-const PLAYER_CACHE_KEY = 'ffaa_players_cache';
-const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
-
-function getCachedPlayers(): Player[] | null {
-  try {
-    const cached = localStorage.getItem(PLAYER_CACHE_KEY);
-    if (!cached) return null;
-    
-    const { data, timestamp } = JSON.parse(cached);
-    if (Date.now() - timestamp < CACHE_EXPIRY) {
-      return data;
-    }
-  } catch (e) {
-    console.warn('Failed to load players from cache', e);
-  }
-  return null;
-}
-
-function savePlayersToCache(players: Player[]) {
-  try {
-    localStorage.setItem(PLAYER_CACHE_KEY, JSON.stringify({
-      data: players,
-      timestamp: Date.now()
-    }));
-  } catch (e) {
-    console.warn('Failed to save players to cache', e);
-  }
-}
-
-interface SleeperPlayer {
+type SleeperPlayer = {
   player_id: string;
-  first_name: string;
-  last_name: string;
-  position: BasePosition;
-  team: string;
-  active: boolean;
-  status?: string;
-  years_exp?: number;
-  search_rank?: number;
-  fantasy_positions?: string[];
+  full_name?: string;
+  first_name?: string;
+  last_name?: string;
+  team?: string;                 // e.g. "KC"
+  position?: string;             // e.g. "RB", "WR", "D/ST", "PK"
+  fantasy_positions?: string[];  // e.g. ["WR"]
+  active?: boolean;
+  depth_chart_order?: number | null;
+};
+
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const LS_KEY = "sleeper_players_v2";
+
+const POSITION_LIMITS: Record<BasePosition, number> = {
+  QB: 32,
+  RB: 96,
+  WR: 128,
+  TE: 48,
+  K: 32,
+  DEF: 32,
+};
+
+function normalizePosition(posRaw?: string): BasePosition | null {
+  const p = (posRaw || "").toUpperCase();
+  if (p === "QB" || p === "RB" || p === "WR" || p === "TE") return p as BasePosition;
+  if (p === "D/ST" || p === "DST" || p === "DEF") return "DEF";
+  if (p === "PK" || p === "K") return "K";
+  return null; // we skip anything else
 }
 
+function toPlayer(sp: SleeperPlayer): Player | null {
+  const name =
+    sp.full_name ||
+    [sp.first_name, sp.last_name].filter(Boolean).join(" ").trim();
+  const posFromPrimary = normalizePosition(sp.position);
+  const posFromFantasy = normalizePosition(sp.fantasy_positions?.[0]);
+
+  const pos = posFromPrimary || posFromFantasy;
+  if (!name || !sp.player_id || !pos) return null;
+
+  return {
+    id: sp.player_id,
+    name,
+    pos,
+    nflTeam: sp.team || undefined,
+  };
+}
+
+function rankKey(p: Player): string {
+  // basic deterministic ordering: by pos, then team, then name
+  const order = ["QB", "RB", "WR", "TE", "K", "DEF"] as const;
+  const i = order.indexOf(p.pos as (typeof order)[number]);
+  return `${i.toString().padStart(2, "0")}-${p.nflTeam || "ZZZ"}-${p.name}`;
+}
+
+function uniqueById(players: Player[]): Player[] {
+  const seen = new Set<string>();
+  const out: Player[] = [];
+  for (const p of players) {
+    if (!seen.has(p.id)) {
+      seen.add(p.id);
+      out.push(p);
+    }
+  }
+  return out;
+}
+
+function capByPosition(players: Player[]): Player[] {
+  const counts: Partial<Record<BasePosition, number>> = {};
+  const out: Player[] = [];
+  for (const p of players) {
+    const pos = p.pos as BasePosition;
+    const limit = POSITION_LIMITS[pos] ?? 0;
+    const used = counts[pos] ?? 0;
+    if (limit === 0 || used < limit) {
+      out.push(p);
+      counts[pos] = used + 1;
+    }
+  }
+  return out;
+}
 
 export function useSleeperPlayers() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadPlayers = useCallback(async () => {
-    // Check cache first
-    const cachedPlayers = getCachedPlayers();
-    if (cachedPlayers) {
-      setPlayers(cachedPlayers);
-      setLoading(false);
-    }
-
+    setLoading(true);
     try {
-      setLoading(true);
-      // Fetch fresh data in the background
-      const response = await fetch("https://api.sleeper.app/v1/players/nfl");
-      const playersData = await response.json();
-      
-      // Process and filter players by position
-      const processAndFilterPlayers = (allPlayers: Record<string, SleeperPlayer>): Player[] => {
-        // First, convert to array and filter out inactive/irrelevant players
-        const validPlayers = Object.values(allPlayers).filter(player => {
-          // Skip if basic info is missing
-          if (!player.active || !player.position || !player.team || player.team === 'FA') {
-            return false;
-          }
-          
-          // Skip if no search rank (likely not relevant for fantasy)
-          if (player.search_rank === undefined) {
-            return false;
-          }
-          
-          // Filter out players who are not active for 2025
-          // This includes checking status and other indicators
-          const inactiveStatuses = [
-            'Injured Reserve', 'PUP', 'Suspended', 'Exempt', 
-            'Not With Team', 'Did Not Report', 'Retired', 'Retirement',
-            'Left Squad', 'Reserve', 'Physically Unable to Perform',
-            'Practice Squad', 'Non-Football Injury', 'Non-Football Illness'
-          ];
-          
-          const status = player.status?.toLowerCase() || '';
-          
-          // Check if status contains any inactive indicator
-          if (inactiveStatuses.some(s => status.includes(s.toLowerCase()))) {
-            return false;
-          }
-          
-          // Additional check for retired players by name (temporary measure)
-          const retiredPlayers = [
-            'ben roethlisberger', 'drew brees', 'philip rivers',
-            'julio jones', 'frank gore', 'adrian peterson'
-          ];
-          
-          const fullName = `${player.first_name} ${player.last_name}`.toLowerCase();
-          if (retiredPlayers.includes(fullName)) {
-            console.log(`Filtering out retired player: ${fullName}`);
-            return false;
-          }
-          
-          // No need to filter by years_exp - rely on search_rank for relevance
-          // Sleeper's rankings should already account for current player relevance
-          
-          return true;
-        });
-        
-        // Sort all players by search_rank first (lower is better)
-        validPlayers.sort((a, b) => (a.search_rank || 9999) - (b.search_rank || 9999));
-        
-        // Group players by position
-        const playersByPosition = validPlayers.reduce((acc, player) => {
-          const position = player.position as BasePosition;
-          if (!acc[position]) {
-            acc[position] = [];
-          }
-          
-          acc[position].push({
-            ...player,
-            fullName: `${player.first_name} ${player.last_name}`.trim()
-          });
-          
-          return acc;
-        }, {} as Record<BasePosition, Array<SleeperPlayer & { fullName: string }>>);
-        
-        // Process each position group and take the top N players
-        const processedPlayers: Player[] = [];
-        
-        (Object.entries(playersByPosition) as [BasePosition, Array<SleeperPlayer & { fullName: string }>][]).forEach(([position, players]) => {
-          const limit = POSITION_LIMITS[position] || 0;
-          if (limit > 0) {
-            // Take the top N players (already pre-sorted by search_rank)
-            const sortedPlayers = players.slice(0, limit);
-              
-            sortedPlayers.forEach(player => {
-              processedPlayers.push({
-                id: player.player_id,
-                name: player.fullName,
-                pos: position,
-                nflTeam: player.team,
-                draftedBy: undefined,
-                price: 0,
-              });
-            });
-          }
-        });
-        
-        return processedPlayers;
-      };
-      
-      // Process all players at once for filtering
-      const processedPlayers = processAndFilterPlayers(playersData);
-      
-      // Sort by position and name
-      processedPlayers.sort((a, b) => 
-        a.pos.localeCompare(b.pos) || a.name.localeCompare(b.name)
-      );
-      
-      savePlayersToCache(processedPlayers);
-      setPlayers(processedPlayers);
-      
-    } catch (error) {
-      console.error("Error loading players:", error);
-      if (!cachedPlayers) {
-        // If we have no cached data, set empty array to prevent infinite loading
-        setPlayers([]);
+      // 1) Try cache first
+      const cachedRaw = localStorage.getItem(LS_KEY);
+      if (cachedRaw) {
+        const { data, ts } = JSON.parse(cachedRaw) as { data: Player[]; ts: number };
+        if (Date.now() - ts < CACHE_TTL_MS && Array.isArray(data) && data.length > 0) {
+          setPlayers(data);
+          setLoading(false);
+          return;
+        }
       }
+
+      // 2) Fetch all players from Sleeper
+      const resp = await fetch("https://api.sleeper.app/v1/players/nfl");
+      if (!resp.ok) throw new Error(`Sleeper API error: ${resp.status}`);
+      const raw = (await resp.json()) as Record<string, SleeperPlayer>;
+
+      // 3) Map + filter
+      const mapped: Player[] = Object.values(raw)
+        .map(toPlayer)
+        .filter((p): p is Player => !!p);
+
+      // 4) Order, unique, cap
+      const ordered = mapped.sort((a, b) => rankKey(a).localeCompare(rankKey(b)));
+      const unique = uniqueById(ordered);
+      const capped = capByPosition(unique);
+
+      // 5) Save to cache
+      setPlayers(capped);
+      localStorage.setItem(LS_KEY, JSON.stringify({ data: capped, ts: Date.now() }));
+    } catch (e) {
+      console.warn("[useSleeperPlayers] Falling back to local players.ts", e);
+      setPlayers(FALLBACK);
     } finally {
       setLoading(false);
     }
@@ -197,3 +136,5 @@ export function useSleeperPlayers() {
 
   return { players, loading };
 }
+
+export default useSleeperPlayers;

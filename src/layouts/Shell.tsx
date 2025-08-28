@@ -5,10 +5,15 @@ import {
   HStack,
   Text,
   VStack,
+  Progress,
 } from "@chakra-ui/react";
 import { Outlet } from "react-router-dom";
 import TopNav from "@/components/TopNav";
 import SideNav from "@/components/SideNav";
+
+interface ShellProps {
+  globalLoading?: boolean;
+}
 
 /**
  * App shell:
@@ -16,13 +21,18 @@ import SideNav from "@/components/SideNav";
  * - Sidebar (visible ≥1024px), Drawer on mobile
  * - Content area with safe max width
  */
-export default function Shell() {
+export default function Shell({ globalLoading = false }: ShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
     <Box minH="100dvh" bg="#181e28" color="white">
       {/* Top Bar */}
       <TopNav onMenu={() => setDrawerOpen(true)} />
+
+      {/* Global loading indicator */}
+      {globalLoading && (
+        <Progress size="xs" isIndeterminate colorScheme="blue" />
+      )}
 
       {/* Body */}
       <Box display="grid" gridTemplateColumns={{ base: "1fr", lg: "260px 1fr" }}>
@@ -40,7 +50,7 @@ export default function Shell() {
         </Box>
 
         {/* Content */}
-        <Box px={{ base: 3, md: 6 }} py={4}>
+        <Box px={{ base: 3, md: 6 }} py={4} opacity={globalLoading ? 0.7 : 1} transition="opacity 0.2s">
           <Outlet />
         </Box>
       </Box>
