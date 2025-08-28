@@ -1,0 +1,274 @@
+import { useState, useEffect } from 'react';
+import { Button, Box, useDisclosure, Text } from '@chakra-ui/react';
+import { FaCog } from 'react-icons/fa';
+
+interface RosterSlots {
+  QB: number;
+  RB: number;
+  WR: number;
+  TE: number;
+  FLEX: number;
+  K: number;
+  DEF: number;
+  BENCH: number;
+}
+
+interface AuctionSettings {
+  timerDuration: number;
+  autoStartTimer: boolean;
+  startingBudget: number;
+  minBidIncrement: number;
+  rosterSlots: RosterSlots;
+  enableSound: boolean;
+  enableNotifications: boolean;
+}
+
+interface SettingsPanelV2Props {
+  isOpen: boolean;
+  onClose: () => void;
+  settings: AuctionSettings;
+  onSave: (settings: AuctionSettings) => void;
+}
+
+const SettingsPanelV2 = ({
+  isOpen,
+  onClose,
+  settings: initialSettings,
+  onSave,
+}: SettingsPanelV2Props) => {
+  const [settings, setSettings] = useState<AuctionSettings>(initialSettings);
+  const [isSaving, setIsSaving] = useState(false);
+  const { isOpen: isModalOpen, onOpen, onClose: closeModal } = useDisclosure();
+
+  useEffect(() => {
+    if (isOpen) {
+      onOpen();
+    } else {
+      closeModal();
+    }
+  }, [isOpen, onOpen, closeModal]);
+
+  const handleSave = () => {
+    setIsSaving(true);
+    onSave(settings);
+    setTimeout(() => {
+      setIsSaving(false);
+      onClose();
+    }, 500);
+  };
+
+  const handleReset = () => {
+    setSettings(initialSettings);
+  };
+
+  if (!isModalOpen) return null;
+
+  return (
+    <Box
+      position="fixed"
+      top={0}
+      left={0}
+      right={0}
+      bottom={0}
+      bg="rgba(0, 0, 0, 0.5)"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      zIndex={1400}
+      onClick={onClose}
+    >
+      <Box
+        bg="white"
+        p={6}
+        borderRadius="md"
+        width="90%"
+        maxW="600px"
+        maxH="90vh"
+        overflowY="auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Text fontSize="xl" fontWeight="bold" mb={4}>
+          Draft Settings
+        </Text>
+
+        <Box mb={6}>
+          <Text fontSize="lg" fontWeight="semibold" mb={3}>
+            Timer Settings
+          </Text>
+          <Box display="grid" gridTemplateColumns="1fr" gap={4} mb={4}>
+            <Box>
+              <Text mb={2}>Timer Duration (seconds)</Text>
+              <input
+                type="number"
+                value={settings.timerDuration}
+                min={30}
+                max={300}
+                onChange={(e) =>
+                  setSettings({ ...settings, timerDuration: Number(e.target.value) })
+                }
+                style={{
+                  padding: '0.5rem',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '0.25rem',
+                  width: '100%',
+                }}
+              />
+            </Box>
+
+            <Box display="flex" alignItems="center">
+              <input
+                type="checkbox"
+                id="auto-start-timer"
+                checked={settings.autoStartTimer}
+                onChange={(e) =>
+                  setSettings({ ...settings, autoStartTimer: e.target.checked })
+                }
+                style={{ marginRight: '0.5rem' }}
+              />
+              <label htmlFor="auto-start-timer">Auto-start timer on nomination</label>
+            </Box>
+          </Box>
+        </Box>
+
+        <Box mb={6}>
+          <Text fontSize="lg" fontWeight="semibold" mb={3}>
+            Budget Settings
+          </Text>
+          <Box display="grid" gridTemplateColumns="1fr 1fr" gap={4} mb={4}>
+            <Box>
+              <Text mb={2}>Starting Budget ($)</Text>
+              <input
+                type="number"
+                value={settings.startingBudget}
+                min={100}
+                max={1000}
+                step={50}
+                onChange={(e) =>
+                  setSettings({ ...settings, startingBudget: Number(e.target.value) })
+                }
+                style={{
+                  padding: '0.5rem',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '0.25rem',
+                  width: '100%',
+                }}
+              />
+            </Box>
+
+            <Box>
+              <Text mb={2}>Min Bid Increment ($)</Text>
+              <input
+                type="number"
+                value={settings.minBidIncrement}
+                min={1}
+                max={50}
+                onChange={(e) =>
+                  setSettings({ ...settings, minBidIncrement: Number(e.target.value) })
+                }
+                style={{
+                  padding: '0.5rem',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '0.25rem',
+                  width: '100%',
+                }}
+              />
+            </Box>
+          </Box>
+        </Box>
+
+        <Box mb={6}>
+          <Text fontSize="lg" fontWeight="semibold" mb={3}>
+            Roster Slots
+          </Text>
+          <Box
+            display="grid"
+            gridTemplateColumns="repeat(auto-fill, minmax(150px, 1fr))"
+            gap={4}
+          >
+            {Object.entries(settings.rosterSlots).map(([position, count]) => (
+              <Box key={position}>
+                <Text mb={2} textTransform="capitalize">
+                  {position}
+                </Text>
+                <input
+                  type="number"
+                  value={count}
+                  min={0}
+                  max={position === 'QB' || position === 'TE' ? 3 : 10}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      rosterSlots: {
+                        ...settings.rosterSlots,
+                        [position]: Number(e.target.value),
+                      },
+                    })
+                  }
+                  style={{
+                    padding: '0.5rem',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '0.25rem',
+                    width: '100%',
+                  }}
+                />
+              </Box>
+            ))}
+          </Box>
+        </Box>
+
+        <Box mb={6}>
+          <Text fontSize="lg" fontWeight="semibold" mb={3}>
+            Preferences
+          </Text>
+          <Box display="flex" flexDirection="column" gap={3}>
+            <Box display="flex" alignItems="center">
+              <input
+                type="checkbox"
+                id="enable-sound"
+                checked={settings.enableSound}
+                onChange={(e) =>
+                  setSettings({ ...settings, enableSound: e.target.checked })
+                }
+                style={{ marginRight: '0.5rem' }}
+              />
+              <label htmlFor="enable-sound">Enable sound effects</label>
+            </Box>
+
+            <Box display="flex" alignItems="center">
+              <input
+                type="checkbox"
+                id="enable-notifications"
+                checked={settings.enableNotifications}
+                onChange={(e) =>
+                  setSettings({ ...settings, enableNotifications: e.target.checked })
+                }
+                style={{ marginRight: '0.5rem' }}
+              />
+              <label htmlFor="enable-notifications">Enable notifications</label>
+            </Box>
+          </Box>
+        </Box>
+
+        <Box display="flex" justifyContent="flex-end" gap={3} mt={6}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isSaving}
+          >
+            Cancel
+          </Button>
+          <Button
+            colorScheme="blue"
+            onClick={handleSave}
+            isLoading={isSaving}
+            loadingText="Saving..."
+          >
+            Save Changes
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+export default SettingsPanelV2;

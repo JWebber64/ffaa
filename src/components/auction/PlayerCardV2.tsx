@@ -1,4 +1,4 @@
-import { Box, Text, VStack, HStack, Badge, Progress, Tooltip, IconButton, Button } from '@chakra-ui/react';
+import { Box, Text, VStack, HStack, Badge, Tooltip, IconButton, Button } from '@chakra-ui/react';
 import { FaInfoCircle, FaGavel } from 'react-icons/fa';
 
 type Player = {

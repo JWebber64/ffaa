@@ -1,5 +1,21 @@
-import { VStack, HStack, Text, Button, Box, Progress, useInterval, Tooltip } from '@chakra-ui/react';
+import { VStack, HStack, Text, Button, Box, IconButton } from '@chakra-ui/react';
 import { FaPlay, FaPause, FaStop, FaUndo, FaRedo, FaGavel } from 'react-icons/fa';
+
+// Fix for Chakra UI v2.8.2 types
+declare module '@chakra-ui/react' {
+  interface IconButtonProps {
+    icon: React.ReactElement;
+    'aria-label': string;
+  }
+  interface ButtonProps {
+    leftIcon?: React.ReactElement;
+    rightIcon?: React.ReactElement;
+    isDisabled?: boolean;
+  }
+  interface StackProps {
+    spacing?: number | string;
+  }
+}
 
 type BidControlsV2Props = {
   currentBid?: number | null;
@@ -49,21 +65,25 @@ export const BidControlsV2 = ({
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
+  
+  // Progress value for the timer
+  const progressValue = (timeLeft / maxTime) * 100;
 
   return (
     <VStack spacing={4} p={4} bg='white' borderRadius='lg' boxShadow='sm' _dark={{ bg: 'gray.800' }}>
       {/* Timer Display */}
-      <Box width='100%' textAlign='center'>
-        <Text fontSize='3xl' fontWeight='bold' mb={2}>
+      <Box width="100%" mb={4}>
+        <Box bg="gray.200" h="8px" borderRadius="full" overflow="hidden" mb={2}>
+          <Box
+            bg="blue.500"
+            h="100%"
+            width={`${(timeLeft / maxTime) * 100}%`}
+            transition="width 0.3s ease"
+          />
+        </Box>
+        <Text textAlign="center" fontSize="sm" color="gray.500">
           {formatTime(timeLeft)}
         </Text>
-        <Progress
-          value={progress}
-          colorScheme={timeLeft <= 10 ? 'red' : timeLeft <= 30 ? 'yellow' : 'green'}
-          size='sm'
-          borderRadius='full'
-          mb={4}
-        />
       </Box>
 
       {/* Current Bid Display */}
@@ -113,85 +133,76 @@ export const BidControlsV2 = ({
       <HStack spacing={2} width='100%' justify='center'>
         {isTimerRunning ? (
           <>
-            <Tooltip label='Pause Timer'>
-              <Button
-                aria-label='Pause timer'
-                colorScheme='yellow'
-                leftIcon={<FaPause />}
+            <Box as="span" title="Pause Timer">
+              <IconButton
+                aria-label="Pause timer"
+                size="sm"
+                colorScheme="yellow"
+                icon={<FaPause />}
                 onClick={onPauseTimer}
-                isDisabled={isProcessing}
-                size='sm'
-                flex='1'
-              >
-                Pause
-              </Button>
-            </Tooltip>
-            <Tooltip label='Stop Timer'>
-              <Button
-                aria-label='Stop timer'
-                colorScheme='red'
-                leftIcon={<FaStop />}
+                isDisabled={!isTimerRunning || isProcessing}
+                variant="ghost"
+              />
+            </Box>
+            <Box as="span" title="Stop Timer">
+              <IconButton
+                aria-label="Stop timer"
+                size="sm"
+                colorScheme="red"
+                icon={<FaStop />}
                 onClick={onStopTimer}
                 isDisabled={isProcessing}
-                size='sm'
-                flex='1'
-              >
-                Stop
-              </Button>
-            </Tooltip>
+                variant="ghost"
+              />
+            </Box>
           </>
         ) : (
-          <Tooltip label='Start Timer'>
-            <Button
-              aria-label='Start timer'
-              colorScheme='green'
-              leftIcon={<FaPlay />}
+          <Box as="span" title="Start Timer">
+            <IconButton
+              aria-label="Start timer"
+              size="sm"
+              colorScheme="blue"
+              icon={<FaPlay />}
               onClick={onStartTimer}
-              isDisabled={isProcessing || timeLeft <= 0}
-              size='sm'
-              flex='1'
-            >
-              Start
-            </Button>
-          </Tooltip>
+              isDisabled={isTimerRunning || isProcessing}
+              variant="ghost"
+            />
+          </Box>
         )}
-        <Tooltip label='Reset Timer'>
-          <Button
-            aria-label='Reset timer'
-            variant='outline'
+        <Box as="span" title="Reset Timer">
+          <IconButton
+            aria-label="Reset timer"
+            size="sm"
+            variant="outline"
+            icon={<FaUndo />}
             onClick={onResetTimer}
             isDisabled={isProcessing}
-            size='sm'
-          >
-            <FaUndo />
-          </Button>
-        </Tooltip>
+          />
+        </Box>
       </HStack>
 
       {/* Undo/Redo Controls */}
       <HStack spacing={2} width='100%' justify='center'>
-        <Tooltip label='Undo'>
-          <Button
-            aria-label='Undo'
-            variant='outline'
+        <Box as="span" title="Undo">
+          <IconButton
+            aria-label="Undo"
+            size="sm"
+            variant="ghost"
+            icon={<FaUndo />}
             onClick={onUndo}
             isDisabled={!canUndo || isProcessing}
-            size='sm'
-          >
-            <FaUndo />
-          </Button>
-        </Tooltip>
-        <Tooltip label='Redo'>
-          <Button
-            aria-label='Redo'
-            variant='outline'
+          />
+        </Box>
+        <Box as="span" title="Redo">
+          <IconButton
+            aria-label="Redo"
+            size="sm"
+            variant="ghost"
+            icon={<FaRedo />}
             onClick={onRedo}
             isDisabled={!canRedo || isProcessing}
-            size='sm'
-          >
-            <FaRedo />
-          </Button>
-        </Tooltip>
+          />
+        </Box>
       </HStack>
 
       {/* Award Player Dropdown */}

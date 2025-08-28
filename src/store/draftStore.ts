@@ -44,6 +44,7 @@ interface DraftState {
   isProcessingQueue: boolean;
   history: DraftState[];
   future: DraftState[];
+  maxHistorySize: number;
   
   // Actions
   setConfig: (config: {
@@ -82,6 +83,15 @@ interface DraftState {
   hasSlotFor: (teamId: number, pos: AssignedSlot) => boolean;
   openSlotsFor: (teamId: number, pos: AssignedSlot) => number;
   computeMaxBid: (teamId: number) => number;
+  
+  // Additional methods from implementation
+  assignPlayer: (playerId: string, toTeamId: number, amount: number) => Result<Player, string>;
+  placeBid: (playerId: string, byTeamId: number, amount: number) => Result<{
+    playerId: string;
+    teamId: number;
+    amount: number;
+  }, string>;
+  nominatePlayer: (playerId: string, byTeamId: number, startAmount: number) => Result<Nomination, string>;
 }
 
 const DEFAULT_ROSTER: Record<Position, number> = {
@@ -112,17 +122,45 @@ const countUsedSlots = (players: Player[], teamId: number): Record<AssignedSlot,
   return used;
 };
 
-const captureDraftState = (state: DraftState): DraftState => ({
-  teamCount: state.teamCount,
-  baseBudget: state.baseBudget,
-  templateRoster: { ...state.templateRoster },
-  teams: state.teams.map(t => ({ ...t, roster: { ...t.roster } })),
-  players: state.players.map(p => ({ ...p })),
-  nominationQueue: [...state.nominationQueue],
-  isProcessingQueue: state.isProcessingQueue,
-  history: [],
-  future: [],
-});
+const captureDraftState = (state: DraftState): DraftState => {
+  const baseState = {
+    teamCount: state.teamCount,
+    baseBudget: state.baseBudget,
+    templateRoster: { ...state.templateRoster },
+    teams: state.teams.map(t => ({ ...t, roster: { ...t.roster } })),
+    players: state.players.map(p => ({ ...p })),
+    nominationQueue: [...state.nominationQueue],
+    isProcessingQueue: state.isProcessingQueue,
+    history: [],
+    future: [],
+    maxHistorySize: state.maxHistorySize || 100,
+    
+    // Methods
+    setConfig: state.setConfig,
+    setTeamNames: state.setTeamNames,
+    setPlayers: state.setPlayers,
+    nominate: state.nominate,
+    startProcessingQueue: state.startProcessingQueue,
+    finishProcessingQueue: state.finishProcessingQueue,
+    popNomination: state.popNomination,
+    removeFromQueue: state.removeFromQueue,
+    clearQueue: state.clearQueue,
+    finalizeSale: state.finalizeSale,
+    captureState: state.captureState,
+    undo: state.undo,
+    redo: state.redo,
+    canUndo: state.canUndo,
+    canRedo: state.canRedo,
+    hasSlotFor: state.hasSlotFor,
+    openSlotsFor: state.openSlotsFor,
+    computeMaxBid: state.computeMaxBid,
+    assignPlayer: state.assignPlayer,
+    placeBid: state.placeBid,
+    nominatePlayer: state.nominatePlayer,
+  };
+  
+  return baseState;
+};
 
 export const useDraftStore = create<DraftState>()(
   devtools(
@@ -137,6 +175,7 @@ export const useDraftStore = create<DraftState>()(
       isProcessingQueue: false,
       history: [],
       future: [],
+      maxHistorySize: 100,
       
       // Actions
       setConfig: ({ teamCount, baseBudget, templateRoster }) => {

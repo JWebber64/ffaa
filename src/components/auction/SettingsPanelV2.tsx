@@ -1,309 +1,327 @@
-import { useState, useEffect } from 'react';
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  FormControl,
-  FormLabel,
-  Input,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-  Select,
-  Switch,
-  VStack,
-  HStack,
-  Button,
-  Text,
-  useDisclosure,
-  IconButton,
-  Tooltip,
-  Divider,
-  Box,
-  SimpleGrid,
-} from '@chakra-ui/react';
-import { FaCog, FaSave, FaUndo } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaCog } from 'react-icons/fa';
+
+// Types
+type RosterSlots = {
+  QB: number;
+  RB: number;
+  WR: number;
+  TE: number;
+  FLEX: number;
+  K: number;
+  DEF: number;
+  BENCH: number;
+};
 
 type AuctionSettings = {
   timerDuration: number;
   startingBudget: number;
   minBidIncrement: number;
-  rosterSlots: {
-    QB: number;
-    RB: number;
-    WR: number;
-    TE: number;
-    FLEX: number;
-    K: number;
-    DEF: number;
-    BENCH: number;
-  };
+  rosterSlots: RosterSlots;
   enableSound: boolean;
   enableNotifications: boolean;
   autoStartTimer: boolean;
 };
 
 type SettingsPanelV2Props = {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   settings: AuctionSettings;
   onSave: (settings: AuctionSettings) => void;
 };
 
-export const SettingsPanelV2 = ({
-  isOpen,
-  onClose,
+const Button: React.FC<{
+  onClick: () => void;
+  children: React.ReactNode;
+  leftIcon?: React.ReactNode;
+  disabled?: boolean;
+  style?: React.CSSProperties;
+}> = ({ onClick, children, leftIcon, disabled = false, style = {} }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      padding: '0.5rem 1rem',
+      borderRadius: '0.375rem',
+      border: '1px solid #E2E8F0',
+      background: 'white',
+      cursor: 'pointer',
+      ...style,
+    }}
+  >
+    {leftIcon && <span style={{ marginRight: '0.5rem' }}>{leftIcon}</span>}
+    {children}
+  </button>
+);
+
+const SettingsPanelV2: React.FC<SettingsPanelV2Props> = ({
+  isOpen: isOpenProp = false,
+  onClose: onCloseProp = () => {},
   settings: initialSettings,
   onSave,
-}: SettingsPanelV2Props) => {
+}) => {
   const [settings, setSettings] = useState<AuctionSettings>(initialSettings);
-  const [isDirty, setIsDirty] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isOpen, setIsOpen] = useState(isOpenProp);
 
-  // Reset form when modal opens or initial settings change
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => {
+    setIsOpen(false);
+    if (onCloseProp) onCloseProp();
+  };
+
   useEffect(() => {
     if (isOpen) {
       setSettings(initialSettings);
-      setIsDirty(false);
     }
   }, [isOpen, initialSettings]);
 
-  const handleChange = <K extends keyof AuctionSettings>(
-    key: K,
-    value: AuctionSettings[K]
-  ) => {
-    setSettings((prev) => ({
+  const handleSaveClick = () => {
+    setIsSaving(true);
+    try {
+      onSave(settings);
+      handleClose();
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleNumberChange = (key: keyof AuctionSettings, value: number) => {
+    setSettings(prev => ({
       ...prev,
       [key]: value,
     }));
-    setIsDirty(true);
   };
 
-  const handleRosterChange = (position: keyof AuctionSettings['rosterSlots'], value: number) => {
-    setSettings((prev) => ({
+  const handleRosterSlotChange = (position: keyof RosterSlots, value: number) => {
+    setSettings(prev => ({
       ...prev,
       rosterSlots: {
         ...prev.rosterSlots,
         [position]: value,
       },
     }));
-    setIsDirty(true);
   };
 
-  const handleSave = () => {
-    onSave(settings);
-    onClose();
+  const handleToggle = (key: keyof Pick<AuctionSettings, 'enableSound' | 'enableNotifications' | 'autoStartTimer'>) => {
+    setSettings(prev => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
   };
 
-  const handleReset = () => {
-    setSettings(initialSettings);
-    setIsDirty(false);
-  };
+  if (!isOpen) {
+    return (
+      <Button onClick={handleOpen} leftIcon={<FaCog />}>
+        Settings
+      </Button>
+    );
+  }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Auction Settings</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <VStack spacing={6} align="stretch">
-            {/* Timer Settings */}
-            <Box>
-              <Text fontWeight="bold" mb={3} fontSize="lg">
-                Timer Settings
-              </Text>
-              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                <FormControl>
-                  <FormLabel>Timer Duration (seconds)</FormLabel>
-                  <NumberInput
-                    min={10}
-                    max={300}
-                    value={settings.timerDuration}
-                    onChange={(_, value) => handleChange('timerDuration', value)}
-                  >
-                    <NumberInputField />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
-                </FormControl>
-                
-                <FormControl display="flex" alignItems="center">
-                  <Switch
-                    id="auto-start-timer"
-                    isChecked={settings.autoStartTimer}
-                    onChange={(e) => handleChange('autoStartTimer', e.target.checked)}
-                    mr={2}
-                  />
-                  <FormLabel htmlFor="auto-start-timer" mb="0">
-                    Auto-start timer on nomination
-                  </FormLabel>
-                </FormControl>
-              </SimpleGrid>
-            </Box>
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1400,
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '1.5rem',
+        borderRadius: '0.5rem',
+        width: '90%',
+        maxWidth: '600px',
+        maxHeight: '90vh',
+        overflowY: 'auto',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0, color: '#2d3748' }}>
+            Auction Settings
+          </h2>
+          <button
+            onClick={handleClose}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+              color: '#718096',
+            }}
+          >
+            &times;
+          </button>
+        </div>
 
-            <Divider />
+        <div style={{ marginBottom: '2rem' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: '#4a5568' }}>
+            Timer Settings
+          </h3>
 
-            {/* Budget Settings */}
-            <Box>
-              <Text fontWeight="bold" mb={3} fontSize="lg">
-                Budget Settings
-              </Text>
-              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                <FormControl>
-                  <FormLabel>Starting Budget ($)</FormLabel>
-                  <NumberInput
-                    min={100}
-                    max={1000}
-                    step={50}
-                    value={settings.startingBudget}
-                    onChange={(_, value) => handleChange('startingBudget', value)}
-                  >
-                    <NumberInputField />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
-                </FormControl>
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>
+              Timer Duration (seconds)
+            </label>
+            <input
+              type="number"
+              value={settings.timerDuration}
+              min={30}
+              max={300}
+              onChange={(e) => handleNumberChange('timerDuration', Number(e.target.value))}
+              style={{
+                width: '100%',
+                padding: '0.5rem',
+                border: '1px solid #E2E8F0',
+                borderRadius: '0.375rem',
+              }}
+            />
+          </div>
 
-                <FormControl>
-                  <FormLabel>Minimum Bid Increment ($)</FormLabel>
-                  <NumberInput
-                    min={1}
-                    max={50}
-                    value={settings.minBidIncrement}
-                    onChange={(_, value) => handleChange('minBidIncrement', value)}
-                  >
-                    <NumberInputField />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
-                </FormControl>
-              </SimpleGrid>
-            </Box>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+            <input
+              type="checkbox"
+              checked={settings.autoStartTimer}
+              onChange={() => handleToggle('autoStartTimer')}
+              style={{ marginRight: '0.5rem' }}
+            />
+            <label>Auto-start timer after nomination</label>
+          </div>
+        </div>
 
-            <Divider />
+        <div style={{ marginBottom: '2rem' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: '#4a5568' }}>
+            Budget Settings
+          </h3>
+          
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>
+              Starting Budget ($)
+            </label>
+            <input
+              type="number"
+              value={settings.startingBudget}
+              min={0}
+              max={1000}
+              onChange={(e) => handleNumberChange('startingBudget', Number(e.target.value))}
+              style={{
+                width: '100%',
+                padding: '0.5rem',
+                border: '1px solid #E2E8F0',
+                borderRadius: '0.375rem',
+              }}
+            />
+          </div>
+          
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>
+              Minimum Bid Increment ($)
+            </label>
+            <input
+              type="number"
+              value={settings.minBidIncrement}
+              min={1}
+              max={100}
+              onChange={(e) => handleNumberChange('minBidIncrement', Number(e.target.value))}
+              style={{
+                width: '100%',
+                padding: '0.5rem',
+                border: '1px solid #E2E8F0',
+                borderRadius: '0.375rem',
+              }}
+            />
+          </div>
+        </div>
 
-            {/* Roster Settings */}
-            <Box>
-              <Text fontWeight="bold" mb={3} fontSize="lg">
-                Roster Slots
-              </Text>
-              <SimpleGrid columns={{ base: 2, sm: 3, md: 4 }} spacing={4}>
-                {Object.entries(settings.rosterSlots).map(([position, count]) => (
-                  <FormControl key={position}>
-                    <FormLabel textTransform="capitalize">{position}</FormLabel>
-                    <NumberInput
-                      min={0}
-                      max={position === 'QB' ? 3 : position === 'TE' ? 3 : 10}
-                      value={count}
-                      onChange={(_, value) =>
-                        handleRosterChange(
-                          position as keyof AuctionSettings['rosterSlots'],
-                          value
-                        )
-                      }
-                    >
-                      <NumberInputField />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                  </FormControl>
-                ))}
-              </SimpleGrid>
-            </Box>
+        <div style={{ marginBottom: '2rem' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: '#4a5568' }}>
+            Notification Settings
+          </h3>
+          
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+            <input
+              type="checkbox"
+              checked={settings.enableSound}
+              onChange={() => handleToggle('enableSound')}
+              style={{ marginRight: '0.5rem' }}
+            />
+            <label>Enable sound effects</label>
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+            <input
+              type="checkbox"
+              checked={settings.enableNotifications}
+              onChange={() => handleToggle('enableNotifications')}
+              style={{ marginRight: '0.5rem' }}
+            />
+            <label>Enable notifications</label>
+          </div>
+        </div>
 
-            <Divider />
+        <div style={{ marginBottom: '2rem' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: '#4a5568' }}>
+            Roster Slots
+          </h3>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1rem' }}>
+            {Object.entries(settings.rosterSlots).map(([position, count]) => (
+              <div key={position}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>
+                  {position}
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={20}
+                  value={count}
+                  onChange={(e) => handleRosterSlotChange(position as keyof RosterSlots, Number(e.target.value))}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '0.375rem',
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
 
-            {/* Notification Settings */}
-            <Box>
-              <Text fontWeight="bold" mb={3} fontSize="lg">
-                Preferences
-              </Text>
-              <VStack spacing={4} align="stretch">
-                <FormControl display="flex" alignItems="center" justifyContent="space-between">
-                  <FormLabel htmlFor="enable-sound" mb="0">
-                    Enable Sound Effects
-                  </FormLabel>
-                  <Switch
-                    id="enable-sound"
-                    isChecked={settings.enableSound}
-                    onChange={(e) => handleChange('enableSound', e.target.checked)}
-                  />
-                </FormControl>
-
-                <FormControl display="flex" alignItems="center" justifyContent="space-between">
-                  <FormLabel htmlFor="enable-notifications" mb="0">
-                    Enable Notifications
-                  </FormLabel>
-                  <Switch
-                    id="enable-notifications"
-                    isChecked={settings.enableNotifications}
-                    onChange={(e) => handleChange('enableNotifications', e.target.checked)}
-                  />
-                </FormControl>
-              </VStack>
-            </Box>
-          </VStack>
-        </ModalBody>
-
-        <ModalFooter>
-          <HStack spacing={3} justify="space-between" width="100%">
-            <Button
-              leftIcon={<FaUndo />}
-              variant="outline"
-              onClick={handleReset}
-              isDisabled={!isDirty}
-            >
-              Reset
-            </Button>
-            <HStack>
-              <Button variant="outline" mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                colorScheme="blue"
-                leftIcon={<FaSave />}
-                onClick={handleSave}
-                isDisabled={!isDirty}
-              >
-                Save Settings
-              </Button>
-            </HStack>
-          </HStack>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
+          <Button
+            onClick={handleClose}
+            style={{
+              border: '1px solid #E2E8F0',
+              background: 'white',
+              color: '#4A5568',
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveClick}
+            disabled={isSaving}
+            style={{
+              background: '#3182CE',
+              color: 'white',
+              border: 'none',
+              opacity: isSaving ? 0.7 : 1,
+            }}
+          >
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 
-// Settings button that can be used to open the settings panel
-export const SettingsButton = ({
-  onClick,
-  ...props
-}: {
-  onClick: () => void;
-  [key: string]: any;
-}) => (
-  <Tooltip label="Settings">
-    <IconButton
-      aria-label="Settings"
-      icon={<FaCog />}
-      onClick={onClick}
-      variant="ghost"
-      {...props}
-    />
-  </Tooltip>
-);
+export default SettingsPanelV2;

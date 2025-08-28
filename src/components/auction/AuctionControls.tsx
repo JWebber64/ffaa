@@ -1,5 +1,5 @@
 import { HStack, VStack, Button, Text, Box, Badge, Input, InputGroup } from '@chakra-ui/react';
-import { createStandaloneToast } from '@chakra-ui/toast';
+import { useToast } from '@chakra-ui/toast';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 import { Player } from '../../store/draftStore';
 import { useState } from 'react';
@@ -31,7 +31,7 @@ export const AuctionControls = ({
   computeMaxBid,
   hasSlotFor,
 }: AuctionControlsProps) => {
-  const toast = createStandaloneToast().toast;
+  const toast = useToast();
   const [customBid, setCustomBid] = useState('');
 
   const handleBid = (teamId: number, amount: number | string): void => {

@@ -1,20 +1,18 @@
 import { useState, useMemo, useCallback } from 'react';
-import type { KeyboardEvent, MouseEvent } from 'react';
+import type { MouseEvent } from 'react';
 import {
-  Box,
   Input,
+  InputGroup,
+  Box,
   VStack,
   Text,
-  Flex,
   Badge,
-  InputGroup,
-  InputElement,
-  useColorModeValue,
-  InputRightElement,
-  IconButton
+  Flex,
+  StackSeparator
 } from '@chakra-ui/react';
+import { useColorModeValue } from '@chakra-ui/color-mode';
 import { SearchIcon, CloseIcon } from '@chakra-ui/icons';
-import type { Player } from '../../store/draftStoreV2';
+import type { Player } from '../../store/draftStore';
 import { useDebounce } from '../../hooks/useDebounce';
 
 interface PlayerSearchProps {
@@ -55,13 +53,7 @@ export const PlayerSearch = ({
       .slice(0, 5);
   }, [players, debouncedSearchQuery]);
 
-  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Escape') {
-      setSearchQuery('');
-    }
-  }, []);
-
-  const handleClearSearch = useCallback((e: MouseEvent<HTMLButtonElement>) => {
+  const handleClearSearch = useCallback((e: React.MouseEvent<SVGElement>) => {
     e.stopPropagation();
     setSearchQuery('');
   }, []);
@@ -87,10 +79,19 @@ export const PlayerSearch = ({
 
   return (
     <Box position="relative" width="100%" mb={4}>
-      <InputGroup>
-        <InputElement pointerEvents="none">
-          <SearchIcon color="gray.400" />
-        </InputElement>
+      <InputGroup
+        startElement={<SearchIcon color="gray.300" />}
+        endElement={
+          searchQuery ? (
+            <CloseIcon
+              color="gray.400"
+              cursor="pointer"
+              onClick={handleClearSearch}
+              _hover={{ color: 'gray.600' }}
+            />
+          ) : undefined
+        }
+      >
         <Input
           type="text"
           placeholder="Search players..."
@@ -98,24 +99,15 @@ export const PlayerSearch = ({
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-          onKeyDown={handleKeyDown}
           bg={inputBg}
-          pl="2.5rem"
-          pr={searchQuery ? '2.5rem' : '1rem'}
+          borderColor="gray.300"
+          _hover={{ borderColor: 'gray.400' }}
+          _focus={{
+            borderColor: 'blue.500',
+            boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)',
+          }}
+          disabled={isLoading}
         />
-        {searchQuery && (
-          <InputRightElement>
-            <IconButton
-              aria-label="Clear search"
-              size="sm"
-              variant="ghost"
-              onClick={handleClearSearch}
-              _hover={{ bg: 'transparent' }}
-            >
-              <CloseIcon boxSize={3} />
-            </IconButton>
-          </InputRightElement>
-        )}
       </InputGroup>
 
       {isFocused && searchQuery && (
@@ -132,7 +124,12 @@ export const PlayerSearch = ({
           overflowY="auto"
         >
           {filteredPlayers.length > 0 ? (
-            <VStack align="stretch" spacing={0} divider={<Box borderColor="gray.200" />}>
+            <VStack
+              separator={<StackSeparator borderColor="gray.200" />}
+              gap={2}
+              align="stretch"
+              mt={2}
+            >
               {filteredPlayers.map((player) => (
                 <Flex
                   key={player.id}
@@ -150,10 +147,10 @@ export const PlayerSearch = ({
                   aria-label={`Select ${player.name}, ${player.pos} - ${player.nflTeam}`}
                 >
                   <Box>
-                    <Text fontWeight="medium" isTruncated>
+                    <Text truncate fontWeight="medium">
                       {player.name}
                     </Text>
-                    <Text fontSize="sm" color="gray.500" isTruncated>
+                    <Text truncate fontSize="sm" color="gray.500">
                       {player.pos} • {player.nflTeam}
                     </Text>
                   </Box>
@@ -188,7 +185,7 @@ export const PlayerSearch = ({
         >
           <Flex justifyContent="space-between" alignItems="center" mb={3}>
             <Box>
-              <Text fontWeight="bold" fontSize="lg">
+              <Text truncate fontWeight="bold" fontSize="lg">
                 {selectedPlayer.name}
               </Text>
               <Text color="gray.500" fontSize="sm">

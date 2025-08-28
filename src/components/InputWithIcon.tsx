@@ -1,41 +1,37 @@
-import React, { ChangeEvent, ReactNode } from 'react';
-import { Input, InputGroup, InputGroupProps, InputProps } from '@chakra-ui/react';
-import { InputLeftElement } from '@chakra-ui/input';
-import { SearchIcon } from '@chakra-ui/icons';
+import { ChangeEvent, ReactNode } from 'react';
+import { Input, InputGroup, InputGroupProps, InputElement, InputProps } from '@chakra-ui/react';
 
-type InputWithIconProps = {
+interface InputWithIconProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   children?: ReactNode;
   inputProps?: Omit<InputProps, 'onChange' | 'value' | 'placeholder'>;
-} & Omit<InputGroupProps, 'children' | 'onChange'>;
+  [key: string]: any; // For any additional props
+}
 
-export const InputWithIcon = ({
+const InputWithIcon = ({
   value,
   onChange,
-  placeholder = 'Search...',
+  placeholder = '',
   children,
   inputProps = {},
   ...props
 }: InputWithIconProps) => {
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
-  };
-
   return (
     <InputGroup {...props}>
-      <InputLeftElement pointerEvents="none">
-        {React.Children.count(children) > 0 ? React.Children.only(children) : <SearchIcon color="gray.300" />}
-      </InputLeftElement>
+      {children && (
+        <InputElement pointerEvents="none" children={children} />
+      )}
       <Input
-        type="text"
         value={value}
-        onChange={handleChange}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
         placeholder={placeholder}
-        variant="outline"
+        pl={children ? '2.5rem' : undefined}
         {...inputProps}
       />
     </InputGroup>
   );
 };
+
+export default InputWithIcon;
