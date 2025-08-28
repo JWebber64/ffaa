@@ -1,63 +1,129 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSpeech, type AuctioneerStyle } from './useSpeech';
+import { 
+  parseBidFromSpeech, 
+  type Team, 
+  type BidRecognitionResult as ParserBidRecognitionResult 
+} from '../utils/speechParser';
 
-// Extend Window interface to include webkitSpeechRecognition
-declare global {
-  interface Window {
-    webkitSpeechRecognition: typeof SpeechRecognition;
-    SpeechRecognition: typeof SpeechRecognition;
-  }
+// Re-export types for backward compatibility
+export type { Team };
+export type BidRecognitionResult = ParserBidRecognitionResult;
+
+interface UseBidRecognitionOptions {
+  /** The auctioneer style to use for speech synthesis */
+  style?: AuctioneerStyle;
+  /** Minimum confidence threshold for accepting a bid (0-1) */
+  minConfidence?: number;
+  /** Whether to announce recognized bids using speech synthesis */
+  announceBids?: boolean;
+  /** Callback when a bid is recognized */
+  onBidRecognized?: (result: BidRecognitionResult) => void;
 }
 
-interface Team {
-  id: number;
-  name: string;
-  aliases?: string[];
-}
+export function useBidRecognition(
+  teams: Team[],
+  options: UseBidRecognitionOptions = {}
+) {
+  const {
+    style = 'classic',
+    minConfidence = 0.7,
+    announceBids = true,
+    onBidRecognized
+  } = options;
 
-type BidRecognitionResult = {
-  amount: number;
-  teamId: number;
-  confidence: number;
-  transcript: string;
-} | null;
+  const { 
+    speak, 
+    listen, 
+    stopListening, 
+    isListening, 
+    error, 
+    isSupported 
+  } = useSpeech(style);
+  
+  const [lastResult, setLastResult] = useState<BidRecognitionResult | null>(null);
+  const activeListenRef = useRef<(() => void) | null>(null);
 
-// Helper function to convert words to numbers
-const wordToNumber = (word: string): number | null => {
-  const numberMap: Record<string, number> = {
-    'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4,
-    'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9,
-    'ten': 10, 'eleven': 11, 'twelve': 12, 'thirteen': 13,
-    'fourteen': 14, 'fifteen': 15, 'sixteen': 16, 'seventeen': 17,
-    'eighteen': 18, 'nineteen': 19, 'twenty': 20, 'thirty': 30,
-    'forty': 40, 'fifty': 50, 'sixty': 60, 'seventy': 70,
-    'eighty': 80, 'ninety': 90, 'hundred': 100, 'thousand': 1000
+  // Handle speech recognition results
+  const handleSpeechResult = useCallback((transcript: string) => {
+    if (!transcript.trim()) return;
+
+    // Parse the bid using our pure parser
+    const result = parseBidFromSpeech(transcript, teams, minConfidence);
+    
+    if (result) {
+      setLastResult(result);
+      
+      if (announceBids) {
+        const { amount, teamId } = result;
+        const team = teams.find(t => t.id === teamId);
+        const teamName = team?.name || 'Unknown team';
+        speak(`Bid of ${amount} for ${teamName}`);
+      }
+      
+      onBidRecognized?.(result);
+    }
+  }, [announceBids, minConfidence, onBidRecognized, speak, teams]);
+
+  // Set up speech recognition
+  useEffect(() => {
+    if (!isSupported) return;
+
+    // Start listening with continuous mode
+    const cleanup = listen(
+      handleSpeechResult,
+      { 
+        continuous: true,
+        interimResults: false,
+        onError: (err: Error) => {
+          console.error('Speech recognition error:', err);
+        }
+      }
+    );
+
+    activeListenRef.current = cleanup;
+    return () => {
+      cleanup();
+      activeListenRef.current = null;
+    };
+  }, [handleSpeechResult, isSupported, listen]);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (activeListenRef.current) {
+        activeListenRef.current();
+        activeListenRef.current = null;
+      }
+    };
+  }, []);
+
+  const startListening = useCallback(() => {
+    if (activeListenRef.current) return;
+    const cleanup = listen(handleSpeechResult, { 
+      continuous: true, 
+      interimResults: false 
+    });
+    activeListenRef.current = cleanup;
+  }, [handleSpeechResult, listen]);
+
+  const stopListeningHandler = useCallback(() => {
+    if (activeListenRef.current) {
+      activeListenRef.current();
+      activeListenRef.current = null;
+    }
+    stopListening();
+  }, [stopListening]);
+
+  return {
+    lastResult,
+    isListening,
+    error,
+    isSupported,
+    startListening,
+    stopListening: stopListeningHandler,
+    reset: () => setLastResult(null)
   };
-
-  // Check if the word is already a number
-  const num = parseInt(word, 10);
-  if (!isNaN(num)) return num;
-  
-  // Convert word to number if it's in the map
-  return numberMap[word.toLowerCase()] ?? null;
-};
-
-export function useBidRecognition(teams: Team[]) {
-  const [isListening, setIsListening] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
-  
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const finalTranscriptRef = useRef('');
-  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Enhanced team matching with fuzzy search
-  const findMatchingTeam = useCallback((text: string): { id: number; confidence: number } | null => {
-    if (!teams.length) return null;
-    
-    const words = text.toLowerCase().split(/\s+/);
-    
-    // First, try to match team names exactly or partially
-    for (const team of teams) {
       const teamName = team.name.toLowerCase();
       const aliases = team.aliases?.map(a => a.toLowerCase()) || [];
       
@@ -104,125 +170,51 @@ export function useBidRecognition(teams: Team[]) {
     }
     
     return null;
-  }, []);
 
   // Process transcript to extract bid information
   const processTranscript = useCallback((transcript: string): BidRecognitionResult => {
     console.log('Processing transcript:', transcript);
     
-    // Find team and amount in the transcript
-    const teamMatch = findMatchingTeam(transcript);
-    const amountMatch = parseBidAmount(transcript);
-    
-    if (teamMatch && amountMatch) {
-      return {
-        teamId: teamMatch.id,
-        amount: amountMatch.amount,
-        confidence: (teamMatch.confidence + amountMatch.confidence) / 2,
-        transcript
-      };
-    }
-    
-    return null;
-  }, [findMatchingTeam, parseBidAmount]);
+    // Set up speech recognition
+    const result = parseBidFromSpeech(transcript, teams, minConfidence);
+    return result;
+  }, [teams, minConfidence]);
 
-  // Initialize speech recognition
   useEffect(() => {
-    const initRecognition = (): SpeechRecognition | null => {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      
-      if (!SpeechRecognition) {
-        setError('Speech recognition is not supported in this browser');
-        return null;
+    if (!isSupported) return;
+
+    // Start listening with continuous mode
+    const cleanup = listen(
+      handleSpeechResult,
+      { 
+        continuous: true,
+        interimResults: false,
+        onError: (error) => {
+          console.error('Speech recognition error:', error);
+        }
       }
+    );
 
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'en-US';
-      
-      // Configure recognition
-      recognition.maxAlternatives = 3; // Get multiple recognition alternatives
-      recognitionRef.current = recognition;
-      
-      // Set up event handlers
-      recognition.onstart = () => {
-        setIsListening(true);
-        setError(null);
-      };
-      
-      recognition.onend = () => {
-        setIsListening(false);
-      };
-      
-      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-        console.error('Speech recognition error', event.error);
-        setError(`Speech recognition error: ${event.error}`);
-        setIsListening(false);
-      };
-      
-      setIsInitialized(true);
-      return recognition;
-    };
-
-    const recognition = initRecognition();
-    
+    activeListenRef.current = cleanup;
     return () => {
-      if (recognition) {
-        recognition.stop();
-      }
-      if (silenceTimerRef.current) {
-        clearTimeout(silenceTimerRef.current);
-      }
+      cleanup();
+      activeListenRef.current = null;
     };
-  }, []);
+  }, [handleSpeechResult, isSupported, listen]);
 
-  const startListening = useCallback((onBid: (result: BidRecognitionResult) => void) => {
-    if (!recognitionRef.current) {
-      setError('Speech recognition not initialized');
-      return () => {};
-    }
+  const startListening = useCallback(() => {
+    if (activeListenRef.current) return;
+    const cleanup = listen(handleSpeechResult, { 
+      continuous: true, 
+      interimResults: false 
+    });
+    activeListenRef.current = cleanup;
+  }, [handleSpeechResult, listen]);
 
-    try {
-      finalTranscriptRef.current = '';
-      
-      const handleResult = (event: SpeechRecognitionEvent) => {
-        // Reset silence timer
-        if (silenceTimerRef.current) {
-          clearTimeout(silenceTimerRef.current);
-        }
-        
-        // Process all results for better accuracy
-        let finalTranscript = '';
-        
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript + ' ';
-          }
-        }
-        
-        finalTranscriptRef.current = finalTranscript.trim();
-        
-        // Process the final transcript if we have one
-        if (finalTranscript) {
-          const result = processTranscript(finalTranscript);
-          if (result) {
-            onBid(result);
-          }
-        }
-        
-        // Set a timer to handle end of speech
-        silenceTimerRef.current = setTimeout(() => {
-          if (finalTranscriptRef.current) {
-            const finalResult = processTranscript(finalTranscriptRef.current);
-            if (finalResult) {
-              onBid(finalResult);
-            }
-            finalTranscriptRef.current = '';
-          }
-        }, 1000); // 1 second of silence indicates end of phrase
-      };
-      
+  const stopListeningHandler = useCallback(() => {
+    if (activeListenRef.current) {
+      activeListenRef.current();
+      activeListenRef.current = null;
       // Set up event handlers
       recognitionRef.current.onresult = handleResult as any;
       

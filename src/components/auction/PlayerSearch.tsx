@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import type { KeyboardEvent } from 'react';
+import type { KeyboardEvent, MouseEvent } from 'react';
 import {
   Box,
   Input,
@@ -14,7 +14,7 @@ import {
   IconButton
 } from '@chakra-ui/react';
 import { SearchIcon, CloseIcon } from '@chakra-ui/icons';
-import { Player } from '../../store/draftStoreV2';
+import type { Player } from '../../store/draftStoreV2';
 import { useDebounce } from '../../hooks/useDebounce';
 
 interface PlayerSearchProps {
@@ -61,11 +61,19 @@ export const PlayerSearch = ({
     }
   }, []);
 
-  const handleClearSearch = useCallback(() => {
+  const handleClearSearch = useCallback((e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     setSearchQuery('');
   }, []);
+  
+  // Handle starting bid change
+  const handleBidChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    onSetStartingBid(e.target.value);
+  }, [onSetStartingBid]);
 
-  const getPositionColor = (position: string) => {
+  type ColorScheme = 'blue' | 'green' | 'purple' | 'orange' | 'yellow' | 'red' | 'gray';
+
+  const getPositionColor = (position: string): ColorScheme => {
     switch (position) {
       case 'QB': return 'blue';
       case 'RB': return 'green';
@@ -101,10 +109,11 @@ export const PlayerSearch = ({
               aria-label="Clear search"
               size="sm"
               variant="ghost"
-              icon={<CloseIcon boxSize={3} />}
               onClick={handleClearSearch}
               _hover={{ bg: 'transparent' }}
-            />
+            >
+              <CloseIcon boxSize={3} />
+            </IconButton>
           </InputRightElement>
         )}
       </InputGroup>
@@ -129,7 +138,7 @@ export const PlayerSearch = ({
                   key={player.id}
                   p={3}
                   _hover={{ bg: hoverBg, cursor: 'pointer' }}
-                  onMouseDown={(e) => {
+                  onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
                     e.preventDefault(); // Prevent input blur
                     onSelectPlayer(player);
                     setSearchQuery('');
@@ -199,7 +208,7 @@ export const PlayerSearch = ({
             type="number"
             placeholder="Starting bid"
             value={startingBid}
-            onChange={(e) => onSetStartingBid(e.target.value)}
+            onChange={handleBidChange}
             min="1"
             mt={2}
           />
