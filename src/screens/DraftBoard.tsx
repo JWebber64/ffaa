@@ -11,10 +11,21 @@ import {
 import { useMemo, useState } from "react";
 import {
   useDraftStore,
-  type Player,
-  type Team,
-  type Position,
+  type Player as BasePlayer,
+  type Team as BaseTeam,
 } from "../store/draftStore";
+
+type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'FLEX' | 'K' | 'DEF' | 'BENCH';
+type RosterPosition = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
+
+interface Player extends Omit<BasePlayer, 'pos'> {
+  pos: RosterPosition;
+  slot?: Position;
+}
+
+interface Team extends Omit<BaseTeam, 'roster'> {
+  roster: Record<Position, number>;
+}
 
 /**
  * DraftBoard
@@ -40,10 +51,14 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
   const columns = teams.length;
 
   // Row order is driven by template roster
-  const slotRows: { key: Position; label: string; count: number }[] = useMemo(() => {
-    const order: Position[] = ["QB", "RB", "WR", "TE", "FLEX", "BENCH"];
+  const slotRows = useMemo(() => {
+    const order: Position[] = ["QB", "RB", "WR", "TE", "FLEX", "K", "DEF", "BENCH"];
     return order
-      .map((k) => ({ key: k, label: k, count: templateRoster[k] ?? 0 }))
+      .map((key) => ({ 
+        key, 
+        label: key, 
+        count: templateRoster[key as keyof typeof templateRoster] ?? 0 
+      }))
       .filter((r) => r.count > 0);
   }, [templateRoster]);
 
@@ -61,16 +76,18 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
 
   const takeFrom = (
     list: Player[] | undefined,
-    wanted: (p: Player) => boolean,
+    predicate: (p: Player) => boolean,
     n: number
   ) => {
     if (!list || !list.length || n <= 0) return [];
-    const res: Player[] = [];
-    for (const p of list) {
-      if (wanted(p)) res.push(p);
-      if (res.length === n) break;
+    const result: Player[] = [];
+    for (const player of list) {
+      if (predicate(player)) {
+        result.push(player);
+        if (result.length === n) break;
+      }
     }
-    return res;
+    return result;
   };
 
   const remainingForFlex = (
@@ -79,41 +96,56 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
     n: number
   ) => {
     if (!list || !list.length || n <= 0) return [];
-    const res: Player[] = [];
-    for (const p of list) {
-      if (usedIds.has(p.id)) continue;
+    const result: Player[] = [];
+    
+    for (const player of list) {
+      if (usedIds.has(player.id)) continue;
+      
       // FLEX accepts RB/WR/TE (or players assigned with slot "FLEX")
-      if (p.slot === "FLEX" || p.pos === "RB" || p.pos === "WR" || p.pos === "TE") {
-        res.push(p);
-        if (res.length === n) break;
+      const isFlexEligible = (
+        player.slot === 'FLEX' || 
+        ['RB', 'WR', 'TE'].includes(player.pos)
+      );
+      
+      if (isFlexEligible) {
+        result.push(player);
+        if (result.length === n) break;
       }
     }
-    return res;
+    
+    return result;
   };
 
   const renderSlotBoxes = (team: Team) => {
     const drafted = draftedByTeam[team.id] ?? [];
 
-    const qb = takeFrom(drafted, (p) => p.slot === "QB", team.roster.QB ?? 0);
-    const rb = takeFrom(drafted, (p) => p.slot === "RB", team.roster.RB ?? 0);
-    const wr = takeFrom(drafted, (p) => p.slot === "WR", team.roster.WR ?? 0);
-    const te = takeFrom(drafted, (p) => p.slot === "TE", team.roster.TE ?? 0);
+    // Get players by position, respecting their assigned slots
+    const qb = takeFrom(drafted, (p) => p.slot === 'QB', team.roster.QB ?? 0);
+    const rb = takeFrom(drafted, (p) => p.slot === 'RB', team.roster.RB ?? 0);
+    const wr = takeFrom(drafted, (p) => p.slot === 'WR', team.roster.WR ?? 0);
+    const te = takeFrom(drafted, (p) => p.slot === 'TE', team.roster.TE ?? 0);
 
+    // Track used player IDs to avoid duplicates
     const used = new Set<string>([...qb, ...rb, ...wr, ...te].map((p) => p.id));
 
+    // Get FLEX players (RB/WR/TE not already used in their primary position)
     const flx = remainingForFlex(drafted, used, team.roster.FLEX ?? 0);
     for (const p of flx) used.add(p.id);
 
+    // Fill bench with remaining players
     const benchNeeded = team.roster.BENCH ?? 0;
     const bench: Player[] = [];
     for (const p of drafted) {
-      if (!used.has(p.id) && bench.length < benchNeeded) bench.push(p);
+      if (!used.has(p.id) && bench.length < benchNeeded) {
+        bench.push(p);
+      }
     }
 
-    const k = takeFrom(drafted, (p) => p.slot === "K", team.roster.K ?? 0);
-    const def = takeFrom(drafted, (p) => p.slot === "DEF", team.roster.DEF ?? 0);
+    // Get K and DEF players
+    const k = takeFrom(drafted, (p) => p.pos === 'K', team.roster.K ?? 0);
+    const def = takeFrom(drafted, (p) => p.pos === 'DEF', team.roster.DEF ?? 0);
 
-    // Create a record with all position types
+    // Initialize with all position types to prevent undefined access
     const pile: Record<Position, Player[]> = {
       QB: qb,
       RB: rb,
@@ -129,9 +161,14 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
       <Stack spacing={3}>
         {slotRows.map(({ key, label, count }) =>
           Array.from({ length: count }).map((_, i) => {
-            const draftedHere = pile[key]?.[i];
+            const players = pile[key as keyof typeof pile] || [];
+            const player = players[i];
             return (
-              <SlotBox key={`${team.id}-${key}-${i}`} label={label} player={draftedHere} />
+              <SlotBox 
+                key={`${team.id}-${key}-${i}`} 
+                label={label} 
+                player={player} 
+              />
             );
           })
         )}
@@ -178,7 +215,7 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
         <Box
           display="grid"
           gridTemplateColumns={`repeat(${columns}, ${COL_WIDTH}px)`}
-          spacing="12px"
+          gap="12px"
           p="12px"
           minW={`${columns * (COL_WIDTH + 12)}px`}
         >
@@ -246,7 +283,12 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
   );
 }
 
-function SlotBox({ label, player }: { label: string; player?: Player }) {
+interface SlotBoxProps {
+  label: string;
+  player?: Player;
+}
+
+function SlotBox({ label, player }: SlotBoxProps) {
   return (
     <Box
       bg="#233347"
@@ -275,14 +317,14 @@ function SlotBox({ label, player }: { label: string; player?: Player }) {
             </Text>
             <Text fontSize="xs" opacity={0.8}>
               {player.pos}
-              {player.slot && player.slot !== player.pos ? ` → ${player.slot}` : ""}{" "}
-              {player.nflTeam ? `• ${player.nflTeam}` : ""}
+              {player.slot && player.slot !== player.pos ? ` → ${player.slot}` : ""}
+              {player.nflTeam && ` • ${player.nflTeam}`}
             </Text>
           </Box>
           <Text fontWeight={700}>${player.price ?? 0}</Text>
         </>
       ) : (
-        <Text opacity={0.7} style={{ margin: "0 auto" }}>
+        <Text opacity={0.7} textAlign="center" width="100%">
           {label}
         </Text>
       )}

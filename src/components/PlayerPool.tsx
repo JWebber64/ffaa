@@ -10,8 +10,7 @@ import {
   SimpleGrid,
   Divider,
 } from '@chakra-ui/react';
-import { useDraftStore } from '../store/draftStore.new';
-import type { Player } from '../store/draftStore';
+import { useDraftStore, type Player } from '../store/draftStore';
 
 type Pos = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
 
@@ -21,10 +20,13 @@ export interface PlayerPoolProps {
 
 const POS_ORDER: Pos[] = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'];
 
-const PlayerRow: React.FC<{
+interface PlayerRowProps {
   p: Player;
   onNominate?: (id: string, name?: string) => void;
-}> = ({ p, onNominate }) => {
+  nominate: (playerId: string, startingBid?: number) => void;
+}
+
+const PlayerRow: React.FC<PlayerRowProps> = ({ p, onNominate, nominate }) => {
   return (
     <HStack
       spacing={3}
@@ -200,6 +202,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({ onNominate }) => {
                     key={p.id}
                     p={p}
                     onNominate={onNominate}
+                    nominate={nominate}
                   />
                 ))}
               </VStack>

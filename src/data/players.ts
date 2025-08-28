@@ -9,4 +9,5 @@ export const FALLBACK_PLAYERS: Player[] = [
   { id: 'TE-001', name: 'Travis Kelce', pos: 'TE', nflTeam: 'KC' },
   { id: 'K-001',  name: 'Justin Tucker', pos: 'K',  nflTeam: 'BAL' },
   { id: 'DEF-001', name: '49ers D/ST', pos: 'DEF', nflTeam: 'SF' },
+  // Note: Using 'DEF' for position while keeping 'D/ST' in the display name for user clarity
 ];

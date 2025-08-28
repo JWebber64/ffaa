@@ -2,43 +2,29 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { produce } from 'immer';
 
-export type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
-export type BasePosition = Position;
-
-// === Auction constraints (tune to your league) ===
-const ROSTER_SIZE = 16; // total roster spots each team must fill
-
-// Optional: per-position caps (used by hasSlotFor)
-const POSITION_CAP: Record<Position, number> = {
-  QB: 2, RB: 6, WR: 6, TE: 3, K: 2, DEF: 2,
-};
-
-// Helper: how many players a team already drafted
-function draftedCountForTeam(players: Player[], teamId: number) {
-  return players.reduce((acc, p) => acc + (p.draftedBy === teamId ? 1 : 0), 0);
-}
+export type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF' | 'FLEX' | 'BENCH';
 
 export interface Team {
   id: number;
   name: string;
-  budget: number; // remaining dollars
-  // optional: simple roster counts by position
-  roster: Partial<Record<Position, number>>;
+  budget: number;
+  roster: Record<Position, number>;
 }
 
 export interface Player {
   id: string;
   name: string;
-  pos: BasePosition;
+  pos: Position;
   nflTeam?: string;
-  draftedBy?: number;  // teamId if drafted
-  price?: number;      // price drafted for
+  draftedBy?: number;
+  price?: number;
 }
 
 export interface Nomination {
   playerId: string;
+  startingBid?: number;
   currentBid: number;
-  highBidder?: number; // teamId
+  highBidder?: number;
 }
 
 interface DraftState {
@@ -47,248 +33,177 @@ interface DraftState {
   teams: Team[];
   nominationQueue: Nomination[];
   currentBidder?: number;
+  baseBudget: number;
+  teamCount: number;
+  templateRoster: Record<Position, number>;
+  currentNominatedId?: string | null;
 
   // actions
   setPlayers: (players: Player[]) => void;
   setTeams: (teams: Team[]) => void;
   setCurrentBidder: (teamId?: number) => void;
-
-  nominate: (playerId: string, startAmount?: number) => void;
-  placeBid: (playerId: string, byTeamId: number, amount: number) => void | Promise<void>;
-  assignPlayer: (playerId: string, teamId: number, price: number) => void | Promise<void>;
-
-  // helpers
+  setCurrentNominatedId: (id: string | null) => void;
+  nominate: (playerId: string, startingBid?: number) => void;
+  placeBid: (playerId: string, byTeamId: number, amount: number) => void;
+  assignPlayer: (playerId: string, teamId: number, price: number) => void;
   computeMaxBid: (teamId: number) => number;
-  hasSlotFor: (teamId: number, pos: string) => boolean;
+  hasSlotFor: (teamId: number, pos: Position) => boolean;
+}
+
+// Auction constraints
+const ROSTER_SIZE = 16;
+const POSITION_CAP: Record<Position, number> = {
+  QB: 2, RB: 6, WR: 6, TE: 3, K: 2, DEF: 2, FLEX: 1, BENCH: 6
+};
+
+// Helper: count players drafted by a team
+function draftedCountForTeam(players: Player[], teamId: number): number {
+  return players.filter(p => p.draftedBy === teamId).length;
 }
 
 export const useDraftStore = create<DraftState>()(
   persist(
     (set, get) => ({
       players: [],
-      teams: [
-        // seed demo teams if you want:
-        // { id: 1, name: 'Team A', budget: 200, roster: {} },
-        // { id: 2, name: 'Team B', budget: 200, roster: {} },
-      ],
+      teams: [],
+      baseBudget: 200,
+      teamCount: 12,
+      templateRoster: POSITION_CAP,
       nominationQueue: [],
-      currentBidder: undefined,
+      currentNominatedId: null,
 
-  setPlayers(players) {
-    set({ players });
-  },
+        setPlayers: (players: Player[]) => set({ players }),
+        setTeams: (teams: Team[]) => set({ teams }),
+        setCurrentNominatedId: (id: string | null) => set({ currentNominatedId: id }),
+        setCurrentBidder: (teamId?: number) => set({ currentBidder: teamId }),
+        nominate: (playerId: string, startingBid: number = 1) => {
+          const { players, nominationQueue } = get();
+          const player = players.find(p => p.id === playerId);
+          
+          if (!player || player.draftedBy !== undefined) {
+            throw new Error('Invalid player or already drafted');
+          }
+          
+          const newNomination: Nomination = {
+            playerId,
+            startingBid,
+            currentBid: startingBid,
+            highBidder: undefined
+          };
+          
+          set({
+            nominationQueue: [...nominationQueue, newNomination],
+            currentNominatedId: playerId
+          });
+        },
 
-  setTeams(teams) {
-    set({ teams });
-  },
+        computeMaxBid: (teamId: number): number => {
+          const { players, teams } = get();
+          const team = teams.find(t => t.id === teamId);
+          if (!team) return 0;
 
-  setCurrentBidder(teamId) {
-    set({ currentBidder: teamId });
-  },
+          const draftedCount = draftedCountForTeam(players, teamId);
+          const remainingSlots = ROSTER_SIZE - draftedCount;
+          if (remainingSlots <= 0) return 0;
 
-  nominate: (playerId, startingBid = 1) =>
-    set(
-      produce((draft: DraftState) => {
-        if (!playerId) return;
+          const reserve = remainingSlots - 1;
+          return Math.max(0, team.budget - reserve);
+        },
 
-        // guards
-        const player = draft.players.find((p: Player) => p.id === playerId);
-        if (!player) return;
-        if (player.draftedBy !== undefined) return;
-        if (draft.nominationQueue.some((n: { playerId: string }) => n.playerId === playerId)) return;
+        hasSlotFor: (teamId: number, pos: Position): boolean => {
+          const { players, teams } = get();
+          const team = teams.find(t => t.id === teamId);
+          if (!team) return false;
 
-        // put new nomination at the FRONT so queue[0] is always the current lot
-        draft.nominationQueue.unshift({ 
-          playerId, 
-          currentBid: Math.max(1, startingBid),
-          highBidder: undefined // Reset bidder until someone places a bid
-        });
+          const currentCount = team.roster[pos] || 0;
+          return currentCount < (POSITION_CAP[pos] || 0);
+        },
 
-        // Reset current bidder when a new player is nominated
-        draft.currentBidder = undefined;
-      })
-    ),
-  },
+        placeBid: (playerId: string, byTeamId: number, amount: number) => {
+          const { players, teams, nominationQueue, computeMaxBid } = get();
+          
+          // Validate player exists and not drafted
+          const player = players.find(p => p.id === playerId);
+          if (!player || player.draftedBy !== undefined) {
+            throw new Error('Invalid player or already drafted');
+          }
 
-  placeBid(playerId, byTeamId, amount) {
-    const { nominationQueue, computeMaxBid } = get();
+          // Validate team exists
+          const team = teams.find(t => t.id === byTeamId);
+          if (!team) {
+            throw new Error('Team not found');
+          }
 
-    const idx = nominationQueue.findIndex((n) => n.playerId === playerId);
-    if (idx < 0) return;
+          // Validate bid amount
+          const maxBid = computeMaxBid(byTeamId);
+          if (amount < 1 || amount > maxBid) {
+            throw new Error(`Bid amount must be between $1 and $${maxBid}`);
+          }
 
-    const max = computeMaxBid(byTeamId);
-    if (amount < 1 || amount > max) {
-      throw new Error(`Bid must be between $1 and your max ($${max}).`);
-    }
+          // Update nomination
+          set({
+            nominationQueue: nominationQueue.map(nom => 
+              nom.playerId === playerId 
+                ? { ...nom, currentBid: amount, highBidder: byTeamId }
+                : nom
+            )
+          });
+        },
 
-    const next = nominationQueue.slice();
-    next[idx] = {
-      ...next[idx],
-      currentBid: amount,
-      highBidder: byTeamId,
-    };
-    set({ nominationQueue: next });
-  },
+        assignPlayer: (playerId: string, teamId: number, price: number) => {
+          const { players, teams, computeMaxBid, hasSlotFor } = get();
+          
+          // Validate player exists and not drafted
+          const player = players.find(p => p.id === playerId);
+          if (!player || player.draftedBy !== undefined) {
+            throw new Error('Invalid player or already drafted');
+          }
 
-  assignPlayer(playerId, teamId, price) {
-    const { players, teams, nominationQueue } = get();
+          // Validate team exists
+          const team = teams.find(t => t.id === teamId);
+          if (!team) {
+            throw new Error('Team not found');
+          }
 
-    const pIndex = players.findIndex((p) => p.id === playerId);
-    if (pIndex < 0) throw new Error('Player not found');
+          // Validate price and slot availability
+          if (price > computeMaxBid(teamId) || !hasSlotFor(teamId, player.pos)) {
+            throw new Error('Invalid bid or no available slot');
+          }
 
-    const tIndex = teams.findIndex((t) => t.id === teamId);
-    if (tIndex < 0) throw new Error('Team not found');
-
-    const player = { ...players[pIndex], draftedBy: teamId, price };
-    const team = { ...teams[tIndex] };
-
-    // Budget and roster increments
-    team.budget = Math.max(0, team.budget - price);
-    const pos = player.pos as Position;
-    const roster = { ...(team.roster || {}) };
-    roster[pos] = (roster[pos] || 0) + 1;
-    team.roster = roster;
-
-    const nextPlayers = players.slice();
-    nextPlayers[pIndex] = player;
-
-    const nextTeams = teams.slice();
-    nextTeams[tIndex] = team;
-
-    // Remove from queue (if it was the current lot, queue[1] becomes next lot)
-    const nextQueue = nominationQueue.filter((n) => n.playerId !== playerId);
-
-    set({ players: nextPlayers, teams: nextTeams, nominationQueue: nextQueue });
-  },
-
-  computeMaxBid(teamId) {
-    const { teams, players } = get();
-    const team = teams.find((t) => t.id === teamId);
-    if (!team) return 0;
-
-    // Remaining roster slots (can't be negative)
-    const drafted = draftedCountForTeam(players, teamId);
-    const slotsRemaining = Math.max(0, ROSTER_SIZE - drafted);
-    
-    // Reserve $1 for each slot *after this bid*
-    // Example: if 5 slots remain, you must keep at least $4 so you can pay $1 for each of the other 4 slots.
-    const requiredReserve = Math.max(0, slotsRemaining - 1);
-
-    return Math.max(0, team.budget - requiredReserve);
-  },
-
-  hasSlotFor(teamId, pos) {
-    const { teams } = get();
-    const team = teams.find((t) => t.id === teamId);
-    if (!team) return false;
-
-    const key = (pos || '').toUpperCase() as Position;
-    const cap = POSITION_CAP[key];
-    if (!cap) return true; // if no cap is defined for this pos, allow
-
-    const current = team.roster?.[key] || 0;
-    return current < cap;
-  },
-      setPlayers: (players: Player[]) => set({ players }),
-      setTeams: (teams: Team[]) => set({ teams }),
-      setCurrentBidder: (teamId?: number) => set({ currentBidder: teamId }),
-
-      nominate: (playerId: string, startAmount = 1) =>
-        set(
-          produce((draft: DraftState) => {
-            if (!playerId) return;
-
-            // guards
-            const player = draft.players.find((p) => p.id === playerId);
-            if (!player) return;
-            if (player.draftedBy !== undefined) return;
-            if (draft.nominationQueue.some((n) => n.playerId === playerId)) return;
-
-            // put new nomination at the FRONT so queue[0] is always the current lot
-            draft.nominationQueue.unshift({
-              playerId,
-              currentBid: Math.max(1, startAmount),
-              highBidder: undefined, // Reset bidder until someone places a bid
-            });
-
-            // Reset current bidder when a new player is nominated
-            draft.currentBidder = undefined;
-          })
-        ),
-
-      placeBid: (playerId: string, byTeamId: number, amount: number) =>
-        set(
-          produce((draft: DraftState) => {
-            const idx = draft.nominationQueue.findIndex((n) => n.playerId === playerId);
-            if (idx === -1) return;
-
-            const maxBid = get().computeMaxBid(byTeamId);
-            if (amount < 1 || amount > maxBid) {
-              throw new Error(`Bid must be between $1 and $${maxBid}`);
+          // Update state
+          set(produce((state: DraftState) => {
+            // Update player
+            const playerIndex = state.players.findIndex(p => p.id === playerId);
+            if (playerIndex !== -1) {
+              state.players[playerIndex].draftedBy = teamId;
+              state.players[playerIndex].price = price;
             }
 
-            draft.nominationQueue[idx].currentBid = amount;
-            draft.nominationQueue[idx].highBidder = byTeamId;
-          })
-        ),
-
-      assignPlayer: (playerId: string, teamId: number, price: number) =>
-        set(
-          produce((draft: DraftState) => {
-            const playerIndex = draft.players.findIndex((p) => p.id === playerId);
-            if (playerIndex === -1) throw new Error('Player not found');
-
-            const teamIndex = draft.teams.findIndex((t) => t.id === teamId);
-            if (teamIndex === -1) throw new Error('Team not found');
-
-            // Update player
-            draft.players[playerIndex].draftedBy = teamId;
-            draft.players[playerIndex].price = price;
-
             // Update team
-            const team = draft.teams[teamIndex];
-            team.budget -= price;
-            const pos = draft.players[playerIndex].pos as Position;
-            team.roster = {
-              ...team.roster,
-              [pos]: (team.roster?.[pos] || 0) + 1,
-            };
+            const teamIndex = state.teams.findIndex(t => t.id === teamId);
+            if (teamIndex !== -1) {
+              // Decrement budget
+              state.teams[teamIndex].budget -= price;
+              
+              // Update roster count
+              const pos = player.pos;
+              state.teams[teamIndex].roster[pos] = (state.teams[teamIndex].roster[pos] || 0) + 1;
+            }
 
-            // Remove from queue
-            draft.nominationQueue = draft.nominationQueue.filter((n) => n.playerId !== playerId);
-          })
-        ),
-
-      computeMaxBid: (teamId: number) => {
-        const { teams, players } = get();
-        const team = teams.find((t) => t.id === teamId);
-        if (!team) return 0;
-
-        // Remaining roster slots (can't be negative)
-        const drafted = players.filter((p) => p.draftedBy === teamId).length;
-        const slotsRemaining = Math.max(0, ROSTER_SIZE - drafted);
-        
-        // Reserve $1 for each slot *after this bid*
-        const requiredReserve = Math.max(0, slotsRemaining - 1);
-        return Math.max(0, team.budget - requiredReserve);
-      },
-
-      hasSlotFor: (teamId: number, pos: string) => {
-        const { teams } = get();
-        const team = teams.find((t) => t.id === teamId);
-        if (!team) return false;
-
-        const key = (pos || '').toUpperCase() as Position;
-        const cap = POSITION_CAP[key];
-        if (!cap) return true; // if no cap is defined for this pos, allow
-
-        const current = team.roster?.[key] || 0;
-        return current < cap;
-      },
-    }),
-    {
-      name: 'auction-draft-state',
-      storage: createJSONStorage(() => localStorage)
-    }
+            // Remove from nomination queue
+            state.nominationQueue = state.nominationQueue.filter(n => n.playerId !== playerId);
+            
+            // Clear current nominated if it was this player
+            if (state.currentNominatedId === playerId) {
+              state.currentNominatedId = null;
+            }
+          }));
+        }
+      }),
+      {
+        name: 'auction-draft-state',
+        storage: createJSONStorage(() => localStorage),
+        version: 1
+      }
+    )
   )
-);

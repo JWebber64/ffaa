@@ -15,7 +15,7 @@ import { SmallCloseIcon } from '@chakra-ui/icons';
 
 type InputVariant = 'outline' | 'filled' | 'flushed' | 'unstyled';
 
-export interface InputWithIconProps {
+type InputWithIconProps = {
   /** The current value of the input */
   value: string;
   /** Callback when input value changes */
