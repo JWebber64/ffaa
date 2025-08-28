@@ -23,7 +23,7 @@ const COUNTDOWN_SECONDS = 30;
 const Auctioneer: React.FC = () => {
   const toast = useToast();
 
-  // ---- store state & actions (rename to your actual selectors as needed) ----
+  // ---- store state & actions ----
   const {
     teams = [],
     players = [],
@@ -46,10 +46,11 @@ const Auctioneer: React.FC = () => {
 
   // ---- derive "who's up" from queue[0] ----
   const currentNom = nominationQueue?.[0] ?? null;
+
   const currentPlayer: Player | null = useMemo(() => {
     if (!currentNom) return null;
     return players.find((p) => p.id === currentNom.playerId) ?? null;
-  }, [nominationQueue, players]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentNom, players]);
 
   const currentBidderTeam: Team | undefined = useMemo(() => {
     return teams.find((t) => t.id === currentBidder);
@@ -185,9 +186,7 @@ const Auctioneer: React.FC = () => {
       <ButtonGroup size="sm" isAttached variant="outline">
         {teams.map((team) => {
           const disabled =
-            currentPlayer && !hasSlotFor
-              ? false
-              : currentPlayer
+            currentPlayer && hasSlotFor
               ? !hasSlotFor(team.id, currentPlayer.pos || '')
               : false;
 
@@ -329,7 +328,7 @@ const Auctioneer: React.FC = () => {
         <Box>
           <PlayerSearch
             players={players}
-            onSelectPlayer={handlePlayerSelect}
+            onSelect={handlePlayerSelect}
             selectedPlayer={null}
             onSetStartingBid={(bid) => setBidAmount(Math.max(1, Number(bid) || 1))}
             startingBid={String(bidAmount)}
@@ -342,11 +341,9 @@ const Auctioneer: React.FC = () => {
             Player Pool
           </Text>
           <PlayerPool
-            onNominate={(playerId: string, _playerName?: string) => {
+            onNominate={(playerId: string) => {
               const p = players.find((pl) => pl.id === playerId);
-              if (p) {
-                handlePlayerSelect(p);
-              }
+              if (p) handlePlayerSelect(p);
             }}
           />
         </Box>

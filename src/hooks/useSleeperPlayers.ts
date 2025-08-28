@@ -1,21 +1,20 @@
-import { useEffect, useState, useCallback } from "react";
-import type { Player, BasePosition } from "../store/draftStore";
-import { PLAYERS as FALLBACK } from "../data/players";
+import { useEffect, useState, useCallback } from 'react';
+import type { Player, BasePosition } from '../store/draftStore';
+import { FALLBACK_PLAYERS } from '../data/players';
 
 type SleeperPlayer = {
   player_id: string;
   full_name?: string;
   first_name?: string;
   last_name?: string;
-  team?: string;                 // e.g. "KC"
-  position?: string;             // e.g. "RB", "WR", "D/ST", "PK"
-  fantasy_positions?: string[];  // e.g. ["WR"]
+  team?: string;
+  position?: string;
+  fantasy_positions?: string[];
   active?: boolean;
-  depth_chart_order?: number | null;
 };
 
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
-const LS_KEY = "sleeper_players_v2";
+const TTL_MS = 24 * 60 * 60 * 1000;
+const LS_KEY = 'sleeper_players_v2';
 
 const POSITION_LIMITS: Record<BasePosition, number> = {
   QB: 32,
@@ -27,21 +26,16 @@ const POSITION_LIMITS: Record<BasePosition, number> = {
 };
 
 function normalizePosition(posRaw?: string): BasePosition | null {
-  const p = (posRaw || "").toUpperCase();
-  if (p === "QB" || p === "RB" || p === "WR" || p === "TE") return p as BasePosition;
-  if (p === "D/ST" || p === "DST" || p === "DEF") return "DEF";
-  if (p === "PK" || p === "K") return "K";
-  return null; // we skip anything else
+  const p = (posRaw || '').toUpperCase();
+  if (p === 'QB' || p === 'RB' || p === 'WR' || p === 'TE') return p as BasePosition;
+  if (p === 'D/ST' || p === 'DST' || p === 'DEF') return 'DEF';
+  if (p === 'PK' || p === 'K') return 'K';
+  return null;
 }
 
 function toPlayer(sp: SleeperPlayer): Player | null {
-  const name =
-    sp.full_name ||
-    [sp.first_name, sp.last_name].filter(Boolean).join(" ").trim();
-  const posFromPrimary = normalizePosition(sp.position);
-  const posFromFantasy = normalizePosition(sp.fantasy_positions?.[0]);
-
-  const pos = posFromPrimary || posFromFantasy;
+  const name = sp.full_name || [sp.first_name, sp.last_name].filter(Boolean).join(' ').trim();
+  const pos = normalizePosition(sp.position) || normalizePosition(sp.fantasy_positions?.[0]);
   if (!name || !sp.player_id || !pos) return null;
 
   return {
@@ -52,14 +46,13 @@ function toPlayer(sp: SleeperPlayer): Player | null {
   };
 }
 
-function rankKey(p: Player): string {
-  // basic deterministic ordering: by pos, then team, then name
-  const order = ["QB", "RB", "WR", "TE", "K", "DEF"] as const;
+function rankKey(p: Player) {
+  const order = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'] as const;
   const i = order.indexOf(p.pos as (typeof order)[number]);
-  return `${i.toString().padStart(2, "0")}-${p.nflTeam || "ZZZ"}-${p.name}`;
+  return `${i.toString().padStart(2, '0')}-${p.nflTeam || 'ZZZ'}-${p.name}`;
 }
 
-function uniqueById(players: Player[]): Player[] {
+function uniqueById(players: Player[]) {
   const seen = new Set<string>();
   const out: Player[] = [];
   for (const p of players) {
@@ -90,49 +83,44 @@ export function useSleeperPlayers() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadPlayers = useCallback(async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
-      // 1) Try cache first
       const cachedRaw = localStorage.getItem(LS_KEY);
       if (cachedRaw) {
         const { data, ts } = JSON.parse(cachedRaw) as { data: Player[]; ts: number };
-        if (Date.now() - ts < CACHE_TTL_MS && Array.isArray(data) && data.length > 0) {
+        if (Date.now() - ts < TTL_MS && Array.isArray(data) && data.length > 0) {
           setPlayers(data);
           setLoading(false);
           return;
         }
       }
 
-      // 2) Fetch all players from Sleeper
-      const resp = await fetch("https://api.sleeper.app/v1/players/nfl");
-      if (!resp.ok) throw new Error(`Sleeper API error: ${resp.status}`);
+      const resp = await fetch('https://api.sleeper.app/v1/players/nfl');
+      if (!resp.ok) throw new Error(`Sleeper ${resp.status}`);
       const raw = (await resp.json()) as Record<string, SleeperPlayer>;
 
-      // 3) Map + filter
       const mapped: Player[] = Object.values(raw)
         .map(toPlayer)
         .filter((p): p is Player => !!p);
 
-      // 4) Order, unique, cap
       const ordered = mapped.sort((a, b) => rankKey(a).localeCompare(rankKey(b)));
       const unique = uniqueById(ordered);
       const capped = capByPosition(unique);
 
-      // 5) Save to cache
       setPlayers(capped);
       localStorage.setItem(LS_KEY, JSON.stringify({ data: capped, ts: Date.now() }));
     } catch (e) {
-      console.warn("[useSleeperPlayers] Falling back to local players.ts", e);
-      setPlayers(FALLBACK);
+      console.warn('[useSleeperPlayers] Falling back to local players.ts', e);
+      setPlayers(FALLBACK_PLAYERS);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    loadPlayers();
-  }, [loadPlayers]);
+    load();
+  }, [load]);
 
   return { players, loading };
 }
