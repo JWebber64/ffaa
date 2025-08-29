@@ -20,6 +20,7 @@ import {
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 import { useDraftStore, type Player, useDraftSelectors } from '../store/draftStore';
+import { formatPositionForDisplay } from '../utils/positionUtils';
 
 type Pos = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
 type TabValue = 'ALL' | Pos | 'FLEX';
@@ -31,7 +32,7 @@ const POSITION_NAMES: Record<Pos, string> = {
   WR: 'Wide Receivers',
   TE: 'Tight Ends',
   K: 'Kickers',
-  DEF: 'Defenses'
+  DEF: 'Defenses/STs'
 };
 
 const ALL_TABS: readonly TabValue[] = ['ALL', ...POS_ORDER, 'FLEX'] as const;
@@ -303,24 +304,16 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
           // Show grouped by position for position-specific tabs
           <VStack align="stretch" spacing={4}>
             {POS_ORDER.map((pos) => {
-              const players = groupedPlayers.get(pos) || [];
-              if (players.length === 0) return null;
+              const posPlayers = groupedPlayers.get(pos) || [];
+              if (posPlayers.length === 0) return null;
 
               return (
-                <Box key={pos}>
-                  <HStack mb={2} pl={2} justify="space-between">
-                    <HStack>
-                      <Text fontWeight="bold" fontSize="lg">
-                        {POSITION_NAMES[pos] || pos}
-                      </Text>
-                      <Badge colorScheme="gray" fontSize="0.7em">
-                        {players.length} {players.length === 1 ? 'player' : 'players'}
-                      </Badge>
-                    </HStack>
+                <Box key={pos} borderWidth="1px" borderRadius="lg" p={4} bg="gray.800">
+                  <HStack justify="space-between" mb={3}>
+                    <Text fontWeight="bold">{POSITION_NAMES[pos]}</Text>
                     <Button 
                       size="xs" 
-                      variant="ghost" 
-                      colorScheme="blue"
+                      variant="outline"
                       onClick={(e) => {
                         e.stopPropagation();
                         handlePositionTabClick(pos);
@@ -330,7 +323,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
                     </Button>
                   </HStack>
                   <VStack align="stretch" spacing={2}>
-                    {players.slice(0, 5).map((p) => (
+                    {posPlayers.slice(0, 5).map((p) => (
                       <PlayerRow
                         key={p.id}
                         p={p}
@@ -339,7 +332,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
                         showDebugInfo={showDebugInfo}
                       />
                     ))}
-                    {players.length > 5 && (
+                    {posPlayers.length > 5 && (
                       <Button 
                         size="sm" 
                         variant="ghost" 
@@ -350,7 +343,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
                         }}
                         mt={2}
                       >
-                        +{players.length - 5} more {pos} players
+                        +{posPlayers.length - 5} more {formatPositionForDisplay(pos as any)} players
                       </Button>
                     )}
                   </VStack>

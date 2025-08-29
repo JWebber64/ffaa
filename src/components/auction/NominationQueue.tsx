@@ -1,5 +1,6 @@
 import { VStack, HStack, Text, Box, Badge, Button } from '@chakra-ui/react';
 import { Player } from '../../store/draftStore';
+import { formatPositionForDisplay } from '../../utils/positionUtils';
 
 interface Nomination {
   playerId: string;
@@ -72,7 +73,9 @@ export const NominationQueue = ({
                 <Box flex={1}>
                   <HStack gap={2}>
                     <Text fontWeight="medium">{player.name}</Text>
-                    <Badge colorScheme={getPositionColor(player.pos)}>{player.pos}</Badge>
+                    <Badge colorScheme={getPositionColor(player.pos)}>
+                  {formatPositionForDisplay(player.pos as any)}
+                </Badge>
                     {player.nflTeam && (
                       <Badge variant="outline" colorScheme="gray">{player.nflTeam}</Badge>
                     )}

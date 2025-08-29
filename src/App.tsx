@@ -6,7 +6,7 @@ import Setup from './screens/Setup';
 import DraftBoard from './screens/DraftBoard';
 import Auctioneer from './screens/Auctioneer';
 import Results from './screens/Results';
-import PlayerPool from './screens/playerPool';
+import PlayerPool from './components/PlayerPool';
 import { useGlobalPlayers } from './hooks/useGlobalPlayers';
 import { useDraftStore } from './store';
 import { ConfigProvider } from './contexts/ConfigContext';

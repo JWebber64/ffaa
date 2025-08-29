@@ -16,6 +16,7 @@ import { FaClock, FaGavel, FaSync } from 'react-icons/fa';
 import { useDraftStore } from '../store';
 import type { Player, Team } from '../store/draftStore';
 import { useConfig } from '../contexts/ConfigContext';
+import { formatPositionForDisplay } from '../utils/positionUtils';
 import { PlayerSearch } from '../components/auction/PlayerSearch';
 import { ResetDraftButton } from '../components/auction/ResetDraftButton';
 
@@ -27,6 +28,7 @@ const Auctioneer: React.FC = () => {
   // ---- store state & actions (pulled via selectors to keep typing safe) ----
   const players = useDraftStore((s) => s.players);
   const teams = useDraftStore((s) => s.teams);
+  const adpLoaded = useDraftStore((s) => s.adpLoaded);
 
   const loadAdp = useDraftStore((s) => s.loadAdp);
   const nominate = useDraftStore((s) => s.nominate);
@@ -46,7 +48,6 @@ const Auctioneer: React.FC = () => {
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingAdp, setIsLoadingAdp] = useState<boolean>(false);
-  const [adpLoaded, setAdpLoaded] = useState<boolean>(false);
   const [time, setTime] = useState<number>(COUNTDOWN_SECONDS);
   const timerRef = useRef<number | null>(null);
 
@@ -128,7 +129,7 @@ const Auctioneer: React.FC = () => {
   // ---- ADP load effect ----
   useEffect(() => {
     const loadAdpData = async () => {
-      if (!playersLoaded || isLoadingAdp || !loadAdp) return;
+      if (!playersLoaded || isLoadingAdp || !loadAdp || adpLoaded) return;
 
       try {
         setIsLoadingAdp(true);
@@ -139,7 +140,6 @@ const Auctioneer: React.FC = () => {
           teams: config.teams,
           scoring,
         });
-        setAdpLoaded(true);
         toast({
           title: 'ADP data loaded',
           status: 'success',
@@ -162,7 +162,7 @@ const Auctioneer: React.FC = () => {
     };
 
     void loadAdpData();
-  }, [playersLoaded, loadAdp, config.year, config.teams, config.scoring, isLoadingAdp, toast]);
+  }, [playersLoaded, loadAdp, config.year, config.teams, config.scoring, isLoadingAdp, adpLoaded, toast]);
 
   // ---- manual ADP reload ----
   const handleReloadAdp = useCallback(async () => {
@@ -181,12 +181,12 @@ const Auctioneer: React.FC = () => {
       setIsLoadingAdp(true);
       // Use the scoring format directly since it already matches the expected type
       const scoring = config.scoring;
-      await loadAdp?.({
+      await loadAdp({
         year: config.year,
         teams: config.teams,
         scoring,
       });
-      setAdpLoaded(true);
+      
       toast({
         title: 'ADP data reloaded',
         description: 'Successfully updated player ADP values',
@@ -207,7 +207,7 @@ const Auctioneer: React.FC = () => {
     } finally {
       setIsLoadingAdp(false);
     }
-  }, [playersLoaded, loadAdp, toast, config.scoring, config.teams, config.year]);
+  }, [playersLoaded, loadAdp, config.scoring, config.teams, config.year, toast]);
 
   // ---- place bid (current bidder on current player) ----
   const handleBidClick = useCallback(async () => {
@@ -234,10 +234,10 @@ const Auctioneer: React.FC = () => {
       return;
     }
 
-    if (currentPlayer.pos && hasSlotFor && !hasSlotFor(currentBidder, currentPlayer.pos)) {
+    if (currentPlayer.pos && hasSlotFor && !hasSlotFor(currentBidder, currentPlayer.pos, config.includeTeInFlex)) {
       toast({
         title: 'No available slot',
-        description: `Team has no open ${currentPlayer.pos} slots`,
+        description: `Team has no open ${formatPositionForDisplay(currentPlayer.pos)} slots`,
         status: 'warning',
         duration: 3000,
         isClosable: true,
@@ -273,6 +273,7 @@ const Auctioneer: React.FC = () => {
   }, [
     bidAmount,
     computeMaxBid,
+    config.includeTeInFlex,
     currentBidder,
     currentNom,
     currentPlayer,
@@ -297,10 +298,10 @@ const Auctioneer: React.FC = () => {
         return;
       }
 
-      if (player.pos && hasSlotFor && !hasSlotFor(currentBidder, player.pos)) {
+      if (player.pos && hasSlotFor && !hasSlotFor(currentBidder, player.pos, config.includeTeInFlex)) {
         toast({
           title: 'No available slot',
-          description: `Team has no open ${player.pos} slots`,
+          description: `Team has no open ${formatPositionForDisplay(player.pos)} slots`,
           status: 'warning',
           duration: 3000,
           isClosable: true,
@@ -348,7 +349,7 @@ const Auctioneer: React.FC = () => {
       const maxBid = computeMaxBid ? computeMaxBid(teamId) : 0;
       const disabled =
         !currentPlayer ||
-        (hasSlotFor && !hasSlotFor(teamId, currentPlayer.pos || ('' as any))) ||
+        (hasSlotFor && !hasSlotFor(teamId, currentPlayer.pos || ('' as any), config.includeTeInFlex)) ||
         maxBid < 1 ||
         isLoading;
 
@@ -396,19 +397,36 @@ const Auctioneer: React.FC = () => {
             w="100%"
           >
             {teams.map((team) => {
-              const disabled =
-                currentPlayer && hasSlotFor
-                  ? !hasSlotFor(team.id, (currentPlayer.pos as any) || '')
-                  : false;
+              const hasSlot = currentPlayer && hasSlotFor
+                ? hasSlotFor(team.id, (currentPlayer.pos as any) || '', config.includeTeInFlex)
+                : false;
+              const isDisabled = !hasSlot;
+              
+              let tooltipLabel = team.name;
+              if (currentPlayer) {
+                if (!hasSlot) {
+                  tooltipLabel = `${team.name} has no ${formatPositionForDisplay(currentPlayer.pos as any)} slot available`;
+                } else if (currentBidder === team.id) {
+                  tooltipLabel = `Current high bidder: ${team.name}`;
+                } else {
+                  tooltipLabel = `Select ${team.name} as bidder`;
+                }
+              }
 
               return (
-                <Tooltip key={`team-${team.id}`} label={team.name}>
+                <Tooltip 
+                  key={`team-${team.id}`} 
+                  label={tooltipLabel}
+                  placement="top"
+                  hasArrow
+                  isDisabled={!currentPlayer}
+                >
                   <Button
                     size="sm"
                     variant={currentBidder === team.id ? 'solid' : 'outline'}
                     colorScheme={currentBidder === team.id ? 'blue' : 'gray'}
                     onClick={() => setCurrentBidder(team.id)}
-                    isDisabled={disabled}
+                    isDisabled={isDisabled}
                     w="100%"
                     minW={0}
                     px={1}
@@ -417,17 +435,23 @@ const Auctioneer: React.FC = () => {
                     overflow="hidden"
                     textOverflow="ellipsis"
                     _hover={{
-                      bg: currentBidder === team.id ? 'blue.500' : 'gray.700',
-                      transform: 'translateY(-2px)',
-                      boxShadow: 'md',
+                      bg: isDisabled ? 'gray.800' : currentBidder === team.id ? 'blue.500' : 'gray.700',
+                      transform: isDisabled ? 'none' : 'translateY(-2px)',
+                      boxShadow: isDisabled ? 'none' : 'md',
                     }}
                     _disabled={{
                       bg: 'gray.800',
                       transform: 'none',
                       cursor: 'not-allowed',
+                      opacity: 0.7,
                     }}
                   >
                     {team.name}
+                    {!hasSlot && currentPlayer && (
+                      <Badge ml={1} colorScheme="red" variant="solid" borderRadius="full" boxSize="16px" fontSize="2xs">
+                        !
+                      </Badge>
+                    )}
                   </Button>
                 </Tooltip>
               );
@@ -447,25 +471,45 @@ const Auctioneer: React.FC = () => {
             w="100%"
           >
             {teams.map((team) => {
-              const maxBid = computeMaxBid ? computeMaxBid(team.id) : 0;
-              const disabled =
-                !currentPlayer ||
-                (hasSlotFor && !hasSlotFor(team.id, (currentPlayer?.pos as any) || '')) ||
-                maxBid < 1 ||
-                isLoading;
+const maxBid = computeMaxBid ? computeMaxBid(team.id, currentPlayer?.pos) : 0;
+              const hasSlot = currentPlayer && hasSlotFor 
+                ? hasSlotFor(team.id, (currentPlayer?.pos as any) || '', config.includeTeInFlex) 
+                : false;
+              
+              const isDisabled = !currentPlayer || !hasSlot || maxBid < 1 || isLoading;
+              const isOutbid = currentBidder === team.id;
+              
+              let tooltipLabel = '';
+              if (!currentPlayer) {
+                tooltipLabel = 'No player is currently nominated for bidding';
+              } else if (!hasSlot) {
+                tooltipLabel = `${team.name} has no ${formatPositionForDisplay(currentPlayer.pos as any)} slot available`;
+              } else if (maxBid < 1) {
+                tooltipLabel = `${team.name} doesn't have enough budget for any bid`;
+              } else if (isOutbid) {
+                tooltipLabel = `${team.name} is already the high bidder`;
+              } else {
+                tooltipLabel = `Bid $${bidAmount} with ${team.name}`;
+              }
 
               return (
-                <Tooltip key={`bid-${team.id}`} label={`Bid $${bidAmount} with ${team.name}`}>
-                  <ButtonGroup size="sm" isAttached>
+                <Tooltip 
+                  key={`bid-${team.id}`} 
+                  label={tooltipLabel}
+                  placement="top"
+                  hasArrow
+                  isDisabled={!currentPlayer}
+                >
+                  <ButtonGroup size="sm" isAttached w="100%">
                     <Button
                       leftIcon={<FaGavel />}
-                      colorScheme="blue"
-                      variant="solid"
+                      colorScheme={isOutbid ? 'green' : 'blue'}
+                      variant={isOutbid ? 'solid' : 'solid'}
                       onClick={(e) => {
                         e.stopPropagation();
                         void handleTeamQuickBid(team.id);
                       }}
-                      isDisabled={disabled}
+                      isDisabled={isDisabled || isOutbid}
                       w="100%"
                       minW={0}
                       px={2}
@@ -473,8 +517,21 @@ const Auctioneer: React.FC = () => {
                       whiteSpace="nowrap"
                       overflow="hidden"
                       textOverflow="ellipsis"
+                      _disabled={{
+                        bg: isOutbid ? 'green.500' : 'gray.700',
+                        color: isOutbid ? 'white' : 'gray.400',
+                        cursor: isOutbid ? 'default' : 'not-allowed',
+                        _hover: {
+                          bg: isOutbid ? 'green.500' : 'gray.700',
+                        }
+                      }}
                     >
-                      ${bidAmount}
+                      {isOutbid ? 'High Bid' : `$${bidAmount}`}
+                      {isOutbid && (
+                        <Badge ml={2} colorScheme="green" variant="solid" borderRadius="full" boxSize="16px" fontSize="2xs">
+                          ✓
+                        </Badge>
+                      )}
                     </Button>
                   </ButtonGroup>
                 </Tooltip>
@@ -548,7 +605,7 @@ const Auctioneer: React.FC = () => {
                   {currentPlayer.name}
                   {currentPlayer.pos && (
                     <Badge ml={2} colorScheme="blue">
-                      {currentPlayer.pos}
+                      {formatPositionForDisplay(currentPlayer.pos)}
                     </Badge>
                   )}
                   {currentPlayer.nflTeam && (

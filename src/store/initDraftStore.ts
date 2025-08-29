@@ -88,18 +88,43 @@ export const useDraftStore = create<DraftState>()(
           })
         ),
 
-      computeMaxBid: (teamId: number) => {
-        const { teams, players } = get();
+      computeMaxBid: (teamId: number, playerPos?: string) => {
+        const { teams, players, templateRoster } = get();
         const team = teams.find((t) => t.id === teamId);
         if (!team) return 0;
 
-        // Remaining roster slots (can't be negative)
-        const drafted = players.filter((p) => p.draftedBy === teamId).length;
-        const slotsRemaining = Math.max(0, ROSTER_SIZE - drafted);
+        // 1. Calculate total roster slots remaining
+        const drafted = players.filter((p) => p.draftedBy === teamId);
+        const totalSlotsRemaining = Math.max(0, ROSTER_SIZE - drafted.length);
         
-        // Reserve $1 for each slot *after this bid*
-        const requiredReserve = Math.max(0, slotsRemaining - 1);
-        return Math.max(0, team.budget - requiredReserve);
+        // 2. If we're checking for a specific position, validate roster slot availability
+        if (playerPos) {
+          const pos = playerPos.toUpperCase() as keyof typeof templateRoster;
+          const posSlots = templateRoster[pos] || 0;
+          const draftedAtPos = drafted.filter(p => p.pos === playerPos).length;
+          
+          // If no more slots at this position, can't bid
+          if (draftedAtPos >= posSlots) return 0;
+        }
+        
+        // 3. Calculate minimum required budget for remaining slots
+        // Reserve at least $1 per remaining slot, but scale with remaining budget
+        const minBidPerSlot = 1;
+        const remainingBudget = team.budget;
+        
+        // More sophisticated reserve calculation:
+        // - Reserve more if we have many slots left to fill
+        // - Reserve less if we're close to filling the roster
+        const baseReserve = Math.max(
+          minBidPerSlot,
+          Math.floor(remainingBudget / (totalSlotsRemaining * 2)) // Reserve more aggressively early, less later
+        );
+        
+        const requiredReserve = Math.max(0, (totalSlotsRemaining - 1) * baseReserve);
+        const maxBid = Math.max(0, remainingBudget - requiredReserve);
+        
+        // Ensure we don't return more than the remaining budget
+        return Math.min(maxBid, remainingBudget);
       },
 
       hasSlotFor: (teamId: number, pos: string) => {

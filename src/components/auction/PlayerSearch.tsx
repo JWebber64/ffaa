@@ -28,6 +28,7 @@ import {
 } from '@chakra-ui/react';
 import { FaGavel } from 'react-icons/fa';
 import type { Player } from '../../store/draftStore';
+import { formatPositionForDisplay } from '../../utils/positionUtils';
 
 export interface PlayerSearchProps {
   players: Player[];
@@ -188,7 +189,10 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
           <ModalBody>
             {selectedPlayerState && (
               <VStack spacing={4} align="stretch">
-                <Text>Bid on {selectedPlayerState.name} ({selectedPlayerState.pos} - {selectedPlayerState.nflTeam || 'FA'})</Text>
+                <HStack spacing={2} align="center">
+                  <Badge colorScheme={POS_COLOR[selectedPlayerState.pos] || 'gray'}>{formatPositionForDisplay(selectedPlayerState.pos as any)}</Badge>
+                  {selectedPlayerState.nflTeam && <Text fontSize="sm" color="gray.400">{selectedPlayerState.nflTeam}</Text>}
+                </HStack>
                 <NumberInput
                   value={bidAmount}
                   onChange={(_, value) => setBidAmount(value)}

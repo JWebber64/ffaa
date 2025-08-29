@@ -12,6 +12,7 @@ import {
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 import { Player } from '../../store/draftStore';
 import { useState } from 'react';
+import { formatPositionForDisplay } from '../../utils/positionUtils';
 
 interface AuctionControlsProps {
   currentPlayer: Player | null;
@@ -66,7 +67,7 @@ export const AuctionControls = ({
     if (!canBid) {
       toast({
         title: 'No available roster spot',
-        description: `Team ${teamId + 1} doesn't have an available ${currentPlayer.pos} or FLEX spot.`,
+        description: `Team ${teamId + 1} doesn't have an available ${formatPositionForDisplay(currentPlayer.pos as any)} or FLEX spot.`,
         status: 'warning',
         duration: 3000,
         isClosable: true,
@@ -211,7 +212,7 @@ export const AuctionControls = ({
               variant={currentBidder === team.id ? 'solid' : 'outline'}
               colorScheme={currentBidder === team.id ? 'blue' : 'gray'}
               size="sm"
-              title={!canBid ? `No available ${currentPlayer.pos} or FLEX spot` : `Bid $${price + 1} or more`}
+              title={!canBid ? `No available ${formatPositionForDisplay(currentPlayer.pos as any)} or FLEX spot` : `Bid $${price + 1} or more`}
             >
               <VStack gap={0} align="stretch">
                 <Text>Team {team.id + 1}</Text>

@@ -15,6 +15,7 @@ export type BasePosition = Exclude<Position, 'FLEX' | 'BENCH'>;
 export interface Team {
   id: number;
   name: string;
+  players: string[];
   budget: number;
   roster: Record<Position, number>;
 }
@@ -46,6 +47,7 @@ export interface DraftState {
   // State
   players: Player[];
   playersLoaded: boolean;
+  adpLoaded: boolean;
   teams: Team[];
   nominationQueue: Nomination[];
   currentBidder?: number;
@@ -75,8 +77,8 @@ export interface DraftState {
   nominate: (playerId: string, startingBid?: number) => void;
   placeBid: (playerId: string, byTeamId: number, amount: number) => void;
   assignPlayer: (playerId: string, teamId: number, price: number) => void;
-  computeMaxBid: (teamId: number) => number;
-  hasSlotFor: (teamId: number, pos: Position) => boolean;
+  computeMaxBid: (teamId: number, playerPos?: string) => number;
+  hasSlotFor: (teamId: number, pos: Position, includeTeInFlex?: boolean) => boolean;
   resetDraft: () => void;
   
   // Selectors
@@ -104,9 +106,10 @@ function draftedCountForTeam(players: Player[], teamId: number): number {
 export const useDraftStore = create<DraftState>()(
   persist(
     (set, get) => ({
-      // State
+      // Initial state
       players: [],
       playersLoaded: false,
+      adpLoaded: false,
       teams: [],
       baseBudget: 200,
       teamCount: 12,
@@ -181,7 +184,7 @@ export const useDraftStore = create<DraftState>()(
           });
           
           get().applyAdp(updates);
-          return true;
+          set({ adpLoaded: true });
           return true;
         } catch (error) {
           console.error('Failed to load ADP data:', error);
@@ -191,33 +194,125 @@ export const useDraftStore = create<DraftState>()(
       },
 
       // ... rest of the existing actions (setConfig, setTeamNames, nominate, placeBid, assignPlayer, resetDraft)
-      // These would be copied from your existing implementation
       setConfig: (config) => {
-        // Implementation from original store
+        const { teamCount, baseBudget, templateRoster } = config;
+        return set(() => ({
+          teamCount,
+          baseBudget,
+          templateRoster: { ...templateRoster },
+        }));
       },
-      setTeamNames: (names) => {
-        // Implementation from original store
-      },
-      nominate: (playerId: string, startingBid: number = 1) => {
-        // Implementation from original store
-      },
-      placeBid: (playerId: string, byTeamId: number, amount: number) => {
-        // Implementation from original store
-      },
-      assignPlayer: (playerId: string, teamId: number, price: number) => {
-        // Implementation from original store
-      },
+      setTeamNames: (names) =>
+        set(() => ({
+          teams: names.map((name, i) => ({
+            id: i + 1,
+            name: name || `Team ${i + 1}`,
+            players: [],
+            budget: get().baseBudget,
+            roster: { ...get().templateRoster }
+          })),
+        })),
+      nominate: (playerId: string, startingBid: number = 1) =>
+        set((state) => {
+          const nom = { playerId, startingBid, currentBid: startingBid, createdAt: Date.now() };
+          const nominationQueue = [
+            nom,
+            ...state.nominationQueue.filter((n) => n.playerId !== playerId),
+          ];
+          return { nominationQueue, currentNominatedId: playerId };
+        }),
+      placeBid: (_playerId, byTeamId) => set({ currentBidder: byTeamId }),
+      assignPlayer: (playerId: string, teamId: number, price: number) =>
+        set((state) => {
+          const players = state.players.map((p) =>
+            p.id === playerId ? { ...p, draftedBy: teamId, price } : p
+          );
+          const teams = state.teams.map((t) =>
+            t.id === teamId ? { ...t, players: [...t.players, playerId] } : t
+          );
+          const nominationQueue = state.nominationQueue.filter(
+            (n) => n.playerId !== playerId
+          );
+          return {
+            players,
+            teams,
+            nominationQueue,
+            currentNominatedId: null,
+            currentBidder: undefined,
+          };
+        }),
       computeMaxBid: (teamId: number) => {
-        // Implementation from original store
-        return 0;
+        const state = get();
+        const budget = state.baseBudget;
+        const owned = state.players.filter((p) => p.draftedBy === teamId);
+        const spent = owned.reduce((sum, p) => sum + (p.price || 0), 0);
+
+        // required roster slots (exclude BENCH)
+        const requiredSlots = Object.entries(state.templateRoster).reduce(
+          (sum, [pos, cnt]) => sum + (pos === 'BENCH' ? 0 : (cnt as number)),
+          0
+        );
+        const filled = owned.filter((p) => p.pos !== 'BENCH').length;
+        const remaining = Math.max(0, requiredSlots - filled);
+
+        // must reserve $1 for every other required spot
+        const reserve = Math.max(0, remaining - 1);
+        return Math.max(0, budget - spent - reserve);
       },
-      hasSlotFor: (teamId: number, pos: Position) => {
-        // Implementation from original store
-        return true;
+      hasSlotFor: (teamId: number, pos: Position, includeTeInFlex: boolean = true) => {
+        const state = get();
+        const team = state.teams.find((t) => t.id === teamId);
+        if (!team) return false;
+
+        const cap = (position: keyof typeof state.templateRoster) =>
+          state.templateRoster[position] ?? 0;
+
+        const owned = state.players.filter((p) => p.draftedBy === teamId);
+        const counts = { QB: 0, RB: 0, WR: 0, TE: 0, K: 0, DEF: 0, FLEX: 0, BENCH: 0 } as Record<
+          Position,
+          number
+        >;
+
+        owned.forEach((p) => {
+          if (p.pos in counts) counts[p.pos as keyof typeof counts] += 1;
+        });
+
+        // strict slot still open?
+        if (counts[pos] < cap(pos as any)) return true;
+
+        // FLEX eligibility by config
+        const flexCap = cap('FLEX' as any);
+        const isFlexEligible =
+          pos === 'RB' || pos === 'WR' || (includeTeInFlex && pos === 'TE');
+
+        if (flexCap > 0 && isFlexEligible) {
+          const eligibleOwned = owned.filter(
+            (p) => p.pos === 'RB' || p.pos === 'WR' || (includeTeInFlex && p.pos === 'TE')
+          ).length;
+
+          const strictUsed =
+            Math.min(counts.RB, cap('RB' as any)) +
+            Math.min(counts.WR, cap('WR' as any)) +
+            Math.min(counts.TE, cap('TE' as any));
+
+          const extraIntoFlex = eligibleOwned - strictUsed;
+          return extraIntoFlex < flexCap;
+        }
+
+        return false;
       },
-      resetDraft: () => {
-        // Implementation from original store
-      },
+      resetDraft: () =>
+        set((state) => ({
+          players: state.players.map((p) => ({
+            ...p,
+            draftedBy: undefined,
+            price: undefined,
+          })),
+          teams: state.teams.map((t) => ({ ...t, players: [] })),
+          nominationQueue: [],
+          currentNominatedId: null,
+          currentBidder: undefined,
+        })),
 
       // Selectors
       selectors: {
