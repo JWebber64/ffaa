@@ -1,16 +1,18 @@
-import {
-  Box,
-  Button,
-  Container,
-  HStack,
-  Heading,
-  Input,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Container, Flex, HStack, VStack, Heading, Input, Stack, Text, useDisclosure } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { useDraftStore } from '../store/draftStore';
 import { shallow } from 'zustand/shallow';
+import PlayerSearch from '../components/PlayerSearch';
+import BidButton from '../components/BidButton';
+import SelectButton from '../components/SelectButton';
+import NominationIndicator from '../components/NominationIndicator';
+import NominateBar from '../components/NominateBar';
+import LiveAuctionBar from '../components/LiveAuctionBar';
+import ActivityLog from '../components/ActivityLog';
+import AuctionSettingsPanel from '../components/AuctionSettingsPanel';
+import AdminActionsBar from '../components/AdminActionsBar';
+import LiveBidWidget from '../components/LiveBidWidget';
+import { FaCog } from 'react-icons/fa';
 
 type RosterPosition = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
 type Position = RosterPosition | 'FLEX' | 'BENCH';
@@ -62,18 +64,29 @@ interface DraftBoardProps {
 }
 
 export default function DraftBoard({ teams }: DraftBoardProps) {
-  const players = useDraftStore(s => s.players, shallow);
-  const templateRoster = useDraftStore(s => s.templateRoster, shallow);
-  const baseBudget = useDraftStore(s => s.baseBudget, shallow);
+  const { players, templateRoster, baseBudget, runtime, teams: storeTeams } = useDraftStore(s => ({
+    players: s.players,
+    templateRoster: s.templateRoster,
+    baseBudget: s.baseBudget,
+    runtime: s.runtime,
+    teams: s.teams
+  }), shallow);
+
+  // Use teams from props if available, otherwise use from store
+  const displayTeams = teams || storeTeams || [];
 
   // Local state: simple on-device claim + rename
   const [claimed, setClaimed] = useState<Record<number, boolean>>({});
   const [editing, setEditing] = useState<number | null>(null);
   const [nameDraft, setNameDraft] = useState("");
+  
+  // TODO: Replace with actual auth state
+  const isAdmin = true;
 
   const minColumnWidth = getMinColumnWidth();
 
   // Row order is driven by template roster
+  const teamColumns = useMemo(() => displayTeams, [displayTeams]);
   const slotRows = useMemo(() => {
     const order: Position[] = ["QB", "RB", "WR", "TE", "FLEX", "K", "DEF", "BENCH"];
     return order
@@ -219,14 +232,39 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
     setEditing(null);
   };
 
+  const { isOpen: isSettingsOpen, onOpen: onSettingsOpen, onClose: onSettingsClose } = useDisclosure();
+  const [showSettings, setShowSettings] = useState(false);
+
   return (
-    <Container maxW="100%" py={4}>
-      <HStack justifyContent="space-between" mb={4}>
-        <Heading size="lg">Draft Board</Heading>
-        <Text opacity={0.8}>
-          Managers: {teams.length} • Budget: ${baseBudget}
-        </Text>
-      </HStack>
+    <Container maxW="container.xl" py={4}>
+      <Stack spacing={4}>
+        <HStack justify="space-between" align="center">
+          <Heading size="lg">Draft Board</Heading>
+          <HStack>
+            <PlayerSearch />
+            <Button
+              leftIcon={<FaCog />}
+              onClick={onSettingsOpen}
+              variant="outline"
+              size="sm"
+            >
+              Settings
+            </Button>
+          </HStack>
+        </HStack>
+        
+        <NominationIndicator />
+        <LiveAuctionBar />
+        
+        {/* Admin Actions Bar */}
+        <AdminActionsBar />
+        
+        {showSettings && (
+          <Box mb={4}>
+            <AuctionSettingsPanel />
+          </Box>
+        )}
+      </Stack>
 
       <Box width="100%" p={2}>
         <Box
@@ -268,37 +306,35 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
             >
               {/* Column header */}
               <Stack alignItems="center" mb={1} p={1} spacing={1} fontSize="sm">
-                <Button
-                  size="xs"
-                  bg="#10b3a5"
-                  color="white"
-                  onClick={() => claimOrEdit(team)}
-                  width="100%"
-                  height="24px"
-                  fontSize="xs"
-                  px={1}
-                >
-                  {claimed[team.id] ? "CLAIMED" : "CLAIM"}
-                </Button>
-
-                {editing === team.id ? (
+                <VStack width="100%" spacing={2}>
+                  <Button
+                    size="xs"
+                    bg="#10b3a5"
+                    color="white"
+                    onClick={() => claimOrEdit(team)}
+                    width="100%"
+                    height="24px"
+                    fontSize="xs"
+                  >
+                    {editing === team.id ? 'Cancel' : 'Edit'}
+                  </Button>
+                  
+                  {editing === team.id ? (
                   <HStack width="100%" spacing={2}>
                     <Input
+                      size="xs"
                       value={nameDraft}
                       onChange={(e) => setNameDraft(e.target.value)}
-                      bg="#0f1623"
-                      borderColor="#2a3546"
-                      color="white"
-                      size="xs"
-                      height="24px"
-                      flex={1}
-                      paddingX={1}
+                      onKeyDown={(e) => e.key === 'Enter' && saveName(team)}
+                      onClick={(e) => e.stopPropagation()}
+                      autoFocus
                     />
-                    <Button 
-                      size="xs" 
-                      bg="#2372b2" 
-                      onClick={() => saveName(team)}
-                      height="24px"
+                    <Button
+                      size="xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        saveName(team);
+                      }}
                       px={2}
                     >
                       Save
@@ -318,7 +354,19 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
                     {team.name}
                   </Heading>
                 )}
+                  <BidButton teamId={team.id} />
+                  <SelectButton teamId={team.id} isAdmin={isAdmin} />
+                </VStack>
               </Stack>
+
+              <Box p={2} borderBottom="1px solid" borderColor="gray.200">
+                <NominateBar />
+              </Box>
+              
+              {/* Live Bid Widget - Convert team.id to string to match prop type */}
+              <Box p={2} pt={1}>
+                <LiveBidWidget teamId={team.id.toString()} />
+              </Box>
 
               {/* Slots */}
               {renderSlotBoxes(team)}

@@ -1,9 +1,28 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
-import { produce } from 'immer';
-import FfcAdp from '../services/FfcAdp';
-import { getPersistedState, persistState, clearPersistedState } from '../utils/persistState';
+import { devtools } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { produce, type Draft } from 'immer';
+import { nanoid } from 'nanoid';
+import { loadAdp as fetchAdp } from '../api/adp';
+import type { 
+  Player as PlayerType,
+  Team as TeamType,
+  Position as PositionType,
+  Nomination as NominationType,
+  CurrentAuction as CurrentAuctionType,
+  AuctionSettings,
+  BidState,
+  DraftRuntime,
+  LogEvent,
+  DraftState,
+  DraftActions,
+  DraftStore,
+  AssignmentHistory
+} from '../types/draft';
 
+/**
+ * TYPES
+ */
 declare global {
   interface Window {
     localStorage: Storage;
@@ -16,15 +35,16 @@ export type BasePosition = Exclude<Position, 'FLEX' | 'BENCH'>;
 export interface Team {
   id: number;
   name: string;
-  players: string[];
+  players: string[]; // player ids
   budget: number;
+  /** Remaining capacity per slot (we mutate downward as slots fill) */
   roster: Record<Position, number>;
 }
 
 export interface Player {
   id: string;
   name: string;
-  pos: Position;
+  pos: Position; // players are stored with base pos; FLEX/BENCH only used as assigned slot
   nflTeam?: string;
   draftedBy?: number;
   price?: number;
@@ -34,13 +54,14 @@ export interface Player {
   posRank?: number;
   adp?: number;
   adpSource?: string;
-  slot?: string; // Add slot property for compatibility
+  /** actual assigned slot on a team (QB/RB/WR/TE/K/DEF/FLEX/BENCH) */
+  slot?: Position;
 }
 
 export interface Nomination {
   playerId: string;
   startingBid?: number;
-  createdAt: number;
+  createdAt: number; // ms
 }
 
 export interface CurrentAuction {
@@ -49,558 +70,701 @@ export interface CurrentAuction {
   highBidder: number | null;
 }
 
-export interface DraftState {
-  // State
-  players: Player[];
-  playersLoaded: boolean;
-  adpLoaded: boolean;
-  teams: Team[];
-  nominationQueue: Nomination[];
-  currentBidder?: number;
-  currentAuction: CurrentAuction | null;
-  baseBudget: number;
-  teamCount: number;
-  templateRoster: Record<Position, number>;
-  currentNominatedId?: string | null;
-
-  // Actions
-  setPlayers: (players: Player[]) => void;
-  setTeams: (teams: Team[]) => void;
-  setCurrentNominatedId: (id: string | null) => void;
-  setCurrentBidder: (teamId?: number) => void;
-  applyAdp: (updates: Array<{ id: string } & Partial<Player>>) => void;
-  loadAdp: (opts?: {
-    year?: number;
-    teams?: number;
-    scoring?: 'standard' | 'ppr' | 'half-ppr';
-    useCache?: boolean;
-  }) => Promise<boolean>;
-  setConfig: (config: {
-    teamCount: number;
-    baseBudget: number;
-    templateRoster: Record<Position, number>;
-  }) => void;
-  setTeamNames: (names: string[]) => void;
-  nominate: (playerId: string, startingBid?: number) => void;
-  placeBid: (playerId: string, byTeamId: number, amount: number) => void;
-  assignPlayer: (playerId: string, teamId: number, price: number) => void;
-  computeMaxBid: (teamId: number, playerPos?: string) => number;
-  hasSlotFor: (teamId: number, pos: Position, includeTeInFlex?: boolean) => boolean;
-  resetDraft: () => void;
-  
-  // Selectors
-  selectors: {
-    undraftedPlayers: (state: DraftState) => Player[];
-    topAvailable: (state: DraftState, limit?: number) => Player[];
-    topAvailableByPos: (state: DraftState, pos: Position, limit?: number) => Player[];
-    topAvailableByMultiPos: (state: DraftState, positions: Position[], limit?: number) => Player[];
-    topAvailableForFlex: (state: DraftState, limit?: number, includeTE?: boolean) => Player[];
-  };
-}
-
-// Auction constraints
-const ROSTER_SIZE = 16;
-const POSITION_CAP: Record<Position, number> = {
-  QB: 2, RB: 6, WR: 6, TE: 3, K: 2, DEF: 2, FLEX: 1, BENCH: 6
+/**
+ * DEFAULTS
+ */
+const DEFAULT_AUCTION_SETTINGS: AuctionSettings = {
+  countdownSeconds: 30,
+  antiSnipeSeconds: 10,
+  nominationOrderMode: 'regular',
+  reverseAtRound: undefined,
 };
 
-// Helper: count players drafted by a team
-function draftedCountForTeam(players: Player[], teamId: number): number {
-  return players.filter(p => p.draftedBy === teamId).length;
-}
-
-// Define the store type for persistence
-interface PersistedDraftState {
-  players: Array<{
-    id: string;
-    draftedBy?: number;
-    price?: number;
-  }>;
-  teams: Array<{
-    id: number;
-    players: string[];
-    budget: number;
-  }>;
-  currentAuction: CurrentAuction | null;
-  currentNominatedId: string | null;
-  currentBidder: number | undefined;
-  baseBudget: number;
-  teamCount: number;
-  templateRoster: Record<Position, number>;
-  playersLoaded: boolean;
-}
-
-// Create the store with persistence
-type SetState = (partial: Partial<DraftState> | ((state: DraftState) => Partial<DraftState>)) => void;
-type GetState = () => DraftState;
-
-// Define the store type
-export type DraftStore = Omit<DraftState, 'selectors'> & {
-  setPlayers: (players: Player[]) => void;
-  setTeams: (teams: Team[]) => void;
-  setCurrentNominatedId: (id: string | null) => void;
-  setCurrentBidder: (teamId?: number) => void;
-  applyAdp: (updates: Array<{ id: string } & Partial<Player>>) => void;
-  loadAdp: (opts?: {
-    year?: number;
-    teams?: number;
-    scoring?: 'standard' | 'ppr' | 'half-ppr';
-    useCache?: boolean;
-    signal?: AbortSignal;
-  }) => Promise<boolean>;
-  setConfig: (config: { baseBudget: number; teamCount: number; templateRoster: Record<Position, number> }) => void;
-  setTeamNames: (names: string[]) => void;
-  nominate: (playerId: string, startingBid?: number) => void;
-  placeBid: (playerId: string, byTeamId: number, amount: number) => void;
-  assignPlayer: (playerId: string, teamId: number, price: number) => void;
-  computeMaxBid: (teamId: number, playerPos?: string) => number;
-  hasSlotFor: (teamId: number, pos: Position, includeTeInFlex?: boolean) => boolean;
-  resetDraft: () => void;
-  selectors: {
-    undraftedPlayers: (state: DraftState) => Player[];
-    topAvailable: (state: DraftState, limit?: number) => Player[];
-    topAvailableByPos: (state: DraftState, pos: Position, limit?: number) => Player[];
-    topAvailableByMultiPos: (state: DraftState, positions: Position[], limit?: number) => Player[];
-    topAvailableForFlex: (state: DraftState, limit?: number, includeTE?: boolean) => Player[];
-  };
+const DEFAULT_BID_STATE: BidState = {
+  isLive: false,
+  highBid: 0,
+  highBidder: null,
+  startingBid: 1,
+  playerId: undefined,
+  endsAt: undefined,
+  round: 1,
 };
 
-// Helper function to get initial state with proper type safety
-const getInitialState = (): DraftState => {
-  const persistedState = getPersistedState();
-  
-  // Default state
-  const defaultState: DraftState = {
-    players: [],
-    playersLoaded: false,
-    adpLoaded: false,
-    teams: [],
-    nominationQueue: [],
-    currentAuction: null,
-    currentNominatedId: null,
-    currentBidder: undefined,
-    baseBudget: 200,
-    teamCount: 12,
-    templateRoster: { ...POSITION_CAP },
-    setPlayers: () => {},
-    setTeams: () => {},
-    setCurrentNominatedId: () => {},
-    setCurrentBidder: () => {},
-    applyAdp: () => {},
-    loadAdp: async () => false,
-    setConfig: () => {},
-    setTeamNames: () => {},
-    nominate: () => {},
-    placeBid: () => {},
-    assignPlayer: () => {},
-    computeMaxBid: () => 0,
-    hasSlotFor: () => false,
-    resetDraft: () => {},
-    selectors: {
-      undraftedPlayers: () => [],
-      topAvailable: () => [],
-      topAvailableByPos: () => [],
-      topAvailableByMultiPos: () => [],
-      topAvailableForFlex: () => []
-    }
-  };
+const DEFAULT_ROSTER: Record<Position, number> = {
+  QB: 2,
+  RB: 6,
+  WR: 6,
+  TE: 3,
+  K: 2,
+  DEF: 2,
+  FLEX: 1,
+  BENCH: 6,
+};
 
-  if (!persistedState) {
-    return defaultState;
+const initialRuntime: DraftRuntime = {
+  currentNominatorTeamId: null,
+  nominationOrder: [],
+  baseOrder: [],
+  round: 1,
+};
+
+/**
+ * HELPERS
+ */
+function computeNominationOrder(
+  base: number[],
+  mode: 'regular' | 'snake' | 'reverse',
+  reverseAtRound: number | undefined,
+  round: number
+): number[] {
+  if (!base.length) return [];
+  if (mode === 'regular') return [...base];
+
+  if (mode === 'snake') {
+    const odd = round % 2 === 1;
+    return odd ? [...base] : [...base].slice().reverse();
   }
 
-  // Merge persisted state with defaults
-  return {
-    ...defaultState,
-    ...persistedState,
-    players: Array.isArray(persistedState.players) ? persistedState.players : [],
-    teams: Array.isArray(persistedState.teams) ? persistedState.teams : [],
-    nominationQueue: Array.isArray(persistedState.nominationQueue) ? persistedState.nominationQueue : [],
-    currentNominatedId: persistedState.currentNominatedId ?? null,
-    currentAuction: persistedState.currentAuction || null,
-    currentBidder: persistedState.currentBidder,
-    baseBudget: typeof persistedState.baseBudget === 'number' ? persistedState.baseBudget : 200,
-    teamCount: typeof persistedState.teamCount === 'number' ? persistedState.teamCount : 12,
-    templateRoster: persistedState.templateRoster || { ...POSITION_CAP },
-    playersLoaded: !!persistedState.playersLoaded
-  };
-};
+  // reverse (from given round inclusive)
+  if (mode === 'reverse') {
+    if (reverseAtRound && round >= reverseAtRound) return [...base].slice().reverse();
+    return [...base];
+  }
+  return [...base];
+}
 
+function draftedCountForTeam(players: Player[], teamId: number): number {
+  return players.filter((p) => p.draftedBy === teamId).length;
+}
+
+function nextNominatorPointer(draft: Draft<DraftState>) {
+  const order = draft.runtime.nominationOrder;
+  if (!order.length) {
+    draft.runtime.currentNominatorTeamId = null;
+    return;
+  }
+  const idx = order.indexOf(draft.runtime.currentNominatorTeamId ?? -1);
+  const nextIdx = idx >= 0 ? (idx + 1) % order.length : 0;
+
+  // Completed lap → advance round & recompute snake/reverse as needed
+  if (idx >= 0 && nextIdx === 0) {
+    draft.runtime.round += 1;
+    draft.bidState.round = draft.runtime.round;
+    draft.runtime.nominationOrder = computeNominationOrder(
+      draft.runtime.baseOrder,
+      draft.auctionSettings.nominationOrderMode,
+      draft.auctionSettings.reverseAtRound,
+      draft.runtime.round
+    );
+  }
+  draft.runtime.currentNominatorTeamId = draft.runtime.nominationOrder[nextIdx] ?? null;
+}
+
+/**
+ * STORE
+ */
+// Helper type for store setter
+type SetState = (
+  partial: DraftState | Partial<DraftState> | ((state: DraftState) => DraftState | Partial<DraftState>),
+  replace?: boolean
+) => void;
+
+// Helper type for store getter
+type GetState = () => DraftState;
+
+// Define the store's state and actions
+type Store = DraftState & DraftActions;
+
+// Helper type for the store creator
+type StoreCreator = (
+  set: (partial: Store | Partial<Store> | ((state: Store) => Store | Partial<Store>), replace?: boolean) => void,
+  get: () => Store,
+  api: any
+) => Store;
+
+/**
+ * CREATE STORE
+ */
 // Create the store with proper typing
-export const useDraftStore = create<DraftStore>()(
-  persist(
-    (set, get) => ({
-      ...getInitialState(),
-      // Actions
+export const useDraftStore = create<DraftState & DraftActions>()(
+  devtools(
+    persist(
+      ((set, get, api) => {
+        const iSet = (
+          producer: (draft: Draft<DraftState>) => void
+        ) => set(produce(producer) as (state: DraftState) => DraftState);
 
-      // Actions
-      setPlayers: (players: Player[]) => set({ players }),
-      setTeams: (teams: Team[]) => set({ teams }),
-      setCurrentNominatedId: (id: string | null) => set({ currentNominatedId: id }),
-      setCurrentBidder: (teamId?: number) => set({ currentBidder: teamId }),
-      
-      // Apply ADP updates to players
-      applyAdp: (updates: Array<{ id: string } & Partial<Player>>) => set(produce((state: DraftState) => {
-        updates.forEach(update => {
-          const player = state.players.find(p => p.id === update.id);
-          if (player) {
-            Object.assign(player, update);
-          }
-        });
-      })),
-      
-      // Load ADP data from FFC API
-      loadAdp: async (opts?: {
-        year?: number;
-        teams?: number;
-        scoring?: 'standard' | 'ppr' | 'half-ppr';
-        useCache?: boolean;
-        signal?: AbortSignal;
-      }) => {
-        try {
-          const { 
-            year = new Date().getFullYear(), 
-            teams = 12, 
-            scoring = 'ppr', 
-            useCache = true,
-            signal
-          } = opts as {
-            year?: number;
-            teams?: number;
-            scoring?: 'ppr' | 'standard' | 'half-ppr';
-            useCache?: boolean;
-            signal?: AbortSignal;
+        // Return the store object with proper typing
+        // Helper function to add to assignment history
+        const pushAssignmentHistory = (s: Draft<DraftState>, h: Omit<AssignmentHistory, 'id' | 'ts'>) => {
+          const newHistory = {
+            ...h,
+            id: nanoid(),
+            ts: Date.now(),
           };
-          
-          // FFC expects 'half', map from 'half-ppr'
-          const ffcScoring: 'ppr' | 'half' | 'standard' = scoring === 'half-ppr' ? 'half' : scoring;
-          
-          const api = new FfcAdp();
-          const rows = await api.load({ 
-            year, 
-            teams, 
-            scoring: ffcScoring, 
-            useCache, 
-            signal 
-          });
-          
-          // Build composite index from your existing players
-          const normName = (s: string) => s.trim().toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ');
-          const keyOf = (n: string, t?: string, p?: string) => `${normName(n)}|${(t ?? '').toUpperCase()}|${(p ?? '').toUpperCase()}`;
-          
-          const byKey = new Map<string, string>(); // key -> playerId
-          const state = get();
-          state.players.forEach(p => {
-            // No need to check for 'D/ST' since Position type only includes 'DEF'
-            byKey.set(keyOf(p.name, p.nflTeam, p.pos), p.id);
-          });
-          
-          const updates = rows.flatMap(r => {
-            const id = byKey.get(keyOf(r.name, r.team, r.position));
-            return id ? [{
-              id,
-              rank: r.rank,
-              posRank: r.posRank,
-              adp: r.adp,
-              adpSource: `FFC-${ffcScoring.toUpperCase()}-${teams}-${year}`,
-            }] : [];
-          });
-          
-          get().applyAdp(updates);
-          set({ adpLoaded: true });
-          return true;
-        } catch (error) {
-          console.error('Failed to load ADP data:', error);
-          // Don't throw - we can continue without ADP data
-          return false;
+          s.assignmentHistory.unshift(newHistory);
+          if (s.assignmentHistory.length > 50) s.assignmentHistory.pop();
         };
-      },
 
-      // ... rest of the existing actions (setConfig, setTeamNames, nominate, placeBid, assignPlayer, resetDraft)
-      setConfig: (config: { teamCount: number; baseBudget: number; templateRoster: Record<Position, number> }) => {
-        const { teamCount, baseBudget, templateRoster } = config;
-        set({
-          teamCount,
-          baseBudget,
-          templateRoster,
-        });
-      },
-      setTeamNames: (names: string[]) => {
-        set(produce((state: DraftState) => {
-          state.teams.forEach((team: Team, i: number) => {
-            team.name = names[i] || `Team ${i + 1}`;
-          });
-        }));
-      },
-      nominate: (playerId: string, startingBid: number = 1) =>
-        set((state) => ({
-          nominationQueue: [
-            { playerId, startingBid, createdAt: Date.now() },
-            ...state.nominationQueue.filter((n) => n.playerId !== playerId),
-          ],
-          currentNominatedId: playerId,
-          currentAuction: { playerId, highBid: startingBid, highBidder: null },
-        })),
-      placeBid: (playerId: string, byTeamId: number, amount: number) => {
-        set(produce((state: DraftState) => {
-          const auction = state.currentAuction;
-          if (!auction) return;
-
-          if (amount > (auction.highBid || 0)) {
-            auction.highBid = amount;
-            auction.highBidder = byTeamId;
-          }
-        }));
-      },
-      assignPlayer: (playerId: string) =>
-        set((state) => {
-          const ca = state.currentAuction;
-          if (!ca || ca.playerId !== playerId) return {};
-          if (!ca || ca.playerId !== playerId || ca.highBidder == null) return {};
-          const teamId = ca.highBidder;
-          const price = ca.highBid;
-
-          const players = state.players.map((p) =>
-            p.id === playerId ? { ...p, draftedBy: teamId, price } : p
-          );
-          const teams = state.teams.map((t) =>
-            t.id === teamId ? { ...t, players: [...t.players, playerId] } : t
-          );
-          const nominationQueue = state.nominationQueue.filter(
-            (n) => n.playerId !== playerId
-          );
-          return {
-            players,
-            teams,
-            nominationQueue,
-            currentNominatedId: null,
-            currentBidder: undefined,
-            currentAuction: null,
-          };
-        }),
-      computeMaxBid: (teamId: number) => {
-        const state = get();
-        const budget = state.baseBudget;
-        const owned = state.players.filter((p) => p.draftedBy === teamId);
-        const spent = owned.reduce((sum, p) => sum + (p.price || 0), 0);
-
-        // required roster slots (exclude BENCH)
-        const requiredSlots = Object.entries(state.templateRoster).reduce(
-          (sum, [pos, cnt]) => sum + (pos === 'BENCH' ? 0 : (cnt as number)),
-          0
-        );
-        const filled = owned.filter((p) => p.pos !== 'BENCH').length;
-        const remaining = Math.max(0, requiredSlots - filled);
-
-        // must reserve $1 for every other required spot
-        const reserve = Math.max(0, remaining - 1);
-        return Math.max(0, budget - spent - reserve);
-      },
-      hasSlotFor: (teamId: number, pos: Position, includeTeInFlex: boolean = true) => {
-        const state = get();
-        const team = state.teams.find((t) => t.id === teamId);
-        if (!team) return false;
-
-        const cap = (position: keyof typeof state.templateRoster) =>
-          state.templateRoster[position] ?? 0;
-
-        const owned = state.players.filter((p) => p.draftedBy === teamId);
-        const counts = { QB: 0, RB: 0, WR: 0, TE: 0, K: 0, DEF: 0, FLEX: 0, BENCH: 0 } as Record<
-          Position,
-          number
-        >;
-
-        owned.forEach((p) => {
-          if (p.pos in counts) counts[p.pos as keyof typeof counts] += 1;
-        });
-
-        // strict slot still open?
-        if (counts[pos] < cap(pos as any)) return true;
-
-        // FLEX eligibility by config
-        const flexCap = cap('FLEX' as any);
-        const isFlexEligible =
-          pos === 'RB' || pos === 'WR' || (includeTeInFlex && pos === 'TE');
-
-        if (flexCap > 0 && isFlexEligible) {
-          const eligibleOwned = owned.filter(
-            (p) => p.pos === 'RB' || p.pos === 'WR' || (includeTeInFlex && p.pos === 'TE')
-          ).length;
-
-          const strictUsed =
-            Math.min(counts.RB, cap('RB' as any)) +
-            Math.min(counts.WR, cap('WR' as any)) +
-            Math.min(counts.TE, cap('TE' as any));
-
-          const extraIntoFlex = eligibleOwned - strictUsed;
-          return extraIntoFlex < flexCap;
-        }
-
-        return false;
-      },
-      resetDraft: () =>
-        set((state) => ({
-          players: state.players.map((p) => ({
-            ...p,
-            draftedBy: undefined,
-            price: undefined,
-          })),
-          teams: state.teams.map((t) => ({ ...t, players: [] })),
+        return {
+          // Initial state
+          players: [],
+          playersLoaded: false,
+          adpLoaded: false,
+          teams: [],
+          assignmentHistory: [],
+          auctionSettings: DEFAULT_AUCTION_SETTINGS,
+          bidState: DEFAULT_BID_STATE,
+          runtime: initialRuntime,
           nominationQueue: [],
+          currentAuction: null,
           currentNominatedId: null,
-          currentBidder: undefined,
-        })),
+          baseBudget: 200,
+          teamCount: 12,
+          templateRoster: { ...DEFAULT_ROSTER },
+          pendingAssignment: null,
+          logs: [],
 
-      // Selectors
-      selectors: {
-        undraftedPlayers: (state: DraftState) => state.players.filter((p: Player) => p.draftedBy === undefined),
-        
-        topAvailable: (state: DraftState, limit: number = 300) => {
-          return state.players
-            .filter((p: Player) => !p.draftedBy)
-            .sort((a: Player, b: Player) => {
-              // First by position rank if available
-              if (a.posRank !== b.posRank) {
-                return (a.posRank || 1000) - (b.posRank || 1000);
+          // Actions
+          setAuctionSettings: (settings: Partial<AuctionSettings>) => {
+            set(state => ({
+              ...state,
+              auctionSettings: { ...state.auctionSettings, ...settings }
+            }));
+          },
+          setPlayers: (players: Player[]) => {
+            set(state => ({
+              ...state,
+              players,
+              playersLoaded: true
+            }));
+          },
+          setTeams: (teams: Team[]) => {
+            set(state => ({
+              ...state,
+              teams
+            }));
+          },
+          setCurrentNominatedId: (id: string | null) => {
+            set(state => ({
+              ...state,
+              currentNominatedId: id
+            }));
+          },
+          setCurrentBidder: (teamId?: number) => {
+            set(state => ({
+              ...state,
+              currentBidder: teamId
+            }));
+          },
+          applyAdp: (updates: Array<{ id: string } & Partial<Player>>) => {
+            set(state => {
+              const newPlayers = [...state.players];
+              updates.forEach(update => {
+                const index = newPlayers.findIndex(p => p.id === update.id);
+                if (index !== -1) {
+                  newPlayers[index] = {
+                    ...newPlayers[index],
+                    adp: update.adp,
+                    adpSource: update.adpSource
+                  };
+                }
+              });
+              return { ...state, players: newPlayers };
+            });
+          },
+          loadAdp: async (opts = {}) => {
+            try {
+              const updates = await fetchAdp(opts);
+              if (updates) {
+                get().applyAdp(updates);
+                return true;
               }
-              // Then by overall rank if available
-              if (a.rank !== b.rank) {
-                return (a.rank || 1000) - (b.rank || 1000);
-              }
-              // Then by ADP if available
-              if (a.adp !== b.adp) {
-                return (a.adp || 1000) - (b.adp || 1000);
-              }
-              // Finally by name (A-Z)
-              return a.name.localeCompare(b.name);
-            })
-            .slice(0, limit);
+              return false;
+            } catch (error) {
+              console.error('Failed to load ADP:', error);
+              return false;
+            }
+          },
+          setConfig: (config: {
+            teamCount: number;
+            baseBudget: number;
+            templateRoster: Record<Position, number>;
+          }) => {
+            iSet(draft => {
+              draft.teamCount = config.teamCount;
+              draft.baseBudget = config.baseBudget;
+              draft.templateRoster = { ...config.templateRoster };
+              // also refresh each team’s roster caps to match new template
+              draft.teams = draft.teams.map(t => ({
+                ...t,
+                roster: { ...draft.templateRoster },
+              }));
+            });
+          },
+          setTeamNames: (names: string[]) => {
+            if (!names.length) return;
+
+            const teams: TeamType[] = names.map((name, i) => ({
+              id: i + 1,
+              name: name || `Team ${i + 1}`,
+              players: [],
+              owner: name || `Owner ${i + 1}`,
+              budget: 200,
+              roster: {} as Record<PositionType, number>,
+            }));
+
+            set({ teams } as Partial<Store>);
+          },
+          nominate: (playerId: string, startingBid?: number) => {
+            const state = get();
+            const player: PlayerType | undefined = state.players.find(p => p.id === playerId);
+            if (!player || player.draftedBy != null) return;
+
+            iSet(draft => {
+              const start = Math.max(1, startingBid ?? 1);
+              const now = Date.now();
+
+              draft.currentNominatedId = playerId;
+              draft.bidState.isLive = true;
+              draft.bidState.playerId = playerId;
+              draft.bidState.startingBid = start;
+              draft.bidState.highBid = start - 1; // allow first bid at "start"
+              draft.bidState.highBidder = null;
+              draft.bidState.endsAt = now + draft.auctionSettings.countdownSeconds * 1000;
+
+              draft.currentAuction = {
+                playerId,
+                highBid: 0,
+                highBidder: null,
+              };
+
+              // advance nominator pointer for next nomination right away
+              nextNominatorPointer(draft);
+            });
+          },
+          placeBid: (playerId: string, byTeamId: number, amount: number) => {
+            set(
+              produce((state: DraftState) => {
+                if (!state.bidState.isLive || state.bidState.playerId !== playerId) return;
+                
+                state.bidState.highBid = amount;
+                state.bidState.highBidder = byTeamId;
+                
+                // Add anti-snipe time if needed
+                const now = Date.now();
+                const timeRemaining = (state.bidState.endsAt || 0) - now;
+                if (timeRemaining < state.auctionSettings.antiSnipeSeconds * 1000) {
+                  state.bidState.endsAt = now + state.auctionSettings.antiSnipeSeconds * 1000;
+                }
+              })
+            );
+          },
+          settleAuctionIfExpired: () => {
+            set(
+              produce((state: DraftState) => {
+                if (!state.bidState.isLive || !state.bidState.endsAt) return;
+                
+                const now = Date.now();
+                if (now >= state.bidState.endsAt) {
+                  const { highBidder, playerId, highBid } = state.bidState;
+                  if (highBidder !== null && playerId) {
+                    // Assign player to team
+                    const player = state.players.find(p => p.id === playerId);
+                    if (player) {
+                      player.draftedBy = highBidder;
+                      player.price = highBid;
+                      
+                      // Deduct from team budget
+                      const team = state.teams.find(t => t.id === highBidder);
+                      if (team) {
+                        team.budget -= highBid;
+                      }
+                      
+                      // Log the transaction
+                      state.logs.push({
+                        id: nanoid(),
+                        ts: now,
+                        type: 'AUCTION_ENDED',
+                        message: `${player.name} drafted by Team ${highBidder} for $${highBid}`
+                      } as LogEvent);
+                    }
+                  }
+                  
+                  // Reset auction state
+                  state.bidState = {
+                    ...DEFAULT_BID_STATE,
+                    round: state.runtime.round
+                  };
+                  
+                  // Move to next nominator
+                  nextNominatorPointer(state);
+                  
+                  // Get references to player and team
+                  const player = state.players.find(p => p.id === state.bidState.playerId);
+                  const team = state.teams.find(t => t.id === state.bidState.highBidder);
+                  
+                  if (player && team) {
+                    const price = state.bidState.highBid;
+                    const slot = state.pendingAssignment?.validSlots?.[0]; // Get first valid slot if available
+                    
+                    // Assign player to team
+                    player.draftedBy = team.id;
+                    player.price = price;
+                    if (slot) player.slot = slot as Position;
+
+                    // Deduct from team budget
+                    team.budget -= price;
+
+                    // Update team's roster slot count if slot is provided
+                    if (slot) {
+                      team.roster[slot as Position] = (team.roster[slot as Position] ?? 0) - 1;
+                    }
+
+                    // Log the assignment
+                    state.logs.push({
+                      id: nanoid(),
+                      ts: Date.now(),
+                      type: 'ASSIGNED',
+                      message: `Assigned ${player.name} to ${team.name} for $${price}${slot ? ` (${slot})` : ''}`,
+                    });
+
+                    // Record assignment history
+                    state.assignmentHistory.unshift({
+                      id: nanoid(),
+                      ts: Date.now(),
+                      playerId: player.id,
+                      teamId: team.id,
+                      slot: slot || null,
+                      priceRefund: price,
+                      source: 'auction' as const,
+                    });
+                    
+                    // Keep only the last 50 assignments
+                    if (state.assignmentHistory.length > 50) {
+                      state.assignmentHistory.pop();
+                    }
+                  }
+                }
+              })
+            );
+          },
+          
+          hasSlotFor: (teamId: number, pos: Position, includeTeInFlex: boolean = false) => {
+            const team = get().teams.find(t => t.id === teamId);
+            if (!team) return false;
+            
+            // Check if position is directly available
+            if (team.roster[pos] > 0) return true;
+            
+            // Check FLEX position if applicable
+            if (pos === 'FLEX') {
+              return (team.roster['RB'] > 0) ||
+                     (team.roster['WR'] > 0) ||
+                     (includeTeInFlex && team.roster['TE'] > 0);
+            }
+            
+            // Check if TE can use FLEX slot
+            if (pos === 'TE' && includeTeInFlex && team.roster['FLEX'] > 0) {
+              return true;
+            }
+            
+            return false;
+          },
+          computeMaxBid: (teamId: number, playerPos?: Position) => {
+            const state = get();
+            const team: TeamType | undefined = state.teams.find(t => t.id === teamId);
+            if (!team) return 0;
+
+            const getTeamSpent = (teamId: number): number => {
+              const team = get().teams.find(t => t.id === teamId);
+              if (!team) return 0;
+
+              const players = get().players.filter(p => team.players.includes(p.id));
+              return players.reduce((sum, p) => sum + (p.price || 0), 0);
+            };
+
+            const spent = getTeamSpent(teamId);
+            const remainingCash = team.budget - spent;
+            if (remainingCash <= 0) return 0;
+
+            const totalRemainingSpots = (Object.keys(team.roster) as Position[]).reduce(
+              (acc, k) => acc + (team.roster[k] ?? 0),
+              0
+            );
+
+            // if no spots, cannot bid
+            if (totalRemainingSpots <= 0) return 0;
+
+            // $1 minimum for each *future* player (reserve 1 for each open spot except the one we’re bidding on)
+            const reserveForOthers = Math.max(0, totalRemainingSpots - 1);
+            const baselineMax = remainingCash - reserveForOthers;
+
+            // additionally, ensure there is at least one legal slot if playerPos provided
+            if (playerPos && !state.hasSlotFor(teamId, playerPos, true)) return 0;
+
+            return Math.max(0, Math.floor(baselineMax));
+        },
+
+        undoLastAssignment: (opts?: { isAdmin?: boolean }) => {
+          const state = get();
+          
+          if (!opts?.isAdmin) {
+            state.pushLog({ 
+              type: 'ERROR', 
+              message: 'Undo rejected: admin only.' 
+            });
+            return;
+          }
+          
+          const lastAssignment = state.assignmentHistory[0];
+          if (!lastAssignment) {
+            state.pushLog({ 
+              type: 'ERROR', 
+              message: 'No assignments to undo.' 
+            });
+            return;
+          }
+          
+          const { playerId, teamId, slot, priceRefund } = lastAssignment;
+          const player = state.players.find(p => p.id === playerId);
+          const team = state.teams.find(t => t.id === teamId);
+          
+          if (!player || !team) {
+            state.pushLog({ 
+              type: 'ERROR', 
+              message: 'Could not find player or team for undo.' 
+            });
+            return;
+          }
+          
+          // Undo the assignment
+          delete player.draftedBy;
+          delete player.price;
+          if (slot) {
+            delete player.slot;
+          }
+          
+          // Refund the team's budget if this was an auction win
+          if (priceRefund) {
+            team.budget += priceRefund;
+          }
+          
+          // Restore roster slot if applicable
+          if (slot) {
+            team.roster[slot as Position] = (team.roster[slot as Position] || 0) + 1;
+          }
+          
+          // Remove from assignment history
+          state.assignmentHistory.shift();
+          
+          // Log the undo action
+          state.pushLog({
+            type: 'ASSIGNED',
+            message: `Undo: Removed ${player.name} from ${team.name}${slot ? ` (${slot})` : ''}`,
+          });
         },
         
-        topAvailableByPos: (state: DraftState, pos: Position, limit: number = 100) => {
-          return state.players
-            .filter((p: Player) => !p.draftedBy && p.pos === pos)
-            .sort((a: Player, b: Player) => {
-              if (a.posRank !== b.posRank) {
-                return (a.posRank || 1000) - (b.posRank || 1000);
-              }
-              if (a.rank !== b.rank) {
-                return (a.rank || 1000) - (b.rank || 1000);
-              }
-              if (a.adp !== b.adp) {
-                return (a.adp || 1000) - (b.adp || 1000);
-              }
-              return a.name.localeCompare(b.name);
-            })
-            .slice(0, limit);
+        assignPlayer: (playerId: string, teamId: number, price: number, slot?: string) => {
+          iSet(draft => {
+            const player = draft.players.find(p => p.id === playerId);
+            if (!player) return;
+
+            const team = draft.teams.find(t => t.id === teamId);
+            if (!team) return;
+
+            // Update player
+            player.draftedBy = teamId;
+            player.price = price;
+            if (slot) player.slot = slot as Position;
+
+            // Deduct from team budget
+            team.budget -= price;
+
+            // Update team's roster slot count if slot is provided
+            if (slot && team.roster[slot as Position] !== undefined) {
+              team.roster[slot as Position] = (team.roster[slot as Position] || 0) - 1;
+            }
+
+            // Log the assignment
+            draft.logs.push({
+              id: nanoid(),
+              ts: Date.now(),
+              type: 'ASSIGNED',
+              message: `Assigned ${player.name} to ${team.name} for $${price}${slot ? ` (${slot})` : ''}`,
+            });
+
+            // Record assignment history
+            draft.assignmentHistory.unshift({
+              id: nanoid(),
+              ts: Date.now(),
+              playerId: player.id,
+              teamId: team.id,
+              slot: slot as Position || null,
+              priceRefund: price,
+              source: 'instant' as const,
+            });
+
+            // Keep only the last 50 assignments
+            if (draft.assignmentHistory.length > 50) {
+              draft.assignmentHistory.pop();
+            }
+          });
         },
-        
-        topAvailableByMultiPos: (state: DraftState, positions: Position[], limit: number = 100) => {
-          return state.players
-            .filter((p: Player) => !p.draftedBy && positions.includes(p.pos))
-            .sort((a: Player, b: Player) => {
-              if (a.posRank !== b.posRank) {
-                return (a.posRank || 1000) - (b.posRank || 1000);
+
+        resetDraft: () => {
+            iSet(draft => {
+              // reset players
+              draft.players = draft.players.map(p => ({
+                ...p,
+                draftedBy: undefined,
+                price: undefined,
+                slot: undefined,
+              }));
+              // reset teams
+              draft.teams = draft.teams.map(t => ({
+                ...t,
+                players: [],
+                budget: draft.baseBudget,
+                roster: { ...draft.templateRoster },
+              }));
+
+              // reset auction/runtime
+              draft.currentAuction = null;
+              draft.currentNominatedId = null;
+              draft.currentBidder = undefined;
+              draft.nominationQueue = [];
+              draft.pendingAssignment = null;
+              draft.bidState = { ...DEFAULT_BID_STATE };
+              draft.runtime = { ...initialRuntime };
+              if (draft.teams.length) {
+                draft.runtime.baseOrder = draft.teams.map(x => x.id);
+                draft.runtime.nominationOrder = computeNominationOrder(
+                  draft.runtime.baseOrder,
+                  draft.auctionSettings.nominationOrderMode,
+                  draft.auctionSettings.reverseAtRound,
+                  draft.runtime.round
+                );
+                draft.runtime.currentNominatorTeamId = draft.runtime.nominationOrder[0] ?? null;
               }
-              if (a.rank !== b.rank) {
-                return (a.rank || 1000) - (b.rank || 1000);
-              }
-              if (a.adp !== b.adp) {
-                return (a.adp || 1000) - (b.adp || 1000);
-              }
-              return a.name.localeCompare(b.name);
-            })
-            .slice(0, limit);
-        },
-        
-        topAvailableForFlex: (state: DraftState, limit: number = 100, includeTE: boolean = true) => {
-          return state.players
-            .filter((p: Player) => {
-              if (p.draftedBy) return false;
-              return p.pos === 'RB' || p.pos === 'WR' || (includeTE && p.pos === 'TE');
-            })
-            .sort((a: Player, b: Player) => {
-              if (a.rank !== b.rank) {
-                return (a.rank || 1000) - (b.rank || 1000);
-              }
-              if (a.adp !== b.adp) {
-                return (a.adp || 1000) - (b.adp || 1000);
-              }
-              return a.name.localeCompare(b.name);
-            })
-            .slice(0, limit);
-        }
+              draft.logs = [];
+            });
+          },
+
+          pushLog: (event: Omit<LogEvent, 'id' | 'ts'>) => {
+            set(
+              produce((state: DraftState) => {
+                if (!state.logs) state.logs = [];
+                state.logs.unshift({
+                  ...event,
+                  id: nanoid(),
+                  ts: Date.now(),
+                } as LogEvent);
+                // Keep logs at a reasonable size
+                if (state.logs.length > 200) state.logs.pop();
+              })
+            );
+          },
+
+          clearLogs: () => {
+            set({ logs: [] });
+          },
+
+          // Selectors (stateful functions)
+          selectors: {
+            undraftedPlayers: (state: DraftState) =>
+              state.players.filter((p: PlayerType) => p.draftedBy === undefined),
+            topAvailable: (state: DraftState, limit = 300) =>
+              state.players
+                .filter((p: PlayerType) => p.draftedBy === undefined)
+                .sort((a: PlayerType, b: PlayerType) => (a.rank || 0) - (b.rank || 0))
+                .slice(0, limit),
+            topAvailableByPos: (state: DraftState, pos: Position, limit = 100) =>
+              state.players
+                .filter((p: Player) => p.draftedBy === undefined && p.pos === pos)
+                .sort((a: Player, b: Player) => (a.rank || 0) - (b.rank || 0))
+                .slice(0, limit),
+            topAvailableByMultiPos: (state: DraftState, positions: Position[], limit = 100) =>
+              state.players
+                .filter(
+                  (p: Player) => p.draftedBy === undefined && positions.includes(p.pos as Position)
+                )
+                .sort((a: Player, b: Player) => (a.rank || 0) - (b.rank || 0))
+                .slice(0, limit),
+            topAvailableForFlex: (state: DraftState, limit = 100, includeTE = true) => {
+              const flexPositions: Position[] = ['RB', 'WR'];
+              if (includeTE) flexPositions.push('TE');
+              return state.players
+                .filter(
+                  (p: Player) =>
+                    p.draftedBy === undefined &&
+                    flexPositions.includes(p.pos as Position)
+                )
+                .sort((a: Player, b: Player) => (a.rank || 0) - (b.rank || 0))
+                .slice(0, limit);
+            },
+          },
+        };
+      }) as StoreCreator,
+      {
+        name: 'draft-store',
+        version: 1,
+        storage: createJSONStorage(() => window.localStorage),
+        partialize: (state: Store) => ({
+          // keep only what we need to restore
+          players: state.players.map(p => ({
+            id: p.id,
+            draftedBy: p.draftedBy,
+            price: p.price,
+            slot: p.slot,
+          })),
+          teams: state.teams.map(t => ({
+            id: t.id,
+            players: t.players,
+            budget: t.budget,
+            roster: t.roster,
+            name: t.name,
+          })),
+          currentAuction: state.currentAuction,
+          currentNominatedId: state.currentNominatedId,
+          currentBidder: state.currentBidder,
+          baseBudget: state.baseBudget,
+          teamCount: state.teamCount,
+          templateRoster: state.templateRoster,
+          playersLoaded: state.playersLoaded,
+          adpLoaded: state.adpLoaded,
+          auctionSettings: state.auctionSettings,
+          bidState: state.bidState,
+          runtime: state.runtime,
+        }),
       }
-    }),
-    {
-      name: 'auction-draft-state',
-      version: 1,
-      storage: createJSONStorage(() => ({
-        getItem: (name: string) => {
-          try {
-            return localStorage.getItem(name);
-          } catch (error) {
-            console.error('Error reading from localStorage:', error);
-            return null;
-          }
-        },
-        setItem: (name: string, value: string) => {
-          try {
-            localStorage.setItem(name, value);
-          } catch (error) {
-            console.error('Error saving to localStorage:', error);
-          }
-        },
-        removeItem: (name: string) => {
-          try {
-            localStorage.removeItem(name);
-          } catch (error) {
-            console.error('Error removing from localStorage:', error);
-          }
-        },
-      })),
-      partialize: (state: DraftState) => ({
-        players: state.players.map(p => ({
-          id: p.id,
-          draftedBy: p.draftedBy,
-          price: p.price
-        })),
-        teams: state.teams.map(t => ({
-          id: t.id,
-          players: t.players,
-          budget: t.budget,
-          roster: t.roster
-        })),
-        currentAuction: state.currentAuction,
-        currentNominatedId: state.currentNominatedId,
-        currentBidder: state.currentBidder,
-        baseBudget: state.baseBudget,
-        teamCount: state.teamCount,
-        templateRoster: state.templateRoster,
-        playersLoaded: state.playersLoaded
-      })
-    }
+    )
   )
 );
 
-// Dev-only: make the store available in the browser console
-if (typeof window !== 'undefined' && import.meta.env.DEV) {
-  // @ts-ignore
+/**
+ * Dev-only: expose in console
+ */
+if (typeof window !== 'undefined' && import.meta.env?.DEV) {
+  // @ts-expect-error dev hook
   window.store = useDraftStore;
 }
 
+/**
+ * HOOK WRAPPER FOR SELECTORS
+ */
 export const useDraftSelectors = () => {
   const selectors = useDraftStore((state) => state.selectors);
-  const getState = useDraftStore.getState;
-  
+  const state = useDraftStore();
+
   return {
-    undraftedPlayers: () => selectors.undraftedPlayers(getState()),
-    topAvailable: (limit = 300) => selectors.topAvailable(getState(), limit),
-    topAvailableByPos: (pos: Position, limit = 100) => 
-      selectors.topAvailableByPos(getState(), pos, limit),
+    undraftedPlayers: () => selectors.undraftedPlayers(state),
+    topAvailable: (limit = 300) => selectors.topAvailable(state, limit),
+    topAvailableByPos: (pos: Position, limit = 100) =>
+      selectors.topAvailableByPos(state, pos, limit),
     topAvailableByMultiPos: (positions: Position[], limit = 100) =>
-      selectors.topAvailableByMultiPos(getState(), positions, limit),
+      selectors.topAvailableByMultiPos(state, positions, limit),
     topAvailableForFlex: (limit = 100, includeTE = true) =>
-      selectors.topAvailableForFlex(getState(), limit, includeTE)
+      selectors.topAvailableForFlex(state, limit, includeTE),
   };
 };
