@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { useDraftStore } from '../store/draftStore';
+import { shallow } from 'zustand/shallow';
 
 type RosterPosition = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
 type Position = RosterPosition | 'FLEX' | 'BENCH';
@@ -61,7 +62,9 @@ interface DraftBoardProps {
 }
 
 export default function DraftBoard({ teams }: DraftBoardProps) {
-  const { players, templateRoster } = useDraftStore();
+  const players = useDraftStore(s => s.players, shallow);
+  const templateRoster = useDraftStore(s => s.templateRoster, shallow);
+  const baseBudget = useDraftStore(s => s.baseBudget, shallow);
 
   // Local state: simple on-device claim + rename
   const [claimed, setClaimed] = useState<Record<number, boolean>>({});
@@ -221,7 +224,7 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
       <HStack justifyContent="space-between" mb={4}>
         <Heading size="lg">Draft Board</Heading>
         <Text opacity={0.8}>
-          Managers: {teams.length} • Budget: ${useDraftStore(state => state.baseBudget)}
+          Managers: {teams.length} • Budget: ${baseBudget}
         </Text>
       </HStack>
 
@@ -230,8 +233,8 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
           display="grid"
           gridTemplateColumns={{
             base: 'repeat(auto-fill, minmax(120px, 1fr))',
-            md: `repeat(${Math.min(teams.length, 8)}, minmax(120px, 1fr))`,
-            lg: `repeat(${Math.min(teams.length, 12)}, minmax(100px, 1fr))`
+            md: `repeat(${Math.max(1, Math.min(teams.length, 8))}, minmax(120px, 1fr))`,
+            lg: `repeat(${Math.max(1, Math.min(teams.length, 12))}, minmax(100px, 1fr))`
           }}
           gap={2}
           width="100%"

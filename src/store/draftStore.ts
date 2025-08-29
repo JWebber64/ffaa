@@ -1,7 +1,8 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import { produce } from 'immer';
 import FfcAdp from '../services/FfcAdp';
+import { getPersistedState, persistState, clearPersistedState } from '../utils/persistState';
 
 declare global {
   interface Window {
@@ -39,8 +40,13 @@ export interface Player {
 export interface Nomination {
   playerId: string;
   startingBid?: number;
-  currentBid: number;
-  highBidder?: number;
+  createdAt: number;
+}
+
+export interface CurrentAuction {
+  playerId: string;
+  highBid: number;
+  highBidder: number | null;
 }
 
 export interface DraftState {
@@ -51,6 +57,7 @@ export interface DraftState {
   teams: Team[];
   nominationQueue: Nomination[];
   currentBidder?: number;
+  currentAuction: CurrentAuction | null;
   baseBudget: number;
   teamCount: number;
   templateRoster: Record<Position, number>;
@@ -102,64 +109,180 @@ function draftedCountForTeam(players: Player[], teamId: number): number {
   return players.filter(p => p.draftedBy === teamId).length;
 }
 
+// Define the store type for persistence
+interface PersistedDraftState {
+  players: Array<{
+    id: string;
+    draftedBy?: number;
+    price?: number;
+  }>;
+  teams: Array<{
+    id: number;
+    players: string[];
+    budget: number;
+  }>;
+  currentAuction: CurrentAuction | null;
+  currentNominatedId: string | null;
+  currentBidder: number | undefined;
+  baseBudget: number;
+  teamCount: number;
+  templateRoster: Record<Position, number>;
+  playersLoaded: boolean;
+}
+
 // Create the store with persistence
-export const useDraftStore = create<DraftState>()(
+type SetState = (partial: Partial<DraftState> | ((state: DraftState) => Partial<DraftState>)) => void;
+type GetState = () => DraftState;
+
+// Define the store type
+export type DraftStore = Omit<DraftState, 'selectors'> & {
+  setPlayers: (players: Player[]) => void;
+  setTeams: (teams: Team[]) => void;
+  setCurrentNominatedId: (id: string | null) => void;
+  setCurrentBidder: (teamId?: number) => void;
+  applyAdp: (updates: Array<{ id: string } & Partial<Player>>) => void;
+  loadAdp: (opts?: {
+    year?: number;
+    teams?: number;
+    scoring?: 'standard' | 'ppr' | 'half-ppr';
+    useCache?: boolean;
+    signal?: AbortSignal;
+  }) => Promise<boolean>;
+  setConfig: (config: { baseBudget: number; teamCount: number; templateRoster: Record<Position, number> }) => void;
+  setTeamNames: (names: string[]) => void;
+  nominate: (playerId: string, startingBid?: number) => void;
+  placeBid: (playerId: string, byTeamId: number, amount: number) => void;
+  assignPlayer: (playerId: string, teamId: number, price: number) => void;
+  computeMaxBid: (teamId: number, playerPos?: string) => number;
+  hasSlotFor: (teamId: number, pos: Position, includeTeInFlex?: boolean) => boolean;
+  resetDraft: () => void;
+  selectors: {
+    undraftedPlayers: (state: DraftState) => Player[];
+    topAvailable: (state: DraftState, limit?: number) => Player[];
+    topAvailableByPos: (state: DraftState, pos: Position, limit?: number) => Player[];
+    topAvailableByMultiPos: (state: DraftState, positions: Position[], limit?: number) => Player[];
+    topAvailableForFlex: (state: DraftState, limit?: number, includeTE?: boolean) => Player[];
+  };
+};
+
+// Helper function to get initial state with proper type safety
+const getInitialState = (): DraftState => {
+  const persistedState = getPersistedState();
+  
+  // Default state
+  const defaultState: DraftState = {
+    players: [],
+    playersLoaded: false,
+    adpLoaded: false,
+    teams: [],
+    nominationQueue: [],
+    currentAuction: null,
+    currentNominatedId: null,
+    currentBidder: undefined,
+    baseBudget: 200,
+    teamCount: 12,
+    templateRoster: { ...POSITION_CAP },
+    setPlayers: () => {},
+    setTeams: () => {},
+    setCurrentNominatedId: () => {},
+    setCurrentBidder: () => {},
+    applyAdp: () => {},
+    loadAdp: async () => false,
+    setConfig: () => {},
+    setTeamNames: () => {},
+    nominate: () => {},
+    placeBid: () => {},
+    assignPlayer: () => {},
+    computeMaxBid: () => 0,
+    hasSlotFor: () => false,
+    resetDraft: () => {},
+    selectors: {
+      undraftedPlayers: () => [],
+      topAvailable: () => [],
+      topAvailableByPos: () => [],
+      topAvailableByMultiPos: () => [],
+      topAvailableForFlex: () => []
+    }
+  };
+
+  if (!persistedState) {
+    return defaultState;
+  }
+
+  // Merge persisted state with defaults
+  return {
+    ...defaultState,
+    ...persistedState,
+    players: Array.isArray(persistedState.players) ? persistedState.players : [],
+    teams: Array.isArray(persistedState.teams) ? persistedState.teams : [],
+    nominationQueue: Array.isArray(persistedState.nominationQueue) ? persistedState.nominationQueue : [],
+    currentNominatedId: persistedState.currentNominatedId ?? null,
+    currentAuction: persistedState.currentAuction || null,
+    currentBidder: persistedState.currentBidder,
+    baseBudget: typeof persistedState.baseBudget === 'number' ? persistedState.baseBudget : 200,
+    teamCount: typeof persistedState.teamCount === 'number' ? persistedState.teamCount : 12,
+    templateRoster: persistedState.templateRoster || { ...POSITION_CAP },
+    playersLoaded: !!persistedState.playersLoaded
+  };
+};
+
+// Create the store with proper typing
+export const useDraftStore = create<DraftStore>()(
   persist(
     (set, get) => ({
-      // Initial state
-      players: [],
-      playersLoaded: false,
-      adpLoaded: false,
-      teams: [],
-      baseBudget: 200,
-      teamCount: 12,
-      templateRoster: { ...POSITION_CAP },
-      nominationQueue: [],
-      currentNominatedId: null,
-      currentBidder: undefined,
+      ...getInitialState(),
+      // Actions
 
       // Actions
-      setPlayers: (players) => set({ players, playersLoaded: true }),
-      setTeams: (teams) => set({ teams }),
-      setCurrentNominatedId: (id) => set({ currentNominatedId: id }),
-      setCurrentBidder: (teamId) => set({ currentBidder: teamId }),
+      setPlayers: (players: Player[]) => set({ players }),
+      setTeams: (teams: Team[]) => set({ teams }),
+      setCurrentNominatedId: (id: string | null) => set({ currentNominatedId: id }),
+      setCurrentBidder: (teamId?: number) => set({ currentBidder: teamId }),
       
       // Apply ADP updates to players
-      applyAdp: (updates) => set(produce((state: DraftState) => {
-        const playerMap = new Map(state.players.map(p => [p.id, p]));
-        for (const update of updates) {
-          const player = playerMap.get(update.id);
+      applyAdp: (updates: Array<{ id: string } & Partial<Player>>) => set(produce((state: DraftState) => {
+        updates.forEach(update => {
+          const player = state.players.find(p => p.id === update.id);
           if (player) {
-            Object.assign(player, {
-              rank: update.rank,
-              posRank: update.posRank,
-              adp: update.adp,
-              adpSource: update.adpSource
-            });
+            Object.assign(player, update);
           }
-        }
+        });
       })),
       
       // Load ADP data from FFC API
-      loadAdp: async (opts = {}) => {
+      loadAdp: async (opts?: {
+        year?: number;
+        teams?: number;
+        scoring?: 'standard' | 'ppr' | 'half-ppr';
+        useCache?: boolean;
+        signal?: AbortSignal;
+      }) => {
         try {
           const { 
             year = new Date().getFullYear(), 
             teams = 12, 
             scoring = 'ppr', 
-            useCache = true 
+            useCache = true,
+            signal
           } = opts as {
             year?: number;
             teams?: number;
             scoring?: 'ppr' | 'standard' | 'half-ppr';
             useCache?: boolean;
+            signal?: AbortSignal;
           };
           
           // FFC expects 'half', map from 'half-ppr'
           const ffcScoring: 'ppr' | 'half' | 'standard' = scoring === 'half-ppr' ? 'half' : scoring;
           
           const api = new FfcAdp();
-          const rows = await api.load({ year, teams, scoring: ffcScoring, useCache });
+          const rows = await api.load({ 
+            year, 
+            teams, 
+            scoring: ffcScoring, 
+            useCache, 
+            signal 
+          });
           
           // Build composite index from your existing players
           const normName = (s: string) => s.trim().toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ');
@@ -194,36 +317,49 @@ export const useDraftStore = create<DraftState>()(
       },
 
       // ... rest of the existing actions (setConfig, setTeamNames, nominate, placeBid, assignPlayer, resetDraft)
-      setConfig: (config) => {
+      setConfig: (config: { teamCount: number; baseBudget: number; templateRoster: Record<Position, number> }) => {
         const { teamCount, baseBudget, templateRoster } = config;
-        return set(() => ({
+        set({
           teamCount,
           baseBudget,
-          templateRoster: { ...templateRoster },
+          templateRoster,
+        });
+      },
+      setTeamNames: (names: string[]) => {
+        set(produce((state: DraftState) => {
+          state.teams.forEach((team: Team, i: number) => {
+            team.name = names[i] || `Team ${i + 1}`;
+          });
         }));
       },
-      setTeamNames: (names) =>
-        set(() => ({
-          teams: names.map((name, i) => ({
-            id: i + 1,
-            name: name || `Team ${i + 1}`,
-            players: [],
-            budget: get().baseBudget,
-            roster: { ...get().templateRoster }
-          })),
-        })),
       nominate: (playerId: string, startingBid: number = 1) =>
-        set((state) => {
-          const nom = { playerId, startingBid, currentBid: startingBid, createdAt: Date.now() };
-          const nominationQueue = [
-            nom,
+        set((state) => ({
+          nominationQueue: [
+            { playerId, startingBid, createdAt: Date.now() },
             ...state.nominationQueue.filter((n) => n.playerId !== playerId),
-          ];
-          return { nominationQueue, currentNominatedId: playerId };
-        }),
-      placeBid: (_playerId, byTeamId) => set({ currentBidder: byTeamId }),
-      assignPlayer: (playerId: string, teamId: number, price: number) =>
+          ],
+          currentNominatedId: playerId,
+          currentAuction: { playerId, highBid: startingBid, highBidder: null },
+        })),
+      placeBid: (playerId: string, byTeamId: number, amount: number) => {
+        set(produce((state: DraftState) => {
+          const auction = state.currentAuction;
+          if (!auction) return;
+
+          if (amount > (auction.highBid || 0)) {
+            auction.highBid = amount;
+            auction.highBidder = byTeamId;
+          }
+        }));
+      },
+      assignPlayer: (playerId: string) =>
         set((state) => {
+          const ca = state.currentAuction;
+          if (!ca || ca.playerId !== playerId) return {};
+          if (!ca || ca.playerId !== playerId || ca.highBidder == null) return {};
+          const teamId = ca.highBidder;
+          const price = ca.highBid;
+
           const players = state.players.map((p) =>
             p.id === playerId ? { ...p, draftedBy: teamId, price } : p
           );
@@ -239,6 +375,7 @@ export const useDraftStore = create<DraftState>()(
             nominationQueue,
             currentNominatedId: null,
             currentBidder: undefined,
+            currentAuction: null,
           };
         }),
       computeMaxBid: (teamId: number) => {
@@ -316,121 +453,79 @@ export const useDraftStore = create<DraftState>()(
 
       // Selectors
       selectors: {
-        // Get undrafted players
-        undraftedPlayers: (state: DraftState) => state.players.filter(p => p.draftedBy === undefined),
+        undraftedPlayers: (state: DraftState) => state.players.filter((p: Player) => p.draftedBy === undefined),
         
-        // Get top available players (undrafted, sorted by rank/adp)
-        topAvailable: (state: DraftState, limit = 300) => {
+        topAvailable: (state: DraftState, limit: number = 300) => {
           return state.players
-            .filter(p => !p.draftedBy)
-            .sort((a, b) => {
+            .filter((p: Player) => !p.draftedBy)
+            .sort((a: Player, b: Player) => {
               // First by position rank if available
               if (a.posRank !== b.posRank) {
-                return (a.posRank || 999) - (b.posRank || 999);
+                return (a.posRank || 1000) - (b.posRank || 1000);
               }
-              
-              // Then by overall rank
+              // Then by overall rank if available
               if (a.rank !== b.rank) {
-                return (a.rank || 999) - (b.rank || 999);
+                return (a.rank || 1000) - (b.rank || 1000);
               }
-              
-              // Then by ADP
+              // Then by ADP if available
               if (a.adp !== b.adp) {
                 return (a.adp || 1000) - (b.adp || 1000);
               }
-              
               // Finally by name (A-Z)
               return a.name.localeCompare(b.name);
             })
             .slice(0, limit);
         },
         
-        // Get top available players by position
-        topAvailableByPos: (state: DraftState, pos: Position, limit = 100) => {
-          const posUpper = pos.toUpperCase();
-          // Create a new array reference by spreading the result
-          return [...state.players
-            .filter(p => p.pos && p.pos.toUpperCase() === posUpper && !p.draftedBy)
-            .sort((a, b) => {
-              // First by position rank (most important for position-specific views)
+        topAvailableByPos: (state: DraftState, pos: Position, limit: number = 100) => {
+          return state.players
+            .filter((p: Player) => !p.draftedBy && p.pos === pos)
+            .sort((a: Player, b: Player) => {
               if (a.posRank !== b.posRank) {
-                return (a.posRank || 999) - (b.posRank || 999);
+                return (a.posRank || 1000) - (b.posRank || 1000);
               }
-              
-              // Then by overall rank
               if (a.rank !== b.rank) {
-                return (a.rank || 999) - (b.rank || 999);
+                return (a.rank || 1000) - (b.rank || 1000);
               }
-              
-              // Then by ADP
               if (a.adp !== b.adp) {
                 return (a.adp || 1000) - (b.adp || 1000);
               }
-              
-              // Finally by name (A-Z)
               return a.name.localeCompare(b.name);
-            })]
+            })
             .slice(0, limit);
         },
         
-        // Get top available players by multiple positions
-        topAvailableByMultiPos: (state: DraftState, positions: Position[], limit = 100) => {
-          const posSet = new Set(positions.map(p => p.toUpperCase()));
-          const undrafted = state.players.filter(p => 
-            p.draftedBy === undefined && p.pos && posSet.has(p.pos.toUpperCase())
-          );
-          
-          return [...undrafted].sort((a, b) => {
-            // Use rank or posRank if available
-            const aRank = a.posRank ?? a.rank ?? Infinity;
-            const bRank = b.posRank ?? b.rank ?? Infinity;
-            
-            if (aRank !== bRank) {
-              return aRank - bRank;
-            }
-            
-            // Fall back to ADP if ranks are equal
-            if (a.adp !== undefined && b.adp !== undefined) {
-              return a.adp - b.adp;
-            }
-            
-            // Finally, sort by name
-            return a.name.localeCompare(b.name);
-          }).slice(0, limit);
-        },
-        
-        // Get top available flex players (RB/WR/TE or RB/WR)
-        topAvailableForFlex: (state: DraftState, limit = 100, includeTE = true) => {
-          const flexPositions = includeTE ? ['RB', 'WR', 'TE'] : ['RB', 'WR'];
-          const flexPositionsUpper = flexPositions.map(p => p.toUpperCase());
+        topAvailableByMultiPos: (state: DraftState, positions: Position[], limit: number = 100) => {
           return state.players
-            .filter(p => p.pos && flexPositionsUpper.includes(p.pos.toUpperCase()) && !p.draftedBy)
-            .sort((a, b) => {
-              // First by rank
+            .filter((p: Player) => !p.draftedBy && positions.includes(p.pos))
+            .sort((a: Player, b: Player) => {
+              if (a.posRank !== b.posRank) {
+                return (a.posRank || 1000) - (b.posRank || 1000);
+              }
               if (a.rank !== b.rank) {
-                return (a.rank || 999) - (b.rank || 999);
+                return (a.rank || 1000) - (b.rank || 1000);
               }
-              
-              // Then by position (RB > WR > TE for flex)
-              const posValue = (pos: string) => {
-                if (pos === 'RB') return 0;
-                if (pos === 'WR') return 1;
-                return 2; // TE
-              };
-              
-              const aPos = posValue(a.pos);
-              const bPos = posValue(b.pos);
-              
-              if (aPos !== bPos) {
-                return aPos - bPos;
-              }
-              
-              // Then by ADP
               if (a.adp !== b.adp) {
                 return (a.adp || 1000) - (b.adp || 1000);
               }
-              
-              // Finally by name (A-Z)
+              return a.name.localeCompare(b.name);
+            })
+            .slice(0, limit);
+        },
+        
+        topAvailableForFlex: (state: DraftState, limit: number = 100, includeTE: boolean = true) => {
+          return state.players
+            .filter((p: Player) => {
+              if (p.draftedBy) return false;
+              return p.pos === 'RB' || p.pos === 'WR' || (includeTE && p.pos === 'TE');
+            })
+            .sort((a: Player, b: Player) => {
+              if (a.rank !== b.rank) {
+                return (a.rank || 1000) - (b.rank || 1000);
+              }
+              if (a.adp !== b.adp) {
+                return (a.adp || 1000) - (b.adp || 1000);
+              }
               return a.name.localeCompare(b.name);
             })
             .slice(0, limit);
@@ -439,24 +534,61 @@ export const useDraftStore = create<DraftState>()(
     }),
     {
       name: 'auction-draft-state',
-      storage: createJSONStorage(() => window.localStorage),
       version: 1,
-      partialize: (state) => ({
-        players: state.players,
-        playersLoaded: state.playersLoaded,
-        teams: state.teams,
+      storage: createJSONStorage(() => ({
+        getItem: (name: string) => {
+          try {
+            return localStorage.getItem(name);
+          } catch (error) {
+            console.error('Error reading from localStorage:', error);
+            return null;
+          }
+        },
+        setItem: (name: string, value: string) => {
+          try {
+            localStorage.setItem(name, value);
+          } catch (error) {
+            console.error('Error saving to localStorage:', error);
+          }
+        },
+        removeItem: (name: string) => {
+          try {
+            localStorage.removeItem(name);
+          } catch (error) {
+            console.error('Error removing from localStorage:', error);
+          }
+        },
+      })),
+      partialize: (state: DraftState) => ({
+        players: state.players.map(p => ({
+          id: p.id,
+          draftedBy: p.draftedBy,
+          price: p.price
+        })),
+        teams: state.teams.map(t => ({
+          id: t.id,
+          players: t.players,
+          budget: t.budget,
+          roster: t.roster
+        })),
+        currentAuction: state.currentAuction,
+        currentNominatedId: state.currentNominatedId,
+        currentBidder: state.currentBidder,
         baseBudget: state.baseBudget,
         teamCount: state.teamCount,
         templateRoster: state.templateRoster,
-        nominationQueue: state.nominationQueue,
-        currentNominatedId: state.currentNominatedId,
-        currentBidder: state.currentBidder
+        playersLoaded: state.playersLoaded
       })
     }
   )
 );
 
-// Export selectors for easier access
+// Dev-only: make the store available in the browser console
+if (typeof window !== 'undefined' && import.meta.env.DEV) {
+  // @ts-ignore
+  window.store = useDraftStore;
+}
+
 export const useDraftSelectors = () => {
   const selectors = useDraftStore((state) => state.selectors);
   const getState = useDraftStore.getState;

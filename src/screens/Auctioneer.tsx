@@ -20,7 +20,7 @@ import { formatPositionForDisplay } from '../utils/positionUtils';
 import { PlayerSearch } from '../components/auction/PlayerSearch';
 import { ResetDraftButton } from '../components/auction/ResetDraftButton';
 
-const COUNTDOWN_SECONDS = 30;
+const COUNTDOWN_SECONDS = 3; // Temporarily set to 3 seconds for testing
 
 const Auctioneer: React.FC = () => {
   const toast = useToast();
@@ -50,6 +50,7 @@ const Auctioneer: React.FC = () => {
   const [isLoadingAdp, setIsLoadingAdp] = useState<boolean>(false);
   const [time, setTime] = useState<number>(COUNTDOWN_SECONDS);
   const timerRef = useRef<number | null>(null);
+  const deadlineRef = useRef<number | null>(null);
 
   // ---- config ----
   const { config } = useConfig();
@@ -74,6 +75,7 @@ const Auctioneer: React.FC = () => {
       timerRef.current = null;
     }
     setIsTimerRunning(false);
+    deadlineRef.current = null;
   }, []);
 
   const handleTimerExpired = useCallback(async () => {
@@ -89,32 +91,82 @@ const Auctioneer: React.FC = () => {
         isClosable: true,
       });
     } catch (e) {
+      console.error('Error assigning player:', e);
+      toast.closeAll();
       toast({
-        title: 'Auto-assign failed',
-        description: e instanceof Error ? e.message : 'Unknown error',
+        id: 'error-assigning-player',
+        title: 'Error assigning player',
+        description: 'Failed to assign player to team',
         status: 'error',
         duration: 3000,
         isClosable: true,
       });
     }
-  }, [assignPlayer, bidAmount, currentBidder, currentNom, currentPlayer, currentBidderTeam, toast]);
+  }, [currentNom, currentPlayer, currentBidder, bidAmount, currentBidderTeam?.name, assignPlayer, toast]);
 
   const startTimer = useCallback(() => {
-    // reset to full clock each start
     stopTimer();
+    const end = Date.now() + COUNTDOWN_SECONDS * 1000;
+    deadlineRef.current = end;
     setIsTimerRunning(true);
-    setTime(COUNTDOWN_SECONDS);
 
-    timerRef.current = window.setInterval(() => {
-      setTime((prev) => {
-        if (prev <= 1) {
+    const updateTime = () => {
+      if (!deadlineRef.current) return;
+      
+      const left = Math.max(0, Math.ceil((deadlineRef.current - Date.now()) / 1000));
+      setTime(left);
+      
+      if (left <= 0) {
+        stopTimer();
+        void handleTimerExpired();
+      }
+    };
+
+    // Initial update
+    updateTime();
+    
+    // Set up interval for updates
+    timerRef.current = window.setInterval(updateTime, 1000);
+  }, [handleTimerExpired, stopTimer]);
+
+  // Update timer immediately when tab becomes visible again
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && deadlineRef.current) {
+        const left = Math.max(0, Math.ceil((deadlineRef.current - Date.now()) / 1000));
+        setTime(left);
+        
+        if (left <= 0) {
           stopTimer();
           void handleTimerExpired();
-          return 0;
         }
-        return prev - 1;
-      });
-    }, 1000);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [handleTimerExpired, stopTimer]);
+
+  // Update timer immediately when tab becomes visible again
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && deadlineRef.current) {
+        const left = Math.max(0, Math.ceil((deadlineRef.current - Date.now()) / 1000));
+        setTime(left);
+        
+        if (left <= 0) {
+          stopTimer();
+          void handleTimerExpired();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [handleTimerExpired, stopTimer]);
 
   // Cleanup timer on unmount

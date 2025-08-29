@@ -9,14 +9,16 @@ import {
   InputGroup,
   useToast 
 } from '@chakra-ui/react';
+import { useConfig } from '../../contexts/ConfigContext';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
-import { Player } from '../../store/draftStore';
+import { Player, CurrentAuction } from '../../store/draftStore';
 import { useState } from 'react';
 import { formatPositionForDisplay } from '../../utils/positionUtils';
 
 interface AuctionControlsProps {
   currentPlayer: Player | null;
   currentBidder: number | null;
+  currentAuction: CurrentAuction | null;
   price: number;
   teams: Array<{ id: number; name: string; budget: number }>;
   onBid: (teamId: number, amount: number) => void;
@@ -25,12 +27,13 @@ interface AuctionControlsProps {
   isListening: boolean;
   toggleListening: () => void;
   computeMaxBid: (teamId: number) => number;
-  hasSlotFor: (teamId: number, pos: string) => boolean;
+  hasSlotFor: (teamId: number, pos: string, includeTeInFlex?: boolean) => boolean;
 }
 
 export const AuctionControls = ({
   currentPlayer,
   currentBidder,
+  currentAuction,
   price,
   teams,
   onBid,
@@ -42,6 +45,7 @@ export const AuctionControls = ({
   hasSlotFor,
 }: AuctionControlsProps) => {
   const toast = useToast();
+  const { config } = useConfig();
   const [customBid, setCustomBid] = useState('');
 
   const handleBid = (teamId: number, amount: number | string): void => {
@@ -51,7 +55,7 @@ export const AuctionControls = ({
     if (isNaN(bidAmount) || bidAmount < 1) return;
     
     const maxBid = computeMaxBid(teamId);
-    const canBid = hasSlotFor(teamId, currentPlayer.pos);
+    const canBid = hasSlotFor(teamId, currentPlayer.pos, config.includeTeInFlex);
 
     if (bidAmount <= price) {
       toast({
@@ -115,10 +119,10 @@ export const AuctionControls = ({
             </HStack>
           </Box>
           <Box textAlign="right">
-            <Text fontSize="3xl" fontWeight="bold" color="white">${price}</Text>
-            {currentBidder !== null && (
+            <Text fontSize="3xl" fontWeight="bold" color="white">${currentAuction?.highBid || price}</Text>
+            {currentAuction?.highBidder !== null && (
               <Text fontSize="sm" color="gray.300">
-                High Bid: Team {currentBidder + 1}
+                High Bid: ${currentAuction?.highBid} by Team {currentAuction?.highBidder !== undefined ? currentAuction.highBidder + 1 : 'None'}
               </Text>
             )}
           </Box>

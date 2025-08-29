@@ -6,6 +6,7 @@ interface FfcAdpOptions {
   scoring: FfcScoring;
   useCache?: boolean;
   ttlMs?: number; // default 12h
+  signal?: AbortSignal;
 }
 
 interface FfcPlayer {
@@ -24,7 +25,12 @@ function normPos(p: string) {
   return (u === 'DST' || u === 'D/ST') ? 'DEF' : u; // internal canonical
 }
 
-function normTeam(t?: string) { return (t ?? '').toUpperCase(); }
+const TEAM_ALIASES: Record<string, string> = { JAX: 'JAC', LA: 'LAR', WSH: 'WAS', SFO: 'SF', KAN: 'KC' };
+
+function normTeam(t?: string) {
+  const team = (t ?? '').toUpperCase();
+  return TEAM_ALIASES[team] ?? team;
+}
 
 class FfcAdp {
   constructor(private base = 'https://fantasyfootballcalculator.com/api/v1') {}
@@ -50,7 +56,10 @@ class FfcAdp {
     }
 
     const url = `${this.base}/adp/${scoring}?year=${year}&teams=${teams}`;
-    const res = await fetch(url, { headers: { accept: 'application/json' } });
+    const res = await fetch(url, { 
+      headers: { accept: 'application/json' },
+      signal: opts.signal
+    });
     if (!res.ok) throw new Error(`FFC ADP fetch failed: ${res.status} ${res.statusText}`);
     const json = await res.json();
     const rows = (json.players ?? json) as any[];
