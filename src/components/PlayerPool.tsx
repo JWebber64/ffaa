@@ -118,9 +118,11 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
   const [activeTab, setActiveTab] = useState<TabValue>('ALL');
   const [search, setSearch] = useState('');
   const [onlyUndrafted, setOnlyUndrafted] = useState(true);
+  const [forceUpdate, setForceUpdate] = useState(0); // Used to force re-render
 
   // Get players based on active tab and filters
   const getFilteredPlayers = useMemo(() => {
+    console.log('Filtering players for tab:', activeTab);
     let players: Player[] = [];
     
     // Get base player list based on tab
@@ -129,11 +131,14 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
     } else if (activeTab === 'FLEX') {
       players = topAvailableForFlex(200, true);
     } else if (activeTab && POS_ORDER.includes(activeTab as Pos)) {
-      players = topAvailableByPos(activeTab as Pos, 100);
+      // Force a new array reference by spreading the result
+      players = [...topAvailableByPos(activeTab as Pos, 100)];
     } else {
       // Default case if activeTab doesn't match any condition
       players = topAvailable(300);
     }
+    
+    console.log(`Found ${players.length} players for tab ${activeTab}`);
 
     // Apply search filter
     const searchTerm = search.trim().toLowerCase();
@@ -166,24 +171,38 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
     return groups;
   }, [getFilteredPlayers]);
   
-  // Handle tab change with type safety
-  const handleTabChange = (index: number) => {
-    const tab = ALL_TABS[index];
-    if (tab !== undefined) {
-      setActiveTab(tab);
-    }
+  // Handle position tab click
+  const handlePositionTabClick = (pos: Pos) => {
+    console.log('Position tab clicked:', pos);
+    setActiveTab(pos);
+    // Force a re-render to ensure the player list updates
+    setForceUpdate(prev => prev + 1);
   };
   
-  // Get current tab index with fallback to 0 (ALL)
-  const activeTabIndex = Math.max(0, ALL_TABS.indexOf(activeTab));
+  // Log active tab changes
+  useEffect(() => {
+    console.log('Active tab updated:', activeTab);
+  }, [activeTab]);
+  
+  // Ensure activeTab is always a valid tab and force update when it changes
+  useEffect(() => {
+    if (!ALL_TABS.includes(activeTab as any)) {
+      setActiveTab('ALL');
+    }
+    // Force a re-render when the tab changes
+    setForceUpdate(prev => prev + 1);
+  }, [activeTab]);
 
   const tabBg = useColorModeValue('gray.100', 'gray.700');
   const activeTabBg = useColorModeValue('blue.500', 'blue.600');
   const tabHoverBg = useColorModeValue('gray.200', 'gray.600');
   const activeTabColor = 'white';
 
+  // Force re-render when tab changes or when forceUpdate changes
+  const tabKey = `tab-${activeTab}-${forceUpdate}`;
+
   return (
-    <VStack align="stretch" spacing={4} color="white">
+    <VStack key={tabKey} align="stretch" spacing={4} color="white">
       {/* Search Bar */}
       <HStack spacing={2}>
         <Input
@@ -216,30 +235,36 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
       </HStack>
 
       {showPositionTabs && (
-        <Tabs 
-          variant="solid-rounded" 
-          colorScheme="blue"
-          index={activeTabIndex}
-          onChange={handleTabChange}
-        >
-          <TabList flexWrap="wrap" gap={1}>
-            {ALL_TABS.map((tab) => (
-              <Tab 
-                key={tab}
-                _selected={{ bg: activeTabBg, color: activeTabColor }}
-                _hover={{ bg: tabHoverBg }}
-                bg={tabBg}
-                color="gray.200"
-                fontSize="sm"
-                px={3}
-                py={1}
-                borderRadius="md"
-              >
-                {tab === 'ALL' ? 'All' : tab === 'FLEX' ? 'FLEX' : tab}
-              </Tab>
-            ))}
-          </TabList>
-        </Tabs>
+        <Box>
+          <HStack as="div" role="tablist" flexWrap="wrap" gap={1} mb={4}>
+            {ALL_TABS.map((tab) => {
+              const isActive = activeTab === tab;
+              return (
+                <Button
+                  key={tab}
+                  as="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveTab(tab)}
+                  size="sm"
+                  variant={isActive ? 'solid' : 'ghost'}
+                  colorScheme={isActive ? 'blue' : 'gray'}
+                  bg={isActive ? activeTabBg : tabBg}
+                  color={isActive ? activeTabColor : 'gray.200'}
+                  _hover={{
+                    bg: isActive ? 'blue.500' : tabHoverBg,
+                  }}
+                  px={3}
+                  py={1}
+                  borderRadius="md"
+                  fontSize="sm"
+                >
+                  {tab === 'ALL' ? 'All' : tab === 'FLEX' ? 'FLEX' : tab}
+                </Button>
+              );
+            })}
+          </HStack>
+        </Box>
       )}
 
       <Box textAlign="right" pr={2}>
@@ -255,9 +280,9 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
       </Box>
 
       {/* Player List */}
-      <VStack align="stretch" spacing={3} maxH="70vh" overflowY="auto" pr={2}>
-        {activeTab === 'ALL' || activeTab === 'FLEX' || search ? (
-          // Show flat list for ALL/FLEX tabs or when searching
+      <VStack align="stretch" spacing={3} maxH="70vh" overflowY="auto" pr={2} key={`player-list-${activeTab}-${forceUpdate}`}>
+        {search || (activeTab !== 'ALL' && activeTab !== 'FLEX') ? (
+          // Show flat list when searching or when a specific position is selected
           <VStack align="stretch" spacing={2}>
             {getFilteredPlayers.map((p) => (
               <PlayerRow
@@ -296,7 +321,10 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
                       size="xs" 
                       variant="ghost" 
                       colorScheme="blue"
-                      onClick={() => setActiveTab(pos)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePositionTabClick(pos);
+                      }}
                     >
                       View All
                     </Button>
@@ -316,7 +344,10 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
                         size="sm" 
                         variant="ghost" 
                         colorScheme="blue"
-                        onClick={() => setActiveTab(pos)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePositionTabClick(pos);
+                        }}
                         mt={2}
                       >
                         +{players.length - 5} more {pos} players

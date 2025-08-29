@@ -295,8 +295,10 @@ export const useDraftStore = create<DraftState>()(
         
         // Get top available players by position
         topAvailableByPos: (state: DraftState, pos: Position, limit = 100) => {
-          return state.players
-            .filter(p => p.pos === pos && !p.draftedBy)
+          const posUpper = pos.toUpperCase();
+          // Create a new array reference by spreading the result
+          return [...state.players
+            .filter(p => p.pos && p.pos.toUpperCase() === posUpper && !p.draftedBy)
             .sort((a, b) => {
               // First by position rank (most important for position-specific views)
               if (a.posRank !== b.posRank) {
@@ -315,15 +317,15 @@ export const useDraftStore = create<DraftState>()(
               
               // Finally by name (A-Z)
               return a.name.localeCompare(b.name);
-            })
+            })]
             .slice(0, limit);
         },
         
         // Get top available players by multiple positions
         topAvailableByMultiPos: (state: DraftState, positions: Position[], limit = 100) => {
-          const posSet = new Set(positions);
+          const posSet = new Set(positions.map(p => p.toUpperCase()));
           const undrafted = state.players.filter(p => 
-            p.draftedBy === undefined && posSet.has(p.pos)
+            p.draftedBy === undefined && p.pos && posSet.has(p.pos.toUpperCase())
           );
           
           return [...undrafted].sort((a, b) => {
@@ -348,8 +350,9 @@ export const useDraftStore = create<DraftState>()(
         // Get top available flex players (RB/WR/TE or RB/WR)
         topAvailableForFlex: (state: DraftState, limit = 100, includeTE = true) => {
           const flexPositions = includeTE ? ['RB', 'WR', 'TE'] : ['RB', 'WR'];
+          const flexPositionsUpper = flexPositions.map(p => p.toUpperCase());
           return state.players
-            .filter(p => flexPositions.includes(p.pos) && !p.draftedBy)
+            .filter(p => p.pos && flexPositionsUpper.includes(p.pos.toUpperCase()) && !p.draftedBy)
             .sort((a, b) => {
               // First by rank
               if (a.rank !== b.rank) {
