@@ -13,8 +13,8 @@ import {
   import { useState } from "react";
   import type { ChangeEvent } from "react"; // 👈 type-only
   import { useNavigate } from "react-router-dom";
-  import { useDraftStore } from "../store/draftStore.new";
-  import type { Position } from "../store/draftStore.new"; // 👈 type-only
+  import { useDraftStore } from "../store/draftStore";
+  import type { Position } from "../store/draftStore";
   
   
   const TEAM_OPTIONS = [8, 10, 12, 14, 16];

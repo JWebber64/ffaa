@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import type { Player, BasePosition } from '../store/draftStore.new';
+import type { Player, BasePosition } from '../store/draftStore';
 import { FALLBACK_PLAYERS } from '../data/players';
 
 type SleeperPlayer = {

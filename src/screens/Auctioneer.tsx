@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { FaClock, FaGavel, FaSync } from 'react-icons/fa';
 import { useDraftStore } from '../store';
-import type { Player, Team } from '../store/draftStore.new';
+import type { Player, Team } from '../store/draftStore';
 import { useConfig } from '../contexts/ConfigContext';
 import { PlayerSearch } from '../components/auction/PlayerSearch';
 import { ResetDraftButton } from '../components/auction/ResetDraftButton';

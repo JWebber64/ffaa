@@ -8,7 +8,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { useDraftStore, type Player, type Team } from "../store/draftStore.new";
+import { useDraftStore, type Player, type Team } from "../store/draftStore";
 import { downloadCSV } from "../utils/csv";
 
 type Row = {

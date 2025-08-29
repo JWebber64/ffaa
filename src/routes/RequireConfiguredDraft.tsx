@@ -1,6 +1,6 @@
 import { ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDraftStore } from '../store/draftStore.new';
+import { useDraftStore } from '../store/draftStore';
 
 export default function RequireConfiguredDraft({ children }: { children: ReactNode }) {
   const navigate = useNavigate();

@@ -9,14 +9,26 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
-import {
-  useDraftStore,
-  type Player as BasePlayer,
-  type Team as BaseTeam,
-} from "../store/draftStore.new";
+import { useDraftStore } from '../store/draftStore';
 
 type RosterPosition = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
 type Position = RosterPosition | 'FLEX' | 'BENCH';
+
+interface BasePlayer {
+  id: string;
+  name: string;
+  pos: string;
+  team?: string;
+  nflTeam?: string;
+  rank?: number;
+  adp?: number;
+}
+
+interface BaseTeam {
+  id: number;
+  name: string;
+  budget: number;
+}
 
 // Extend BasePlayer but keep the original Position type from the store
 interface Player extends Omit<BasePlayer, 'pos'> {
@@ -209,7 +221,7 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
       <HStack justifyContent="space-between" mb={4}>
         <Heading size="lg">Draft Board</Heading>
         <Text opacity={0.8}>
-          Managers: {teams.length} • Budget: ${useDraftStore.getState().baseBudget}
+          Managers: {teams.length} • Budget: ${useDraftStore(state => state.baseBudget)}
         </Text>
       </HStack>
 

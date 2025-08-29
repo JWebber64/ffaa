@@ -1,9 +1,9 @@
-import { normalizeTeamName } from '../config/teamAliases';
+import { normalizeTeamName, logTeamNameMiss } from '../config/teamAliases';
 
 export interface FfcAdpOptions {
   year: number;
   teams: number;
-  scoring: 'standard' | 'ppr' | 'half-ppr';
+  scoring: 'standard' | 'ppr' | 'half';
   useCache?: boolean;
 }
 
@@ -100,7 +100,11 @@ class FfcAdp {
         // Normalize team names for D/ST players
         let team = player.team;
         if (player.position === 'DST') {
-          team = normalizeTeamName(team);
+          const normalizedTeam = normalizeTeamName(team);
+          if (normalizedTeam !== team) {
+            logTeamNameMiss(team, normalizedTeam);
+          }
+          team = normalizedTeam;
         }
 
         return {

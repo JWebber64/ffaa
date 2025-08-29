@@ -34,10 +34,10 @@ export const TEAM_ALIASES: Record<string, string> = {
   'TEN': 'TEN', 'Tennessee': 'TEN', 'Titans': 'TEN',
   'WAS': 'WAS', 'WSH': 'WAS', 'Washington': 'WAS', 'Commanders': 'WAS', 'Football Team': 'WAS',
 
-  // Common D/ST name variations
-  'Cardinals D/ST': 'ARI', 'Arizona D/ST': 'ARI', 'ARI D/ST': 'ARI',
-  'Falcons D/ST': 'ATL', 'Atlanta D/ST': 'ATL', 'ATL D/ST': 'ATL',
-  // ... add more D/ST variations as needed
+  // Common DEF name variations
+  'Cardinals DEF': 'ARI', 'Arizona DEF': 'ARI', 'ARI DEF': 'ARI',
+  'Falcons DEF': 'ATL', 'Atlanta DEF': 'ATL', 'ATL DEF': 'ATL',
+  // ... add more DEF variations as needed
 };
 
 /**
@@ -58,11 +58,24 @@ export function normalizeTeamName(teamName: string): string {
     }
   }
   
-  // Try partial match for D/ST
-  if (teamName.includes('D/ST')) {
-    const teamPart = teamName.split('D/ST')[0].trim();
+  // Try partial match for DEF
+  if (teamName.includes('DEF')) {
+    const teamPart = teamName.split('DEF')[0].trim();
     return TEAM_ALIASES[teamPart] || teamName;
   }
   
   return teamName;
+}
+
+/**
+ * Log when a team name is normalized to help identify missing aliases
+ * @param original The original team name that needed normalization
+ * @param normalized The normalized team name
+ */
+export function logTeamNameMiss(original: string, normalized: string): void {
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(`Team name normalization: "${original}" -> "${normalized}"`);
+  }
+  // In production, you might want to send this to an analytics service
+  // analytics.track('team_name_normalization', { original, normalized });
 }

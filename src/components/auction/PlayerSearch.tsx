@@ -27,7 +27,7 @@ import {
   NumberDecrementStepper,
 } from '@chakra-ui/react';
 import { FaGavel } from 'react-icons/fa';
-import type { Player } from '../../store/draftStore.new';
+import type { Player } from '../../store/draftStore';
 
 export interface PlayerSearchProps {
   players: Player[];

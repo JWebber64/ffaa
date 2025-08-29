@@ -1,4 +1,4 @@
-import type { Player } from '../store/draftStore.new';
+import type { Player } from '../store/draftStore';
 
 // Utility function to generate player IDs
 const generatePlayerIds = (position: string, count: number, startIndex = 1): string[] => {
@@ -131,22 +131,22 @@ const ks: Player[] = [
   // Add more Ks as needed
 ];
 
-// 32 D/STs
+// 32 DEFs
 const defIds = generatePlayerIds('DEF', 32);
 const defs: Player[] = [
-  { id: defIds[0], name: '49ers D/ST', pos: 'DEF', nflTeam: 'SF' },
-  { id: defIds[1], name: 'Cowboys D/ST', pos: 'DEF', nflTeam: 'DAL' },
-  { id: defIds[2], name: 'Eagles D/ST', pos: 'DEF', nflTeam: 'PHI' },
-  { id: defIds[3], name: 'Patriots D/ST', pos: 'DEF', nflTeam: 'NE' },
-  { id: defIds[4], name: 'Bills D/ST', pos: 'DEF', nflTeam: 'BUF' },
-  { id: defIds[5], name: 'Ravens D/ST', pos: 'DEF', nflTeam: 'BAL' },
-  { id: defIds[6], name: 'Jets D/ST', pos: 'DEF', nflTeam: 'NYJ' },
-  { id: defIds[7], name: 'Browns D/ST', pos: 'DEF', nflTeam: 'CLE' },
-  { id: defIds[8], name: 'Saints D/ST', pos: 'DEF', nflTeam: 'NO' },
-  { id: defIds[9], name: 'Broncos D/ST', pos: 'DEF', nflTeam: 'DEN' },
-  { id: defIds[10], name: 'Buccaneers D/ST', pos: 'DEF', nflTeam: 'TB' },
-  { id: defIds[11], name: 'Commanders D/ST', pos: 'DEF', nflTeam: 'WAS' },
-  // Add more D/STs as needed
+  { id: defIds[0], name: '49ers DEF', pos: 'DEF', nflTeam: 'SF' },
+  { id: defIds[1], name: 'Cowboys DEF', pos: 'DEF', nflTeam: 'DAL' },
+  { id: defIds[2], name: 'Eagles DEF', pos: 'DEF', nflTeam: 'PHI' },
+  { id: defIds[3], name: 'Patriots DEF', pos: 'DEF', nflTeam: 'NE' },
+  { id: defIds[4], name: 'Bills DEF', pos: 'DEF', nflTeam: 'BUF' },
+  { id: defIds[5], name: 'Ravens DEF', pos: 'DEF', nflTeam: 'BAL' },
+  { id: defIds[6], name: 'Jets DEF', pos: 'DEF', nflTeam: 'NYJ' },
+  { id: defIds[7], name: 'Browns DEF', pos: 'DEF', nflTeam: 'CLE' },
+  { id: defIds[8], name: 'Saints DEF', pos: 'DEF', nflTeam: 'NO' },
+  { id: defIds[9], name: 'Broncos DEF', pos: 'DEF', nflTeam: 'DEN' },
+  { id: defIds[10], name: 'Buccaneers DEF', pos: 'DEF', nflTeam: 'TB' },
+  { id: defIds[11], name: 'Commanders DEF', pos: 'DEF', nflTeam: 'WAS' },
+  // Add more DEFs as needed
 ];
 
 

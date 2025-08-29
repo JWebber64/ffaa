@@ -19,7 +19,7 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
-import { useDraftStore, type Player, useDraftSelectors } from '../store/draftStore.new';
+import { useDraftStore, type Player, useDraftSelectors } from '../store/draftStore';
 
 type Pos = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
 type TabValue = 'ALL' | Pos | 'FLEX';

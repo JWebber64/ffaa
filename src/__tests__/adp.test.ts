@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { describe, it, expect, vi, beforeEach, afterEach, beforeAll } from 'vitest';
 import { create } from 'zustand';
-import type { DraftState, Player, Position } from '../store/draftStore.new';
+import type { DraftState, Player, Position } from '../store/draftStore';
 import FfcAdp from '../services/FfcAdp';
 
 type ViType = typeof vi;
