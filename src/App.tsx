@@ -6,6 +6,7 @@ import Setup from './screens/Setup';
 import DraftBoard from './screens/DraftBoard';
 import Auctioneer from './screens/Auctioneer';
 import Results from './screens/Results';
+import PlayerPool from './screens/PlayerPool';
 import { useGlobalPlayers } from './hooks/useGlobalPlayers';
 import { useDraftStore } from './store/draftStore';
 import TopNav from './components/TopNav';
@@ -26,6 +27,11 @@ function App() {
             <Routes>
               <Route index element={<Home />} />
               <Route path="/setup" element={<Setup />} />
+              <Route path="/player-pool" element={
+                <RequireConfiguredDraft>
+                  <PlayerPool />
+                </RequireConfiguredDraft>
+              } />
               <Route path="/board" element={
                 <RequireConfiguredDraft>
                   <DraftBoard teams={teams} />

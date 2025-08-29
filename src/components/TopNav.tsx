@@ -38,6 +38,7 @@ export default function TopNav({ onMenu }: Props) {
           <HStack spacing={2} display={{ base: "none", md: "flex" }}>
             <NavLink to="/" style={linkStyle}>Home</NavLink>
             <NavLink to="/setup" style={linkStyle}>Setup</NavLink>
+            <NavLink to="/player-pool" style={linkStyle}>Player Pool</NavLink>
             <NavLink to="/board" style={linkStyle}>Board</NavLink>
             <NavLink to="/auctioneer" style={linkStyle}>Auctioneer</NavLink>
             <NavLink to="/results" style={linkStyle}>Results</NavLink>

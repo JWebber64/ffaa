@@ -47,7 +47,7 @@ export const AuctionControls = ({
     if (!currentPlayer) return;
     // Convert string amount to number if needed
     const bidAmount = typeof amount === 'string' ? parseInt(amount, 10) : amount;
-    if (isNaN(bidAmount)) return;
+    if (isNaN(bidAmount) || bidAmount < 1) return;
     
     const maxBid = computeMaxBid(teamId);
     const canBid = hasSlotFor(teamId, currentPlayer.pos);
@@ -160,7 +160,7 @@ export const AuctionControls = ({
               handleBid(currentBidder, customBid);
             }
           }}
-          disabled={!customBid || !customBid.trim()}
+          isDisabled={!customBid || !customBid.trim()}
           type="button"
         >
           Bid
@@ -179,7 +179,20 @@ export const AuctionControls = ({
             {isListening ? 'Stop' : 'Voice'}
           </Box>
         </Button>
-        <Button colorScheme="green" onClick={onTimerEnd}>
+        <Button 
+          colorScheme="green" 
+          onClick={() => {
+            onTimerEnd();
+            // Clear any existing toasts to avoid stacking
+            toast.closeAll();
+            toast({
+              title: 'Player sold!',
+              status: 'success',
+              duration: 2000,
+              isClosable: true,
+            });
+          }}
+        >
           Sold!
         </Button>
       </HStack>
@@ -194,7 +207,7 @@ export const AuctionControls = ({
             <Button
               key={team.id}
               onClick={() => handleBid(team.id, price + 1)}
-              disabled={!canBid || isOutbid}
+              isDisabled={!canBid || isOutbid}
               variant={currentBidder === team.id ? 'solid' : 'outline'}
               colorScheme={currentBidder === team.id ? 'blue' : 'gray'}
               size="sm"

@@ -19,6 +19,8 @@ export interface Player {
   nflTeam?: string;
   draftedBy?: number;
   price?: number;
+  search_rank?: number;
+  search_rank_ppr?: number;
 }
 
 export interface Nomination {
@@ -57,6 +59,7 @@ export interface DraftState {
   assignPlayer: (playerId: string, teamId: number, price: number) => void;
   computeMaxBid: (teamId: number) => number;
   hasSlotFor: (teamId: number, pos: Position) => boolean;
+  resetDraft: () => void;
 }
 
 // Auction constraints
@@ -200,8 +203,11 @@ export const useDraftStore = create<DraftState>()(
           
           // Validate player exists and not drafted
           const player = players.find(p => p.id === playerId);
-          if (!player || player.draftedBy !== undefined) {
-            throw new Error('Invalid player or already drafted');
+          if (!player) {
+            throw new Error('Player not found');
+          }
+          if (player.draftedBy !== undefined) {
+            throw new Error('Player already drafted');
           }
 
           // Validate team exists
@@ -210,12 +216,22 @@ export const useDraftStore = create<DraftState>()(
             throw new Error('Team not found');
           }
 
-          // Validate price and slot availability
-          if (price > computeMaxBid(teamId) || !hasSlotFor(teamId, player.pos)) {
-            throw new Error('Invalid bid or no available slot');
+          // Validate price is positive and within budget
+          if (price <= 0) {
+            throw new Error('Bid amount must be positive');
+          }
+          
+          // Validate team has enough budget
+          if (price > team.budget) {
+            throw new Error('Team does not have enough budget');
           }
 
-          // Update state
+          // Check if team has an open slot for this position
+          if (!hasSlotFor(teamId, player.pos)) {
+            throw new Error(`No available ${player.pos} slot on team`);
+          }
+
+          // Update state using immer's produce for immutable updates
           set(produce((state: DraftState) => {
             // Update player
             const playerIndex = state.players.findIndex(p => p.id === playerId);
@@ -224,26 +240,62 @@ export const useDraftStore = create<DraftState>()(
               state.players[playerIndex].price = price;
             }
 
-            // Update team
+            // Update team budget and roster
             const teamIndex = state.teams.findIndex(t => t.id === teamId);
             if (teamIndex !== -1) {
               // Decrement budget
               state.teams[teamIndex].budget -= price;
               
-              // Update roster count
+              // Initialize roster if needed and update position count
               const pos = player.pos;
+              if (!state.teams[teamIndex].roster) {
+                state.teams[teamIndex].roster = { ...POSITION_CAP };
+                Object.keys(state.teams[teamIndex].roster).forEach(key => {
+                  state.teams[teamIndex].roster[key as Position] = 0;
+                });
+              }
+              
+              // Increment position count
               state.teams[teamIndex].roster[pos] = (state.teams[teamIndex].roster[pos] || 0) + 1;
             }
 
-            // Remove from nomination queue
+            // Remove from nomination queue and reset current nomination
             state.nominationQueue = state.nominationQueue.filter(n => n.playerId !== playerId);
-            
-            // Clear current nominated if it was this player
-            if (state.currentNominatedId === playerId) {
-              state.currentNominatedId = null;
-            }
+            state.currentNominatedId = null;
+            state.currentBidder = undefined;
           }));
-        }
+        },
+
+        // Reset the draft to its initial state while preserving configuration
+        resetDraft: () => set(produce((state: DraftState) => {
+          // Reset players (remove draft info but keep player data)
+          state.players.forEach(player => {
+            delete player.draftedBy;
+            delete player.price;
+          });
+
+          // Reset teams (reset budget and roster)
+          const baseBudget = state.baseBudget;
+          state.teams.forEach(team => {
+            team.budget = baseBudget;
+            // Reset roster counts
+            if (team.roster) {
+              Object.keys(team.roster).forEach(pos => {
+                team.roster[pos as Position] = 0;
+              });
+            } else {
+              team.roster = { ...POSITION_CAP };
+              Object.keys(team.roster).forEach(key => {
+                team.roster[key as Position] = 0;
+              });
+            }
+          });
+
+          // Clear draft state
+          state.nominationQueue = [];
+          state.currentNominatedId = null;
+          state.currentBidder = undefined;
+        }))
       }),
       {
         name: 'auction-draft-state',

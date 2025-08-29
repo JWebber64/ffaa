@@ -17,10 +17,10 @@ const TTL_MS = 24 * 60 * 60 * 1000;
 const LS_KEY = 'sleeper_players_v2';
 
 const POSITION_LIMITS: Record<BasePosition, number> = {
-  QB: 32,
-  RB: 96,
-  WR: 128,
-  TE: 48,
+  QB: 50,
+  RB: 125,
+  WR: 150,
+  TE: 50,
   K: 32,
   DEF: 32,
 };
@@ -33,7 +33,7 @@ function normalizePosition(posRaw?: string): BasePosition | null {
   return null;
 }
 
-function toPlayer(sp: SleeperPlayer): Player | null {
+function toPlayer(sp: SleeperPlayer & { search_rank?: number; search_rank_ppr?: number }): (Player & { search_rank?: number; search_rank_ppr?: number }) | null {
   const name = sp.full_name || [sp.first_name, sp.last_name].filter(Boolean).join(' ').trim();
   const pos = normalizePosition(sp.position) || normalizePosition(sp.fantasy_positions?.[0]);
   if (!name || !sp.player_id || !pos) return null;
@@ -43,13 +43,26 @@ function toPlayer(sp: SleeperPlayer): Player | null {
     name,
     pos,
     nflTeam: sp.team || undefined,
+    search_rank: sp.search_rank,
+    search_rank_ppr: sp.search_rank_ppr,
   };
 }
 
-function rankKey(p: Player) {
-  const order = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'] as const;
-  const i = order.indexOf(p.pos as (typeof order)[number]);
-  return `${i.toString().padStart(2, '0')}-${p.nflTeam || 'ZZZ'}-${p.name}`;
+function rankKey(p: Player & { search_rank?: number; search_rank_ppr?: number }) {
+  // Position priority: QB, RB, WR, TE, K, DEF
+  const positionOrder = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'] as const;
+  const positionIndex = positionOrder.indexOf(p.pos as (typeof positionOrder)[number]);
+  
+  // Use search_rank_ppr if available (lower is better), then search_rank, then fallback
+  const rank = p.search_rank_ppr ?? p.search_rank ?? 9999;
+  
+  // Format: positionPriority-rank-playerName
+  // This ensures players are sorted by position first, then by rank
+  return [
+    positionIndex.toString().padStart(2, '0'),
+    rank.toString().padStart(5, '0'),
+    p.name
+  ].join('-');
 }
 
 function uniqueById(players: Player[]) {
@@ -106,7 +119,22 @@ export function useSleeperPlayers() {
 
       const ordered = mapped.sort((a, b) => rankKey(a).localeCompare(rankKey(b)));
       const unique = uniqueById(ordered);
+      console.log('[useSleeperPlayers] Unique players:', {
+        total: unique.length,
+        byPosition: unique.reduce((acc, p) => {
+          acc[p.pos] = (acc[p.pos] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      });
+
       const capped = capByPosition(unique);
+      console.log('[useSleeperPlayers] Capped players:', {
+        total: capped.length,
+        byPosition: capped.reduce((acc, p) => {
+          acc[p.pos] = (acc[p.pos] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      });
 
       setPlayers(capped);
       localStorage.setItem(LS_KEY, JSON.stringify({ data: capped, ts: Date.now() }));

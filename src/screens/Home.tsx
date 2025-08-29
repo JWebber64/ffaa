@@ -3,14 +3,14 @@ import { NavLink } from "react-router-dom";
 
 export default function Home() {
   return (
-    <Box maxW="2xl" mx="auto" py={10}>
-      <Heading mb={2}>Fantasy Football Auction App</Heading>
-      <Text opacity={0.85} mb={8}>
+    <Box maxW="2xl" mx="auto" py={10} px={4} textAlign="center">
+      <Heading mb={4}>Fantasy Football Auction App</Heading>
+      <Text opacity={0.85} mb={8} maxW="2xl" mx="auto">
         Set up your league, nominate players, run the live auction with voice input,
         and export results—dark blues & grays theme.
       </Text>
 
-      <Stack spacing={3} maxW="sm">
+      <Stack spacing={3} maxW="sm" mx="auto">
         <NavLink to="/setup" style={{ textDecoration: "none" }}>
           <Button bg="#2372b2" width="100%">Start New Draft</Button>
         </NavLink>

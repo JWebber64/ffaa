@@ -18,7 +18,7 @@ import {
   
   
   const TEAM_OPTIONS = [8, 10, 12, 14, 16];
-  const POSITIONS: Position[] = ["QB", "RB", "WR", "TE", "FLEX", "BENCH"];
+  const POSITIONS: Position[] = ["QB", "RB", "WR", "TE", "FLEX", "K", "DEF", "BENCH"];
   
   export default function Setup() {
     const nav = useNavigate();
@@ -26,7 +26,14 @@ import {
   
     const [teams, setTeams] = useState<number>(teamCount || 12);
     const [budget, setBudget] = useState<number>(baseBudget || 200);
-    const [roster, setRoster] = useState<Record<Position, number>>({ ...templateRoster });
+    // Initialize roster with all positions set to 0 by default
+  const [roster, setRoster] = useState<Record<Position, number>>(() => {
+    const initialRoster = {} as Record<Position, number>;
+    POSITIONS.forEach(pos => {
+      initialRoster[pos] = templateRoster[pos] || 0;
+    });
+    return initialRoster;
+  });
     const [names, setNames] = useState<string[]>(
       Array.from({ length: teams }).map((_, i) => `Team ${i + 1}`)
     );
@@ -46,7 +53,16 @@ import {
   
     const updateRoster = (pos: Position) => (e: ChangeEvent<HTMLInputElement>) => {
       const val = parseInt(e.target.value || "0", 10);
-      setRoster((r) => ({ ...r, [pos]: Number.isNaN(val) ? 0 : Math.max(0, val) }));
+      setRoster((r) => {
+        const newRoster = { ...r };
+        POSITIONS.forEach(p => {
+          if (!(p in newRoster)) {
+            newRoster[p] = 0;
+          }
+        });
+        newRoster[pos] = Number.isNaN(val) ? 0 : Math.max(0, val);
+        return newRoster;
+      });
     };
   
     const updateName = (i: number) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +71,8 @@ import {
       setNames(next);
     };
   
-    const totalSlots = Object.values(roster).reduce((a, b) => a + b, 0);
+    const totalSlots = POSITIONS
+      .reduce((sum, pos) => sum + (roster[pos] || 0), 0);
     const totalLeagueBudget = teams * budget;
   
     const handleStart = () => {

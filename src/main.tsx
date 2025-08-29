@@ -21,57 +21,62 @@ const theme = extendTheme({
   },
   components: {
     Button: {
-      baseStyle: (props: any) => ({
-        _focus: {
-          boxShadow: '0 0 0 3px var(--chakra-colors-blue-400)',
+      baseStyle: {
+        _focus: { 
+          boxShadow: '0 0 0 3px var(--chakra-colors-blue-400)' 
         },
         _disabled: {
-          '&, &:hover, &[data-hover]': {
-            opacity: '1 !important',
-            cursor: 'not-allowed !important',
-            color: 'gray.100 !important',
-            bg: 'transparent !important',
-          }
+          opacity: 1,
+          cursor: 'not-allowed',
         },
-      }),
+      },
       variants: {
-        solid: (props: any) => ({
-          bg: props.colorMode === 'dark' ? 'blue.500' : 'blue.500',
-          color: 'white',
-          _hover: {
-            bg: props.colorMode === 'dark' ? 'blue.400' : 'blue.600',
-            _disabled: {
-              bg: 'gray.600',
-              color: 'gray.300',
-            },
+        solid: {
+          _hover: { 
+            bg: 'blue.600' 
           },
-          _active: {
-            bg: 'blue.600',
+          _active: { 
+            bg: 'blue.700' 
           },
-        }),
-        outline: (props: any) => ({
+          _disabled: { 
+            bg: 'gray.600', 
+            color: 'gray.300', 
+            boxShadow: 'none' 
+          },
+          '&[disabled], &[data-disabled]': {
+            opacity: 1,
+            bg: 'gray.600',
+            color: 'gray.300',
+            boxShadow: 'none',
+            pointerEvents: 'none',
+          },
+        },
+        outline: {
           border: '1px solid',
           borderColor: 'gray.600',
-          color: props.colorMode === 'dark' ? 'white' : 'gray.800',
-          '&[disabled], &[disabled]:hover, &[disabled][data-active]': {
+          color: 'white',
+          _hover: { 
+            bg: 'gray.700' 
+          },
+          _active: { 
+            bg: 'gray.600' 
+          },
+          _disabled: {
             opacity: 1,
-            cursor: 'not-allowed',
             borderColor: 'gray.600',
-            color: 'gray.500 !important',
-            backgroundColor: props.colorMode === 'dark' ? 'gray.800' : 'gray.100' + ' !important',
-            boxShadow: 'none !important',
-            '&:hover, &:active, &[data-hover], &[data-active]': {
-              backgroundColor: (props.colorMode === 'dark' ? 'gray.800' : 'gray.100') + ' !important',
-              color: 'gray.500 !important',
-            },
+            color: 'gray.400',
+            bg: 'gray.800',
+            boxShadow: 'none',
           },
-          _hover: {
-            bg: props.colorMode === 'dark' ? 'gray.700' : 'gray.100',
+          '&[disabled], &[data-disabled]': {
+            opacity: 1,
+            borderColor: 'gray.600',
+            color: 'gray.400',
+            bg: 'gray.800',
+            boxShadow: 'none',
+            pointerEvents: 'none',
           },
-          _active: {
-            bg: props.colorMode === 'dark' ? 'gray.600' : 'gray.200',
-          },
-        }),
+        },
         ghost: (props: any) => ({
           color: props.colorMode === 'dark' ? 'white' : 'gray.800',
           '&[disabled], &[disabled]:hover, &[disabled][data-active]': {

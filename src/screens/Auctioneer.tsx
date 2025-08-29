@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Badge,
   Box,
@@ -12,11 +12,11 @@ import {
   VStack,
   useToast,
 } from '@chakra-ui/react';
-import { FaCheck, FaClock, FaTimes } from 'react-icons/fa';
+import { FaCheck, FaClock, FaTimes, FaGavel } from 'react-icons/fa';
 import { useDraftStore } from '../store/draftStore';
 import type { Team, Player } from '../store/draftStore';
-import PlayerPool from '../components/PlayerPool';
 import { PlayerSearch } from '../components/auction/PlayerSearch';
+import { ResetDraftButton } from '../components/auction/ResetDraftButton';
 
 const COUNTDOWN_SECONDS = 30;
 
@@ -44,6 +44,44 @@ const Auctioneer: React.FC = () => {
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const timerRef = useRef<number | null>(null);
 
+  // Handle placing a bid from the player search
+  const handleSearchBid = useCallback(async (player: Player, amount: number) => {
+    if (!currentBidder) {
+      toast({
+        title: 'No team selected',
+        description: 'Please select a team first',
+        status: 'warning',
+        duration: 2000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      // Use the placeBid function from the store
+      await Promise.resolve(placeBid(player.id, currentBidder, amount));
+      
+      toast({
+        title: 'Bid Placed',
+        description: `Bid of $${amount} placed on ${player.name}`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: 'Bid Failed',
+        description: error instanceof Error ? error.message : 'Failed to place bid',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentBidder, placeBid, toast]);
+
   // ---- derive "who's up" from queue[0] ----
   const currentNom = nominationQueue?.[0] ?? null;
 
@@ -65,6 +103,41 @@ const Auctioneer: React.FC = () => {
     setIsTimerRunning(false);
   }, []);
 
+  // Add cleanup effect for timer
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
+  // Handle timer expiration
+  const handleTimerExpired = useCallback(async () => {
+    if (!currentNom || !currentBidder || !currentPlayer) {
+      return;
+    }
+
+    try {
+      await Promise.resolve(assignPlayer(currentNom.playerId, currentBidder, bidAmount));
+      toast({
+        title: 'Auction won',
+        description: `${currentPlayer.name} assigned to ${currentBidderTeam?.name ?? 'team'} for $${bidAmount}`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (e) {
+      toast({
+        title: 'Auto-assign failed',
+        description: e instanceof Error ? e.message : 'Unknown error',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  }, [assignPlayer, bidAmount, currentBidder, currentNom, currentPlayer, currentBidderTeam, toast]);
+
   const startTimer = useCallback(() => {
     // reset to full clock each start
     stopTimer();
@@ -74,28 +147,8 @@ const Auctioneer: React.FC = () => {
     timerRef.current = window.setInterval(() => {
       setTime((prev) => {
         if (prev <= 1) {
-          // timer expires: auto-assign to currentBidder at current bidAmount
           stopTimer();
-          if (currentNom && currentBidder && currentPlayer) {
-            try {
-              assignPlayer(currentNom.playerId, currentBidder, bidAmount);
-              toast({
-                title: 'Auction won',
-                description: `${currentPlayer.name} assigned to ${currentBidderTeam?.name ?? 'team'} for $${bidAmount}`,
-                status: 'success',
-                duration: 3000,
-                isClosable: true,
-              });
-            } catch (e) {
-              toast({
-                title: 'Auto-assign failed',
-                description: e instanceof Error ? e.message : 'Unknown error',
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-              });
-            }
-          }
+          handleTimerExpired();
           return 0;
         }
         return prev - 1;
@@ -104,7 +157,7 @@ const Auctioneer: React.FC = () => {
   }, [assignPlayer, bidAmount, currentBidder, currentNom, currentPlayer, currentBidderTeam, stopTimer, toast]);
 
   // ---- actions ----
-  const handlePlaceBid = useCallback(async () => {
+  const handleBidClick = useCallback(async () => {
     if (!currentNom || !currentBidder || !currentPlayer) {
       toast({
         title: 'Cannot place bid',
@@ -244,57 +297,152 @@ const Auctioneer: React.FC = () => {
 
   // ---- team bidder buttons ----
   const renderTeamBidButtons = useMemo(() => {
+    const handleBidClick = async (teamId: number) => {
+      if (!currentNom || !currentPlayer) return;
+      
+      try {
+        setIsLoading(true);
+        await Promise.resolve(placeBid(currentNom.playerId, teamId, bidAmount));
+        
+        // Reset/extend timer after a valid bid
+        setTime(COUNTDOWN_SECONDS);
+        if (!isTimerRunning) startTimer();
+        
+        toast({
+          title: 'Bid placed',
+          description: `Bid $${bidAmount} on ${currentPlayer.name}`,
+          status: 'success',
+          duration: 2000,
+          isClosable: true,
+        });
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to place bid';
+        console.error('Bid error:', error);
+        toast({
+          title: 'Bid failed',
+          description: errorMessage,
+          status: 'error',
+          duration: 3500,
+          isClosable: true,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  return (
-    <ButtonGroup size="md" spacing={2} flexWrap="wrap">
-      {teams.map((team) => {
-        const disabled =
-          currentPlayer && hasSlotFor
-            ? !hasSlotFor(team.id, currentPlayer.pos || '')
-            : false;
+    return (
+      <VStack spacing={2} w="100%">
+        {/* Team Selection Row */}
+        <Box w="100%">
+          <Text fontSize="sm" color="gray.300" mb={1}>
+            Select Team:
+          </Text>
+          <Box 
+            display="grid" 
+            gridTemplateColumns={`repeat(${teams.length}, minmax(0, 1fr))`}
+            gap={1}
+            w="100%"
+          >
+            {teams.map((team) => {
+              const disabled = currentPlayer && hasSlotFor
+                ? !hasSlotFor(team.id, currentPlayer.pos || '')
+                : false;
+              
+              return (
+                <Tooltip key={`team-${team.id}`} label={team.name}>
+                  <Button
+                    size="sm"
+                    variant={currentBidder === team.id ? 'solid' : 'outline'}
+                    colorScheme={currentBidder === team.id ? 'blue' : 'gray'}
+                    onClick={() => setCurrentBidder(team.id)}
+                    isDisabled={disabled}
+                    flex="1 1 0%"
+                    w="100%"
+                    minW={0}
+                    px={1}
+                    fontSize={{ base: 'xs', sm: 'sm' }}
+                    whiteSpace="nowrap"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
+                    _hover={{
+                      bg: currentBidder === team.id ? 'blue.500' : 'gray.700',
+                      transform: 'translateY(-2px)',
+                      boxShadow: 'md',
+                      _disabled: {
+                        bg: 'gray.800',
+                        transform: 'none',
+                        cursor: 'not-allowed'
+                      }
+                    }}
+                    _active={{
+                      transform: 'translateY(0)'
+                    }}
+                    _disabled={{
+                      opacity: 0.6,
+                      cursor: 'not-allowed',
+                      _hover: {
+                        bg: 'gray.800'
+                      }
+                    }}
+                    transition='all 0.2s'
+                  >
+                    {team.name}
+                  </Button>
+                </Tooltip>
+              );
+            })}
+          </Box>
+        </Box>
 
-        return (
-          <Tooltip key={team.id} label={`${team.name} ($${computeMaxBid ? computeMaxBid(team.id) : 0})`}>
-            <Button
-              size="md"
-              variant={currentBidder === team.id ? 'solid' : 'outline'}
-              colorScheme={currentBidder === team.id ? 'blue' : 'gray'}
-              onClick={() => {
-                setCurrentBidder?.(team.id);
-                setBidAmount(1);
-              }}
-              isDisabled={disabled}
-              minW="100px"
-              _hover={{
-                bg: currentBidder === team.id ? 'blue.500' : 'gray.700',
-                transform: 'translateY(-2px)',
-                boxShadow: 'md',
-                _disabled: {
-                  bg: 'gray.800',
-                  transform: 'none',
-                  cursor: 'not-allowed'
-                }
-              }}
-              _active={{
-                transform: 'translateY(0)'
-              }}
-              _disabled={{
-                opacity: 0.6,
-                cursor: 'not-allowed',
-                _hover: {
-                  bg: 'gray.800'
-                }
-              }}
-              transition='all 0.2s'
-            >
-              {team.name}
-            </Button>
-          </Tooltip>
-        );
-      })}
-    </ButtonGroup>
-  );
-}, [teams, currentBidder, currentPlayer, computeMaxBid, hasSlotFor, setCurrentBidder]);
+        {/* Bid Buttons Row */}
+        <Box w="100%" mt={2}>
+          <Text fontSize="sm" color="gray.300" mb={1}>
+            Place Bid:
+          </Text>
+          <Box 
+            display="grid" 
+            gridTemplateColumns={`repeat(${teams.length}, minmax(0, 1fr))`}
+            gap={1}
+            w="100%"
+          >
+            {teams.map((team) => {
+              const maxBid = computeMaxBid ? computeMaxBid(team.id) : 0;
+              const disabled = !currentPlayer || 
+                (hasSlotFor && !hasSlotFor(team.id, currentPlayer.pos || '')) || 
+                maxBid < 1 ||
+                isLoading;
+              
+              return (
+                <Tooltip key={`bid-${team.id}`} label={`Bid $${bidAmount} with ${team.name}`}>
+                  <ButtonGroup size="sm" isAttached variant="outline">
+                    <Button
+                      leftIcon={<FaGavel />}
+                      colorScheme="blue"
+                      variant="solid"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleBidClick(team.id);
+                      }}
+                      isDisabled={disabled}
+                      w="100%"
+                      minW={0}
+                      px={2}
+                      fontSize="sm"
+                      whiteSpace="nowrap"
+                      overflow="hidden"
+                      textOverflow="ellipsis"
+                    >
+                      ${bidAmount}
+                    </Button>
+                  </ButtonGroup>
+                </Tooltip>
+              );
+            })}
+          </Box>
+        </Box>
+      </VStack>
+    );
+  }, [teams, currentBidder, currentPlayer, computeMaxBid, hasSlotFor, setCurrentBidder, currentNom, placeBid, isTimerRunning, startTimer, toast, bidAmount, isLoading]);
 
 // ...
 
@@ -302,14 +450,17 @@ return (
   <Container maxW="container.xl" py={4} color="white">
     <VStack spacing={6} align="stretch">
       {/* Header */}
-      <Box>
-        <Text fontSize="2xl" fontWeight="bold" mb={2} color="white">
-          Auction Room
-        </Text>
-        <Text color="gray.300">
-          {teams.length} teams • {players.filter((p) => p.draftedBy).length} players drafted
-        </Text>
-      </Box>
+      <HStack justify="space-between" align="flex-start">
+        <Box>
+          <Text fontSize="2xl" fontWeight="bold" mb={2} color="white">
+            Auction Room
+          </Text>
+          <Text color="gray.300">
+            {teams.length} teams • {players.filter((p) => p.draftedBy).length} players drafted
+          </Text>
+        </Box>
+        <ResetDraftButton />
+      </HStack>
 
       {/* Current Auction Card */}
       <Box p={6} borderWidth="1px" borderRadius="lg" bg="gray.800" borderColor="gray.700" boxShadow="lg">
@@ -379,24 +530,18 @@ return (
         <Box>
           <PlayerSearch
             players={players}
-            onSelect={handlePlayerSelect}
-            selectedPlayer={null}
-            onSetStartingBid={(bid) => setBidAmount(Math.max(1, Number(bid) || 1))}
-            startingBid={String(bidAmount)}
+            onSelect={(player) => handlePlayerSelect(player)}
+            startingBid={bidAmount.toString()}
+            onSetStartingBid={(bid) => setBidAmount(Number(bid))}
+            onBid={handleSearchBid}
           />
         </Box>
 
         {/* Player Pool */}
         <Box borderWidth="1px" borderRadius="lg" p={4} bg="gray.800" borderColor="gray.700" boxShadow="lg">
           <Text fontSize="xl" fontWeight="bold" mb={4} color="white">
-            Player Pool
+            Player Search
           </Text>
-          <PlayerPool
-            onNominate={(playerId: string) => {
-              const p = players.find((pl) => pl.id === playerId);
-              if (p) handlePlayerSelect(p);
-            }}
-          />
         </Box>
 
         {/* Data guard */}

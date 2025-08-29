@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
+  Button,
+  ButtonGroup,
   HStack,
   Input,
   List,
@@ -10,7 +12,21 @@ import {
   Badge,
   Kbd,
   Spinner,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from '@chakra-ui/react';
+import { FaGavel } from 'react-icons/fa';
 import type { Player } from '../../store/draftStore';
 
 export interface PlayerSearchProps {
@@ -20,6 +36,8 @@ export interface PlayerSearchProps {
   /** string so it can bind to text inputs easily */
   startingBid?: string;
   onSetStartingBid?: (bid: string) => void;
+  /** Called when a bid is placed on a player */
+  onBid?: (player: Player, amount: number) => void;
   /** filter out already-drafted players (default: true) */
   excludeDrafted?: boolean;
   /** max results displayed (default: 8) */
@@ -46,11 +64,15 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
   excludeDrafted = true,
   limit = 8,
   debounceMs = 150,
+  onBid,
 }) => {
   const [q, setQ] = useState('');
   const [pending, setPending] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const [selectedPlayerState, setSelectedPlayerState] = useState<Player | null>(null);
+  const [bidAmount, setBidAmount] = useState<number>(1);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   // debounce search typing
   useEffect(() => {
@@ -108,6 +130,24 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
       const sel = filtered[idx];
       if (sel) onSelect(sel);
     }
+  };
+
+  const handleSelect = (player: Player) => {
+    onSelect(player);
+    setQ('');
+    setFocusedIndex(-1);
+  };
+
+  const handleBidClick = (player: Player) => {
+    setSelectedPlayerState(player);
+    setBidAmount(1);
+    onOpen();
+  };
+
+  const handlePlaceBid = () => {
+    if (!selectedPlayerState || !onBid) return;
+    onBid(selectedPlayerState, bidAmount);
+    onClose();
   };
 
   const handleClickResult = (p: Player) => {
@@ -170,6 +210,21 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                   {selectedPlayer?.id === p.id ? (
                     <Badge colorScheme="green">selected</Badge>
                   ) : null}
+                  {onBid && (
+                    <ButtonGroup size="sm" isAttached variant="outline">
+                      <Button
+                        leftIcon={<FaGavel />}
+                        colorScheme="blue"
+                        variant="solid"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBidClick(p);
+                        }}
+                      >
+                        Bid
+                      </Button>
+                    </ButtonGroup>
+                  )}
                 </HStack>
               </ListItem>
             ))}
@@ -180,6 +235,41 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
           </Text>
         )}
       </Box>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Place Bid</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {selectedPlayerState && (
+              <VStack spacing={4} align="stretch">
+                <Text>Bid on {selectedPlayerState.name} ({selectedPlayerState.pos} - {selectedPlayerState.nflTeam || 'FA'})</Text>
+                <NumberInput
+                  value={bidAmount}
+                  onChange={(_, value) => setBidAmount(value)}
+                  min={1}
+                  max={200}
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </VStack>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button colorScheme="blue" onClick={handlePlaceBid}>
+              Place Bid
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </VStack>
   );
 };

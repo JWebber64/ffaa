@@ -102,7 +102,7 @@ export const NominationQueue = ({
                     size="xs" 
                     colorScheme="red" 
                     variant="outline"
-                    disabled={isCurrent}
+                    isDisabled={isCurrent}
                     onClick={() => onRemoveFromQueue(index)}
                   >
                     Remove

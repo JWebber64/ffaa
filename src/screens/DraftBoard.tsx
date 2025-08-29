@@ -37,7 +37,12 @@ interface Team extends Omit<BaseTeam, 'roster'> {
  * - Body: fixed number of slots per roster position
  */
 
-const COL_WIDTH = 220; // px per team column
+// Calculate minimum column width based on viewport width
+const getMinColumnWidth = () => {
+  if (typeof window === 'undefined') return 80; // Default for SSR
+  const viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+  return Math.max(60, Math.min(120, viewportWidth * 0.12)); // Between 60px and 120px, 12% of viewport width
+};
 
 interface DraftBoardProps {
   teams: Team[];
@@ -51,7 +56,7 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
   const [editing, setEditing] = useState<number | null>(null);
   const [nameDraft, setNameDraft] = useState("");
 
-  const columns = teams.length;
+  const minColumnWidth = getMinColumnWidth();
 
   // Row order is driven by template roster
   const slotRows = useMemo(() => {
@@ -208,50 +213,79 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
         </Text>
       </HStack>
 
-      <Box
-        overflowX="auto"
-        border="1px solid"
-        borderColor="gray.700"
-        rounded="lg"
-        bg="#121722"
-      >
+      <Box width="100%" p={2}>
         <Box
           display="grid"
-          gridTemplateColumns={`repeat(${columns}, ${COL_WIDTH}px)`}
-          gap="12px"
-          p="12px"
-          minW={`${columns * (COL_WIDTH + 12)}px`}
+          gridTemplateColumns={{
+            base: 'repeat(auto-fill, minmax(120px, 1fr))',
+            md: `repeat(${Math.min(teams.length, 8)}, minmax(120px, 1fr))`,
+            lg: `repeat(${Math.min(teams.length, 12)}, minmax(100px, 1fr))`
+          }}
+          gap={2}
+          width="100%"
+          overflowX="auto"
+          sx={{
+            '&::-webkit-scrollbar': {
+              height: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'gray.800',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: 'gray.600',
+              borderRadius: '4px',
+              '&:hover': {
+                background: 'gray.500',
+              },
+            },
+          }}
         >
           {teams.map((team) => (
             <Box
               key={team.id}
-              bg="#18202c"
-              border="1px solid #2a3546"
-              rounded="md"
-              p={3}
+              minWidth="0"
+              borderWidth="1px"
+              borderRadius="md"
+              overflow="hidden"
+              bg="gray.800"
+              transition="all 0.2s ease-in-out"
             >
               {/* Column header */}
-              <Stack alignItems="center" mb={2} spacing={2}>
+              <Stack alignItems="center" mb={1} p={1} spacing={1} fontSize="sm">
                 <Button
-                  size="sm"
+                  size="xs"
                   bg="#10b3a5"
                   color="white"
                   onClick={() => claimOrEdit(team)}
+                  width="100%"
+                  height="24px"
+                  fontSize="xs"
+                  px={1}
                 >
                   {claimed[team.id] ? "CLAIMED" : "CLAIM"}
                 </Button>
 
                 {editing === team.id ? (
-                  <HStack width="100%">
+                  <HStack width="100%" spacing={2}>
                     <Input
                       value={nameDraft}
                       onChange={(e) => setNameDraft(e.target.value)}
                       bg="#0f1623"
                       borderColor="#2a3546"
                       color="white"
-                      size="sm"
+                      size="xs"
+                      height="24px"
+                      flex={1}
+                      paddingX={1}
                     />
-                    <Button size="sm" bg="#2372b2" onClick={() => saveName(team)}>
+                    <Button 
+                      size="xs" 
+                      bg="#2372b2" 
+                      onClick={() => saveName(team)}
+                      height="24px"
+                      px={2}
+                    >
                       Save
                     </Button>
                   </HStack>
@@ -259,7 +293,6 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
                   <Heading
                     size="sm"
                     textAlign="center"
-                    // Chakra v3 doesn't have `noOfLines`; use CSS truncation:
                     style={{
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -279,7 +312,7 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
         </Box>
       </Box>
 
-      <HStack mt={3} justifyContent="flex-end" opacity={0.75} fontSize="sm">
+      <HStack mt={3} justifyContent="flex-end" opacity={0.75} fontSize="sm" px={2}>
         <Text>Tap “CLAIM” to rename a team column.</Text>
       </HStack>
     </Container>
