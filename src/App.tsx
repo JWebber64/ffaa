@@ -6,9 +6,10 @@ import Setup from './screens/Setup';
 import DraftBoard from './screens/DraftBoard';
 import Auctioneer from './screens/Auctioneer';
 import Results from './screens/Results';
-import PlayerPool from './screens/PlayerPool';
+import PlayerPool from './screens/playerPool';
 import { useGlobalPlayers } from './hooks/useGlobalPlayers';
-import { useDraftStore } from './store/draftStore';
+import { useDraftStore } from './store';
+import { ConfigProvider } from './contexts/ConfigContext';
 import TopNav from './components/TopNav';
 import RequireConfiguredDraft from './routes/RequireConfiguredDraft';
 
@@ -20,7 +21,8 @@ function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <BrowserRouter>
+    <ConfigProvider>
+      <BrowserRouter>
         <Box minH="100vh">
           <TopNav onMenu={() => setIsMenuOpen(!isMenuOpen)} />
           <Box as="main" pt="64px">
@@ -52,6 +54,7 @@ function App() {
           </Box>
         </Box>
       </BrowserRouter>
+    </ConfigProvider>
   );
 }
 

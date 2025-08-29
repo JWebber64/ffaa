@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -9,24 +9,47 @@ import {
   Input,
   SimpleGrid,
   Divider,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+  useColorModeValue,
+  Tooltip,
+  IconButton,
 } from '@chakra-ui/react';
-import { useDraftStore, type Player } from '../store/draftStore';
+import { SearchIcon } from '@chakra-ui/icons';
+import { useDraftStore, type Player, useDraftSelectors } from '../store/draftStore.new';
 
 type Pos = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
+type TabValue = 'ALL' | Pos | 'FLEX';
+
+const POS_ORDER: readonly Pos[] = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'] as const;
+const POSITION_NAMES: Record<Pos, string> = {
+  QB: 'Quarterbacks',
+  RB: 'Running Backs',
+  WR: 'Wide Receivers',
+  TE: 'Tight Ends',
+  K: 'Kickers',
+  DEF: 'Defenses'
+};
+
+const ALL_TABS: readonly TabValue[] = ['ALL', ...POS_ORDER, 'FLEX'] as const;
 
 export interface PlayerPoolProps {
   onNominate?: (playerId: string, playerName?: string) => void;
+  showPositionTabs?: boolean;
+  showDebugInfo?: boolean;
 }
-
-const POS_ORDER: Pos[] = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'];
 
 interface PlayerRowProps {
   p: Player;
   onNominate?: (id: string, name?: string) => void;
   nominate: (playerId: string, startingBid?: number) => void;
+  showDebugInfo?: boolean;
 }
 
-const PlayerRow: React.FC<PlayerRowProps> = ({ p, onNominate, nominate }) => {
+const PlayerRow: React.FC<PlayerRowProps> = ({ p, onNominate, nominate, showDebugInfo = false }) => {
   return (
     <HStack
       spacing={3}
@@ -40,11 +63,18 @@ const PlayerRow: React.FC<PlayerRowProps> = ({ p, onNominate, nominate }) => {
       align="center"
       justify="space-between"
     >
-      <HStack spacing={3}>
-        <Text fontWeight="semibold">{p.name}</Text>
-        {p.pos ? <Badge colorScheme="blue">{p.pos}</Badge> : null}
-        {p.nflTeam ? <Badge colorScheme="gray">{p.nflTeam}</Badge> : null}
-        {p.draftedBy ? <Badge colorScheme="red">Drafted</Badge> : null}
+      <HStack spacing={3} flex={1}>
+        <Text fontWeight="semibold" isTruncated>{p.name}</Text>
+        {p.pos ? <Badge colorScheme="blue" minW="2.5em" textAlign="center">{p.pos}</Badge> : null}
+        {p.nflTeam ? <Badge colorScheme="gray" minW="2.5em" textAlign="center">{p.nflTeam}</Badge> : null}
+        {showDebugInfo && (
+          <HStack spacing={2} ml="auto" pr={2}>
+            {p.rank && <Badge colorScheme="purple" title="Overall Rank">{p.rank}</Badge>}
+            {p.posRank && <Badge colorScheme="teal" title="Position Rank">{p.pos}{p.posRank}</Badge>}
+            {p.adp && <Badge colorScheme="orange" title="ADP">{p.adp.toFixed(1)}</Badge>}
+          </HStack>
+        )}
+        {p.draftedBy ? <Badge colorScheme="red" minW="4.5em">Drafted</Badge> : null}
       </HStack>
       <Button
         size="sm"
@@ -71,203 +101,234 @@ const PlayerRow: React.FC<PlayerRowProps> = ({ p, onNominate, nominate }) => {
   );
 };
 
-const PlayerPool: React.FC<PlayerPoolProps> = ({ onNominate }) => {
-  // Single source of truth: read players and drafted status from the store
-  const players = useDraftStore((s) => s.players);
-  const draftedIds = useDraftStore((s) =>
-    new Set(s.players.filter((p) => p.draftedBy !== undefined).map((p) => p.id))
-  );
+const PlayerPool: React.FC<PlayerPoolProps> = ({ 
+  onNominate, 
+  showPositionTabs = true,
+  showDebugInfo = false
+}) => {
+  // Get selectors and actions
+  const { 
+    undraftedPlayers, 
+    topAvailable, 
+    topAvailableByPos,
+    topAvailableForFlex 
+  } = useDraftSelectors();
   
   const nominate = useDraftStore((s) => s.nominate);
-
-  // UI state with enhanced defaults
+  const [activeTab, setActiveTab] = useState<TabValue>('ALL');
   const [search, setSearch] = useState('');
   const [onlyUndrafted, setOnlyUndrafted] = useState(true);
-  const [selectedPositions, setSelectedPositions] = useState<Pos[]>([]);
-  const [quickSearch, setQuickSearch] = useState('');
 
-  const togglePos = (pos: Pos) => {
-    setSelectedPositions((prev) =>
-      prev.includes(pos) ? prev.filter((p) => p !== pos) : [...prev, pos]
-    );
-  };
-
-  const filtered = useMemo(() => {
-    let list = players.slice();
-
-    // Apply undrafted filter first (most restrictive)
-    if (onlyUndrafted) {
-      list = list.filter((p) => !draftedIds.has(p.id));
+  // Get players based on active tab and filters
+  const getFilteredPlayers = useMemo(() => {
+    let players: Player[] = [];
+    
+    // Get base player list based on tab
+    if (activeTab === 'ALL') {
+      players = topAvailable(300);
+    } else if (activeTab === 'FLEX') {
+      players = topAvailableForFlex(200, true);
+    } else if (activeTab && POS_ORDER.includes(activeTab as Pos)) {
+      players = topAvailableByPos(activeTab as Pos, 100);
+    } else {
+      // Default case if activeTab doesn't match any condition
+      players = topAvailable(300);
     }
 
-    // Apply position filter
-    if (selectedPositions.length) {
-      list = list.filter((p) => p.pos && selectedPositions.includes(p.pos as Pos));
-    }
-
-    // Apply search (both quick and advanced)
-    const searchTerm = quickSearch.trim() || search.trim();
+    // Apply search filter
+    const searchTerm = search.trim().toLowerCase();
     if (searchTerm) {
-      const t = searchTerm.toLowerCase();
-      list = list.filter(
+      players = players.filter(
         (p) =>
-          p.name.toLowerCase().includes(t) ||
-          (p.nflTeam || '').toLowerCase().includes(t) ||
-          (p.pos || '').toLowerCase().includes(t) ||
-          (p.pos && p.nflTeam && `${p.pos} ${p.nflTeam}`.toLowerCase().includes(t))
+          p.name.toLowerCase().includes(searchTerm) ||
+          (p.nflTeam || '').toLowerCase().includes(searchTerm) ||
+          (p.pos || '').toLowerCase().includes(searchTerm) ||
+          (p.pos && p.nflTeam && `${p.pos}${p.nflTeam}`.toLowerCase().includes(searchTerm))
       );
     }
 
-    // order: pos -> team -> name
-    list.sort((a, b) => {
-      const ai = POS_ORDER.indexOf((a.pos as Pos) || ('ZZZ' as Pos));
-      const bi = POS_ORDER.indexOf((b.pos as Pos) || ('ZZZ' as Pos));
-      if (ai !== bi) return ai - bi;
-      const at = (a.nflTeam || 'ZZZ').localeCompare(b.nflTeam || 'ZZZ');
-      if (at !== 0) return at;
-      return a.name.localeCompare(b.name);
-    });
+    return players;
+  }, [activeTab, search, topAvailable, topAvailableByPos, topAvailableForFlex]);
 
-    return list;
-  }, [players, draftedIds, onlyUndrafted, selectedPositions, search]);
-
-  const grouped = useMemo(() => {
-    const m = new Map<Pos, Player[]>();
-    POS_ORDER.forEach((pos) => m.set(pos, []));
-    for (const p of filtered) {
-      if (p.pos && (POS_ORDER as string[]).includes(p.pos)) {
-        m.get(p.pos as Pos)!.push(p);
+  // Group players by position for the position tabs view
+  const groupedPlayers = useMemo(() => {
+    const groups = new Map<Pos, Player[]>();
+    POS_ORDER.forEach(pos => groups.set(pos, []));
+    
+    for (const player of getFilteredPlayers) {
+      if (player.pos && POS_ORDER.includes(player.pos as Pos)) {
+        const pos = player.pos as Pos;
+        const group = groups.get(pos) || [];
+        groups.set(pos, [...group, player]);
       }
     }
-    return m;
-  }, [filtered]);
+    
+    return groups;
+  }, [getFilteredPlayers]);
+  
+  // Handle tab change with type safety
+  const handleTabChange = (index: number) => {
+    const tab = ALL_TABS[index];
+    if (tab !== undefined) {
+      setActiveTab(tab);
+    }
+  };
+  
+  // Get current tab index with fallback to 0 (ALL)
+  const activeTabIndex = Math.max(0, ALL_TABS.indexOf(activeTab));
+
+  const tabBg = useColorModeValue('gray.100', 'gray.700');
+  const activeTabBg = useColorModeValue('blue.500', 'blue.600');
+  const tabHoverBg = useColorModeValue('gray.200', 'gray.600');
+  const activeTabColor = 'white';
 
   return (
     <VStack align="stretch" spacing={4} color="white">
-      {/* Quick Search Bar */}
-      <Input
-        placeholder="Quick search (name, team, position...)"
-        value={quickSearch}
-        onChange={(e) => setQuickSearch(e.target.value)}
-        size="md"
-        bg="gray.800"
-        borderColor="gray.600"
-        color="white"
-        _placeholder={{ color: 'gray.400' }}
-        _hover={{ borderColor: 'blue.500' }}
-        _focus={{
-          borderColor: 'blue.400',
-          boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)'
-        }}
-      />
-
-      {/* Filters */}
-      <VStack align="stretch" spacing={3}>
-        <HStack spacing={3} flexWrap="wrap">
+      {/* Search Bar */}
+      <HStack spacing={2}>
+        <Input
+          placeholder="Search players..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          size="md"
+          bg="gray.800"
+          borderColor="gray.600"
+          color="white"
+          _placeholder={{ color: 'gray.400' }}
+          _hover={{ borderColor: 'blue.500' }}
+          _focus={{
+            borderColor: 'blue.400',
+            boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)'
+          }}
+          flex={1}
+        />
+        <Tooltip label={onlyUndrafted ? 'Show all players' : 'Show undrafted only'}>
           <Button
-            size="sm"
+            size="md"
             variant={onlyUndrafted ? 'solid' : 'outline'}
             colorScheme={onlyUndrafted ? 'green' : 'gray'}
-            onClick={() => setOnlyUndrafted((v) => !v)}
-            leftIcon={onlyUndrafted ? <span>✓</span> : undefined}
-            _hover={{
-              bg: onlyUndrafted ? 'green.500' : 'gray.700',
-            }}
+            onClick={() => setOnlyUndrafted(!onlyUndrafted)}
+            px={4}
           >
-            Undrafted Only
+            {onlyUndrafted ? 'Undrafted' : 'All'}
           </Button>
-          
-          <Button
-            size="sm"
-            variant="outline"
-            colorScheme="blue"
-            onClick={() => {
-              setSearch('');
-              setQuickSearch('');
-              setSelectedPositions([]);
-              setOnlyUndrafted(true);
-            }}
-            _hover={{
-              bg: 'blue.600',
-              color: 'white'
-            }}
-          >
-            Reset Filters
-          </Button>
-          
-          <Box flex={1} textAlign="right">
-            <Badge colorScheme={filtered.length === 0 ? 'red' : 'gray'} px={3} py={1} borderRadius="full">
-              {filtered.length} {filtered.length === 1 ? 'player' : 'players'} shown
-            </Badge>
-          </Box>
-        </HStack>
+        </Tooltip>
+      </HStack>
 
-        <HStack spacing={2} flexWrap="wrap">
-              <Button
-                size="sm"
-                variant={selectedPositions.length ? 'outline' : 'solid'}
-                colorScheme={selectedPositions.length ? 'gray' : 'blue'}
-                onClick={() => setSelectedPositions([])}
-                _hover={{
-                  bg: selectedPositions.length ? 'gray.700' : 'blue.500',
-                  color: 'white'
-                }}
+      {showPositionTabs && (
+        <Tabs 
+          variant="solid-rounded" 
+          colorScheme="blue"
+          index={activeTabIndex}
+          onChange={handleTabChange}
+        >
+          <TabList flexWrap="wrap" gap={1}>
+            {ALL_TABS.map((tab) => (
+              <Tab 
+                key={tab}
+                _selected={{ bg: activeTabBg, color: activeTabColor }}
+                _hover={{ bg: tabHoverBg }}
+                bg={tabBg}
+                color="gray.200"
+                fontSize="sm"
+                px={3}
+                py={1}
+                borderRadius="md"
               >
-                All
-              </Button>
-          {POS_ORDER.map((pos) => (
-            <Button
-              key={pos}
-              size="sm"
-              variant={selectedPositions.includes(pos) ? 'solid' : 'outline'}
-              colorScheme={selectedPositions.includes(pos) ? 'blue' : 'gray'}
-              onClick={() => togglePos(pos)}
-              _hover={{
-                bg: selectedPositions.includes(pos) ? 'blue.500' : 'gray.700',
-                color: 'white',
-                transform: 'translateY(-1px)'
-              }}
-              _active={{
-                transform: 'translateY(0)'
-              }}
-              transition='all 0.2s'
-            >
-              {pos}
-            </Button>
-          ))}
-          <Badge ml={2} px={2} py={1} borderRadius="md">
-            {filtered.length} shown
-          </Badge>
-        </HStack>
+                {tab === 'ALL' ? 'All' : tab === 'FLEX' ? 'FLEX' : tab}
+              </Tab>
+            ))}
+          </TabList>
+        </Tabs>
+      )}
+
+      <Box textAlign="right" pr={2}>
+        <Badge 
+          colorScheme={getFilteredPlayers.length === 0 ? 'red' : 'gray'} 
+          px={3} 
+          py={1} 
+          borderRadius="full"
+          fontSize="0.8em"
+        >
+          {getFilteredPlayers.length} {getFilteredPlayers.length === 1 ? 'player' : 'players'} shown
+        </Badge>
+      </Box>
+
+      {/* Player List */}
+      <VStack align="stretch" spacing={3} maxH="70vh" overflowY="auto" pr={2}>
+        {activeTab === 'ALL' || activeTab === 'FLEX' || search ? (
+          // Show flat list for ALL/FLEX tabs or when searching
+          <VStack align="stretch" spacing={2}>
+            {getFilteredPlayers.map((p) => (
+              <PlayerRow
+                key={p.id}
+                p={p}
+                onNominate={onNominate}
+                nominate={nominate}
+                showDebugInfo={showDebugInfo}
+              />
+            ))}
+            {getFilteredPlayers.length === 0 && (
+              <Text color="gray.400" textAlign="center" py={4}>
+                No players found matching your criteria
+              </Text>
+            )}
+          </VStack>
+        ) : (
+          // Show grouped by position for position-specific tabs
+          <VStack align="stretch" spacing={4}>
+            {POS_ORDER.map((pos) => {
+              const players = groupedPlayers.get(pos) || [];
+              if (players.length === 0) return null;
+
+              return (
+                <Box key={pos}>
+                  <HStack mb={2} pl={2} justify="space-between">
+                    <HStack>
+                      <Text fontWeight="bold" fontSize="lg">
+                        {POSITION_NAMES[pos] || pos}
+                      </Text>
+                      <Badge colorScheme="gray" fontSize="0.7em">
+                        {players.length} {players.length === 1 ? 'player' : 'players'}
+                      </Badge>
+                    </HStack>
+                    <Button 
+                      size="xs" 
+                      variant="ghost" 
+                      colorScheme="blue"
+                      onClick={() => setActiveTab(pos)}
+                    >
+                      View All
+                    </Button>
+                  </HStack>
+                  <VStack align="stretch" spacing={2}>
+                    {players.slice(0, 5).map((p) => (
+                      <PlayerRow
+                        key={p.id}
+                        p={p}
+                        onNominate={onNominate}
+                        nominate={nominate}
+                        showDebugInfo={showDebugInfo}
+                      />
+                    ))}
+                    {players.length > 5 && (
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        colorScheme="blue"
+                        onClick={() => setActiveTab(pos)}
+                        mt={2}
+                      >
+                        +{players.length - 5} more {pos} players
+                      </Button>
+                    )}
+                  </VStack>
+                </Box>
+              );
+            })}
+          </VStack>
+        )}
       </VStack>
-
-      <Divider />
-
-      {/* Groups */}
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-        {POS_ORDER.map((pos) => {
-          const list = grouped.get(pos) || [];
-          if (!list.length) return null;
-          return (
-            <Box key={pos} borderWidth="1px" borderRadius="lg" p={3} bg="gray.800" borderColor="gray.700">
-              <HStack justify="space-between" mb={2}>
-                <Text fontWeight="bold">{pos}</Text>
-                <Badge colorScheme="gray">{list.length}</Badge>
-              </HStack>
-              <VStack align="stretch" spacing={2}>
-                {list.map((p) => (
-                  <PlayerRow
-                    key={p.id}
-                    p={p}
-                    onNominate={onNominate}
-                    nominate={nominate}
-                  />
-                ))}
-              </VStack>
-            </Box>
-          );
-        })}
-      </SimpleGrid>
     </VStack>
   );
 };

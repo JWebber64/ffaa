@@ -1,5 +1,5 @@
 import { Box, Heading, VStack, useToast } from "@chakra-ui/react";
-import { useDraftStore } from "../store/draftStore";
+import { useDraftStore } from "../store/draftStore.new";
 import PlayerPoolComponent from "../components/PlayerPool";
 
 export default function PlayerPool() {

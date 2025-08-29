@@ -27,7 +27,7 @@ import {
   NumberDecrementStepper,
 } from '@chakra-ui/react';
 import { FaGavel } from 'react-icons/fa';
-import type { Player } from '../../store/draftStore';
+import type { Player } from '../../store/draftStore.new';
 
 export interface PlayerSearchProps {
   players: Player[];
@@ -179,62 +179,6 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
           />
         </HStack>
       </HStack>
-
-      <Box borderWidth="1px" borderRadius="md" p={2} bg="gray.800" borderColor="gray.700">
-        {pending ? (
-          <HStack p={2} spacing={2}>
-            <Spinner size="sm" color="blue.400" />
-            <Text fontSize="sm" color="gray.400">
-              Searching…
-            </Text>
-          </HStack>
-        ) : filtered.length ? (
-          <List spacing={1}>
-            {filtered.map((p, idx) => (
-              <ListItem
-                key={p.id}
-                p={2}
-                borderRadius="md"
-                _hover={{ bg: 'gray.700' }}
-                cursor="pointer"
-                onClick={() => handleClickResult(p)}
-              >
-                <HStack justify="space-between">
-                  <HStack spacing={3}>
-                    <Text fontWeight="semibold">{p.name}</Text>
-                    {p.pos ? (
-                      <Badge colorScheme={POS_COLOR[p.pos] || 'gray'}>{p.pos}</Badge>
-                    ) : null}
-                    {p.nflTeam ? <Badge colorScheme="gray">{p.nflTeam}</Badge> : null}
-                  </HStack>
-                  {selectedPlayer?.id === p.id ? (
-                    <Badge colorScheme="green">selected</Badge>
-                  ) : null}
-                  {onBid && (
-                    <ButtonGroup size="sm" isAttached variant="outline">
-                      <Button
-                        leftIcon={<FaGavel />}
-                        colorScheme="blue"
-                        variant="solid"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleBidClick(p);
-                        }}
-                      >
-                        Bid
-                      </Button>
-                    </ButtonGroup>
-                  )}
-                </HStack>
-              </ListItem>
-            ))}
-          </List>
-        ) : (
-          <Text fontSize="sm" color="gray.500" px={2} py={1}>
-            No matches. Try another name. <Kbd>↓</Kbd>/<Kbd>↑</Kbd> to navigate, <Kbd>Enter</Kbd> to nominate.
-          </Text>
-        )}
-      </Box>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />

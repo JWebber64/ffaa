@@ -1,4 +1,4 @@
-import type { Player } from '../store/draftStore';
+import type { Player } from '../store/draftStore.new';
 
 // Utility function to generate player IDs
 const generatePlayerIds = (position: string, count: number, startIndex = 1): string[] => {

@@ -13,15 +13,15 @@ import {
   useDraftStore,
   type Player as BasePlayer,
   type Team as BaseTeam,
-} from "../store/draftStore";
+} from "../store/draftStore.new";
 
 type RosterPosition = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
 type Position = RosterPosition | 'FLEX' | 'BENCH';
 
 // Extend BasePlayer but keep the original Position type from the store
-interface Player extends Omit<BasePlayer, 'pos' | 'slot'> {
+interface Player extends Omit<BasePlayer, 'pos'> {
   pos: Position;
-  slot?: Position;
+  slot?: string; // Allow any string for slot to match the base Player type
   draftedBy?: number;
   price?: number;
 }

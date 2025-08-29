@@ -6,15 +6,16 @@ import {
   ButtonGroup,
   Container,
   HStack,
-  Input,
   Text,
   Tooltip,
   VStack,
   useToast,
+  IconButton,
 } from '@chakra-ui/react';
-import { FaCheck, FaClock, FaTimes, FaGavel } from 'react-icons/fa';
-import { useDraftStore } from '../store/draftStore';
-import type { Team, Player } from '../store/draftStore';
+import { FaClock, FaGavel, FaSync } from 'react-icons/fa';
+import { useDraftStore } from '../store';
+import type { Player, Team } from '../store/draftStore.new';
+import { useConfig } from '../contexts/ConfigContext';
 import { PlayerSearch } from '../components/auction/PlayerSearch';
 import { ResetDraftButton } from '../components/auction/ResetDraftButton';
 
@@ -23,76 +24,47 @@ const COUNTDOWN_SECONDS = 30;
 const Auctioneer: React.FC = () => {
   const toast = useToast();
 
-  // ---- store state & actions ----
-  const {
-    teams = [],
-    players = [],
-    nominationQueue = [],
-    currentBidder,
-    setCurrentBidder,
-    placeBid,       // (playerId: string, teamId: number, amount: number) => Promise<void> | void
-    assignPlayer,   // (playerId: string, teamId: number, price: number) => Promise<void> | void
-    nominate,       // (playerId: string, startingBid?: number) => void
-    computeMaxBid,  // (teamId: number) => number
-    hasSlotFor,     // (teamId: number, pos: string) => boolean
-  } = useDraftStore();
+  // ---- store state & actions (pulled via selectors to keep typing safe) ----
+  const players = useDraftStore((s) => s.players);
+  const teams = useDraftStore((s) => s.teams);
+
+  const loadAdp = useDraftStore((s) => s.loadAdp);
+  const nominate = useDraftStore((s) => s.nominate);
+  const placeBid = useDraftStore((s) => s.placeBid);
+  const assignPlayer = useDraftStore((s) => s.assignPlayer);
+  const computeMaxBid = useDraftStore((s) => s.computeMaxBid);
+  const hasSlotFor = useDraftStore((s) => s.hasSlotFor);
+
+  const nominationQueue = useDraftStore((s) => s.nominationQueue);
+  const currentBidder = useDraftStore((s) => s.currentBidder);
+  const setCurrentBidder = useDraftStore((s) => s.setCurrentBidder);
+
+  const playersLoaded = players.length > 0;
 
   // ---- local state ----
   const [bidAmount, setBidAmount] = useState<number>(1);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [time, setTime] = useState<number>(COUNTDOWN_SECONDS);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingAdp, setIsLoadingAdp] = useState<boolean>(false);
+  const [adpLoaded, setAdpLoaded] = useState<boolean>(false);
+  const [time, setTime] = useState<number>(COUNTDOWN_SECONDS);
   const timerRef = useRef<number | null>(null);
 
-  // Handle placing a bid from the player search
-  const handleSearchBid = useCallback(async (player: Player, amount: number) => {
-    if (!currentBidder) {
-      toast({
-        title: 'No team selected',
-        description: 'Please select a team first',
-        status: 'warning',
-        duration: 2000,
-        isClosable: true,
-      });
-      return;
-    }
+  // ---- config ----
+  const { config } = useConfig();
 
-    try {
-      setIsLoading(true);
-      // Use the placeBid function from the store
-      await Promise.resolve(placeBid(player.id, currentBidder, amount));
-      
-      toast({
-        title: 'Bid Placed',
-        description: `Bid of $${amount} placed on ${player.name}`,
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
-    } catch (error) {
-      toast({
-        title: 'Bid Failed',
-        description: error instanceof Error ? error.message : 'Failed to place bid',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentBidder, placeBid, toast]);
-
-  // ---- derive "who's up" from queue[0] ----
+  // ---- queue-derived state ----
   const currentNom = nominationQueue?.[0] ?? null;
 
-  const currentPlayer: Player | null = useMemo(() => {
-    if (!currentNom) return null;
-    return players.find((p) => p.id === currentNom.playerId) ?? null;
+  const currentPlayer = useMemo<Player | undefined>(() => {
+    if (!currentNom) return undefined;
+    return players.find((p) => p.id === currentNom.playerId);
   }, [currentNom, players]);
 
-  const currentBidderTeam: Team | undefined = useMemo(() => {
+  const currentBidderTeam = useMemo<Team | undefined>(() => {
+    if (typeof currentBidder !== 'number') return undefined;
     return teams.find((t) => t.id === currentBidder);
-  }, [teams, currentBidder]);
+  }, [currentBidder, teams]);
 
   // ---- timer controls ----
   const stopTimer = useCallback(() => {
@@ -103,21 +75,9 @@ const Auctioneer: React.FC = () => {
     setIsTimerRunning(false);
   }, []);
 
-  // Add cleanup effect for timer
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, []);
-
-  // Handle timer expiration
   const handleTimerExpired = useCallback(async () => {
-    if (!currentNom || !currentBidder || !currentPlayer) {
-      return;
-    }
-
+    // On expiry, if we have a bidder and player, auto-assign at the current bid
+    if (!currentNom || !currentPlayer || typeof currentBidder !== 'number') return;
     try {
       await Promise.resolve(assignPlayer(currentNom.playerId, currentBidder, bidAmount));
       toast({
@@ -148,17 +108,110 @@ const Auctioneer: React.FC = () => {
       setTime((prev) => {
         if (prev <= 1) {
           stopTimer();
-          handleTimerExpired();
+          void handleTimerExpired();
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-  }, [assignPlayer, bidAmount, currentBidder, currentNom, currentPlayer, currentBidderTeam, stopTimer, toast]);
+  }, [handleTimerExpired, stopTimer]);
 
-  // ---- actions ----
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        window.clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
+  // ---- ADP load effect ----
+  useEffect(() => {
+    const loadAdpData = async () => {
+      if (!playersLoaded || isLoadingAdp || !loadAdp) return;
+
+      try {
+        setIsLoadingAdp(true);
+        // Use the scoring format directly since it already matches the expected type
+        const scoring = config.scoring;
+        await loadAdp({
+          year: config.year,
+          teams: config.teams,
+          scoring,
+        });
+        setAdpLoaded(true);
+        toast({
+          title: 'ADP data loaded',
+          status: 'success',
+          duration: 2500,
+          isClosable: true,
+        });
+      } catch (error) {
+        console.error('Failed to load ADP data:', error);
+        toast({
+          title: 'ADP unavailable',
+          description: 'List may be unranked',
+          status: 'warning',
+          duration: 5000,
+          isClosable: true,
+          position: 'top',
+        });
+      } finally {
+        setIsLoadingAdp(false);
+      }
+    };
+
+    void loadAdpData();
+  }, [playersLoaded, loadAdp, config.year, config.teams, config.scoring, isLoadingAdp, toast]);
+
+  // ---- manual ADP reload ----
+  const handleReloadAdp = useCallback(async () => {
+    if (!playersLoaded) {
+      toast({
+        title: 'Players not loaded',
+        description: 'Please wait for players to load before reloading ADP data',
+        status: 'warning',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    try {
+      setIsLoadingAdp(true);
+      // Use the scoring format directly since it already matches the expected type
+      const scoring = config.scoring;
+      await loadAdp?.({
+        year: config.year,
+        teams: config.teams,
+        scoring,
+      });
+      setAdpLoaded(true);
+      toast({
+        title: 'ADP data reloaded',
+        description: 'Successfully updated player ADP values',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Failed to reload ADP data:', error);
+      toast({
+        title: 'ADP reload failed',
+        description: error instanceof Error ? error.message : 'List may be unranked',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+        position: 'top',
+      });
+    } finally {
+      setIsLoadingAdp(false);
+    }
+  }, [playersLoaded, loadAdp, toast, config.scoring, config.teams, config.year]);
+
+  // ---- place bid (current bidder on current player) ----
   const handleBidClick = useCallback(async () => {
-    if (!currentNom || !currentBidder || !currentPlayer) {
+    if (!currentNom || !currentPlayer || typeof currentBidder !== 'number') {
       toast({
         title: 'Cannot place bid',
         description: 'No active auction or bidder selected',
@@ -169,7 +222,6 @@ const Auctioneer: React.FC = () => {
       return;
     }
 
-    // Validate bid amount
     const maxBid = computeMaxBid ? computeMaxBid(currentBidder) : 0;
     if (bidAmount < 1 || bidAmount > maxBid) {
       toast({
@@ -182,7 +234,6 @@ const Auctioneer: React.FC = () => {
       return;
     }
 
-    // Check if team has an open slot for this position
     if (currentPlayer.pos && hasSlotFor && !hasSlotFor(currentBidder, currentPlayer.pos)) {
       toast({
         title: 'No available slot',
@@ -197,11 +248,8 @@ const Auctioneer: React.FC = () => {
     try {
       setIsLoading(true);
       await Promise.resolve(placeBid(currentNom.playerId, currentBidder, bidAmount));
-
-      // reset/extend timer after a valid bid
       setTime(COUNTDOWN_SECONDS);
       if (!isTimerRunning) startTimer();
-
       toast({
         title: 'Bid placed',
         description: `Bid $${bidAmount} on ${currentPlayer.name}`,
@@ -222,23 +270,23 @@ const Auctioneer: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [bidAmount, currentBidder, currentNom, currentPlayer, isTimerRunning, placeBid, startTimer, toast, computeMaxBid, hasSlotFor]);
+  }, [
+    bidAmount,
+    computeMaxBid,
+    currentBidder,
+    currentNom,
+    currentPlayer,
+    hasSlotFor,
+    isTimerRunning,
+    placeBid,
+    startTimer,
+    toast,
+  ]);
 
-  const handlePass = useCallback(() => {
-    stopTimer();
-    toast({
-      title: 'Pass',
-      description: 'You passed on this player.',
-      status: 'info',
-      duration: 1500,
-      isClosable: true,
-    });
-    // Optional: advance turn logic here if your rules require it.
-  }, [stopTimer, toast]);
-
+  // ---- nominate from search ----
   const handlePlayerSelect = useCallback(
     (player: Player) => {
-      if (!currentBidder) {
+      if (typeof currentBidder !== 'number') {
         toast({
           title: 'No active bidder',
           description: 'Select a team first (buttons below).',
@@ -249,7 +297,6 @@ const Auctioneer: React.FC = () => {
         return;
       }
 
-      // Check if team has an open slot for this position
       if (player.pos && hasSlotFor && !hasSlotFor(currentBidder, player.pos)) {
         toast({
           title: 'No available slot',
@@ -261,7 +308,6 @@ const Auctioneer: React.FC = () => {
         return;
       }
 
-      // Validate bid amount
       const bid = Math.max(1, bidAmount);
       const maxBid = computeMaxBid ? computeMaxBid(currentBidder) : 0;
       if (bid > maxBid) {
@@ -275,7 +321,6 @@ const Auctioneer: React.FC = () => {
         return;
       }
 
-      // Nominate immediately with current bid amount (or 1)
       try {
         nominate(player.id, bid);
         setTime(COUNTDOWN_SECONDS);
@@ -292,22 +337,29 @@ const Auctioneer: React.FC = () => {
         });
       }
     },
-    [bidAmount, currentBidder, isTimerRunning, nominate, startTimer, toast, hasSlotFor, computeMaxBid]
+    [bidAmount, computeMaxBid, currentBidder, hasSlotFor, isTimerRunning, nominate, startTimer, toast]
   );
 
-  // ---- team bidder buttons ----
-  const renderTeamBidButtons = useMemo(() => {
-    const handleBidClick = async (teamId: number) => {
+  // ---- team buttons block (select team & per-team quick bid) ----
+  const teamButtonsBlock = useMemo(() => {
+    const handleTeamQuickBid = async (teamId: number) => {
       if (!currentNom || !currentPlayer) return;
-      
+
+      const maxBid = computeMaxBid ? computeMaxBid(teamId) : 0;
+      const disabled =
+        !currentPlayer ||
+        (hasSlotFor && !hasSlotFor(teamId, currentPlayer.pos || ('' as any))) ||
+        maxBid < 1 ||
+        isLoading;
+
+      if (disabled) return;
+
       try {
         setIsLoading(true);
         await Promise.resolve(placeBid(currentNom.playerId, teamId, bidAmount));
-        
-        // Reset/extend timer after a valid bid
         setTime(COUNTDOWN_SECONDS);
         if (!isTimerRunning) startTimer();
-        
+
         toast({
           title: 'Bid placed',
           description: `Bid $${bidAmount} on ${currentPlayer.name}`,
@@ -332,22 +384,23 @@ const Auctioneer: React.FC = () => {
 
     return (
       <VStack spacing={2} w="100%">
-        {/* Team Selection Row */}
+        {/* Select Team */}
         <Box w="100%">
           <Text fontSize="sm" color="gray.300" mb={1}>
             Select Team:
           </Text>
-          <Box 
-            display="grid" 
-            gridTemplateColumns={`repeat(${teams.length}, minmax(0, 1fr))`}
+          <Box
+            display="grid"
+            gridTemplateColumns={`repeat(${Math.max(teams.length, 1)}, minmax(0, 1fr))`}
             gap={1}
             w="100%"
           >
             {teams.map((team) => {
-              const disabled = currentPlayer && hasSlotFor
-                ? !hasSlotFor(team.id, currentPlayer.pos || '')
-                : false;
-              
+              const disabled =
+                currentPlayer && hasSlotFor
+                  ? !hasSlotFor(team.id, (currentPlayer.pos as any) || '')
+                  : false;
+
               return (
                 <Tooltip key={`team-${team.id}`} label={team.name}>
                   <Button
@@ -356,7 +409,6 @@ const Auctioneer: React.FC = () => {
                     colorScheme={currentBidder === team.id ? 'blue' : 'gray'}
                     onClick={() => setCurrentBidder(team.id)}
                     isDisabled={disabled}
-                    flex="1 1 0%"
                     w="100%"
                     minW={0}
                     px={1}
@@ -368,23 +420,12 @@ const Auctioneer: React.FC = () => {
                       bg: currentBidder === team.id ? 'blue.500' : 'gray.700',
                       transform: 'translateY(-2px)',
                       boxShadow: 'md',
-                      _disabled: {
-                        bg: 'gray.800',
-                        transform: 'none',
-                        cursor: 'not-allowed'
-                      }
-                    }}
-                    _active={{
-                      transform: 'translateY(0)'
                     }}
                     _disabled={{
-                      opacity: 0.6,
+                      bg: 'gray.800',
+                      transform: 'none',
                       cursor: 'not-allowed',
-                      _hover: {
-                        bg: 'gray.800'
-                      }
                     }}
-                    transition='all 0.2s'
                   >
                     {team.name}
                   </Button>
@@ -394,34 +435,35 @@ const Auctioneer: React.FC = () => {
           </Box>
         </Box>
 
-        {/* Bid Buttons Row */}
+        {/* Place Bid with Each Team */}
         <Box w="100%" mt={2}>
           <Text fontSize="sm" color="gray.300" mb={1}>
             Place Bid:
           </Text>
-          <Box 
-            display="grid" 
-            gridTemplateColumns={`repeat(${teams.length}, minmax(0, 1fr))`}
+          <Box
+            display="grid"
+            gridTemplateColumns={`repeat(${Math.max(teams.length, 1)}, minmax(0, 1fr))`}
             gap={1}
             w="100%"
           >
             {teams.map((team) => {
               const maxBid = computeMaxBid ? computeMaxBid(team.id) : 0;
-              const disabled = !currentPlayer || 
-                (hasSlotFor && !hasSlotFor(team.id, currentPlayer.pos || '')) || 
+              const disabled =
+                !currentPlayer ||
+                (hasSlotFor && !hasSlotFor(team.id, (currentPlayer?.pos as any) || '')) ||
                 maxBid < 1 ||
                 isLoading;
-              
+
               return (
                 <Tooltip key={`bid-${team.id}`} label={`Bid $${bidAmount} with ${team.name}`}>
-                  <ButtonGroup size="sm" isAttached variant="outline">
+                  <ButtonGroup size="sm" isAttached>
                     <Button
                       leftIcon={<FaGavel />}
                       colorScheme="blue"
                       variant="solid"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleBidClick(team.id);
+                        void handleTeamQuickBid(team.id);
                       }}
                       isDisabled={disabled}
                       w="100%"
@@ -442,59 +484,101 @@ const Auctioneer: React.FC = () => {
         </Box>
       </VStack>
     );
-  }, [teams, currentBidder, currentPlayer, computeMaxBid, hasSlotFor, setCurrentBidder, currentNom, placeBid, isTimerRunning, startTimer, toast, bidAmount, isLoading]);
+  }, [
+    teams,
+    currentBidder,
+    currentPlayer,
+    hasSlotFor,
+    setCurrentBidder,
+    currentNom,
+    placeBid,
+    isTimerRunning,
+    startTimer,
+    toast,
+    bidAmount,
+    isLoading,
+    computeMaxBid,
+  ]);
 
-// ...
+  // ---- UI ----
+  return (
+    <Container maxW="container.xl" py={4} color="white">
+      <VStack spacing={6} align="stretch">
+        {/* Header */}
+        <HStack justify="space-between" align="flex-start">
+          <Box>
+            <Text fontSize="2xl" fontWeight="bold" mb={2} color="white">
+              Auction Room
+            </Text>
+            <Text color="gray.300">
+              {teams.length} teams • {players.filter((p) => p.draftedBy).length} players drafted
+            </Text>
+          </Box>
+          <HStack spacing={2}>
+            <Tooltip
+              label={!playersLoaded ? 'Load players first' : adpLoaded ? 'Reload ADP data' : 'Load ADP data'}
+            >
+              <IconButton
+                aria-label={adpLoaded ? 'Reload ADP data' : 'Load ADP data'}
+                icon={<FaSync />}
+                onClick={handleReloadAdp}
+                isLoading={isLoadingAdp}
+                isDisabled={!playersLoaded}
+                variant={adpLoaded ? 'solid' : 'ghost'}
+                colorScheme={adpLoaded ? 'green' : 'blue'}
+              />
+            </Tooltip>
+            <ResetDraftButton />
+          </HStack>
+        </HStack>
 
-return (
-  <Container maxW="container.xl" py={4} color="white">
-    <VStack spacing={6} align="stretch">
-      {/* Header */}
-      <HStack justify="space-between" align="flex-start">
-        <Box>
-          <Text fontSize="2xl" fontWeight="bold" mb={2} color="white">
-            Auction Room
-          </Text>
-          <Text color="gray.300">
-            {teams.length} teams • {players.filter((p) => p.draftedBy).length} players drafted
-          </Text>
-        </Box>
-        <ResetDraftButton />
-      </HStack>
+        {/* Current Auction Card */}
+        <Box
+          p={6}
+          borderWidth="1px"
+          borderRadius="lg"
+          bg="gray.800"
+          borderColor="gray.700"
+          boxShadow="lg"
+        >
+          {currentPlayer ? (
+            <VStack spacing={4} align="stretch">
+              <HStack justify="space-between" align="center">
+                <Text fontSize="xl" fontWeight="bold" color="white">
+                  {currentPlayer.name}
+                  {currentPlayer.pos && (
+                    <Badge ml={2} colorScheme="blue">
+                      {currentPlayer.pos}
+                    </Badge>
+                  )}
+                  {currentPlayer.nflTeam && (
+                    <Badge ml={2} colorScheme="gray">
+                      {currentPlayer.nflTeam}
+                    </Badge>
+                  )}
+                </Text>
 
-      {/* Current Auction Card */}
-      <Box p={6} borderWidth="1px" borderRadius="lg" bg="gray.800" borderColor="gray.700" boxShadow="lg">
-        {currentPlayer ? (
-          <VStack spacing={4} align="stretch">
-            <HStack justify="space-between" align="center">
-              <Text fontSize="xl" fontWeight="bold" color="white">
-                {currentPlayer.name}
-                {currentPlayer.pos && (
-                  <Badge ml={2} colorScheme="blue">
-                    {currentPlayer.pos}
-                  </Badge>
-                )}
-                {currentPlayer.nflTeam && (
-                  <Badge ml={2} colorScheme="gray">
-                    {currentPlayer.nflTeam}
-                  </Badge>
-                )}
-              </Text>
-
-              <HStack>
-                <Button
-                  leftIcon={<FaClock />}
-                  size="sm"
-                  variant="ghost"
-                  _hover={{ bg: 'gray.700' }}
-                  _active={{ bg: 'gray.600' }}
-                >
-                  {time}s
-                </Button>
+                <HStack>
+                  <Button
+                    leftIcon={<FaClock />}
+                    size="sm"
+                    variant="ghost"
+                    _hover={{ bg: 'gray.700' }}
+                    _active={{ bg: 'gray.600' }}
+                    onClick={() => {
+                      if (isTimerRunning) {
+                        stopTimer();
+                      } else {
+                        startTimer();
+                      }
+                    }}
+                  >
+                    {time}s
+                  </Button>
+                </HStack>
               </HStack>
-            </HStack>
 
-              {currentBidder && computeMaxBid && (
+              {typeof currentBidder === 'number' && computeMaxBid && (
                 <Box mt={2} p={3} bg="gray.700" borderRadius="md">
                   <Text fontSize="sm" color="gray.200">
                     Current Bid: <strong>${bidAmount}</strong>
@@ -503,56 +587,106 @@ return (
                   </Text>
                 </Box>
               )}
+
+              {/* Select Bidder + Quick Bid */}
+              <Box mt={4}>
+                <Text fontWeight="bold" mb={2} color="white">
+                  Select Bidder:
+                </Text>
+                <Box bg="gray.800" p={4} borderRadius="lg" borderWidth="1px" borderColor="gray.700">
+                  {teamButtonsBlock}
+                </Box>
+              </Box>
+
+              {/* Player Search */}
+              <Box mt={4}>
+                <PlayerSearch
+                  players={players}
+                  onSelect={(p) => handlePlayerSelect(p)}
+                  startingBid={bidAmount.toString()}
+                  onSetStartingBid={(bid) => setBidAmount(Number(bid))}
+                  onBid={async (player, amount) => {
+                    // “Bid” button inside search → place bid for current bidder
+                    if (typeof currentBidder !== 'number') {
+                      toast({
+                        title: 'No team selected',
+                        description: 'Please select a team first',
+                        status: 'warning',
+                        duration: 2000,
+                        isClosable: true,
+                      });
+                      return;
+                    }
+                    try {
+                      setIsLoading(true);
+                      await Promise.resolve(placeBid(player.id, currentBidder, amount));
+                      setTime(COUNTDOWN_SECONDS);
+                      if (!isTimerRunning) startTimer();
+                      toast({
+                        title: 'Bid Placed',
+                        description: `Bid of $${amount} placed on ${player.name}`,
+                        status: 'success',
+                        duration: 3000,
+                        isClosable: true,
+                      });
+                    } catch (error) {
+                      toast({
+                        title: 'Bid Failed',
+                        description: error instanceof Error ? error.message : 'Failed to place bid',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                      });
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                />
+              </Box>
+
+              {/* Player Pool placeholder (you can swap in your pool/table here) */}
+              <Box
+                mt={4}
+                borderWidth="1px"
+                borderRadius="lg"
+                p={4}
+                bg="gray.800"
+                borderColor="gray.700"
+                boxShadow="lg"
+              >
+                <Text fontSize="xl" fontWeight="bold" mb={4} color="white">
+                  Player Search
+                </Text>
+                {/* TODO: Insert your ranked PlayerPool table here if needed */}
+              </Box>
+
+              {/* Data guard */}
+              {(teams.length === 0 || players.length === 0) && (
+                <Text fontSize="sm" color="orange.400">
+                  Heads up: teams or players are empty. Make sure global player load and team setup are completed.
+                </Text>
+              )}
             </VStack>
           ) : (
-            <VStack spacing={2} align="center" py={8}>
-              <Text fontSize="lg" color="gray.600">
-                No player currently being auctioned
-              </Text>
-              <Text fontSize="sm" color="gray.500">
-                Use search or the player pool below to nominate a player.
-              </Text>
-            </VStack>
+            <Text color="gray.400">No player currently nominated for auction</Text>
           )}
         </Box>
 
-        {/* Team Bidding Buttons */}
-        <Box>
-          <Text fontWeight="bold" mb={2} color="white">
-            Select Bidder:
-          </Text>
-          <Box bg="gray.800" p={4} borderRadius="lg" borderWidth="1px" borderColor="gray.700">
-            {renderTeamBidButtons}
-          </Box>
-        </Box>
-
-        {/* Player Search */}
-        <Box>
-          <PlayerSearch
-            players={players}
-            onSelect={(player) => handlePlayerSelect(player)}
-            startingBid={bidAmount.toString()}
-            onSetStartingBid={(bid) => setBidAmount(Number(bid))}
-            onBid={handleSearchBid}
-          />
-        </Box>
-
-        {/* Player Pool */}
-        <Box borderWidth="1px" borderRadius="lg" p={4} bg="gray.800" borderColor="gray.700" boxShadow="lg">
-          <Text fontSize="xl" fontWeight="bold" mb={4} color="white">
-            Player Search
-          </Text>
-        </Box>
-
-        {/* Data guard */}
-        {(teams.length === 0 || players.length === 0) && (
-          <Text fontSize="sm" color="orange.600">
-            Heads up: teams or players are empty. Make sure global player load (Sleeper → Zustand) and team setup are completed.
-          </Text>
-        )}
+        {/* Footer controls */}
+        <HStack>
+          <Button colorScheme="blue" onClick={handleBidClick} isDisabled={!currentPlayer || typeof currentBidder !== 'number'}>
+            Place Bid
+          </Button>
+          <Button variant="outline" onClick={stopTimer}>
+            Pause Timer
+          </Button>
+          <Button variant="ghost" onClick={() => setTime(COUNTDOWN_SECONDS)}>
+            Reset Clock
+          </Button>
+        </HStack>
       </VStack>
     </Container>
   );
 };
 
-export default Auctioneer;
+export default React.memo(Auctioneer);

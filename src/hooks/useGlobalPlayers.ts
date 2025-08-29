@@ -1,8 +1,8 @@
 import { useEffect, useCallback } from 'react';
 import { useSleeperPlayers } from './useSleeperPlayers';
-import { useDraftStore } from '../store/draftStore';
+import { useDraftStore } from '../store/draftStore.new';
 import { FALLBACK_PLAYERS } from '../data/players';
-import type { Player } from '../store/draftStore';
+import type { Player } from '../store/draftStore.new';
 
 export function useGlobalPlayers() {
   const { players: sleeperPlayers, loading } = useSleeperPlayers();

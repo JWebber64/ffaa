@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import type { Player, BasePosition } from '../store/draftStore';
+import type { Player, BasePosition } from '../store/draftStore.new';
 import { FALLBACK_PLAYERS } from '../data/players';
 
 type SleeperPlayer = {
@@ -45,6 +45,11 @@ function toPlayer(sp: SleeperPlayer & { search_rank?: number; search_rank_ppr?: 
     nflTeam: sp.team || undefined,
     search_rank: sp.search_rank,
     search_rank_ppr: sp.search_rank_ppr,
+    // Add required fields with default values
+    rank: 0,
+    posRank: 0,
+    adp: 0,
+    adpSource: 'sleeper',
   };
 }
 

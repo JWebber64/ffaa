@@ -25,57 +25,42 @@ const theme = extendTheme({
         _focus: { 
           boxShadow: '0 0 0 3px var(--chakra-colors-blue-400)' 
         },
-        _disabled: {
-          opacity: 1,
-          cursor: 'not-allowed',
+        _disabled: { 
+          opacity: 0.75, 
+          cursor: 'not-allowed' 
         },
       },
       variants: {
-        solid: {
-          _hover: { 
-            bg: 'blue.600' 
-          },
-          _active: { 
-            bg: 'blue.700' 
-          },
-          _disabled: { 
-            bg: 'gray.600', 
-            color: 'gray.300', 
-            boxShadow: 'none' 
-          },
-          '&[disabled], &[data-disabled]': {
-            opacity: 1,
-            bg: 'gray.600',
-            color: 'gray.300',
-            boxShadow: 'none',
-            pointerEvents: 'none',
-          },
+        solid: (props: any) => {
+          const { colorScheme: cs = 'blue' } = props;
+          return {
+            bg: `${cs}.500`,
+            color: 'white',
+            _hover: { bg: `${cs}.600` },
+            _active: { bg: `${cs}.700` },
+            _disabled: {
+              bg: `${cs}.500`,
+              color: 'white',
+              opacity: 0.75,
+              boxShadow: 'none',
+            },
+          };
         },
-        outline: {
-          border: '1px solid',
-          borderColor: 'gray.600',
-          color: 'white',
-          _hover: { 
-            bg: 'gray.700' 
-          },
-          _active: { 
-            bg: 'gray.600' 
-          },
-          _disabled: {
-            opacity: 1,
-            borderColor: 'gray.600',
-            color: 'gray.400',
-            bg: 'gray.800',
-            boxShadow: 'none',
-          },
-          '&[disabled], &[data-disabled]': {
-            opacity: 1,
-            borderColor: 'gray.600',
-            color: 'gray.400',
-            bg: 'gray.800',
-            boxShadow: 'none',
-            pointerEvents: 'none',
-          },
+        outline: (props: any) => {
+          const { colorScheme: cs = 'blue' } = props;
+          return {
+            border: '1px solid',
+            borderColor: `${cs}.500`,
+            color: 'white',
+            _hover: { bg: 'rgba(255,255,255,0.08)' },
+            _active: { bg: 'rgba(255,255,255,0.12)' },
+            _disabled: {
+              borderColor: `${cs}.500`,
+              color: 'whiteAlpha.800',
+              opacity: 0.6,
+              bg: 'transparent',
+            },
+          };
         },
         ghost: (props: any) => ({
           color: props.colorMode === 'dark' ? 'white' : 'gray.800',

@@ -8,7 +8,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { useDraftStore, type Player, type Team } from "../store/draftStore";
+import { useDraftStore, type Player, type Team } from "../store/draftStore.new";
 import { downloadCSV } from "../utils/csv";
 
 type Row = {
@@ -47,13 +47,13 @@ export default function Results({ teams }: ResultsProps) {
       const teamIdx = p.draftedBy as number;
       const t = teams.find((tm) => tm.id === teamIdx);
       return {
-        name: p.name,
-        pos: p.pos,
-        slot: p.slot ?? "",
-        nflTeam: p.nflTeam ?? "",
-        teamName: t?.name ?? `Team ${teamIdx + 1}`,
+        name: p.name || "",
+        pos: p.pos || "",
+        slot: (p as any).slot || "", // Handle potential slot property
+        nflTeam: p.nflTeam || "",
+        teamName: t?.name || `Team ${teamIdx + 1}`,
         teamNumber: teamIdx + 1,
-        price: p.price ?? 0,
+        price: p.price || 0,
       } as Row;
     });
 
