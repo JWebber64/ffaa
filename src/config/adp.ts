@@ -1,5 +1,4 @@
-// ADP configuration settings
-type ScoringFormat = 'ppr' | 'standard' | 'half-ppr';
+export type ScoringFormat = 'ppr' | 'standard' | 'half-ppr';
 
 export interface AdpConfig {
   scoring: ScoringFormat;
@@ -8,45 +7,49 @@ export interface AdpConfig {
   includeTeInFlex: boolean;
 }
 
-// Default configuration values
-const defaultConfig: AdpConfig = {
+// Defaults
+const defaults: AdpConfig = {
   scoring: 'ppr',
   teams: 12,
   year: new Date().getFullYear(),
   includeTeInFlex: true,
 };
 
-// Get configuration from environment variables with fallbacks
-const getEnvConfig = (): Partial<AdpConfig> => ({
-  scoring: (import.meta.env.VITE_ADP_SCORING as ScoringFormat) || undefined,
-  teams: import.meta.env.VITE_ADP_TEAMS ? parseInt(import.meta.env.VITE_ADP_TEAMS, 10) : undefined,
-  year: import.meta.env.VITE_ADP_YEAR ? parseInt(import.meta.env.VITE_ADP_YEAR, 10) : undefined,
-  includeTeInFlex: import.meta.env.VITE_INCLUDE_TE_IN_FLEX !== 'false',
-});
-
-// Merge default config with environment config
-export const adpConfig: AdpConfig = {
-  ...defaultConfig,
-  ...getEnvConfig(),
-};
-
-// Validate scoring format
-if (!['ppr', 'half', 'standard'].includes(adpConfig.scoring)) {
-  console.warn(`Invalid scoring format: ${adpConfig.scoring}. Defaulting to 'ppr'.`);
-  adpConfig.scoring = 'ppr';
+// Try to hydrate from localStorage (optional)
+function loadFromStorage(): Partial<AdpConfig> | null {
+  try {
+    const raw = localStorage.getItem('adpConfig');
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
 }
 
-// Validate teams
-if (isNaN(adpConfig.teams) || adpConfig.teams < 4 || adpConfig.teams > 20) {
-  console.warn(`Invalid team count: ${adpConfig.teams}. Defaulting to 12.`);
-  adpConfig.teams = 12;
+function sanitize(cfg: Partial<AdpConfig>): AdpConfig {
+  const out: AdpConfig = { ...defaults, ...cfg };
+
+  // scoring
+  if (!['ppr', 'standard', 'half-ppr'].includes(out.scoring)) out.scoring = 'ppr';
+
+  // teams
+  if (Number.isNaN(out.teams) || out.teams < 4 || out.teams > 20) out.teams = 12;
+
+  // year
+  const cur = new Date().getFullYear();
+  if (Number.isNaN(out.year) || out.year < 2020 || out.year > cur + 1) out.year = cur;
+
+  // includeTeInFlex stays boolean
+  out.includeTeInFlex = !!out.includeTeInFlex;
+
+  return out;
 }
 
-// Validate year
-const currentYear = new Date().getFullYear();
-if (isNaN(adpConfig.year) || adpConfig.year < 2020 || adpConfig.year > currentYear + 1) {
-  console.warn(`Invalid year: ${adpConfig.year}. Defaulting to ${currentYear}.`);
-  adpConfig.year = currentYear;
-}
+export const adpConfig: AdpConfig = sanitize(loadFromStorage() ?? {});
 
-console.log('ADP Configuration:', adpConfig);
+// save helper (optional; your context may handle this instead)
+export function saveAdpConfig(cfg: AdpConfig) {
+  try {
+    localStorage.setItem('adpConfig', JSON.stringify(cfg));
+  } catch {}
+}

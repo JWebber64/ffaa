@@ -138,96 +138,50 @@ export const useDraftStore = create<DraftState>()(
       })),
       
       // Load ADP data from FFC API
-      loadAdp: async (opts: {
-        year?: number;
-        teams?: number;
-        scoring?: 'standard' | 'ppr' | 'half-ppr';
-        useCache?: boolean;
-      } = {}) => {
+      loadAdp: async (opts = {}) => {
         try {
           const { 
-            year = 2023, 
+            year = new Date().getFullYear(), 
             teams = 12, 
             scoring = 'ppr', 
             useCache = true 
-          } = opts;
-          const ffc = new FfcAdp();
+          } = opts as {
+            year?: number;
+            teams?: number;
+            scoring?: 'ppr' | 'standard' | 'half-ppr';
+            useCache?: boolean;
+          };
           
-          // Map 'half-ppr' to 'half' for FFC API
-          const ffcScoring = scoring === 'half-ppr' ? 'half' : scoring;
+          // FFC expects 'half', map from 'half-ppr'
+          const ffcScoring: 'ppr' | 'half' | 'standard' = scoring === 'half-ppr' ? 'half' : scoring;
           
-          const players = await ffc.load({
-            year,
-            teams,
-            scoring: ffcScoring,
-            useCache,
-          });
-
-          // Map FFC players to our player format
-          const updates = players.map(p => {
-            // Handle D/ST position naming
-            const position = p.position === 'DST' ? 'DEF' : p.position;
-            
-            return {
-              id: p.id,
-              name: p.name || 'Unknown Player',
-              pos: position as Position,
-              nflTeam: p.team || 'FA',
-              adp: p.adp || 999,
-              rank: p.averagePick || 999,
-              posRank: 0, // Will be calculated below
-              adpSource: 'ffc',
-              // Set default values for required fields
-              draftedBy: undefined,
-              price: undefined,
-              search_rank: undefined,
-              search_rank_ppr: undefined
-            };
-          });
-
-          // Calculate position ranks
-          const byPosition = new Map<Position, typeof updates>();
-          updates.forEach(update => {
-            const pos = update.pos;
-            if (!byPosition.has(pos)) {
-              byPosition.set(pos, []);
-            }
-            byPosition.get(pos)?.push(update);
-          });
-
-          // Sort each position group by rank and assign position ranks
-          byPosition.forEach(players => {
-            // Sort by rank, then by ADP, then by name for tiebreakers
-            players.sort((a, b) => {
-              // First by rank (lower is better)
-              if (a.rank !== b.rank) {
-                return (a.rank || 999) - (b.rank || 999);
-              }
-              
-              // Then by ADP (lower is better)
-              if (a.adp !== b.adp) {
-                return (a.adp || 1000) - (b.adp || 1000);
-              }
-              
-              // Finally by name (A-Z)
-              return a.name.localeCompare(b.name);
-            });
-            
-            // Assign position ranks
-            players.forEach((p, i) => {
-              p.posRank = i + 1;
-            });
-          });
-
-          // Apply updates to the store
-          set(state => {
-            const updatedPlayers = state.players.map(p => {
-              const update = updates.find(u => u.id === p.id);
-              return update ? { ...p, ...update } : p;
-            });
-            return { players: updatedPlayers };
+          const api = new FfcAdp();
+          const rows = await api.load({ year, teams, scoring: ffcScoring, useCache });
+          
+          // Build composite index from your existing players
+          const normName = (s: string) => s.trim().toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ');
+          const keyOf = (n: string, t?: string, p?: string) => `${normName(n)}|${(t ?? '').toUpperCase()}|${(p ?? '').toUpperCase()}`;
+          
+          const byKey = new Map<string, string>(); // key -> playerId
+          const state = get();
+          state.players.forEach(p => {
+            // No need to check for 'D/ST' since Position type only includes 'DEF'
+            byKey.set(keyOf(p.name, p.nflTeam, p.pos), p.id);
           });
           
+          const updates = rows.flatMap(r => {
+            const id = byKey.get(keyOf(r.name, r.team, r.position));
+            return id ? [{
+              id,
+              rank: r.rank,
+              posRank: r.posRank,
+              adp: r.adp,
+              adpSource: `FFC-${ffcScoring.toUpperCase()}-${teams}-${year}`,
+            }] : [];
+          });
+          
+          get().applyAdp(updates);
+          return true;
           return true;
         } catch (error) {
           console.error('Failed to load ADP data:', error);

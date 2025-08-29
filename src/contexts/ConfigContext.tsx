@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
-import { AdpConfig, adpConfig as defaultConfig } from '../config/adp';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
+import { AdpConfig, adpConfig as defaultConfig, saveAdpConfig } from '../config/adp';
 
 interface ConfigContextType {
   config: AdpConfig;
@@ -22,6 +22,11 @@ export const ConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const resetConfig = useCallback(() => {
     setConfig(defaultConfig);
   }, []);
+
+  // Persist config changes to localStorage
+  useEffect(() => {
+    saveAdpConfig(config);
+  }, [config]);
 
   return (
     <ConfigContext.Provider value={{ config, updateConfig, resetConfig }}>
