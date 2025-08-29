@@ -1,8 +1,7 @@
 import { useCallback } from 'react';
 import { useDraftStore } from './useDraftStore';
 import { FALLBACK_PLAYERS } from '../data/players';
-import type { Player } from '../types/index';
-import type { Position } from '../types/index';
+import type { Player, Position } from '../types/draft';
 
 export function useGlobalPlayers() {
   // Get players and setter from the store

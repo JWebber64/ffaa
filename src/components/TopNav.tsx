@@ -1,5 +1,6 @@
-import { Box, Button, HStack, Text } from "@chakra-ui/react";
+import { Box, Button, HStack, Text, Tooltip } from "@chakra-ui/react";
 import { NavLink, useLocation } from "react-router-dom";
+import AdminLogin from "./AdminLogin";
 
 type Props = { onMenu: () => void };
 
@@ -47,6 +48,7 @@ export default function TopNav({ onMenu }: Props) {
         </HStack>
 
         <HStack spacing={2}>
+          <AdminLogin />
           {pathname !== "/auctioneer" && (
             <NavLink to="/auctioneer" style={{ textDecoration: "none" }}>
               <Button size="sm" bg="#2372b2">Start Auction</Button>

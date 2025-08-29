@@ -14,14 +14,16 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import { useDraftStore } from '../../store/initDraftStore';
+import { useDraftStore } from '../../hooks/useDraftStore';
+import type { Position } from '../../types/draft';
+import type { DraftState } from '../../types/draft';
 
 type PositionPickerModalProps = {
   isOpen: boolean;
   onClose: () => void;
   teamId: number;
   playerId: string;
-  validSlots: string[];
+  validSlots: Position[];
 };
 
 export default function PositionPickerModal({
@@ -32,60 +34,45 @@ export default function PositionPickerModal({
   validSlots,
 }: PositionPickerModalProps) {
   const toast = useToast();
-  const { players, teams } = useDraftStore(s => ({
+  const { players, teams } = useDraftStore((s: DraftState) => ({
     players: s.players,
     teams: s.teams,
   }));
-  const [slot, setSlot] = useState<string>('');
+  
+  const assignPlayer = useDraftStore(state => state.assignPlayer);
+  
+  const [selectedSlot, setSelectedSlot] = useState<Position | ''>('');
+  
+  const handleSlotChange = (value: string) => {
+    setSelectedSlot(value as Position);
+  };
 
-  const player = players.find(p => p.id === playerId);
-  const team = teams.find(t => t.id === teamId);
+  const player = players.find((p: { id: string }) => p.id === playerId);
+  const team = teams.find((t: { id: number }) => t.id === teamId);
 
   const onAssign = () => {
-    if (!slot) {
-      toast({ status: 'warning', title: 'Select a slot first.' });
+    if (!selectedSlot) {
+      toast({ status: 'warning', title: 'Please select a position slot' });
       return;
     }
-    // commit assignment directly to state
-    useDraftStore.setState((state) => {
-      const updatedTeams = [...state.teams];
-      const updatedPlayers = [...state.players];
-      
-      const teamIndex = updatedTeams.findIndex(t => t.id === teamId);
-      const playerIndex = updatedPlayers.findIndex(p => p.id === playerId);
-      
-      if (teamIndex !== -1 && playerIndex !== -1) {
-        const updatedPlayer = { ...updatedPlayers[playerIndex] };
-        const updatedTeam = { ...updatedTeams[teamIndex] };
-        
-        updatedPlayer.slot = slot;
-        updatedPlayer.draftedBy = teamId;
-        
-        // Update roster count
-        updatedTeam.roster = { ...updatedTeam.roster };
-        updatedTeam.roster[slot as keyof typeof updatedTeam.roster] =
-          (updatedTeam.roster[slot as keyof typeof updatedTeam.roster] ?? 0) - 1;
-        
-        // Update the player in the team's players array if needed
-        if (!updatedTeam.players.includes(playerId)) {
-          updatedTeam.players = [...updatedTeam.players, playerId];
-        }
-        
-        // Update the arrays
-        updatedPlayers[playerIndex] = updatedPlayer;
-        updatedTeams[teamIndex] = updatedTeam;
-        
-        return {
-          ...state,
-          players: updatedPlayers,
-          teams: updatedTeams,
-        };
-      }
-      
-      return state;
+
+    if (!player) {
+      toast({ status: 'error', title: 'Player not found' });
+      return;
+    }
+
+    // Use the store's assignPlayer action to handle the assignment
+    assignPlayer(playerId, teamId, player.price || 0, selectedSlot);
+    
+    // Log the assignment
+    toast({ 
+      status: 'success', 
+      title: `Assigned to ${selectedSlot}`,
+      description: `${player.name} has been assigned to ${selectedSlot} position`
     });
-    toast({ status: 'success', title: `Assigned to ${slot}` });
-    setSlot('');
+    
+    // Reset and close
+    setSelectedSlot('');
     onClose();
   };
 
@@ -95,31 +82,44 @@ export default function PositionPickerModal({
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Choose Slot for {player.name}</ModalHeader>
+        <ModalHeader>Assign Position</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text mb={2}>Multiple slots are available for this player.</Text>
-          <RadioGroup onChange={(value: string) => setSlot(value)} value={slot ?? ''}>
-            <Stack>
-              {validSlots.map(s => (
-                <Radio key={s} value={s}>
-                  {s}
+          <Text mb={2} fontWeight="bold">{player.name}</Text>
+          <Text mb={4} color="gray.600">
+            Select a position for {player.name} on {team.name}:
+          </Text>
+          
+          <RadioGroup 
+            onChange={handleSlotChange} 
+            value={selectedSlot}
+            mb={4}
+          >
+            <Stack spacing={3}>
+              {validSlots.map((slot) => (
+                <Radio key={slot} value={slot} size="lg" colorScheme="blue">
+                  <Text fontSize="lg">{slot}</Text>
                 </Radio>
               ))}
             </Stack>
           </RadioGroup>
         </ModalBody>
+        
         <ModalFooter>
-          <Button variant="ghost" mr={3} onClick={onClose}>
+          <Button 
+            variant="outline" 
+            mr={3} 
+            onClick={onClose}
+          >
             Cancel
           </Button>
           <Button 
+            colorScheme="blue" 
             onClick={onAssign} 
-            isDisabled={!slot} 
-            bg="blue.300" 
-            _hover={{ bg: 'blue.400' }}
+            isDisabled={!selectedSlot}
+            px={6}
           >
-            Assign
+            Confirm
           </Button>
         </ModalFooter>
       </ModalContent>

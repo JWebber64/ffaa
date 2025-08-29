@@ -18,7 +18,7 @@ export default function LiveAuctionBar() {
   if (!bidState.isLive || !bidState.playerId) return null;
 
   const player = players.find((p: Player) => p.id === bidState.playerId);
-  const leader = teams.find((t: Team) => t.id === (bidState as any).highBidTeamId);
+  const leader = teams.find((t) => t.id === (bidState.highBidder ?? -1));
 
   return (
     <Box border="1px solid" borderColor="blue.100" p={3} borderRadius="md" bg="blue.50">

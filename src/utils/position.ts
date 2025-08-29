@@ -1,4 +1,6 @@
-export type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
+import type { Position } from '../types/draft';
+
+export type { Position };
 
 /**
  * Converts any position string to the internal position format.
@@ -9,7 +11,7 @@ export const toInternalPos = (position: string): Position => {
   const normalized = position.toUpperCase().replace('D/ST', 'DEF').replace('DST', 'DEF');
   
   // Validate the position is one of our allowed values
-  if (['QB', 'RB', 'WR', 'TE', 'K', 'DEF'].includes(normalized)) {
+  if (['QB', 'RB', 'WR', 'TE', 'K', 'DEF', 'FLEX', 'BENCH'].includes(normalized)) {
     return normalized as Position;
   }
   

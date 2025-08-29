@@ -25,9 +25,9 @@ const wordToNumber = (word: string): number | null => {
   return numberMap[word.toLowerCase()] ?? null;
 };
 
-interface Team {
-  id: number;
-  name: string;
+import type { Team } from '../types/draft';
+
+interface TeamWithAliases extends Team {
   aliases?: string[];
 }
 
@@ -90,32 +90,24 @@ export const parseBidAmount = (text: string): ParseBidAmountResult | null => {
 /**
  * Finds a matching team in the text with confidence scoring
  */
-export const findMatchingTeam = (text: string, teams: Team[]): ParseTeamResult | null => {
+export const recognizeBid = (transcript: string, teams: TeamWithAliases[]): BidRecognitionResult | null => {
   if (!teams.length) return null;
   
-  const words = text.toLowerCase().split(/\s+/);
+  const transcriptWords = transcript.toLowerCase().split(/\s+/);
   
-  // First, try to match team names exactly or partially
-  for (const team of teams) {
+  // First, try to match team names exactly  // Find team by name or alias
+  const matchingTeam = teams.find((team: TeamWithAliases) => {
     const teamName = team.name.toLowerCase();
-    const aliases = team.aliases?.map(a => a.toLowerCase()) || [];
-    
-    // Check if any word matches the team name or its aliases
-    const match = words.some(word => {
-      const normalizedWord = word.replace(/[^a-z]/g, '');
-      return (
-        teamName.includes(normalizedWord) || 
-        aliases.some(alias => alias.includes(normalizedWord)) ||
-        normalizedWord === teamName ||
-        aliases.includes(normalizedWord)
-      );
-    });
-    
-    if (match) {
-      // Calculate confidence based on match quality
-      const confidence = teamName.length > 0 ? 0.9 : 0.7;
-      return { id: team.id, confidence };
-    }
+    const aliases = team.aliases || [];
+    return [teamName, ...aliases].some((alias: string) => 
+      transcriptWords.some((word: string) => word.toLowerCase() === alias.toLowerCase())
+    );
+  });
+
+  if (matchingTeam) {
+    // Calculate confidence based on match quality
+    const confidence = matchingTeam.name.length > 0 ? 0.9 : 0.7;
+    return { teamId: matchingTeam.id, amount: 0, confidence, transcript };
   }
   
   return null;
@@ -126,60 +118,21 @@ export const findMatchingTeam = (text: string, teams: Team[]): ParseTeamResult |
  */
 export const parseBidFromSpeech = (
   transcript: string, 
-  teams: Team[],
+  teams: TeamWithAliases[],
   minConfidence = 0.7
 ): BidRecognitionResult | null => {
-  // First try to find a team and amount in the same phrase
-  const teamMatch = findMatchingTeam(transcript, teams);
   const amountMatch = parseBidAmount(transcript);
+  const teamMatch = recognizeBid(transcript, teams);
   
   if (teamMatch && amountMatch) {
     const confidence = (teamMatch.confidence + amountMatch.confidence) / 2;
     if (confidence >= minConfidence) {
       return {
-        teamId: teamMatch.id,
+        teamId: teamMatch.teamId,
         amount: amountMatch.amount,
         confidence,
         transcript
       };
-    }
-  }
-  
-  // If no team/amount pair found, try to find them separately
-  // This handles cases where the team and amount are in different parts of the transcript
-  const words = transcript.split(/\s+/);
-  for (let i = 0; i < words.length; i++) {
-    const firstHalf = words.slice(0, i + 1).join(' ');
-    const secondHalf = words.slice(i + 1).join(' ');
-    
-    const teamFirst = findMatchingTeam(firstHalf, teams);
-    const amountSecond = parseBidAmount(secondHalf);
-    
-    if (teamFirst && amountSecond) {
-      const confidence = (teamFirst.confidence + amountSecond.confidence) / 2;
-      if (confidence >= minConfidence) {
-        return {
-          teamId: teamFirst.id,
-          amount: amountSecond.amount,
-          confidence,
-          transcript
-        };
-      }
-    }
-    
-    const amountFirst = parseBidAmount(firstHalf);
-    const teamSecond = findMatchingTeam(secondHalf, teams);
-    
-    if (amountFirst && teamSecond) {
-      const confidence = (amountFirst.confidence + teamSecond.confidence) / 2;
-      if (confidence >= minConfidence) {
-        return {
-          teamId: teamSecond.id,
-          amount: amountFirst.amount,
-          confidence,
-          transcript
-        };
-      }
     }
   }
   

@@ -1,8 +1,8 @@
-import { Box, Button, Container, Flex, HStack, VStack, Heading, Input, Stack, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Container, Flex, HStack, VStack, Heading, Input, Stack, Text, useDisclosure, useToast } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { useDraftStore } from '../store/draftStore';
 import { shallow } from 'zustand/shallow';
-import PlayerSearch from '../components/PlayerSearch';
+import PlayerSearch from '../components/unified/PlayerSearch';
 import BidButton from '../components/BidButton';
 import SelectButton from '../components/SelectButton';
 import NominationIndicator from '../components/NominationIndicator';
@@ -13,30 +13,16 @@ import AuctionSettingsPanel from '../components/AuctionSettingsPanel';
 import AdminActionsBar from '../components/AdminActionsBar';
 import LiveBidWidget from '../components/LiveBidWidget';
 import { FaCog } from 'react-icons/fa';
+import PositionPickerModal from '../components/modals/PositionPickerModal';
+
+import type { Position, Player as BasePlayer, Team as BaseTeam } from '../types/draft';
 
 type RosterPosition = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
-type Position = RosterPosition | 'FLEX' | 'BENCH';
 
-interface BasePlayer {
-  id: string;
-  name: string;
-  pos: string;
-  team?: string;
-  nflTeam?: string;
-  rank?: number;
-  adp?: number;
-}
-
-interface BaseTeam {
-  id: number;
-  name: string;
-  budget: number;
-}
-
-// Extend BasePlayer but keep the original Position type from the store
-interface Player extends Omit<BasePlayer, 'pos'> {
+// Extend the base Player type to include the Position type from draft.ts
+interface Player extends Omit<BasePlayer, 'pos' | 'slot'> {
   pos: Position;
-  slot?: string; // Allow any string for slot to match the base Player type
+  slot?: Position; // Use Position type for slot to match the base Player type
   draftedBy?: number;
   price?: number;
 }
@@ -59,21 +45,15 @@ const getMinColumnWidth = () => {
   return Math.max(60, Math.min(120, viewportWidth * 0.12)); // Between 60px and 120px, 12% of viewport width
 };
 
-interface DraftBoardProps {
-  teams: Team[];
-}
 
-export default function DraftBoard({ teams }: DraftBoardProps) {
-  const { players, templateRoster, baseBudget, runtime, teams: storeTeams } = useDraftStore(s => ({
+export default function DraftBoard() {
+  const { players, templateRoster, baseBudget, runtime, teams } = useDraftStore(s => ({
     players: s.players,
     templateRoster: s.templateRoster,
     baseBudget: s.baseBudget,
     runtime: s.runtime,
-    teams: s.teams
+    teams: s.teams as Team[]
   }), shallow);
-
-  // Use teams from props if available, otherwise use from store
-  const displayTeams = teams || storeTeams || [];
 
   // Local state: simple on-device claim + rename
   const [claimed, setClaimed] = useState<Record<number, boolean>>({});
@@ -86,7 +66,7 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
   const minColumnWidth = getMinColumnWidth();
 
   // Row order is driven by template roster
-  const teamColumns = useMemo(() => displayTeams, [displayTeams]);
+  const teamColumns = useMemo(() => teams, [teams]);
   const slotRows = useMemo(() => {
     const order: Position[] = ["QB", "RB", "WR", "TE", "FLEX", "K", "DEF", "BENCH"];
     return order
@@ -233,6 +213,8 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
   };
 
   const { isOpen: isSettingsOpen, onOpen: onSettingsOpen, onClose: onSettingsClose } = useDisclosure();
+  const toast = useToast();
+  const pendingAssignment = useDraftStore(state => state.pendingAssignment);
   const [showSettings, setShowSettings] = useState(false);
 
   return (
@@ -264,120 +246,128 @@ export default function DraftBoard({ teams }: DraftBoardProps) {
             <AuctionSettingsPanel />
           </Box>
         )}
-      </Stack>
 
-      <Box width="100%" p={2}>
-        <Box
-          display="grid"
-          gridTemplateColumns={{
-            base: 'repeat(auto-fill, minmax(120px, 1fr))',
-            md: `repeat(${Math.max(1, Math.min(teams.length, 8))}, minmax(120px, 1fr))`,
-            lg: `repeat(${Math.max(1, Math.min(teams.length, 12))}, minmax(100px, 1fr))`
-          }}
-          gap={2}
-          width="100%"
-          overflowX="auto"
-          sx={{
-            '&::-webkit-scrollbar': {
-              height: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'gray.800',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: 'gray.600',
-              borderRadius: '4px',
-              '&:hover': {
-                background: 'gray.500',
+        <Box width="100%" p={2}>
+          <Box
+            display="grid"
+            gridTemplateColumns={{
+              base: 'repeat(auto-fill, minmax(120px, 1fr))',
+              md: `repeat(${Math.max(1, Math.min(teams.length, 8))}, minmax(120px, 1fr))`,
+              lg: `repeat(${Math.max(1, Math.min(teams.length, 12))}, minmax(100px, 1fr))`
+            }}
+            gap={2}
+            width="100%"
+            overflowX="auto"
+            sx={{
+              '&::-webkit-scrollbar': {
+                height: '8px',
               },
-            },
-          }}
-        >
-          {teams.map((team) => (
-            <Box
-              key={team.id}
-              minWidth="0"
-              borderWidth="1px"
-              borderRadius="md"
-              overflow="hidden"
-              bg="gray.800"
-              transition="all 0.2s ease-in-out"
-            >
-              {/* Column header */}
-              <Stack alignItems="center" mb={1} p={1} spacing={1} fontSize="sm">
-                <VStack width="100%" spacing={2}>
-                  <Button
-                    size="xs"
-                    bg="#10b3a5"
-                    color="white"
-                    onClick={() => claimOrEdit(team)}
-                    width="100%"
-                    height="24px"
-                    fontSize="xs"
-                  >
-                    {editing === team.id ? 'Cancel' : 'Edit'}
-                  </Button>
-                  
-                  {editing === team.id ? (
-                  <HStack width="100%" spacing={2}>
-                    <Input
-                      size="xs"
-                      value={nameDraft}
-                      onChange={(e) => setNameDraft(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && saveName(team)}
-                      onClick={(e) => e.stopPropagation()}
-                      autoFocus
-                    />
+              '&::-webkit-scrollbar-track': {
+                background: 'gray.800',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'gray.600',
+                borderRadius: '4px',
+                '&:hover': {
+                  background: 'gray.500',
+                },
+              },
+            }}
+          >
+            {teams.map((team) => (
+              <Box
+                key={team.id}
+                minWidth="0"
+                borderWidth="1px"
+                borderRadius="md"
+                overflow="hidden"
+                bg="gray.800"
+                transition="all 0.2s ease-in-out"
+              >
+                {/* Column header */}
+                <Stack alignItems="center" mb={1} p={1} spacing={1} fontSize="sm">
+                  <VStack width="100%" spacing={2}>
                     <Button
                       size="xs"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        saveName(team);
-                      }}
-                      px={2}
+                      bg="#10b3a5"
+                      color="white"
+                      onClick={() => claimOrEdit(team)}
+                      width="100%"
+                      height="24px"
+                      fontSize="xs"
                     >
-                      Save
+                      {editing === team.id ? 'Cancel' : 'Edit'}
                     </Button>
-                  </HStack>
-                ) : (
-                  <Heading
-                    size="sm"
-                    textAlign="center"
-                    style={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      width: "100%",
-                    }}
-                  >
-                    {team.name}
-                  </Heading>
-                )}
-                  <BidButton teamId={team.id} />
-                  <SelectButton teamId={team.id} isAdmin={isAdmin} />
-                </VStack>
-              </Stack>
+                    
+                    {editing === team.id ? (
+                      <HStack width="100%" spacing={2}>
+                        <Input
+                          size="xs"
+                          value={nameDraft}
+                          onChange={(e) => setNameDraft(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && saveName(team)}
+                          onClick={(e) => e.stopPropagation()}
+                          autoFocus
+                        />
+                        <Button
+                          size="xs"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            saveName(team);
+                          }}
+                          px={2}
+                        >
+                          Save
+                        </Button>
+                      </HStack>
+                    ) : (
+                      <Heading
+                        size="sm"
+                        textAlign="center"
+                        style={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          width: "100%",
+                        }}
+                      >
+                        {team.name}
+                      </Heading>
+                    )}
+                    <BidButton teamId={team.id} />
+                    <SelectButton teamId={team.id} />
+                  </VStack>
+                </Stack>
 
-              <Box p={2} borderBottom="1px solid" borderColor="gray.200">
-                <NominateBar />
-              </Box>
-              
-              {/* Live Bid Widget - Convert team.id to string to match prop type */}
-              <Box p={2} pt={1}>
-                <LiveBidWidget teamId={team.id.toString()} />
-              </Box>
+                <Box p={2} borderBottom="1px solid" borderColor="gray.200">
+                  <NominateBar />
+                </Box>
+                
+                <Box p={2} pt={1}>
+                  <LiveBidWidget teamId={team.id.toString()} />
+                </Box>
 
-              {/* Slots */}
-              {renderSlotBoxes(team)}
-            </Box>
-          ))}
+                {/* Slots */}
+                {renderSlotBoxes(team)}
+              </Box>
+            ))}
+          </Box>
         </Box>
-      </Box>
 
-      <HStack mt={3} justifyContent="flex-end" opacity={0.75} fontSize="sm" px={2}>
-        <Text>Tap “CLAIM” to rename a team column.</Text>
-      </HStack>
+        <HStack mt={3} justifyContent="flex-end" opacity={0.75} fontSize="sm" px={2}>
+          <Text>Tap "CLAIM" to rename a team column.</Text>
+        </HStack>
+      </Stack>
+
+      {/* Position Picker Modal */}
+      <PositionPickerModal
+        isOpen={!!pendingAssignment}
+        onClose={() => useDraftStore.setState({ pendingAssignment: null })}
+        teamId={pendingAssignment?.teamId!}
+        playerId={pendingAssignment?.playerId!}
+        validSlots={pendingAssignment?.validSlots ?? []}
+      />
     </Container>
   );
 }

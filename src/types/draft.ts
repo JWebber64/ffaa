@@ -14,6 +14,7 @@ export type LogEventType =
   | 'ASSIGN_PENDING_SLOT'
   | 'ASSIGN_REJECTED'
   | 'INSTANT_ASSIGN'
+  | 'PENDING_ASSIGNMENT'
   | 'ERROR';
 
 export interface LogEvent {
@@ -124,7 +125,7 @@ export interface DraftState {
 
 export interface DraftActions {
   // State setters
-  setAuctionSettings: (settings: Partial<AuctionSettings>) => void;
+  setAuctionSettings: (settings: Partial<AuctionSettings>, options?: { isAdmin?: boolean }) => void;
   setPlayers: (players: Player[]) => void;
   setTeams: (teams: Team[]) => void;
   setCurrentNominatedId: (id: string | null) => void;
@@ -133,19 +134,19 @@ export interface DraftActions {
     teamCount: number;
     baseBudget: number;
     templateRoster: Record<Position, number>;
-  }) => void;
-  setTeamNames: (names: string[]) => void;
+  }, options?: { isAdmin?: boolean }) => void;
+  setTeamNames: (names: string[], options?: { isAdmin?: boolean }) => void;
   
   // Auction actions
   nominate: (playerId: string, startingBid?: number) => void;
   placeBid: (playerId: string, byTeamId: number, amount: number) => void;
   settleAuctionIfExpired: () => void;
-  assignPlayer: (playerId: string, teamId: number, price: number, slot?: Position) => void;
+  assignPlayer: (playerId: string, teamId: number, price: number, slot?: Position, options?: { isAdmin?: boolean }) => void;
   
   // Helpers
   computeMaxBid: (teamId: number, playerPos?: Position) => number;
   hasSlotFor: (teamId: number, pos: Position, includeTeInFlex?: boolean) => boolean;
-  resetDraft: () => void;
+  resetDraft: (options?: { isAdmin?: boolean }) => void;
   
   // ADP
   applyAdp: (updates: Array<{ id: string } & Partial<Player>>) => void;
@@ -155,6 +156,7 @@ export interface DraftActions {
     scoring?: 'standard' | 'ppr' | 'half-ppr';
     useCache?: boolean;
     signal?: AbortSignal;
+    isAdmin?: boolean;
   }) => Promise<boolean>;
   
   // Logging

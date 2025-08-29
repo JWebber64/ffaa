@@ -8,20 +8,23 @@ import Auctioneer from './screens/Auctioneer';
 import Results from './screens/Results';
 import PlayerPool from './components/PlayerPool';
 import { useGlobalPlayers } from './hooks/useGlobalPlayers';
-import { useDraftStore } from './store';
+import { useDraftStore } from './store/draftStore';
 import { ConfigProvider } from './contexts/ConfigContext';
+import { RoleProvider } from './contexts/RoleContext';
+import type { DraftState } from './types/draft';
 import TopNav from './components/TopNav';
 import RequireConfiguredDraft from './routes/RequireConfiguredDraft';
 
 function App() {
   // Load Sleeper → store.players once for the whole app
   useGlobalPlayers();
-  const teams = useDraftStore((state) => state.teams);
+  const teams = useDraftStore((state: DraftState) => state.teams);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <ConfigProvider>
+      <RoleProvider>
       <BrowserRouter>
         <Box minH="100vh">
           <TopNav onMenu={() => setIsMenuOpen(!isMenuOpen)} />
@@ -36,7 +39,7 @@ function App() {
               } />
               <Route path="/board" element={
                 <RequireConfiguredDraft>
-                  <DraftBoard teams={teams} />
+                  <DraftBoard />
                 </RequireConfiguredDraft>
               } />
               <Route path="/auctioneer" element={
@@ -54,6 +57,7 @@ function App() {
           </Box>
         </Box>
       </BrowserRouter>
+    </RoleProvider>
     </ConfigProvider>
   );
 }

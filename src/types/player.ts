@@ -1,10 +1,2 @@
-export interface Player {
-  id: string;
-  name: string;
-  position: string;
-  team: string;
-  adp?: number;
-  adpSource?: string;
-  adpLastUpdated?: string;
-  [key: string]: any; // For any additional properties
-}
+// Re-export Player type from the canonical source
+export type { Player } from './draft';

@@ -9,7 +9,8 @@ import {
 } from '@chakra-ui/react';
 import { useMemo, useState } from 'react';
 import { useDraftStore } from '../store/draftStore';
-import PlayerSearch from './PlayerSearch';
+import { PlayerSearch } from './unified/PlayerSearch';
+import type { Player } from '../store/draftStore';
 
 export default function NominateBar() {
   const toast = useToast();
@@ -25,7 +26,7 @@ export default function NominateBar() {
     bidState: s.bidState,
   }));
 
-  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [startingBid, setStartingBid] = useState<number>(1);
 
   const teamName = useMemo(
@@ -43,14 +44,14 @@ export default function NominateBar() {
       return;
     }
     const bid = Math.max(1, Math.floor(startingBid || 1));
-    if (!selectedPlayerId) {
+    if (!selectedPlayer) {
       toast({ status: 'warning', title: 'Select a player to nominate.' });
       return;
     }
-    nominate(selectedPlayerId, bid);
-    setSelectedPlayerId(null);
+    nominate(selectedPlayer.id, bid);
+    setSelectedPlayer(null);
     setStartingBid(1);
-    toast({ status: 'success', title: `Nominated at $${bid}.` });
+    toast({ status: 'success', title: `Nominated ${selectedPlayer.name} at $${bid}.` });
   };
 
   return (
@@ -61,7 +62,7 @@ export default function NominateBar() {
             {teamName ? `${teamName} — Your Nomination` : 'Your Nomination'}
           </Text>
           <PlayerSearch
-            onSelect={(id) => setSelectedPlayerId(id)}
+            onSelect={(player) => setSelectedPlayer(player)}
             placeholder="Search player to nominate…"
             filterUndrafted
             maxResults={50}
@@ -83,7 +84,7 @@ export default function NominateBar() {
         <Box alignSelf={{ base: 'stretch', md: 'flex-end' }}>
           <Button
             onClick={onNominate}
-            isDisabled={!isNominatorsTurn || auctionLive || !selectedPlayerId || (startingBid ?? 0) < 1}
+            isDisabled={!isNominatorsTurn || auctionLive || !selectedPlayer || (startingBid ?? 0) < 1}
             bg="blue.300"
             _hover={{ bg: 'blue.400' }}
             width={{ base: '100%', md: 'auto' }}

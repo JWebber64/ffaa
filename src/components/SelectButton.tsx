@@ -1,14 +1,15 @@
 import { Button, useDisclosure } from '@chakra-ui/react';
 import { Check } from 'lucide-react';
 import SelectPlayerModal from './modals/SelectPlayerModal';
+import { useRole } from '../contexts/RoleContext';
 
 type SelectButtonProps = {
   teamId: number;
-  isAdmin: boolean;
 };
 
-export default function SelectButton({ teamId, isAdmin }: SelectButtonProps) {
+export default function SelectButton({ teamId }: SelectButtonProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isAdmin } = useRole();
 
   return (
     <>
@@ -23,7 +24,7 @@ export default function SelectButton({ teamId, isAdmin }: SelectButtonProps) {
       >
         Select
       </Button>
-      <SelectPlayerModal isOpen={isOpen} onClose={onClose} teamId={teamId} isAdmin={isAdmin} />
+      <SelectPlayerModal isOpen={isOpen} onClose={onClose} teamId={teamId} />
     </>
   );
 }

@@ -11,45 +11,48 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import PlayerSearch from '@/components/PlayerSearch';
-import { useDraftStore } from '@/store/draftStore';
+import { PlayerSearch } from '../unified/PlayerSearch';
+import { useDraftStore } from '../../store/draftStore';
+import { useRole } from '../../contexts/RoleContext';
+import type { Player } from '../../store/draftStore';
 
 type SelectPlayerModalProps = {
   teamId: number;
   isOpen: boolean;
   onClose: () => void;
-  isAdmin: boolean;
 };
 
-export default function SelectPlayerModal({ teamId, isOpen, onClose, isAdmin }: SelectPlayerModalProps) {
+export default function SelectPlayerModal({ teamId, isOpen, onClose }: SelectPlayerModalProps) {
   const toast = useToast();
-  const selectPlayerImmediate = useDraftStore(s => s.selectPlayerImmediate);
-  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const assignPlayer = useDraftStore(s => s.assignPlayer);
+  const { isAdmin } = useRole();
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
   const handleAssign = () => {
     if (!isAdmin) {
       toast({ status: 'error', title: 'Admin only.' });
       return;
     }
-    if (!selectedPlayerId) {
+    if (!selectedPlayer) {
       toast({ status: 'warning', title: 'Pick a player first.' });
       return;
     }
-    selectPlayerImmediate(teamId, selectedPlayerId, { isAdmin: true });
-    toast({ status: 'success', title: 'Player assigned to team.' });
-    setSelectedPlayerId(null);
+    // Using 0 as price since this is an admin assignment, not an auction
+    assignPlayer(selectedPlayer.id, teamId, 0, 'BENCH');
+    toast({ status: 'success', title: `${selectedPlayer.name} assigned to team.` });
+    setSelectedPlayer(null);
     onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={() => { setSelectedPlayerId(null); onClose(); }} size="lg" isCentered>
+    <Modal isOpen={isOpen} onClose={() => { setSelectedPlayer(null); onClose(); }} size="lg" isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Select & Assign Player (Admin)</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           {isAdmin ? (
-            <PlayerSearch onSelect={(id) => setSelectedPlayerId(id)} />
+            <PlayerSearch onSelect={setSelectedPlayer} filterUndrafted={false} />
           ) : (
             <Text color="red.500">You must be an admin to assign players directly.</Text>
           )}
@@ -58,7 +61,7 @@ export default function SelectPlayerModal({ teamId, isOpen, onClose, isAdmin }: 
           <Button variant="ghost" mr={3} onClick={onClose}>Cancel</Button>
           <Button
             onClick={handleAssign}
-            isDisabled={!isAdmin || !selectedPlayerId}
+            isDisabled={!isAdmin || !selectedPlayer}
             colorScheme="blue"
           >
             Assign to Team

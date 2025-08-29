@@ -1,44 +1,20 @@
-// Define Position type to match the one in draftStore.ts
-type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF' | 'FLEX' | 'BENCH';
+import type { Position, Player, Team, DraftState } from '../types/draft';
 
-// Define interfaces for the parts of DraftState we need
-interface Player {
-  id: string;
-  pos: Position;
-  draftedBy?: number;
-  price?: number;
-  slot?: string;
-}
-
-interface Team {
-  id: number;
-  roster: Record<Position, number>;
-  players: string[];
-  budget: number;
-}
-
-interface DraftState {
-  players: Player[];
-  teams: Team[];
-  pendingAssignment: {
-    teamId: number;
-    playerId: string;
-    validSlots: string[];
-  } | null;
-}
-
-
-export function getOpenSlotsForTeamAndPlayer(state: DraftState, teamId: number, playerId: string): string[] {
+export function getOpenSlotsForTeamAndPlayer(
+  state: DraftState,
+  teamId: number,
+  playerId: string
+): Position[] {
   const team = state.teams.find(t => t.id === teamId);
   const player = state.players.find(p => p.id === playerId);
   
   if (!team || !player) return [];
   
-  const openSlots: string[] = [];
+  const openSlots: Position[] = [];
   const pos = player.pos;
   
   // Check primary position slot
-  if (team.roster[pos as keyof typeof team.roster] > 0) {
+  if (team.roster[pos] > 0) {
     openSlots.push(pos);
   }
   
@@ -60,7 +36,7 @@ export function assignPlayerToSlot(
   playerId: string,
   teamId: number,
   price: number,
-  slot?: string
+  slot?: Position
 ): void {
   const player = state.players.find(p => p.id === playerId);
   const team = state.teams.find(t => t.id === teamId);
@@ -80,8 +56,8 @@ export function assignPlayerToSlot(
   player.slot = slot;
   
   // Update team roster
-  if (team.roster[slot as keyof typeof team.roster] > 0) {
-    team.roster[slot as keyof typeof team.roster]--;
+  if (team.roster[slot] > 0) {
+    team.roster[slot]--;
   }
   
   // Update team players if not already included

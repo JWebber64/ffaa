@@ -1,12 +1,12 @@
 import { Box, Button, HStack, Text, useToast } from '@chakra-ui/react';
 import { RotateCcw } from 'lucide-react';
 import { useDraftStore } from '../store/draftStore';
+import { useRole } from '../contexts/RoleContext';
 
 export default function AdminActionsBar() {
   const toast = useToast();
   const undoLastAssignment = useDraftStore(s => s.undoLastAssignment);
-  // TODO: wire real role; for now assume admin
-  const isAdmin = true;
+  const { isAdmin } = useRole();
 
   const onUndo = () => {
     if (!isAdmin) {

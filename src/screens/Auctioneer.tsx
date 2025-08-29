@@ -17,10 +17,8 @@ import { useDraftStore } from '../store';
 import type { Player, Team } from '../store/draftStore';
 import { useConfig } from '../contexts/ConfigContext';
 import { formatPositionForDisplay } from '../utils/positionUtils';
-import { PlayerSearch } from '../components/auction/PlayerSearch';
+import { PlayerSearch } from '../components/unified/PlayerSearch';
 import { ResetDraftButton } from '../components/auction/ResetDraftButton';
-
-const COUNTDOWN_SECONDS = 3; // Temporarily set to 3 seconds for testing
 
 const Auctioneer: React.FC = () => {
   const toast = useToast();
@@ -29,6 +27,7 @@ const Auctioneer: React.FC = () => {
   const players = useDraftStore((s) => s.players);
   const teams = useDraftStore((s) => s.teams);
   const adpLoaded = useDraftStore((s) => s.adpLoaded);
+  const { countdownSeconds, antiSnipeSeconds } = useDraftStore(s => s.auctionSettings);
 
   const loadAdp = useDraftStore((s) => s.loadAdp);
   const nominate = useDraftStore((s) => s.nominate);
@@ -48,7 +47,7 @@ const Auctioneer: React.FC = () => {
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingAdp, setIsLoadingAdp] = useState<boolean>(false);
-  const [time, setTime] = useState<number>(COUNTDOWN_SECONDS);
+  const [time, setTime] = useState<number>(countdownSeconds);
   const timerRef = useRef<number | null>(null);
   const deadlineRef = useRef<number | null>(null);
 
@@ -106,7 +105,7 @@ const Auctioneer: React.FC = () => {
 
   const startTimer = useCallback(() => {
     stopTimer();
-    const end = Date.now() + COUNTDOWN_SECONDS * 1000;
+    const end = Date.now() + countdownSeconds * 1000;
     deadlineRef.current = end;
     setIsTimerRunning(true);
 
@@ -300,7 +299,7 @@ const Auctioneer: React.FC = () => {
     try {
       setIsLoading(true);
       await Promise.resolve(placeBid(currentNom.playerId, currentBidder, bidAmount));
-      setTime(COUNTDOWN_SECONDS);
+      setTime(countdownSeconds);
       if (!isTimerRunning) startTimer();
       toast({
         title: 'Bid placed',
@@ -376,7 +375,7 @@ const Auctioneer: React.FC = () => {
 
       try {
         nominate(player.id, bid);
-        setTime(COUNTDOWN_SECONDS);
+        setTime(countdownSeconds);
         if (!isTimerRunning) startTimer();
       } catch (e) {
         const errorMessage = e instanceof Error ? e.message : 'Failed to nominate player';
@@ -410,7 +409,7 @@ const Auctioneer: React.FC = () => {
       try {
         setIsLoading(true);
         await Promise.resolve(placeBid(currentNom.playerId, teamId, bidAmount));
-        setTime(COUNTDOWN_SECONDS);
+        setTime(countdownSeconds);
         if (!isTimerRunning) startTimer();
 
         toast({
@@ -729,7 +728,7 @@ const maxBid = computeMaxBid ? computeMaxBid(team.id, currentPlayer?.pos) : 0;
                     try {
                       setIsLoading(true);
                       await Promise.resolve(placeBid(player.id, currentBidder, amount));
-                      setTime(COUNTDOWN_SECONDS);
+                      setTime(countdownSeconds);
                       if (!isTimerRunning) startTimer();
                       toast({
                         title: 'Bid Placed',
@@ -789,7 +788,7 @@ const maxBid = computeMaxBid ? computeMaxBid(team.id, currentPlayer?.pos) : 0;
           <Button variant="outline" onClick={stopTimer}>
             Pause Timer
           </Button>
-          <Button variant="ghost" onClick={() => setTime(COUNTDOWN_SECONDS)}>
+          <Button variant="ghost" onClick={() => setTime(countdownSeconds)}>
             Reset Clock
           </Button>
         </HStack>
