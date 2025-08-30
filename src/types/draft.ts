@@ -15,7 +15,17 @@ export type LogEventType =
   | 'ASSIGN_REJECTED'
   | 'INSTANT_ASSIGN'
   | 'PENDING_ASSIGNMENT'
-  | 'ERROR';
+  | 'ERROR'
+  | 'ADMIN_OVERRIDE'
+  | 'ADMIN_ASSIGN'
+  | 'ADP_LOADED'
+  | 'ADP_LOAD_ERROR'
+  | 'AUCTION_SETTINGS_UPDATED'
+  | 'DRAFT_CONFIG_UPDATED'
+  | 'TEAM_NAMES_UPDATED'
+  | 'LOGS_CLEARED'
+  | 'DRAFT_RESET'
+  | 'UNDO_ASSIGNMENT';
 
 export interface LogEvent {
   id: string;           // nanoid or Date.now().toString()
@@ -31,7 +41,7 @@ export interface AssignmentHistory {
   teamId: number;       // ID of the team receiving the player
   slot?: string | null; // Optional slot assignment
   priceRefund?: number; // If auction win deducted budget, we refund this
-  source: 'auction' | 'instant'; // Source of the assignment
+  source: 'auction' | 'instant' | 'admin'; // Source of the assignment
 }
 
 export interface AuctionSettings {
@@ -109,7 +119,7 @@ export interface DraftState {
   nominationQueue: Nomination[];
   currentAuction: CurrentAuction | null;
   currentNominatedId: string | null;
-  currentBidder?: number;
+  currentBidder: number | undefined;  // Explicitly allow undefined
   
   // config
   baseBudget: number;
@@ -123,48 +133,54 @@ export interface DraftState {
   logs: LogEvent[];
 }
 
+export interface AdminOptions {
+  isAdmin?: boolean;
+}
+
 export interface DraftActions {
-  // State setters
-  setAuctionSettings: (settings: Partial<AuctionSettings>, options?: { isAdmin?: boolean }) => void;
-  setPlayers: (players: Player[]) => void;
-  setTeams: (teams: Team[]) => void;
-  setCurrentNominatedId: (id: string | null) => void;
-  setCurrentBidder: (teamId?: number) => void;
-  setConfig: (config: {
-    teamCount: number;
-    baseBudget: number;
-    templateRoster: Record<Position, number>;
-  }, options?: { isAdmin?: boolean }) => void;
-  setTeamNames: (names: string[], options?: { isAdmin?: boolean }) => void;
-  
-  // Auction actions
-  nominate: (playerId: string, startingBid?: number) => void;
-  placeBid: (playerId: string, byTeamId: number, amount: number) => void;
-  settleAuctionIfExpired: () => void;
-  assignPlayer: (playerId: string, teamId: number, price: number, slot?: Position, options?: { isAdmin?: boolean }) => void;
-  
-  // Helpers
-  computeMaxBid: (teamId: number, playerPos?: Position) => number;
-  hasSlotFor: (teamId: number, pos: Position, includeTeInFlex?: boolean) => boolean;
-  resetDraft: (options?: { isAdmin?: boolean }) => void;
-  
-  // ADP
-  applyAdp: (updates: Array<{ id: string } & Partial<Player>>) => void;
+  // Admin-only operations
+  setAuctionSettings: (settings: Partial<AuctionSettings>, options?: AdminOptions) => void;
+  setConfig: (
+    config: {
+      teamCount: number;
+      baseBudget: number;
+      templateRoster: Record<Position, number>;
+    },
+    options?: AdminOptions
+  ) => void;
+  setTeamNames: (names: string[], options?: AdminOptions) => void;
+  resetDraft: (options?: AdminOptions) => void;
+  undoLastAssignment: (options?: AdminOptions) => void;
+  assignPlayer: (playerId: string, teamId: number, price: number, slot?: Position, options?: AdminOptions) => void;
   loadAdp: (opts?: {
     year?: number;
     teams?: number;
     scoring?: 'standard' | 'ppr' | 'half-ppr';
     useCache?: boolean;
     signal?: AbortSignal;
-    isAdmin?: boolean;
-  }) => Promise<boolean>;
+  } & AdminOptions) => Promise<boolean>;
+  
+  // Regular operations
+  setPlayers: (players: Player[]) => void;
+  setTeams: (teams: Team[]) => void;
+  setCurrentNominatedId: (id: string | null) => void;
+  setCurrentBidder: (teamId?: number) => void;
+  
+  // Auction actions
+  nominate: (playerId: string, startingBid?: number) => void;
+  placeBid: (playerId: string, byTeamId: number, amount: number) => void;
+  settleAuctionIfExpired: () => void;
+  
+  // Helpers
+  computeMaxBid: (teamId: number, playerPos?: Position) => number;
+  hasSlotFor: (teamId: number, pos: Position, includeTeInFlex?: boolean) => boolean;
+  
+  // Data operations
+  applyAdp: (updates: Array<{ id: string } & Partial<Player>>) => void;
   
   // Logging
   pushLog: (event: Omit<LogEvent, 'id' | 'ts'>) => void;
-  clearLogs: () => void;
-  
-  // Undo functionality
-  undoLastAssignment: (opts?: { isAdmin?: boolean }) => void;
+  clearLogs: (options?: AdminOptions) => void;
   
   // Selectors
   selectors: {
@@ -177,3 +193,9 @@ export interface DraftActions {
 }
 
 export type DraftStore = DraftState & DraftActions;
+
+export type DebugStore = {
+  getState: () => DraftStore;
+  setState: (state: Partial<DraftStore> | ((state: DraftStore) => DraftStore)) => void;
+  subscribe: (listener: (state: DraftStore, prevState: DraftStore) => void) => () => void;
+};

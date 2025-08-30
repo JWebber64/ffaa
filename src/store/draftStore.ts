@@ -11,28 +11,22 @@ import type {
   Team,
   Position,
   BasePosition,
-  Nomination,
-  CurrentAuction,
   AuctionSettings,
   BidState,
   DraftRuntime,
   LogEvent,
-  DraftState,
-  DraftActions,
   DraftStore as DraftStoreType,
   AssignmentHistory,
   NominationOrderMode,
-  LogEventType,
 } from '../types/draft';
 
 // Re-export for compatibility (prevents unused-type lint noise elsewhere)
 export type {
+  DraftState,
   Position,
   BasePosition,
   Player,
   Team,
-  Nomination,
-  CurrentAuction,
   AuctionSettings,
   BidState,
   DraftRuntime,
@@ -44,43 +38,50 @@ export type {
 
 /* ---------------------------------------------------------------------------------------------- */
 
+// Type for the store that will be exposed on window for debugging
+type DebugStore = {
+  getState: () => DraftStoreType;
+  setState: (state: Partial<DraftStoreType> | ((state: DraftStoreType) => DraftStoreType)) => void;
+  subscribe: (listener: (state: DraftStoreType, prevState: DraftStoreType) => void) => () => void;
+};
+
 declare global {
   interface Window {
     localStorage: Storage;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    store?: any;
+    store?: DebugStore;
   }
 }
 
 type DraftStore = DraftStoreType;
 
 /* Defaults */
-const DEFAULT_AUCTION_SETTINGS: AuctionSettings = {
+const DEFAULT_AUCTION_SETTINGS: Omit<AuctionSettings, 'reverseAtRound'> & { reverseAtRound?: number | undefined } = {
   countdownSeconds: 30,
   antiSnipeSeconds: 10,
   nominationOrderMode: 'regular',
   reverseAtRound: undefined,
 };
 
-const DEFAULT_BID_STATE: BidState = {
+const DEFAULT_BID_STATE: Omit<BidState, 'playerId' | 'endsAt'> & {
+  playerId?: string;
+  endsAt?: number;
+} = {
   isLive: false,
   highBid: 0,
   highBidder: null,
   startingBid: 1,
-  playerId: undefined,
-  endsAt: undefined,
   round: 1,
 };
 
 const DEFAULT_ROSTER: Record<Position, number> = {
-  QB: 2,
-  RB: 6,
-  WR: 6,
-  TE: 3,
-  K: 2,
-  DEF: 2,
+  QB: 1,
+  RB: 2,
+  WR: 3,
+  TE: 1,
+  K: 0,
+  DEF: 0,
   FLEX: 1,
-  BENCH: 6,
+  BENCH: 4,
 };
 
 const initialRuntime: DraftRuntime = {
@@ -194,16 +195,17 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
     /* -------------------------------- Actions -------------------------------- */
 
     setAuctionSettings: (settings: Partial<AuctionSettings>, options: { isAdmin?: boolean } = {}) => {
-      const { isAdmin = false } = options as { isAdmin?: boolean };
-      if (!isAdmin) {
-        // eslint-disable-next-line no-console
-        console.warn('Unauthorized: Admin access required to update auction settings');
-        return;
+      if (!options.isAdmin) {
+        throw new Error('Admin privileges required to update auction settings');
       }
-      set((state) => ({
-        ...state,
-        auctionSettings: { ...state.auctionSettings, ...settings },
-      }));
+      
+      iSet((draft) => {
+        draft.auctionSettings = { ...draft.auctionSettings, ...settings };
+        draft.pushLog({
+          type: 'AUCTION_SETTINGS_UPDATED',
+          message: `Auction settings updated`,
+        });
+      });
     },
 
     setPlayers: (players: Player[]) => {
@@ -239,93 +241,117 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
       set((state) => ({
         ...state,
         currentBidder: teamId,
-      }));
+      } as DraftStore));
     },
 
     applyAdp: (updates: { id: string; adp: number; adpSource: string }[]) => {
       set((state) => {
-        const newPlayers = [...state.players];
-        updates.forEach((u: { id: string; adp: number; adpSource: string }) => {
-          const i = newPlayers.findIndex((p) => p.id === u.id);
-          if (i !== -1) {
-            newPlayers[i] = {
-              ...newPlayers[i],
-              adp: u.adp,
-              adpSource: u.adpSource,
-            };
-          }
+        const newPlayers = state.players.map(player => {
+          const update = updates.find(u => u.id === player.id);
+          if (!update) return player;
+          
+          return {
+            ...player,
+            adp: update.adp,
+            adpSource: update.adpSource,
+          };
         });
         return { ...state, players: newPlayers };
       });
     },
 
-    loadAdp: async (opts: {
-      year?: number;
-      teams?: number;
-      scoring?: 'standard' | 'ppr' | 'half-ppr';
-      useCache?: boolean;
-      signal?: AbortSignal;
-      isAdmin?: boolean;
-    } = {}) => {
-      const { isAdmin = false } = opts;
+    loadAdp: async (opts: { 
+    year?: number;
+    teams?: number;
+    scoring?: 'standard' | 'ppr' | 'half-ppr';
+    useCache?: boolean;
+    signal?: AbortSignal;
+    isAdmin?: boolean;
+  } = {}) => {
+      const { year = 2023, teams = 12, scoring = 'ppr', useCache = true, signal, isAdmin } = opts;
+      
       if (!isAdmin) {
-        // eslint-disable-next-line no-console
-        console.warn('Unauthorized: Admin access required to load ADP data');
-        return false;
+        throw new Error('Admin privileges required to load ADP data');
       }
+      
       try {
-        const updates = await fetchAdp(opts);
-        if (updates) {
-          get().applyAdp(updates);
-          set({ adpLoaded: true });
-          return true;
+        const fetchOptions = { year, teams, scoring, useCache };
+        // Only include signal if it's defined
+        if (signal) {
+          Object.assign(fetchOptions, { signal });
         }
-        return false;
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to load ADP:', e);
+        const updates = await fetchAdp(fetchOptions);
+        
+        iSet((draft) => {
+          draft.applyAdp(updates);
+          draft.adpLoaded = true;
+          draft.pushLog({
+            type: 'ADP_LOADED',
+            message: `ADP data loaded for ${year} (${teams} teams, ${scoring} scoring)`,
+          });
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Failed to load ADP data:', error);
+        iSet(draft => {
+          draft.pushLog({
+            type: 'ADP_LOAD_ERROR',
+            message: `Failed to load ADP data: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          });
+        });
         return false;
       }
     },
 
-    setConfig: (config: { teamCount: number; baseBudget: number; templateRoster: Record<Position, number> }, options: { isAdmin?: boolean } = {}) => {
-      const { isAdmin = false } = options as { isAdmin?: boolean };
-      if (!isAdmin) {
-        // eslint-disable-next-line no-console
-        console.warn('Unauthorized: Admin access required to update config');
-        return;
+    setConfig: (config: {
+    teamCount: number;
+    baseBudget: number;
+    templateRoster: Record<Position, number>;
+  }, options: { isAdmin?: boolean } = {}) => {
+      if (!options.isAdmin) {
+        throw new Error('Admin privileges required to update draft configuration');
       }
+      
       iSet((draft) => {
         draft.teamCount = config.teamCount;
         draft.baseBudget = config.baseBudget;
-        draft.templateRoster = { ...config.templateRoster };
-        draft.teams = draft.teams.map((t) => ({
-          ...t,
+        draft.templateRoster = config.templateRoster;
+        
+        // Reset teams with new config
+        draft.teams = Array.from({ length: config.teamCount }, (_, i) => ({
+          id: i + 1,
+          name: `Team ${i + 1}`,
+          players: [],
+          budget: config.baseBudget,
           roster: { ...draft.templateRoster },
         }));
+        
+        draft.pushLog({
+          type: 'DRAFT_CONFIG_UPDATED',
+          message: `Draft config updated: ${config.teamCount} teams, $${config.baseBudget} budget`,
+        });
       });
     },
 
-    setTeamNames: (names: string[], options: { isAdmin?: boolean } = {}) => {
-      const { isAdmin = false } = options as { isAdmin?: boolean };
-      if (!isAdmin) {
-        // eslint-disable-next-line no-console
-        console.warn('Unauthorized: Admin access required to update team names');
-        return;
-      }
-      if (!names.length) return;
-      const baseBudget = get().baseBudget;
-      const template = get().templateRoster;
-
-      const newTeams: Team[] = Array.from({ length: names.length }, (_, i: number) => ({
-        id: i + 1,
-        name: names[i] || `Team ${i + 1}`,
-        players: [],
-        budget: baseBudget,
-        roster: { ...template },
-      }));
-
-      set({ teams: newTeams });
+    setTeamNames: (names: string[]) => {
+      iSet((draft) => {
+        if (names.length !== draft.teamCount) {
+          console.warn(`Expected ${draft.teamCount} team names, got ${names.length}. Using default names.`);
+          return;
+        }
+        
+        draft.teams.forEach((team, i) => {
+          if (names[i]) {
+            team.name = names[i];
+          }
+        });
+        
+        draft.pushLog({
+          type: 'TEAM_NAMES_UPDATED',
+          message: 'Team names updated',
+        });
+      });
     },
 
     nominate: (playerId: string, startingBid: number) => {
@@ -422,27 +448,48 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
 
           if (validSlots.length === 1) {
             const slot = validSlots[0];
-            player.draftedBy = team.id;
-            player.price = highBid;
-            player.slot = slot;
-            team.roster[slot] = Math.max(0, (team.roster[slot] ?? 0) - 1);
+            const updatedPlayer = {
+              ...player,
+              draftedBy: team.id,
+              price: highBid,
+              slot: slot as Position,
+            };
+            
+            const updatedTeam = {
+              ...team,
+              roster: {
+                ...team.roster,
+                ...(slot === 'QB' ? { QB: Math.max(0, (team.roster.QB ?? 0) - 1) } : {}),
+                ...(slot === 'RB' ? { RB: Math.max(0, (team.roster.RB ?? 0) - 1) } : {}),
+                ...(slot === 'WR' ? { WR: Math.max(0, (team.roster.WR ?? 0) - 1) } : {}),
+                ...(slot === 'TE' ? { TE: Math.max(0, (team.roster.TE ?? 0) - 1) } : {}),
+                ...(slot === 'K' ? { K: Math.max(0, (team.roster.K ?? 0) - 1) } : {}),
+                ...(slot === 'DEF' ? { DEF: Math.max(0, (team.roster.DEF ?? 0) - 1) } : {}),
+                ...(slot === 'FLEX' ? { FLEX: Math.max(0, (team.roster.FLEX ?? 0) - 1) } : {}),
+                ...(slot === 'BENCH' ? { BENCH: Math.max(0, (team.roster.BENCH ?? 0) - 1) } : {}),
+              },
+            };
 
             state.logs.unshift({
               id: nanoid(),
               ts: now,
               type: 'ASSIGNED',
               message: `Assigned ${player.name} to ${team.name} for $${highBid} (${slot})`,
-            } as LogEvent);
+            });
 
             state.assignmentHistory.unshift({
               id: nanoid(),
               ts: now,
               playerId: player.id,
               teamId: team.id,
-              slot,
+              slot: slot as Position,
               priceRefund: highBid,
               source: 'auction',
-            });
+            } as AssignmentHistory);
+            
+            // Update the player and team in the state
+            state.players = state.players.map(p => p.id === player.id ? updatedPlayer : p);
+            state.teams = state.teams.map(t => t.id === team.id ? updatedTeam : t);
           } else if (validSlots.length > 1) {
             state.pendingAssignment = {
               teamId: team.id,
@@ -542,13 +589,13 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
       return Math.max(0, Math.floor(baselineMax));
     },
 
-    undoLastAssignment: (opts: { isAdmin?: boolean } = {}) => {
+    undoLastAssignment: (options: { isAdmin?: boolean } = {}) => {
       const state = get();
-      const { isAdmin = false } = opts;
+      const { isAdmin = false } = options;
 
       if (!isAdmin) {
         state.pushLog({
-          type: 'ERROR' as LogEventType,
+          type: 'ERROR',
           message: 'Undo rejected: admin only.',
         });
         return;
@@ -557,7 +604,7 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
       const last = state.assignmentHistory[0];
       if (!last) {
         state.pushLog({
-          type: 'ERROR' as LogEventType,
+          type: 'ERROR',
           message: 'No assignments to undo.',
         });
         return;
@@ -569,7 +616,7 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
 
       if (!player || !team) {
         state.pushLog({
-          type: 'ERROR' as LogEventType,
+          type: 'ERROR',
           message: 'Could not find player or team for undo.',
         });
         return;
@@ -589,50 +636,82 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
       set((s) => ({ assignmentHistory: s.assignmentHistory.slice(1) }));
 
       state.pushLog({
-        type: 'ASSIGNED' as LogEventType,
+        type: 'ASSIGNED',
         message: `Undo: Removed ${player.name} from ${team.name}${slot ? ` (${slot})` : ''}`,
       });
     },
 
-    assignPlayer: (playerId: string, teamId: number, price: number, slot?: Position | null, options = {}) => {
-      const { isAdmin = false } = options as { isAdmin?: boolean };
-      if (!isAdmin) {
-        // eslint-disable-next-line no-console
-        console.warn('Unauthorized: Admin access required to assign players');
-        return;
-      }
+    assignPlayer: (playerId: string, teamId: number, price: number, slot?: Position | null, options: { isAdmin?: boolean } = {}) => {
       iSet((draft) => {
-        const player = draft.players.find((p: Player) => p.id === playerId);
-        const team = draft.teams.find((t: Team) => t.id === teamId);
-        if (!player || !team) return;
+        const player = draft.players.find(p => p.id === playerId);
+        const team = draft.teams.find(t => t.id === teamId);
 
-        player.draftedBy = teamId;
-        player.price = price;
-        if (slot) player.slot = slot;
-
-        team.budget -= price;
-        if (slot && slot in team.roster) {
-          team.roster[slot] = Math.max(0, (team.roster[slot] ?? 0) - 1);
+        if (!player || !team) {
+          console.warn('Player or team not found');
+          return;
         }
 
-        draft.logs.unshift({
+        // If this is an admin override, skip validation
+        if (!options.isAdmin) {
+          // Check if team has enough budget
+          if (team.budget < price) {
+            draft.pushLog({
+              type: 'ASSIGN_REJECTED',
+              message: `Cannot assign ${player.name} to ${team.name}: Not enough budget`,
+            });
+            return;
+          }
+
+          // Check if position is valid
+          if (slot && !getValidSlots(team, player).includes(slot)) {
+            draft.pushLog({
+              type: 'ASSIGN_REJECTED',
+              message: `Cannot assign ${player.name} to ${slot}: Invalid position`,
+            });
+            return;
+          }
+        } else if (price > team.budget) {
+          // For admin overrides, just log a warning but allow it
+          draft.pushLog({
+            type: 'ADMIN_OVERRIDE',
+            message: `Admin override: Assigning ${player.name} to ${team.name} with insufficient budget`,
+          });
+        }
+
+        // Deduct price from team budget (if they have enough, or it's an admin override)
+        const actualPrice = Math.min(price, team.budget);
+        team.budget -= actualPrice;
+        
+        // Add player to team
+        team.players.push(playerId);
+        player.draftedBy = teamId;
+        player.price = actualPrice;
+        
+        // Assign to specific slot if provided
+        if (slot) {
+          player.slot = slot;
+          if (slot in team.roster) {
+            team.roster[slot]--;
+          }
+        }
+        
+        // Add to assignment history
+        const assignment: AssignmentHistory = {
           id: nanoid(),
           ts: Date.now(),
-          type: 'ASSIGNED',
-          message: `Assigned ${player.name} to ${team.name} for $${price}${slot ? ` (${slot})` : ''}`,
+          playerId,
+          teamId,
+          slot: slot || null,
+          priceRefund: actualPrice,
+          source: options.isAdmin ? 'admin' : 'instant',
+        };
+        
+        draft.assignmentHistory.push(assignment);
+        
+        draft.pushLog({
+          type: options.isAdmin ? 'ADMIN_ASSIGN' : 'INSTANT_ASSIGN',
+          message: `${player.name} assigned to ${team.name} for $${actualPrice}${slot ? ` (${slot})` : ''}${options.isAdmin ? ' (admin override)' : ''}`,
         });
-
-        draft.assignmentHistory.unshift({
-          id: nanoid(),
-          ts: Date.now(),
-          playerId: player.id,
-          teamId: team.id,
-          slot: slot ?? null,
-          priceRefund: price,
-          source: 'instant',
-        });
-
-        if (draft.assignmentHistory.length > 50) draft.assignmentHistory.pop();
       });
     },
 
@@ -650,63 +729,106 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
       );
     },
 
-    clearLogs: (opts?: { isAdmin?: boolean }) => {
-      const isAdmin = opts?.isAdmin ?? false;
-      if (!isAdmin) {
-        // eslint-disable-next-line no-console
-        console.warn('Unauthorized: Admin access required to clear logs');
-        return;
+    clearLogs: (options: { isAdmin?: boolean } = {}) => {
+      if (!options.isAdmin) {
+        throw new Error('Admin privileges required to clear logs');
       }
-      set({ logs: [] });
+      
+      iSet((draft) => {
+        draft.logs = [];
+        draft.pushLog({
+          type: 'LOGS_CLEARED',
+          message: 'Logs cleared by admin',
+        });
+      });
     },
 
     resetDraft: (options: { isAdmin?: boolean } = {}) => {
-      const { isAdmin = false } = options;
-      if (!isAdmin) {
-        // eslint-disable-next-line no-console
-        console.warn('Unauthorized: Admin access required to reset draft');
-        return;
+      if (!options.isAdmin) {
+        throw new Error('Admin privileges required to reset the draft');
       }
+      
       iSet((draft) => {
-        draft.players.forEach((p) => {
-          p.draftedBy = undefined;
-          p.price = undefined;
-          p.slot = undefined;
-        });
-
-        draft.teams = [];
-
-        draft.bidState = { ...DEFAULT_BID_STATE };
-        draft.runtime = { ...initialRuntime };
+        // Reset all draft state
+        draft.bidState = {
+          isLive: false,
+          highBid: 0,
+          highBidder: null,
+          startingBid: 0,
+          round: 1,
+        };
+        
+        draft.runtime = {
+          currentNominatorTeamId: null,
+          nominationOrder: [],
+          baseOrder: [],
+          round: 1,
+        };
+        
         draft.nominationQueue = [];
         draft.currentAuction = null;
         draft.currentNominatedId = null;
         draft.currentBidder = undefined;
         draft.pendingAssignment = null;
-        draft.assignmentHistory = [];
-        draft.logs = [];
+        
+        // Reset teams
+        draft.teams.forEach(team => {
+          team.players = [];
+          team.budget = draft.baseBudget;
+          team.roster = { ...draft.templateRoster };
+        });
+        
+        // Reset player assignments
+        draft.players.forEach(player => {
+          delete player.draftedBy;
+          delete player.price;
+          delete player.slot;
+        });
+        
+        draft.pushLog({
+          type: 'DRAFT_RESET',
+          message: 'Draft has been reset',
+        });
       });
+    },
+
+    /* -------------------------------- Utils ------------------------------- */
+    maxBidForTeam: (teamId: number) => {
+      const state = get();
+      const team = state.teams.find(t => t.id === teamId);
+      if (!team) return 0;
+      
+      // Get all players that have been assigned to this team
+      const teamPlayers = state.players.filter(p => p.draftedBy === teamId);
+      
+      // Calculate total spent by summing up all player prices
+      const spent = teamPlayers.reduce((sum, player) => {
+        return sum + (player.price || 0);
+      }, 0);
+      
+      const remainingBudget = team.budget - spent;
+      return Math.max(0, remainingBudget);
     },
 
     /* -------------------------------- Selectors bag ------------------------------- */
     selectors: {
       undraftedPlayers: (state: { players: Player[] }) => state.players.filter((p: Player) => p.draftedBy === undefined),
-topAvailable: (state: { players: Player[] }, limit = 300) =>
+      topAvailable: (state: { players: Player[] }, limit = 300) =>
         state.players
           .filter((p: Player) => p.draftedBy === undefined)
           .sort((a: Player, b: Player) => (a.rank ?? 0) - (b.rank ?? 0))
           .slice(0, limit),
-topAvailableByPos: (state: { players: Player[] }, pos: Position, limit = 100) =>
+      topAvailableByPos: (state: { players: Player[] }, pos: Position, limit = 100) =>
         state.players
           .filter((p: Player) => p.draftedBy === undefined && (p.pos as Position) === pos)
           .sort((a: Player, b: Player) => (a.rank ?? 0) - (b.rank ?? 0))
           .slice(0, limit),
-topAvailableByMultiPos: (state: { players: Player[] }, positions: Position[], limit = 100) =>
+      topAvailableByMultiPos: (state: { players: Player[] }, positions: Position[], limit = 100) =>
         state.players
           .filter((p: Player) => p.draftedBy === undefined && positions.includes(p.pos as Position))
           .sort((a: Player, b: Player) => (a.rank ?? 0) - (b.rank ?? 0))
           .slice(0, limit),
-topAvailableForFlex: (state: { players: Player[] }, limit = 100, includeTE = true) => {
+      topAvailableForFlex: (state: { players: Player[] }, limit = 100, includeTE = true) => {
         const flexPositions: Position[] = ['RB', 'WR'];
         if (includeTE) flexPositions.push('TE');
         return state.players
@@ -757,8 +879,8 @@ export const useDraftStore = create<DraftStore>()(
 
 /* Dev: expose store in console */
 if (typeof window !== 'undefined' && import.meta.env?.DEV) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).store = useDraftStore;
+  // Safely expose store to window for debugging in development
+  window.store = useDraftStore as unknown as DebugStore;
 }
 
 /* Selector hook */

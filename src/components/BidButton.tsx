@@ -11,7 +11,13 @@ type BidButtonProps = {
 export default function BidButton({ teamId }: BidButtonProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const store = useDraftStore();
-  const disabledReason = bidDisabledReason(store, teamId);
+  const { computeMaxBid, hasSlotFor, ...state } = store;
+  const disabledReason = bidDisabledReason({
+    state,
+    computeMaxBid,
+    hasSlotFor,
+    teamId,
+  });
   const disabled = !!disabledReason;
 
   return (

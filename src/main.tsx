@@ -31,7 +31,7 @@ const theme = extendTheme({
         },
       },
       variants: {
-        solid: (props: any) => {
+        solid: (props: { colorScheme?: string; colorMode?: 'light' | 'dark' }) => {
           const { colorScheme: cs = 'blue' } = props;
           return {
             bg: `${cs}.500`,
@@ -46,7 +46,7 @@ const theme = extendTheme({
             },
           };
         },
-        outline: (props: any) => {
+        outline: (props: { colorScheme?: string; colorMode?: 'light' | 'dark' }) => {
           const { colorScheme: cs = 'blue' } = props;
           return {
             border: '1px solid',
@@ -62,7 +62,7 @@ const theme = extendTheme({
             },
           };
         },
-        ghost: (props: any) => ({
+        ghost: (props: { colorScheme?: string; colorMode?: 'light' | 'dark' }) => ({
           color: props.colorMode === 'dark' ? 'white' : 'gray.800',
           '&[disabled], &[disabled]:hover, &[disabled][data-active]': {
             opacity: 1,

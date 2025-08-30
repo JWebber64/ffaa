@@ -8,7 +8,8 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { useDraftStore, type Player, type Team } from "../store/draftStore";
+import { useDraftStore } from "../store/draftStore";
+import type { Player, Team } from "../types/draft";
 import { downloadCSV } from "../utils/csv";
 
 type Row = {
@@ -43,18 +44,18 @@ export default function Results({ teams }: ResultsProps) {
   // ----- rows -----
   const rows: Row[] = useMemo(() => {
     const drafted = players.filter((p) => p.draftedBy !== undefined) as Player[];
-    const list = drafted.map((p) => {
+    const list = drafted.map((p: Player & { slot?: string }) => {
       const teamIdx = p.draftedBy as number;
       const t = teams.find((tm) => tm.id === teamIdx);
       return {
         name: p.name || "",
         pos: p.pos || "",
-        slot: (p as any).slot || "", // Handle potential slot property
+        slot: p.slot || "",
         nflTeam: p.nflTeam || "",
         teamName: t?.name || `Team ${teamIdx + 1}`,
         teamNumber: teamIdx + 1,
         price: p.price || 0,
-      } as Row;
+      };
     });
 
     const cmp = (a: Row, b: Row) => {

@@ -7,22 +7,18 @@ import {
   Text,
   Badge,
   Input,
-  SimpleGrid,
-  Divider,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
   useColorModeValue,
   Tooltip,
-  IconButton,
+  InputGroup,
+  InputLeftElement
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
-import { useDraftStore, type Player, useDraftSelectors } from '../store/draftStore';
+import type { Position as PositionType } from '../types/draft';
+import { useDraftStore, useDraftSelectors } from '../store/draftStore';
+import type { Player } from '../types/draft';
 import { formatPositionForDisplay } from '../utils/positionUtils';
 
-type Pos = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
+type Pos = Exclude<PositionType, 'FLEX' | 'BENCH'>;
 type TabValue = 'ALL' | Pos | 'FLEX';
 
 const POS_ORDER: readonly Pos[] = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'] as const;
@@ -44,13 +40,13 @@ export interface PlayerPoolProps {
 }
 
 interface PlayerRowProps {
-  p: Player;
-  onNominate?: (id: string, name?: string) => void;
+  player: Player;
+  onNominate: ((playerId: string, playerName?: string) => void) | undefined;
   nominate: (playerId: string, startingBid?: number) => void;
   showDebugInfo?: boolean;
 }
 
-const PlayerRow: React.FC<PlayerRowProps> = ({ p, onNominate, nominate, showDebugInfo = false }) => {
+const PlayerRow: React.FC<PlayerRowProps> = ({ player, onNominate, nominate, showDebugInfo = false }) => {
   return (
     <HStack
       spacing={3}
@@ -65,17 +61,17 @@ const PlayerRow: React.FC<PlayerRowProps> = ({ p, onNominate, nominate, showDebu
       justify="space-between"
     >
       <HStack spacing={3} flex={1}>
-        <Text fontWeight="semibold" isTruncated>{p.name}</Text>
-        {p.pos ? <Badge colorScheme="blue" minW="2.5em" textAlign="center">{p.pos}</Badge> : null}
-        {p.nflTeam ? <Badge colorScheme="gray" minW="2.5em" textAlign="center">{p.nflTeam}</Badge> : null}
+        <Text fontWeight="semibold" isTruncated>{player.name}</Text>
+        {player.pos && <Badge colorScheme="blue" minW="2.5em" textAlign="center">{player.pos}</Badge>}
+        {player.nflTeam && <Badge colorScheme="gray" minW="2.5em" textAlign="center">{player.nflTeam}</Badge>}
         {showDebugInfo && (
           <HStack spacing={2} ml="auto" pr={2}>
-            {p.rank && <Badge colorScheme="purple" title="Overall Rank">{p.rank}</Badge>}
-            {p.posRank && <Badge colorScheme="teal" title="Position Rank">{p.pos}{p.posRank}</Badge>}
-            {p.adp && <Badge colorScheme="orange" title="ADP">{p.adp.toFixed(1)}</Badge>}
+            {player.rank && <Badge colorScheme="purple" title="Overall Rank">{player.rank}</Badge>}
+            {player.posRank && <Badge colorScheme="teal" title="Position Rank">{player.pos}{player.posRank}</Badge>}
+            {player.adp && <Badge colorScheme="orange" title="ADP">{player.adp.toFixed(1)}</Badge>}
           </HStack>
         )}
-        {p.draftedBy ? <Badge colorScheme="red" minW="4.5em">Drafted</Badge> : null}
+        {player.draftedBy && <Badge colorScheme="red" minW="4.5em">Drafted</Badge>}
       </HStack>
       <Button
         size="sm"
@@ -91,10 +87,10 @@ const PlayerRow: React.FC<PlayerRowProps> = ({ p, onNominate, nominate, showDebu
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          nominate(p.id);
-          onNominate?.(p.id, p.name);
+          nominate(player.id);
+          onNominate?.(player.id, player.name);
         }}
-        isDisabled={Boolean(p.draftedBy)}
+        isDisabled={Boolean(player.draftedBy)}
       >
         Nominate
       </Button>
@@ -108,14 +104,9 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
   showDebugInfo = false
 }) => {
   // Get selectors and actions
-  const { 
-    undraftedPlayers, 
-    topAvailable, 
-    topAvailableByPos,
-    topAvailableForFlex 
-  } = useDraftSelectors();
-  
+  const selectors = useDraftSelectors();
   const nominate = useDraftStore((s) => s.nominate);
+  
   const [activeTab, setActiveTab] = useState<TabValue>('ALL');
   const [search, setSearch] = useState('');
   const [onlyUndrafted, setOnlyUndrafted] = useState(true);
@@ -123,75 +114,68 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
 
   // Get players based on active tab and filters
   const getFilteredPlayers = useMemo(() => {
-    console.log('Filtering players for tab:', activeTab);
     let players: Player[] = [];
+    const searchTerm = search.trim().toLowerCase();
     
     // Get base player list based on tab
     if (activeTab === 'ALL') {
-      players = topAvailable(300);
+      players = selectors.topAvailable(500);
     } else if (activeTab === 'FLEX') {
-      players = topAvailableForFlex(200, true);
+      players = selectors.topAvailableForFlex(300, true);
     } else if (activeTab && POS_ORDER.includes(activeTab as Pos)) {
-      // Force a new array reference by spreading the result
-      players = [...topAvailableByPos(activeTab as Pos, 100)];
+      players = [...selectors.topAvailableByPos(activeTab as PositionType, 300)];
     } else {
-      // Default case if activeTab doesn't match any condition
-      players = topAvailable(300);
+      players = selectors.topAvailable(500);
     }
-    
-    console.log(`Found ${players.length} players for tab ${activeTab}`);
 
-    // Apply search filter
-    const searchTerm = search.trim().toLowerCase();
+    // Filter players based on search term
     if (searchTerm) {
       players = players.filter(
         (p) =>
-          p.name.toLowerCase().includes(searchTerm) ||
-          (p.nflTeam || '').toLowerCase().includes(searchTerm) ||
-          (p.pos || '').toLowerCase().includes(searchTerm) ||
-          (p.pos && p.nflTeam && `${p.pos}${p.nflTeam}`.toLowerCase().includes(searchTerm))
+          p.name?.toLowerCase().includes(searchTerm) ||
+          p.pos?.toLowerCase().includes(searchTerm) ||
+          p.nflTeam?.toLowerCase().includes(searchTerm)
       );
     }
 
+    // Filter undrafted players if needed
+    if (onlyUndrafted) {
+      players = players.filter(p => !p.draftedBy);
+    }
+
     return players;
-  }, [activeTab, search, topAvailable, topAvailableByPos, topAvailableForFlex]);
+  }, [activeTab, search, selectors, onlyUndrafted]);
+
+  // Memoize the filtered players to prevent unnecessary re-renders
+  const filteredPlayers = useMemo(() => getFilteredPlayers, [getFilteredPlayers]);
 
   // Group players by position for the position tabs view
   const groupedPlayers = useMemo(() => {
     const groups = new Map<Pos, Player[]>();
     POS_ORDER.forEach(pos => groups.set(pos, []));
     
-    for (const player of getFilteredPlayers) {
+    for (const player of filteredPlayers) {
       if (player.pos && POS_ORDER.includes(player.pos as Pos)) {
         const pos = player.pos as Pos;
         const group = groups.get(pos) || [];
-        groups.set(pos, [...group, player]);
+        group.push(player);
       }
     }
     
     return groups;
-  }, [getFilteredPlayers]);
+  }, [filteredPlayers]);
   
   // Handle position tab click
-  const handlePositionTabClick = (pos: Pos) => {
-    console.log('Position tab clicked:', pos);
+  const handlePositionTabClick = (pos: TabValue) => {
     setActiveTab(pos);
-    // Force a re-render to ensure the player list updates
     setForceUpdate(prev => prev + 1);
   };
   
-  // Log active tab changes
-  useEffect(() => {
-    console.log('Active tab updated:', activeTab);
-  }, [activeTab]);
-  
   // Ensure activeTab is always a valid tab and force update when it changes
   useEffect(() => {
-    if (!ALL_TABS.includes(activeTab as any)) {
+    if (!(ALL_TABS as readonly string[]).includes(activeTab)) {
       setActiveTab('ALL');
     }
-    // Force a re-render when the tab changes
-    setForceUpdate(prev => prev + 1);
   }, [activeTab]);
 
   const tabBg = useColorModeValue('gray.100', 'gray.700');
@@ -205,23 +189,28 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
   return (
     <VStack key={tabKey} align="stretch" spacing={4} color="white">
       {/* Search Bar */}
-      <HStack spacing={2}>
-        <Input
-          placeholder="Search players..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          size="md"
-          bg="gray.800"
-          borderColor="gray.600"
-          color="white"
-          _placeholder={{ color: 'gray.400' }}
-          _hover={{ borderColor: 'blue.500' }}
-          _focus={{
-            borderColor: 'blue.400',
-            boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)'
-          }}
-          flex={1}
-        />
+      <HStack spacing={2} w="100%">
+        <InputGroup maxW="400px">
+          <InputLeftElement pointerEvents="none">
+            <SearchIcon color="gray.500" />
+          </InputLeftElement>
+          <Input
+            placeholder="Search players..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            size="md"
+            bg="gray.800"
+            borderColor="gray.600"
+            color="white"
+            _placeholder={{ color: 'gray.400' }}
+            _hover={{ borderColor: 'blue.500' }}
+            _focus={{
+              borderColor: 'blue.400',
+              boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)'
+            }}
+            pl={10}
+          />
+        </InputGroup>
         <Tooltip label={onlyUndrafted ? 'Show all players' : 'Show undrafted only'}>
           <Button
             size="md"
@@ -285,10 +274,10 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
         {search || (activeTab !== 'ALL' && activeTab !== 'FLEX') ? (
           // Show flat list when searching or when a specific position is selected
           <VStack align="stretch" spacing={2}>
-            {getFilteredPlayers.map((p) => (
+            {getFilteredPlayers.map((player) => (
               <PlayerRow
-                key={p.id}
-                p={p}
+                key={player.id}
+                player={player}
                 onNominate={onNominate}
                 nominate={nominate}
                 showDebugInfo={showDebugInfo}
@@ -323,10 +312,10 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
                     </Button>
                   </HStack>
                   <VStack align="stretch" spacing={2}>
-                    {posPlayers.slice(0, 5).map((p) => (
+                    {posPlayers.slice(0, 5).map((player) => (
                       <PlayerRow
-                        key={p.id}
-                        p={p}
+                        key={player.id}
+                        player={player}
                         onNominate={onNominate}
                         nominate={nominate}
                         showDebugInfo={showDebugInfo}
