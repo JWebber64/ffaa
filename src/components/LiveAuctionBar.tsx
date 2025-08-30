@@ -21,18 +21,18 @@ export default function LiveAuctionBar() {
   const leader = teams.find((t) => t.id === (bidState.highBidder ?? -1));
 
   return (
-    <Box border="1px solid" borderColor="blue.100" p={3} borderRadius="md" bg="blue.50">
+    <Box border="1px solid" borderColor="blue.700" p={3} borderRadius="md" bg="gray.800">
       <Flex direction={{ base: 'column', md: 'row' }} gap={3} align="center" justify="space-between">
         <HStack spacing={3} align="center">
           <Badge colorScheme="blue" fontSize="0.8em">LIVE</Badge>
-          <Text>
-            <Text as="span" fontWeight="semibold">{player?.name ?? `Player ${bidState.playerId}`}</Text>
-            <Text as="span" color="gray.600"> — Current High Bid: </Text>
-            <Text as="span" fontWeight="semibold">${bidState.highBid}</Text>
+          <Text color="white">
+            <Text as="span" fontWeight="semibold" color="white">{player?.name ?? `Player ${bidState.playerId}`}</Text>
+            <Text as="span" color="gray.300"> — Current High Bid: </Text>
+            <Text as="span" fontWeight="semibold" color="white">${bidState.highBid}</Text>
             {leader && (
               <>
-                <Text as="span" color="gray.600"> by </Text>
-                <Text as="span" fontWeight="semibold">{leader.name}</Text>
+                <Text as="span" color="gray.400"> by </Text>
+                <Text as="span" fontWeight="semibold" color="white">{leader.name}</Text>
               </>
             )}
           </Text>
