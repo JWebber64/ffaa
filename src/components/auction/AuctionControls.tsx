@@ -11,9 +11,11 @@ import {
 } from '@chakra-ui/react';
 import { useConfig } from '../../contexts/ConfigContext';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
-import { Player, CurrentAuction } from '../../store/draftStore';
+import { Player } from '../../store/draftStore';
+import type { CurrentAuction } from '../../types/draft';
 import { useState } from 'react';
 import { formatPositionForDisplay } from '../../utils/positionUtils';
+import type { Position } from '../../types/draft';
 
 interface AuctionControlsProps {
   currentPlayer: Player | null;
@@ -71,7 +73,7 @@ export const AuctionControls = ({
     if (!canBid) {
       toast({
         title: 'No available roster spot',
-        description: `Team ${teamId + 1} doesn't have an available ${formatPositionForDisplay(currentPlayer.pos as any)} or FLEX spot.`,
+        description: `Team ${teamId + 1} doesn't have an available ${formatPositionForDisplay(currentPlayer.pos as Position)} or FLEX spot.`,
         status: 'warning',
         duration: 3000,
         isClosable: true,

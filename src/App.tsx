@@ -14,6 +14,8 @@ import { RoleProvider } from './contexts/RoleContext';
 import type { DraftState } from './types/draft';
 import TopNav from './components/TopNav';
 import RequireConfiguredDraft from './routes/RequireConfiguredDraft';
+import AuctionTimer from './components/AuctionTimer';
+import { useAuctionSubscriber } from './hooks/useAuctionSubscriber';
 
 function App() {
   // Load Sleeper → store.players once for the whole app
@@ -22,42 +24,49 @@ function App() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Initialize the auction subscriber
+  useAuctionSubscriber();
+
   return (
     <ConfigProvider>
       <RoleProvider>
-      <BrowserRouter>
-        <Box minH="100vh">
-          <TopNav onMenu={() => setIsMenuOpen(!isMenuOpen)} />
-          <Box as="main" pt="64px">
-            <Routes>
-              <Route index element={<Home />} />
-              <Route path="/setup" element={<Setup />} />
-              <Route path="/player-pool" element={
-                <RequireConfiguredDraft>
-                  <PlayerPool />
-                </RequireConfiguredDraft>
-              } />
-              <Route path="/board" element={
-                <RequireConfiguredDraft>
-                  <DraftBoard />
-                </RequireConfiguredDraft>
-              } />
-              <Route path="/auctioneer" element={
-                <RequireConfiguredDraft>
-                  <Auctioneer />
-                </RequireConfiguredDraft>
-              } />
-              <Route path="/results" element={
-                <RequireConfiguredDraft>
-                  <Results teams={teams} />
-                </RequireConfiguredDraft>
-              } />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+        <BrowserRouter>
+          <Box minH="100vh">
+            <TopNav onMenu={() => setIsMenuOpen(!isMenuOpen)} />
+            {/* Fixed auction timer at the top */}
+            <Box position="fixed" top="64px" left={0} right={0} zIndex={10} px={4} bg="white" shadow="sm">
+              <AuctionTimer />
+            </Box>
+            <Box as="main" pt="104px">
+              <Routes>
+                <Route index element={<Home />} />
+                <Route path="/setup" element={<Setup />} />
+                <Route path="/player-pool" element={
+                  <RequireConfiguredDraft>
+                    <PlayerPool />
+                  </RequireConfiguredDraft>
+                } />
+                <Route path="/board" element={
+                  <RequireConfiguredDraft>
+                    <DraftBoard />
+                  </RequireConfiguredDraft>
+                } />
+                <Route path="/auctioneer" element={
+                  <RequireConfiguredDraft>
+                    <Auctioneer />
+                  </RequireConfiguredDraft>
+                } />
+                <Route path="/results" element={
+                  <RequireConfiguredDraft>
+                    <Results teams={teams} />
+                  </RequireConfiguredDraft>
+                } />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Box>
           </Box>
-        </Box>
-      </BrowserRouter>
-    </RoleProvider>
+        </BrowserRouter>
+      </RoleProvider>
     </ConfigProvider>
   );
 }

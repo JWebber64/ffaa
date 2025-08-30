@@ -1,4 +1,4 @@
-import { Position } from '../store/draftStore';
+import type { Position } from '../types/draft';
 
 /**
  * Converts internal position format to display format

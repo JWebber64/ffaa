@@ -25,11 +25,11 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-  Kbd,
   Spinner,
+  Skeleton,
   VStack,
 } from '@chakra-ui/react';
-import { FaGavel, FaSearch } from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 import { useDraftStore } from '../../store/draftStore';
 import type { Player } from '../../store/draftStore';
 import { formatPositionForDisplay } from '../../utils/positionUtils';
@@ -86,22 +86,41 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
 }) => {
   // State
   const [query, setQuery] = useState('');
-  const [isPending, setIsPending] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [bidAmount, setBidAmount] = useState(1);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [selectedPlayerState, setSelectedPlayerState] = useState<Player | null>(selectedPlayer);
 
   // Get players from store if not provided via props
   const storePlayers = useDraftStore(s => s.players);
   const players = externalPlayers || storePlayers;
 
-  // Debounce search
+  // Debounce search with loading state
   useEffect(() => {
-    setIsPending(true);
-    const timer = setTimeout(() => setIsPending(false), debounceMs);
-    return () => clearTimeout(timer);
+    if (query.trim()) {
+      setIsSearching(true);
+      const timer = setTimeout(() => {
+        setIsSearching(false);
+      }, debounceMs);
+      return () => clearTimeout(timer);
+    }
+    setIsSearching(false);
+    return undefined;
   }, [query, debounceMs]);
+
+  // Simulate loading state when data is being fetched
+  useEffect(() => {
+    if (players.length === 0) {
+      setIsLoading(true);
+      const timer = setTimeout(() => setIsLoading(false), 500);
+      return () => clearTimeout(timer);
+    }
+    setIsLoading(false);
+    return undefined;
+  }, [players]);
 
   // Filter players based on query and other criteria
   const filteredPlayers = useMemo(() => {
@@ -151,7 +170,9 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
   };
 
   // Handle player selection
-  const handleSelect = (player: Player) => {
+  const handleSelect = (player: Player | undefined) => {
+    if (!player) return;
+    
     if (showBidButton) {
       setSelectedPlayerState(player);
       onOpen();
@@ -162,11 +183,17 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
     }
   };
 
+  // Update selected player state when selectedPlayer prop changes
+  useEffect(() => {
+    setSelectedPlayerState(selectedPlayer);
+  }, [selectedPlayer]);
+
   // Handle bid placement
   const handlePlaceBid = () => {
-    if (!selectedPlayerState || !onBid) return;
-    onBid(selectedPlayerState, bidAmount);
-    onClose();
+    if (selectedPlayerState && onBid) {
+      onBid(selectedPlayerState, bidAmount);
+      onClose();
+    }
   };
 
   // Handle starting bid change
@@ -176,24 +203,26 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
     }
   };
 
-  // Set selected player state when selectedPlayer prop changes
-  const [selectedPlayerState, setSelectedPlayerState] = useState<Player | null>(selectedPlayer);
-  useEffect(() => {
-    setSelectedPlayerState(selectedPlayer);
-  }, [selectedPlayer]);
-
   return (
     <Box position="relative" width="100%">
       <InputGroup>
         <InputLeftElement pointerEvents="none">
-          {isPending ? <Spinner size="sm" /> : <FaSearch />}
+          {isSearching ? (
+            <Spinner size="sm" />
+          ) : (
+            <FaSearch color="gray.300" />
+          )}
         </InputLeftElement>
         <Input
           ref={inputRef}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
+          onChange={e => setQuery(e.target.value)}
           placeholder={placeholder}
+          onFocus={() => setFocusedIndex(-1)}
+          onKeyDown={handleKeyDown}
+          autoComplete="off"
+          aria-label="Search for players"
+          isDisabled={isLoading}
           variant="outline"
           size="md"
           width="100%"
@@ -245,7 +274,21 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
             borderColor: 'gray.700',
           }}
         >
-          {filteredPlayers.length > 0 ? (
+          {isSearching ? (
+            // Show loading skeleton while searching
+            <List spacing={0}>
+              {Array(3).fill(0).map((_, i) => (
+                <Skeleton key={`skeleton-${i}`} height="40px" m={1} borderRadius="md" />
+              ))}
+            </List>
+          ) : isLoading ? (
+            // Show loading state when data is being fetched
+            <Flex justify="center" p={4}>
+              <Spinner />
+              <Text ml={2}>Loading players...</Text>
+            </Flex>
+          ) : filteredPlayers.length > 0 ? (
+            // Show search results
             <List spacing={0}>
               {filteredPlayers.map((player, index) => (
                 <ListItem
@@ -269,16 +312,6 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                           {formatPositionForDisplay(player.pos)}
                         </Badge>
                       )}
-                      {player.nflTeam && (
-                        <Text fontSize="sm" color="gray.500" _dark={{ color: 'gray.400' }}>
-                          {player.nflTeam}
-                        </Text>
-                      )}
-                      {player.draftedBy && (
-                        <Badge colorScheme="red" fontSize="xs">
-                          Drafted
-                        </Badge>
-                      )}
                     </Flex>
                   </Flex>
                 </ListItem>
@@ -286,7 +319,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
             </List>
           ) : (
             <Box px={4} py={2} color="gray.500" _dark={{ color: 'gray.400' }}>
-              {isPending ? 'Searching...' : 'No players found'}
+              {isSearching ? 'Searching...' : 'No players found'}
             </Box>
           )}
         </Box>
@@ -318,12 +351,16 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
               </VStack>
             </ModalBody>
             <ModalFooter>
-              <ButtonGroup>
-                <Button variant="outline" onClick={onClose}>
+              <ButtonGroup spacing={2}>
+                <Button variant="ghost" onClick={onClose}>
                   Cancel
                 </Button>
-                <Button colorScheme="blue" onClick={handlePlaceBid} leftIcon={<FaGavel />}>
-                  Place Bid
+                <Button
+                  colorScheme="blue"
+                  onClick={handlePlaceBid}
+                  isDisabled={!bidAmount || bidAmount < 1}
+                >
+                  Place Bid (${bidAmount})
                 </Button>
               </ButtonGroup>
             </ModalFooter>

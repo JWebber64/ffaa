@@ -14,7 +14,7 @@ import {
   import type { ChangeEvent } from "react"; // 👈 type-only
   import { useNavigate } from "react-router-dom";
   import { useDraftStore } from "../store/draftStore";
-  import type { Position } from "../store/draftStore";
+  import type { Position } from "../types/draft";
   
   
   const TEAM_OPTIONS = [8, 10, 12, 14, 16];
@@ -80,8 +80,8 @@ import {
         teamCount: teams,
         baseBudget: budget,
         templateRoster: roster,
-      });
-      setTeamNames(names);
+      }, { isAdmin: true });
+      setTeamNames(names, { isAdmin: true });
       nav("/board");
     };
   

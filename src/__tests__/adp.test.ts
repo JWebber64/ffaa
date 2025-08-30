@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { describe, it, expect, vi, beforeEach, afterEach, beforeAll } from 'vitest';
 import { create } from 'zustand';
-import type { DraftState, Player, Position } from '../store/draftStore';
+import type { DraftState, Player, Position } from '../types/draft';
 import FfcAdp from '../services/FfcAdp';
 
 type ViType = typeof vi;
@@ -49,7 +49,7 @@ const createTestStore = (initialState: Partial<DraftState> = {}) => {
           nflTeam: p.team || 'FA',
           adp: p.adp || 999,
           adpSource: 'ffc',
-          rank: (p as any).rank || 999,
+          rank: p.rank || 999,
           posRank: 1, // Will be calculated
           bye: 0,
           isDrafted: false,
@@ -83,7 +83,7 @@ const createTestStore = (initialState: Partial<DraftState> = {}) => {
     addToNominationQueue: (playerId: string, teamId: number) => {},
     removeFromNominationQueue: (playerId: string) => {},
     updatePlayer: (playerId: string, updates: Partial<Player>) => {},
-    updateTeam: (teamId: number, updates: any) => {},
+    updateTeam: (teamId: number, updates: Partial<{ name: string; players: string[]; budget: number; roster: Record<string, number> }>) => {},
     
     // Initialize with any provided state
     ...initialState,
@@ -101,9 +101,9 @@ const createTestStore = (initialState: Partial<DraftState> = {}) => {
     
     // Mock actions
     setPlayers: (players: Player[]) => set({ players }),
-    setTeams: (teams: any[]) => set({ teams }),
+    setTeams: (teams: { id: number; name: string; players: string[]; budget: number; roster: Record<string, number> }[]) => set({ teams }),
     setCurrentNominatedId: (id: string | null) => set({ currentNominatedId: id }),
-    applyAdp: (updates: any) => {
+    applyAdp: (updates: Record<string, { adp?: number; adpSource?: string }>) => {
       set(state => ({
         players: state.players.map(p => ({
           ...p,
@@ -119,7 +119,7 @@ const createTestStore = (initialState: Partial<DraftState> = {}) => {
         scoring: 'ppr' as const
       });
       set({
-        players: data.map((p: any) => ({
+        players: data.map((p: { id: string; name: string; position: string }) => ({
           id: p.id,
           name: p.name,
           pos: p.position as Position,
@@ -134,7 +134,7 @@ const createTestStore = (initialState: Partial<DraftState> = {}) => {
       return true;
     },
     // Add other required actions with empty implementations
-    setConfig: (config: any) => {},
+    setConfig: (config: { teamCount: number; baseBudget: number; templateRoster: Record<string, number> }) => {},
     setTeamNames: (names: string[]) => {},
     nominate: (playerId: string, startingBid: number = 1) => {},
     placeBid: (playerId: string, byTeamId: number, amount: number) => {},
@@ -149,22 +149,22 @@ const createTestStore = (initialState: Partial<DraftState> = {}) => {
     ...store,
     getState: store.getState,
     selectors: {
-      undraftedPlayers: (state: DraftState) => state.players.filter((p: Player) => !(p as any).isDrafted),
+      undraftedPlayers: (state: DraftState) => state.players.filter(p => !p.isDrafted),
       topAvailable: (state: DraftState, limit = 100) => 
         [...state.players]
-          .filter((p: Player) => (p as any).isDraftable !== false && !(p as any).isDrafted)
-          .sort((a, b) => ((a as any).rank || 999) - ((b as any).rank || 999))
+          .filter(p => p.isDraftable !== false && !p.isDrafted)
+          .sort((a, b) => (a.rank || 999) - (b.rank || 999))
           .slice(0, limit),
       topAvailableByPos: (state: DraftState, pos: Position, limit = 100) => 
         [...state.players]
-          .filter((p: Player) => p.pos === pos && (p as any).isDraftable !== false && !(p as any).isDrafted)
-          .sort((a, b) => ((a as any).rank || 999) - ((b as any).rank || 999))
+          .filter((p: Player) => p.pos === pos && p.isDraftable !== false && !p.isDrafted)
+          .sort((a, b) => (a.rank || 999) - (b.rank || 999))
           .slice(0, limit),
       topAvailableForFlex: (state: DraftState, limit = 100, includeTE = false) => {
         const flexPositions = ['RB', 'WR', ...(includeTE ? ['TE'] : [])];
         return [...state.players]
-          .filter((p: Player) => flexPositions.includes(p.pos) && (p as any).isDraftable !== false && !(p as any).isDrafted)
-          .sort((a, b) => ((a as any).rank || 999) - ((b as any).rank || 999))
+          .filter((p: Player) => flexPositions.includes(p.pos) && p.isDraftable !== false && !p.isDrafted)
+          .sort((a, b) => (a.rank || 999) - (b.rank || 999))
           .slice(0, limit);
       }
     }
@@ -193,11 +193,11 @@ type FfcPlayer = {
 type MockFfcAdp = {
   load: vi.Mock<Promise<FfcPlayer[]>> & {
     mockClear: () => void;
-    mockImplementation: (fn: any) => void;
+    mockImplementation: (fn: (opts: { year?: number; teams?: number; scoring?: string }) => Promise<FfcPlayer[]>) => void;
   };
-  getCacheKey?: (opts: any) => string;
-  loadFromCache?: (key: string) => any;
-  saveToCache?: (key: string, data: any) => void;
+  getCacheKey?: (opts: { year?: number; teams?: number; scoring?: string }) => string;
+  loadFromCache?: (key: string) => FfcPlayer[] | null;
+  saveToCache?: (key: string, data: FfcPlayer[]) => void;
   clearCache?: () => void;
   baseUrl?: string;
 };
@@ -411,10 +411,10 @@ describe('ADP Integration', () => {
     // Mock cache implementation
     const cache: Record<string, any> = {};
     if (mockFfc.loadFromCache) {
-      (mockFfc.loadFromCache as any).mockImplementation((key: string) => cache[key]);
+      (mockFfc.loadFromCache as jest.Mock).mockImplementation((key: string) => cache[key]);
     }
     if (mockFfc.saveToCache) {
-      (mockFfc.saveToCache as any).mockImplementation((key: string, data: any) => {
+      (mockFfc.saveToCache as jest.Mock).mockImplementation((key: string, data: FfcPlayer[]) => {
         cache[key] = data;
       });
     }

@@ -8,8 +8,8 @@ import {
   Progress,
 } from "@chakra-ui/react";
 import { Outlet } from "react-router-dom";
-import TopNav from "@/components/TopNav";
-import SideNav from "@/components/SideNav";
+import TopNav from "../components/TopNav";
+import SideNav from "../components/SideNav";
 
 interface ShellProps {
   globalLoading?: boolean;

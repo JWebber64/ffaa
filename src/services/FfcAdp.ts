@@ -56,22 +56,42 @@ class FfcAdp {
     }
 
     const url = `${this.base}/adp/${scoring}?year=${year}&teams=${teams}`;
-    const res = await fetch(url, { 
-      headers: { accept: 'application/json' },
-      signal: opts.signal
-    });
+    const fetchOptions: RequestInit = {
+      headers: { accept: 'application/json' }
+    };
+    
+    if (opts.signal) {
+      fetchOptions.signal = opts.signal;
+    }
+    
+    const res = await fetch(url, fetchOptions);
     if (!res.ok) throw new Error(`FFC ADP fetch failed: ${res.status} ${res.statusText}`);
     const json = await res.json();
-    const rows = (json.players ?? json) as any[];
+    interface FfcApiPlayer {
+      name?: string;
+      position?: string;
+      team?: string;
+      adp?: number | string;
+      rank?: number | string;
+      overall_rank?: number | string;
+      pos_rank?: number | string;
+    }
+    
+    const response = json as FfcApiPlayer[] | { players: FfcApiPlayer[] };
+    const rows = 'players' in response ? response.players : response;
 
-    const data: FfcPlayer[] = rows.map(p => ({
-      name: String(p.name ?? ''),
-      position: normPos(String(p.position ?? '')),
-      team: normTeam(p.team),
-      adp: Number(p.adp ?? Number.POSITIVE_INFINITY),
-      rank: Number(p.rank ?? p.overall_rank ?? Number.POSITIVE_INFINITY),
-      posRank: p.pos_rank != null ? Number(p.pos_rank) : undefined,
-    }));
+    const data: FfcPlayer[] = rows.map(p => {
+      const posRank = p.pos_rank != null ? Number(p.pos_rank) : 0;
+      
+      return {
+        name: String(p.name ?? ''),
+        position: normPos(String(p.position ?? '')),
+        team: normTeam(p.team) || '',
+        adp: Number(p.adp ?? Number.POSITIVE_INFINITY),
+        rank: Number(p.rank ?? p.overall_rank ?? Number.POSITIVE_INFINITY),
+        posRank: posRank,
+      };
+    });
 
     if (useCache) localStorage.setItem(key, JSON.stringify({ t: Date.now(), data }));
     return data;

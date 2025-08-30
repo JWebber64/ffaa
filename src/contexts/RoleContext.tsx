@@ -15,9 +15,9 @@ export const RoleProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // In a real app, this would be handled by a proper auth service
   const login = useCallback((password: string): boolean => {
-    // For demo purposes, using a simple password check
-    // In production, replace this with proper authentication
-    const isAuthenticated = password === 'admin123'; // TODO: Replace with secure authentication
+    // Check against the admin password from environment variables
+    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || '';
+    const isAuthenticated = password === adminPassword;
     
     if (isAuthenticated) {
       setIsAdmin(true);

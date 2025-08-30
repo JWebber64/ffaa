@@ -23,8 +23,23 @@ export default function AdminLogin() {
     try {
       const success = login(password);
       if (!success) {
+        toast({
+          title: 'Incorrect password',
+          description: 'Please check the admin password and try again.',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
         setPassword('');
       }
+    } catch (error) {
+      toast({
+        title: 'Error during login',
+        description: error instanceof Error ? error.message : 'An unknown error occurred',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     } finally {
       setIsAuthenticating(false);
     }

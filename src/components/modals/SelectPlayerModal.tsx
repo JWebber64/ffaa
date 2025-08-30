@@ -14,7 +14,7 @@ import { useState } from 'react';
 import { PlayerSearch } from '../unified/PlayerSearch';
 import { useDraftStore } from '../../store/draftStore';
 import { useRole } from '../../contexts/RoleContext';
-import type { Player } from '../../store/draftStore';
+import type { Player } from '../../types/draft';
 
 type SelectPlayerModalProps = {
   teamId: number;

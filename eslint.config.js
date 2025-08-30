@@ -16,6 +16,9 @@ export default tseslint.config([
       reactHooks.configs['recommended-latest'],
       reactRefresh.configs.vite,
     ],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'error',
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: {

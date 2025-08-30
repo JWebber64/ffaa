@@ -28,17 +28,22 @@ export default function BidModal({ teamId, isOpen, onClose }: BidModalProps) {
   const {
     bidState,
     teams,
-    maxBidForTeam,
+    computeMaxBid,
     placeBid,
   } = useDraftStore(s => ({
     bidState: s.bidState,
     teams: s.teams,
-    maxBidForTeam: s.maxBidForTeam,
+    computeMaxBid: s.computeMaxBid,
     placeBid: s.placeBid,
   }));
 
   const team = useMemo(() => teams.find(t => t.id === teamId) ?? null, [teams, teamId]);
-  const teamMax = useMemo(() => maxBidForTeam(teamId) ?? 0, [maxBidForTeam, teamId]);
+  const teamMax = useMemo(() => {
+    // Get the current player being bid on to determine position
+    const currentPlayer = bidState.playerId ? 
+      useDraftStore.getState().players.find(p => p.id === bidState.playerId) : null;
+    return computeMaxBid(teamId, currentPlayer?.pos) ?? 0;
+  }, [computeMaxBid, teamId, bidState.playerId]);
 
   const [amount, setAmount] = useState<number>(Math.max(bidState.highBid + 1, 1));
 

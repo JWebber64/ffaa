@@ -14,9 +14,10 @@ import {
 } from '@chakra-ui/react';
 import { FaClock, FaGavel, FaSync } from 'react-icons/fa';
 import { useDraftStore } from '../store';
-import type { Player, Team } from '../store/draftStore';
+import type { Player, Team } from '../types/draft';
 import { useConfig } from '../contexts/ConfigContext';
 import { formatPositionForDisplay } from '../utils/positionUtils';
+import type { Position } from '../types/draft';
 import { PlayerSearch } from '../components/unified/PlayerSearch';
 import { ResetDraftButton } from '../components/auction/ResetDraftButton';
 
@@ -27,7 +28,7 @@ const Auctioneer: React.FC = () => {
   const players = useDraftStore((s) => s.players);
   const teams = useDraftStore((s) => s.teams);
   const adpLoaded = useDraftStore((s) => s.adpLoaded);
-  const { countdownSeconds, antiSnipeSeconds } = useDraftStore(s => s.auctionSettings);
+  const { countdownSeconds } = useDraftStore(s => s.auctionSettings);
 
   const loadAdp = useDraftStore((s) => s.loadAdp);
   const nominate = useDraftStore((s) => s.nominate);
@@ -400,7 +401,7 @@ const Auctioneer: React.FC = () => {
       const maxBid = computeMaxBid ? computeMaxBid(teamId) : 0;
       const disabled =
         !currentPlayer ||
-        (hasSlotFor && !hasSlotFor(teamId, currentPlayer.pos || ('' as any), config.includeTeInFlex)) ||
+        (hasSlotFor && !hasSlotFor(teamId, currentPlayer.pos as Position, config.includeTeInFlex)) ||
         maxBid < 1 ||
         isLoading;
 
@@ -412,12 +413,15 @@ const Auctioneer: React.FC = () => {
         setTime(countdownSeconds);
         if (!isTimerRunning) startTimer();
 
+        // Show success toast
+        const team = teams.find((t) => t.id === teamId);
         toast({
-          title: 'Bid placed',
-          description: `Bid $${bidAmount} on ${currentPlayer.name}`,
+          title: 'Bid placed!',
+          description: `Bid $${bidAmount} on ${currentPlayer.name} for ${team?.name || 'your team'}`,
           status: 'success',
-          duration: 2000,
+          duration: 3000,
           isClosable: true,
+          position: 'top',
         });
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to place bid';
@@ -449,14 +453,14 @@ const Auctioneer: React.FC = () => {
           >
             {teams.map((team) => {
               const hasSlot = currentPlayer && hasSlotFor
-                ? hasSlotFor(team.id, (currentPlayer.pos as any) || '', config.includeTeInFlex)
+                ? hasSlotFor(team.id, currentPlayer.pos || 'UNK', config.includeTeInFlex)
                 : false;
               const isDisabled = !hasSlot;
               
               let tooltipLabel = team.name;
               if (currentPlayer) {
                 if (!hasSlot) {
-                  tooltipLabel = `${team.name} has no ${formatPositionForDisplay(currentPlayer.pos as any)} slot available`;
+                  tooltipLabel = `${team.name} has no ${formatPositionForDisplay(currentPlayer.pos)} slot available`;
                 } else if (currentBidder === team.id) {
                   tooltipLabel = `Current high bidder: ${team.name}`;
                 } else {
@@ -634,6 +638,7 @@ const maxBid = computeMaxBid ? computeMaxBid(team.id, currentPlayer?.pos) : 0;
                 isDisabled={!playersLoaded}
                 variant={adpLoaded ? 'solid' : 'ghost'}
                 colorScheme={adpLoaded ? 'green' : 'blue'}
+                title={!playersLoaded ? 'Load players first' : adpLoaded ? 'Reload ADP data' : 'Load ADP data'}
               />
             </Tooltip>
             <ResetDraftButton />

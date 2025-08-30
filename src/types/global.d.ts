@@ -7,8 +7,8 @@ declare global {
     start: () => void;
     stop: () => void;
     abort: () => void;
-    onresult: (event: any) => void;
-    onerror: (event: any) => void;
+    onresult: (event: SpeechRecognitionEvent) => void;
+    onerror: (event: SpeechRecognitionErrorEvent) => void;
     onend: () => void;
   }
 
