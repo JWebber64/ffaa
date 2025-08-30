@@ -1,7 +1,8 @@
 // src/store/draftStore.ts
-import { create, type StateCreator } from 'zustand';
+import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import type { StateCreator } from 'zustand';
 import { produce, type Draft } from 'immer';
 import { nanoid } from 'nanoid';
 import { loadAdp as fetchAdp } from '../api/adp';
@@ -137,9 +138,22 @@ function isFlexEligible(pos: BasePosition, includeTE = true): pos is 'RB' | 'WR'
 function getValidSlots(team: Team, player: Player, includeTEinFlex = true): Position[] {
   const out: Position[] = [];
   const basePos = player.pos as Position;
+  
+  // Special handling for QBs - prioritize QB slot
+  if (basePos === 'QB') {
+    if ((team.roster.QB ?? 0) > 0) {
+      return ['QB'];
+    }
+    // If no QB slot, don't assign to other positions
+    return (team.roster.BENCH ?? 0) > 0 ? ['BENCH'] : [];
+  }
+  
+  // For other positions, check primary position first
   if (basePos !== 'FLEX' && basePos !== 'BENCH' && (team.roster[basePos] ?? 0) > 0) {
     out.push(basePos);
   }
+  
+  // Check FLEX eligibility if needed
   if (
     player.pos !== 'FLEX' &&
     player.pos !== 'BENCH' &&
@@ -148,6 +162,12 @@ function getValidSlots(team: Team, player: Player, includeTEinFlex = true): Posi
   ) {
     out.push('FLEX');
   }
+  
+  // Always include BENCH as a fallback if no other slots are available
+  if ((team.roster.BENCH ?? 0) > 0) {
+    out.push('BENCH');
+  }
+  
   return out;
 }
 
@@ -463,33 +483,139 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
           const team = state.teams.find((t) => t.id === highBidder);
           if (!player || !team) return;
 
-          const validSlots = getValidSlots(team, player, true);
+          // For QBs, handle specially to ensure they go to QB slot first
+          if (player.pos === 'QB') {
+            const teamIndex = state.teams.findIndex((t: Team) => t.id === team.id);
+            const playerIndex = state.players.findIndex((p: Player) => p.id === player.id);
+            
+            if (teamIndex === -1 || playerIndex === -1) return;
+            
+            // Get current state with proper type assertions
+            const currentTeam = state.teams[teamIndex] as Team & {
+              roster: Record<Position, number>;
+              budget: number;
+            };
+            const currentPlayer = state.players[playerIndex] as Player & {
+              name: string;
+              pos: Position;
+            };
+            
+            if (currentTeam.roster.QB > 0) {
+              // Assign to QB slot
+              // Create the updated player
+              const updatedPlayer: Player = {
+                ...currentPlayer,
+                draftedBy: team.id,
+                price: highBid,
+                slot: 'QB' as const
+              };
+              
+              // Update the players array first
+              state.players = state.players.map(p => 
+                p.id === playerId ? updatedPlayer : p
+              );
+              
+              // Then update the team
+              state.teams[teamIndex] = {
+                ...currentTeam,
+                roster: {
+                  ...currentTeam.roster,
+                  QB: currentTeam.roster.QB - 1
+                },
+                budget: currentTeam.budget - highBid,
+                players: [...new Set([...(currentTeam.players || []), playerId])]
+              };
+              
+              state.logs = [{
+                id: nanoid(),
+                ts: now,
+                type: 'ASSIGNED' as const,
+                message: `Assigned ${currentPlayer.name} to ${currentTeam.name} for $${highBid} (QB)`,
+              }, ...state.logs];
 
-          // Deduct budget
+              state.assignmentHistory = [{
+                id: nanoid(),
+                ts: now,
+                playerId: currentPlayer.id,
+                teamId: currentTeam.id,
+                slot: 'QB' as const,
+                priceRefund: highBid,
+                source: 'auction' as const,
+              }, ...state.assignmentHistory];
+              
+              return;
+            } else if (currentTeam.roster.BENCH > 0) {
+              // No QB slot available, assign to bench
+              // Create the updated player
+              const updatedPlayer: Player = {
+                ...currentPlayer,
+                draftedBy: team.id,
+                price: highBid,
+                slot: 'BENCH' as const
+              };
+              
+              // Update the players array first
+              state.players = state.players.map(p => 
+                p.id === playerId ? updatedPlayer : p
+              );
+              
+              // Then update the team
+              state.teams[teamIndex] = {
+                ...currentTeam,
+                roster: {
+                  ...currentTeam.roster,
+                  BENCH: currentTeam.roster.BENCH - 1
+                },
+                budget: currentTeam.budget - highBid,
+                players: [...new Set([...(currentTeam.players || []), playerId])]
+              };
+              
+              state.logs = [{
+                id: nanoid(),
+                ts: now,
+                type: 'ASSIGNED' as const,
+                message: `Assigned ${currentPlayer.name} to ${currentTeam.name} for $${highBid} (BENCH - No QB slot available)`,
+              }, ...state.logs];
+
+              state.assignmentHistory = [{
+                id: nanoid(),
+                ts: now,
+                playerId: currentPlayer.id,
+                teamId: currentTeam.id,
+                slot: 'BENCH' as const,
+                priceRefund: highBid,
+                source: 'auction' as const,
+              }, ...state.assignmentHistory];
+              
+              return;
+            }
+          }
+          
+          // For non-QB players, use normal slot assignment
+          const validSlots = getValidSlots(team, player, true);
           team.budget -= highBid;
 
-          if (validSlots.length === 1) {
+          if (validSlots.length >= 1) {
             const slot = validSlots[0];
+            if (!slot) return;
+            
             const updatedPlayer = {
               ...player,
               draftedBy: team.id,
               price: highBid,
-              slot: slot as Position,
+              slot: slot,
             };
+            
+            // Create a new roster object with the updated slot count
+            const updatedRoster = { ...team.roster };
+            const rosterKey = slot as keyof typeof updatedRoster;
+            if (rosterKey in updatedRoster && rosterKey !== 'BENCH') {
+              updatedRoster[rosterKey] = Math.max(0, (updatedRoster[rosterKey] ?? 1) - 1);
+            }
             
             const updatedTeam = {
               ...team,
-              roster: {
-                ...team.roster,
-                ...(slot === 'QB' ? { QB: Math.max(0, (team.roster.QB ?? 0) - 1) } : {}),
-                ...(slot === 'RB' ? { RB: Math.max(0, (team.roster.RB ?? 0) - 1) } : {}),
-                ...(slot === 'WR' ? { WR: Math.max(0, (team.roster.WR ?? 0) - 1) } : {}),
-                ...(slot === 'TE' ? { TE: Math.max(0, (team.roster.TE ?? 0) - 1) } : {}),
-                ...(slot === 'K' ? { K: Math.max(0, (team.roster.K ?? 0) - 1) } : {}),
-                ...(slot === 'DEF' ? { DEF: Math.max(0, (team.roster.DEF ?? 0) - 1) } : {}),
-                ...(slot === 'FLEX' ? { FLEX: Math.max(0, (team.roster.FLEX ?? 0) - 1) } : {}),
-                ...(slot === 'BENCH' ? { BENCH: Math.max(0, (team.roster.BENCH ?? 0) - 1) } : {}),
-              },
+              roster: updatedRoster
             };
 
             state.logs.unshift({
@@ -510,8 +636,16 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
             } as AssignmentHistory);
             
             // Update the player and team in the state
-            state.players = state.players.map(p => p.id === player.id ? updatedPlayer : p);
-            state.teams = state.teams.map(t => t.id === team.id ? updatedTeam : t);
+            const playerIndex = state.players.findIndex(p => p.id === player.id);
+            const teamIndex = state.teams.findIndex(t => t.id === team.id);
+            
+            if (playerIndex !== -1) {
+              state.players[playerIndex] = updatedPlayer;
+            }
+            
+            if (teamIndex !== -1) {
+              state.teams[teamIndex] = updatedTeam;
+            }
           } else if (validSlots.length > 1) {
             state.pendingAssignment = {
               teamId: team.id,
@@ -712,8 +846,9 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
         // Assign to specific slot if provided
         if (slot) {
           player.slot = slot;
-          if (slot in team.roster) {
-            team.roster[slot]--;
+          // Only decrement roster slot if it's not a bench assignment
+          if (slot in team.roster && slot !== 'BENCH') {
+            team.roster[slot as keyof typeof team.roster] = Math.max(0, (team.roster[slot as keyof typeof team.roster] ?? 0) - 1);
           }
         }
         
@@ -834,28 +969,28 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
 
     /* -------------------------------- Selectors bag ------------------------------- */
     selectors: {
-      undraftedPlayers: (state: { players: Player[] }) => state.players.filter((p: Player) => p.draftedBy === undefined),
+      undraftedPlayers: (state: { players: Player[] }) => state.players.filter((p: Player) => !p.draftedBy),
       topAvailable: (state: { players: Player[] }, limit = 300) =>
         state.players
-          .filter((p: Player) => p.draftedBy === undefined)
-          .sort((a: Player, b: Player) => (a.rank ?? 0) - (b.rank ?? 0))
+          .filter((p: Player) => !p.draftedBy)
+          .sort((a: Player, b: Player) => (a.rank ?? 999) - (b.rank ?? 999))
           .slice(0, limit),
       topAvailableByPos: (state: { players: Player[] }, pos: Position, limit = 100) =>
         state.players
-          .filter((p: Player) => p.draftedBy === undefined && (p.pos as Position) === pos)
-          .sort((a: Player, b: Player) => (a.rank ?? 0) - (b.rank ?? 0))
+          .filter((p: Player) => !p.draftedBy && (p.pos as Position) === pos)
+          .sort((a: Player, b: Player) => (a.rank ?? 999) - (b.rank ?? 999))
           .slice(0, limit),
       topAvailableByMultiPos: (state: { players: Player[] }, positions: Position[], limit = 100) =>
         state.players
-          .filter((p: Player) => p.draftedBy === undefined && positions.includes(p.pos as Position))
-          .sort((a: Player, b: Player) => (a.rank ?? 0) - (b.rank ?? 0))
+          .filter((p: Player) => !p.draftedBy && positions.includes(p.pos as Position))
+          .sort((a: Player, b: Player) => (a.rank ?? 999) - (b.rank ?? 999))
           .slice(0, limit),
       topAvailableForFlex: (state: { players: Player[] }, limit = 100, includeTE = true) => {
         const flexPositions: Position[] = ['RB', 'WR'];
         if (includeTE) flexPositions.push('TE');
         return state.players
-          .filter((p: Player) => p.draftedBy === undefined && flexPositions.includes(p.pos as Position))
-          .sort((a: Player, b: Player) => (a.rank ?? 0) - (b.rank ?? 0))
+          .filter((p: Player) => !p.draftedBy && flexPositions.includes(p.pos as Position))
+          .sort((a: Player, b: Player) => (a.rank ?? 999) - (b.rank ?? 999))
           .slice(0, limit);
       },
     },
@@ -870,12 +1005,8 @@ export const useDraftStore = create<DraftStore>()(
       version: 1,
       storage: createJSONStorage(() => window.localStorage),
       partialize: (state) => ({
-        players: state.players.map((p) => ({
-          id: p.id,
-          draftedBy: p.draftedBy,
-          price: p.price,
-          slot: p.slot,
-        })),
+        // Save all player data, not just a subset of fields
+        players: state.players,
         teams: state.teams.map((t) => ({
           id: t.id,
           players: t.players,

@@ -2,8 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Button,
-  ButtonGroup,
-  HStack,
   Input,
   InputGroup,
   InputLeftElement,
@@ -12,49 +10,31 @@ import {
   Text,
   Badge,
   useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
+  HStack,
+  VStack,
+  Spinner,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-  Spinner,
-  VStack,
 } from '@chakra-ui/react';
 import { FaSearch } from 'react-icons/fa';
 import { useDraftStore } from '../../store/draftStore';
 import type { Player } from '../../store/draftStore';
 
 type PlayerSearchProps = {
-  /** Array of players to search through. If not provided, will use players from store */
   players?: Player[];
-  /** Called when a player is selected */
   onSelect?: (player: Player) => void;
-  /** Currently selected player */
   selectedPlayer?: Player | null;
-  /** Starting bid amount (as string for input binding) */
   startingBid?: string;
-  /** Called when starting bid changes */
   onSetStartingBid?: (bid: string) => void;
-  /** Called when a bid is placed on a player */
   onBid?: (player: Player, amount: number) => void;
-  /** Filter out already-drafted players (default: true) */
   filterUndrafted?: boolean;
-  /** Max results to display (default: 8) */
   maxResults?: number;
-  /** Debounce time in milliseconds (default: 150) */
   debounceMs?: number;
-  /** Search input placeholder */
   placeholder?: string;
-  /** Show bid button (default: false) */
   showBidButton?: boolean;
-  /** Show starting bid input (default: false) */
   showStartingBid?: boolean;
 };
 
@@ -83,21 +63,17 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
 }) => {
   // State
   const [query, setQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [bidAmount, setBidAmount] = useState(1);
+  const [showResults, setShowResults] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const [selectedPlayerState, setSelectedPlayerState] = useState<Player | null>(selectedPlayer);
-  const [showResults, setShowResults] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
 
   // Get players from store if not provided via props
-  const storePlayers = useDraftStore(
-    (s) => s.players,
-    (a, b) => a === b
-  );
+  const storePlayers = useDraftStore(s => s.players);
   const players = externalPlayers || storePlayers;
 
   // Debounce search with loading state
@@ -112,17 +88,6 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
     setIsSearching(false);
     return undefined;
   }, [query, debounceMs]);
-
-  // Simulate loading state when data is being fetched
-  useEffect(() => {
-    if (players.length === 0) {
-      setIsLoading(true);
-      const timer = setTimeout(() => setIsLoading(false), 500);
-      return () => clearTimeout(timer);
-    }
-    setIsLoading(false);
-    return undefined;
-  }, [players]);
 
   // Filter players based on query and other criteria
   const filteredPlayers = useMemo(() => {
@@ -191,28 +156,6 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
     }
   };
 
-  // Update selected player state when selectedPlayer prop changes
-  useEffect(() => {
-    setSelectedPlayerState(selectedPlayer);
-  }, [selectedPlayer]);
-
-  // Handle bid placement
-  const handlePlaceBid = () => {
-    if (selectedPlayerState && onBid) {
-      onBid(selectedPlayerState, bidAmount);
-      setQuery('');
-      setShowResults(false);
-      onClose();
-    }
-  };
-
-  // Handle starting bid change
-  const handleStartingBidChange = (value: string) => {
-    if (onSetStartingBid) {
-      onSetStartingBid(value);
-    }
-  };
-
   // Handle clicks outside to close results
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -225,6 +168,21 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Handle bid placement
+  const handlePlaceBid = () => {
+    if (selectedPlayerState && onBid) {
+      onBid(selectedPlayerState, bidAmount);
+      onClose();
+    }
+  };
+
+  // Handle starting bid change
+  const handleStartingBidChange = (value: string) => {
+    if (onSetStartingBid) {
+      onSetStartingBid(value);
+    }
+  };
 
   return (
     <Box position="relative" width="100%" maxW="400px">
@@ -239,9 +197,8 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => setShowResults(true)}
-          bg="gray.800"
-          color="white"
-          _placeholder={{ color: 'gray.400' }}
+          bg="white"
+          color="gray.800"
           autoComplete="off"
           aria-autocomplete="list"
           aria-controls="player-search-results"
@@ -268,26 +225,24 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
         </HStack>
       )}
 
-      {showResults && (isSearching || isLoading) && (
-        <Box position="absolute" width="100%" mt={1} bg="gray.800" borderRadius="md" boxShadow="dark-lg" zIndex={10} border="1px" borderColor="gray.700">
+      {showResults && (isSearching) && (
+        <Box position="absolute" width="100%" mt={1} bg="white" borderRadius="md" boxShadow="md" zIndex={10}>
           <Box p={3} textAlign="center">
-            <Spinner size="sm" mr={2} color="white" />
-            <Text color="white">Searching players...</Text>
+            <Spinner size="sm" mr={2} />
+            <Text>Searching players...</Text>
           </Box>
         </Box>
       )}
       
-      {showResults && !isSearching && !isLoading && filteredPlayers.length > 0 && (
+      {showResults && !isSearching && filteredPlayers.length > 0 && (
         <Box 
           ref={resultsRef}
           position="absolute" 
           width="100%" 
           mt={1} 
-          bg="gray.800"
-          border="1px"
-          borderColor="gray.700"
+          bg="white" 
           borderRadius="md" 
-          boxShadow="dark-lg"
+          boxShadow="md" 
           zIndex={10}
           maxH="300px"
           overflowY="auto"
@@ -299,12 +254,12 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
               <ListItem
                 key={player.id}
                 p={2}
-                bg={focusedIndex === index ? 'gray.700' : 'transparent'}
-                _hover={{ bg: 'gray.700', cursor: 'pointer' }}
+                bg={focusedIndex === index ? 'blue.50' : 'transparent'}
+                _hover={{ bg: 'blue.50', cursor: 'pointer' }}
                 onClick={() => handleSelect(player)}
                 onMouseEnter={() => setFocusedIndex(index)}
                 borderBottom="1px"
-                borderColor="gray.700"
+                borderColor="gray.100"
                 role="option"
                 aria-selected={focusedIndex === index}
               >
@@ -336,71 +291,19 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
         </Box>
       )}
       
-      {showResults && !isSearching && !isLoading && query && filteredPlayers.length === 0 && (
+      {showResults && !isSearching && query && filteredPlayers.length === 0 && (
         <Box 
           position="absolute" 
           width="100%" 
           mt={1} 
-          bg="gray.800"
-          border="1px"
-          borderColor="gray.700"
+          bg="white" 
           borderRadius="md" 
-          boxShadow="dark-lg"
+          boxShadow="md" 
           p={3}
           zIndex={10}
         >
-          <Text color="white">No players found. Try a different search term.</Text>
+          <Text>No players found. Try a different search term.</Text>
         </Box>
-      )}
-
-      {/* Bid Modal */}
-      {showBidButton && selectedPlayerState && (
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent _dark={{ bg: 'gray.800' }}>
-            <ModalHeader>Place Bid</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <VStack spacing={4}>
-                <Text>Player: {selectedPlayerState.name} ({selectedPlayerState.pos})</Text>
-                <NumberInput
-                  value={bidAmount}
-                  onChange={(value) => setBidAmount(Number(value))}
-                  min={1}
-                  max={1000}
-                  width="100%"
-                  defaultValue={1}
-                >
-                  <NumberInputField />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
-              </VStack>
-            </ModalBody>
-            <ModalFooter>
-              <ButtonGroup spacing={2}>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => {
-                    onClose();
-                    setShowResults(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  colorScheme="blue"
-                  onClick={handlePlaceBid}
-                  isDisabled={!bidAmount || bidAmount < 1}
-                >
-                  Place Bid (${bidAmount})
-                </Button>
-              </ButtonGroup>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
       )}
     </Box>
   );
