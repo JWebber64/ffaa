@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Run Script</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #output {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      white-space: pre-wrap;
+      min-height: 100px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>Run FantasyPros Script</h1>
+  <p>Click the button below to run the FantasyPros data fetch script:</p>
+  <button id="runScript">Run Script</button>
+  <div id="output">Output will appear here...</div>
+
+  <script>
+    document.getElementById('runScript').addEventListener('click', async () => {
+      const output = document.getElementById('output');
+      output.textContent = 'Running script...\n';
+      
+      try {
+        // This will be called from the browser's context
+        const response = await fetch('/api/test-endpoint');
+        const result = await response.json();
+        output.textContent += '\n' + JSON.stringify(result, null, 2);
+      } catch (error) {
+        output.textContent += '\nError: ' + error.message;
+      }
+    });
+  </script>
+</body>
+</html>

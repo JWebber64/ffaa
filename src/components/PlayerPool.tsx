@@ -15,6 +15,7 @@ import {
 import { SearchIcon } from '@chakra-ui/icons';
 import type { Position as PositionType } from '../types/draft';
 import { useDraftStore, useDraftSelectors } from '../store/draftStore';
+import { useGlobalPlayers } from '../hooks/useGlobalPlayers';
 import type { Player } from '../types/draft';
 import { formatPositionForDisplay } from '../utils/positionUtils';
 
@@ -103,44 +104,93 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
   showPositionTabs = true,
   showDebugInfo = false
 }) => {
-  // Get selectors and actions
+  // Get players and selectors
+  const { players, isLoading } = useGlobalPlayers();
   const selectors = useDraftSelectors();
   const nominate = useDraftStore((s) => s.nominate);
   
   const [activeTab, setActiveTab] = useState<TabValue>('ALL');
   const [search, setSearch] = useState('');
   const [onlyUndrafted, setOnlyUndrafted] = useState(true);
-  const [forceUpdate, setForceUpdate] = useState(0); // Used to force re-render
+  const [forceUpdate, setForceUpdate] = useState(0);
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('[PlayerPool] Players in store:', players.length);
+    console.log('[PlayerPool] Is loading:', isLoading);
+    if (players.length > 0) {
+      console.log('[PlayerPool] Sample players:', players.slice(0, 3));
+      
+      // Log selector results for debugging
+      const allPlayers = selectors.topAvailable(500);
+      console.log('[PlayerPool] Top available players:', allPlayers.length);
+      if (allPlayers.length > 0) {
+        console.log('[PlayerPool] First available player:', allPlayers[0]);
+      }
+    }
+  }, [players, isLoading, selectors]);
 
   // Get players based on active tab and filters
   const getFilteredPlayers = useMemo(() => {
+    console.log('[PlayerPool] Getting filtered players for tab:', activeTab);
     let players: Player[] = [];
     const searchTerm = search.trim().toLowerCase();
     
     // Get base player list based on tab
     if (activeTab === 'ALL') {
       players = selectors.topAvailable(500);
+      console.log('[PlayerPool] All players:', players.length);
     } else if (activeTab === 'FLEX') {
       players = selectors.topAvailableForFlex(300, true);
+      console.log('[PlayerPool] Flex players:', players.length);
     } else if (activeTab && POS_ORDER.includes(activeTab as Pos)) {
       players = [...selectors.topAvailableByPos(activeTab as PositionType, 300)];
+      console.log(`[PlayerPool] ${activeTab} players:`, players.length);
     } else {
       players = selectors.topAvailable(500);
+      console.log('[PlayerPool] Default players:', players.length);
+    }
+    
+    // Debug: Log first few players and their properties
+    if (players.length > 0) {
+      const firstPlayer = players[0];
+      if (firstPlayer) {
+        const playerInfo = {
+          id: firstPlayer.id || 'N/A',
+          name: firstPlayer.name || 'N/A',
+          pos: firstPlayer.pos || 'N/A',
+          nflTeam: firstPlayer.nflTeam || 'N/A',
+          rank: firstPlayer.rank ?? 'N/A',
+          draftedBy: firstPlayer.draftedBy || 'Not Drafted'
+        };
+        console.log('[PlayerPool] First player in filtered list:', playerInfo);
+        
+        // Log all player positions for debugging
+        const positions = new Set(players.map(p => p?.pos).filter(Boolean));
+        console.log('[PlayerPool] Available positions:', Array.from(positions));
+      } else {
+        console.warn('[PlayerPool] First player is undefined in players array');
+      }
     }
 
     // Filter players based on search term
     if (searchTerm) {
+      console.log('[PlayerPool] Filtering with search term:', searchTerm);
       players = players.filter(
         (p) =>
-          p.name?.toLowerCase().includes(searchTerm) ||
+          (p.name?.toLowerCase().includes(searchTerm) ||
           p.pos?.toLowerCase().includes(searchTerm) ||
-          p.nflTeam?.toLowerCase().includes(searchTerm)
+          p.nflTeam?.toLowerCase().includes(searchTerm)) &&
+          (!onlyUndrafted || !p.draftedBy)
       );
+      console.log('[PlayerPool] Players after search filter:', players.length);
     }
 
     // Filter undrafted players if needed
     if (onlyUndrafted) {
+      const beforeCount = players.length;
       players = players.filter(p => !p.draftedBy);
+      console.log(`[PlayerPool] Filtered out ${beforeCount - players.length} drafted players`);
     }
 
     return players;
@@ -271,22 +321,41 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
 
       {/* Player List */}
       <VStack align="stretch" spacing={3} maxH="70vh" overflowY="auto" pr={2} key={`player-list-${activeTab}-${forceUpdate}`}>
-        {search || (activeTab !== 'ALL' && activeTab !== 'FLEX') ? (
+        {isLoading ? (
+          <Box textAlign="center" py={10}>
+            <Text color="gray.400">Loading players...</Text>
+          </Box>
+        ) : search || (activeTab !== 'ALL' && activeTab !== 'FLEX') ? (
           // Show flat list when searching or when a specific position is selected
           <VStack align="stretch" spacing={2}>
-            {getFilteredPlayers.map((player) => (
-              <PlayerRow
-                key={player.id}
-                player={player}
-                onNominate={onNominate}
-                nominate={nominate}
-                showDebugInfo={showDebugInfo}
-              />
-            ))}
-            {getFilteredPlayers.length === 0 && (
-              <Text color="gray.400" textAlign="center" py={4}>
-                No players found matching your criteria
-              </Text>
+            {getFilteredPlayers.length === 0 ? (
+              <Box textAlign="center" py={10}>
+                <Text color="gray.400">
+                  {players.length === 0 
+                    ? 'No players available. Please check your data source.' 
+                    : 'No players match your current filters'}
+                </Text>
+                {players.length === 0 && (
+                  <Button 
+                    mt={2} 
+                    colorScheme="blue" 
+                    size="sm"
+                    onClick={() => window.location.reload()}
+                  >
+                    Reload Data
+                  </Button>
+                )}
+              </Box>
+            ) : (
+              getFilteredPlayers.map((player) => (
+                <PlayerRow
+                  key={player.id}
+                  player={player}
+                  onNominate={onNominate}
+                  nominate={nominate}
+                  showDebugInfo={showDebugInfo}
+                />
+              ))
             )}
           </VStack>
         ) : (

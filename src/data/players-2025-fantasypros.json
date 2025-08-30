@@ -1,0 +1,8768 @@
+[
+  {
+    "id": "2025-K-jamarr-chase",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 1,
+    "name": "Ja'Marr Chase",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-bijan-robinson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 2,
+    "name": "Bijan Robinson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-saquon-barkley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 3,
+    "name": "Saquon Barkley",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jahmyr-gibbs",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 4,
+    "name": "Jahmyr Gibbs",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-justin-jefferson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 5,
+    "name": "Justin Jefferson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ceedee-lamb",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 6,
+    "name": "CeeDee Lamb",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-christian-mccaffrey",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 7,
+    "name": "Christian McCaffrey",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-amon-ra-st-brown",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 8,
+    "name": "Amon-Ra St. Brown",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-malik-nabers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 9,
+    "name": "Malik Nabers",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-derrick-henry",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 10,
+    "name": "Derrick Henry",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-ashton-jeanty",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 11,
+    "name": "Ashton Jeanty",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-puka-nacua",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 12,
+    "name": "Puka Nacua",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-nico-collins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 13,
+    "name": "Nico Collins",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-devon-achane",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 14,
+    "name": "De'Von Achane",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-brian-thomas-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 15,
+    "name": "Brian Thomas Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-josh-jacobs",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 16,
+    "name": "Josh Jacobs",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-drake-london",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 17,
+    "name": "Drake London",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-brock-bowers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 18,
+    "name": "Brock Bowers",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jonathan-taylor",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 19,
+    "name": "Jonathan Taylor",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-aj-brown",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 20,
+    "name": "A.J. Brown",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-josh-allen",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 21,
+    "name": "Josh Allen",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-chase-brown",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 22,
+    "name": "Chase Brown",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-bucky-irving",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 23,
+    "name": "Bucky Irving",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-lamar-jackson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 24,
+    "name": "Lamar Jackson",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-kyren-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 25,
+    "name": "Kyren Williams",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-ladd-mcconkey",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 26,
+    "name": "Ladd McConkey",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-trey-mcbride",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 27,
+    "name": "Trey McBride",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-james-cook",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 28,
+    "name": "James Cook",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tee-higgins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 29,
+    "name": "Tee Higgins",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jayden-daniels",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 30,
+    "name": "Jayden Daniels",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-tyreek-hill",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 31,
+    "name": "Tyreek Hill",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-joe-burrow",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 32,
+    "name": "Joe Burrow",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jaxon-smith-njigba",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 33,
+    "name": "Jaxon Smith-Njigba",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jalen-hurts",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 34,
+    "name": "Jalen Hurts",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-omarion-hampton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 35,
+    "name": "Omarion Hampton",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-alvin-kamara",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 36,
+    "name": "Alvin Kamara",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-breece-hall",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 37,
+    "name": "Breece Hall",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-george-kittle",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 38,
+    "name": "George Kittle",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-terry-mclaurin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 39,
+    "name": "Terry McLaurin",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-mike-evans",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 40,
+    "name": "Mike Evans",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-garrett-wilson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 41,
+    "name": "Garrett Wilson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-davante-adams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 42,
+    "name": "Davante Adams",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kenneth-walker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 43,
+    "name": "Kenneth Walker",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-marvin-harrison-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 44,
+    "name": "Marvin Harrison Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-chuba-hubbard",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 45,
+    "name": "Chuba Hubbard",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-treveyon-henderson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 46,
+    "name": "TreVeyon Henderson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-james-conner",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 47,
+    "name": "James Conner",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-dj-moore",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 48,
+    "name": "DJ Moore",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dk-metcalf",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 49,
+    "name": "DK Metcalf",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-patrick-mahomes",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 50,
+    "name": "Patrick Mahomes",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-courtland-sutton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 51,
+    "name": "Courtland Sutton",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-sam-laporta",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 52,
+    "name": "Sam LaPorta",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-xavier-worthy",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 53,
+    "name": "Xavier Worthy",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dandre-swift",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 54,
+    "name": "D'Andre Swift",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-devonta-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 55,
+    "name": "DeVonta Smith",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-david-montgomery",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 56,
+    "name": "David Montgomery",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jameson-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 57,
+    "name": "Jameson Williams",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-isiah-pacheco",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 58,
+    "name": "Isiah Pacheco",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-zay-flowers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 59,
+    "name": "Zay Flowers",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-rj-harvey",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 60,
+    "name": "RJ Harvey",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tetairoa-mcmillan",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 61,
+    "name": "Tetairoa McMillan",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-travis-kelce",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 62,
+    "name": "Travis Kelce",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-baker-mayfield",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 63,
+    "name": "Baker Mayfield",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-calvin-ridley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 64,
+    "name": "Calvin Ridley",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tj-hockenson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 65,
+    "name": "T.J. Hockenson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-george-pickens",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 66,
+    "name": "George Pickens",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-aaron-jones-sr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 67,
+    "name": "Aaron Jones Sr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-rashee-rice",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 68,
+    "name": "Rashee Rice",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tony-pollard",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 69,
+    "name": "Tony Pollard",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-travis-hunter",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 70,
+    "name": "Travis Hunter",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-bo-nix",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 71,
+    "name": "Bo Nix",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jaylen-waddle",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 72,
+    "name": "Jaylen Waddle",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-mark-andrews",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 73,
+    "name": "Mark Andrews",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jerry-jeudy",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 74,
+    "name": "Jerry Jeudy",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kaleb-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 75,
+    "name": "Kaleb Johnson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tyrone-tracy-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 76,
+    "name": "Tyrone Tracy Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-rome-odunze",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 77,
+    "name": "Rome Odunze",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-chris-olave",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 78,
+    "name": "Chris Olave",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-evan-engram",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 79,
+    "name": "Evan Engram",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-deebo-samuel-sr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 80,
+    "name": "Deebo Samuel Sr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-david-njoku",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 81,
+    "name": "David Njoku",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-stefon-diggs",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 82,
+    "name": "Stefon Diggs",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kyler-murray",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 83,
+    "name": "Kyler Murray",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jaylen-warren",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 84,
+    "name": "Jaylen Warren",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-ricky-pearsall",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 85,
+    "name": "Ricky Pearsall",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jakobi-meyers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 86,
+    "name": "Jakobi Meyers",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-cooper-kupp",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 87,
+    "name": "Cooper Kupp",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-emeka-egbuka",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 88,
+    "name": "Emeka Egbuka",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tyler-warren",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 89,
+    "name": "Tyler Warren",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-matthew-golden",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 90,
+    "name": "Matthew Golden",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jordan-addison",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 91,
+    "name": "Jordan Addison",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-travis-etienne-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 92,
+    "name": "Travis Etienne Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-brock-purdy",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 93,
+    "name": "Brock Purdy",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-dak-prescott",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 94,
+    "name": "Dak Prescott",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-khalil-shakir",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 95,
+    "name": "Khalil Shakir",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-chris-godwin-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 96,
+    "name": "Chris Godwin Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jacory-croskey-merritt",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 97,
+    "name": "Jacory Croskey-Merritt",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-joe-mixon",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 98,
+    "name": "Joe Mixon",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jordan-mason",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 99,
+    "name": "Jordan Mason",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-cam-skattebo",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 100,
+    "name": "Cam Skattebo",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jared-goff",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 101,
+    "name": "Jared Goff",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-brandon-aubrey",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 102,
+    "name": "Brandon Aubrey",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-DEF-denver-broncos",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 103,
+    "name": "Denver Broncos",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-jk-dobbins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 104,
+    "name": "J.K. Dobbins",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jauan-jennings",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 105,
+    "name": "Jauan Jennings",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-javonte-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 106,
+    "name": "Javonte Williams",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-zach-charbonnet",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 107,
+    "name": "Zach Charbonnet",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tucker-kraft",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 108,
+    "name": "Tucker Kraft",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-justin-fields",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 109,
+    "name": "Justin Fields",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-justin-herbert",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 110,
+    "name": "Justin Herbert",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-michael-pittman-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 111,
+    "name": "Michael Pittman Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-DEF-philadelphia-eagles",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 112,
+    "name": "Philadelphia Eagles",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-rhamondre-stevenson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 113,
+    "name": "Rhamondre Stevenson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-quinshon-judkins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 114,
+    "name": "Quinshon Judkins",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-colston-loveland",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 115,
+    "name": "Colston Loveland",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-austin-ekeler",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 116,
+    "name": "Austin Ekeler",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-keon-coleman",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 117,
+    "name": "Keon Coleman",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-caleb-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 118,
+    "name": "Caleb Williams",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-DEF-baltimore-ravens",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 119,
+    "name": "Baltimore Ravens",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-brian-robinson-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 120,
+    "name": "Brian Robinson Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jayden-reed",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 121,
+    "name": "Jayden Reed",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-josh-downs",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 122,
+    "name": "Josh Downs",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dalton-kincaid",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 123,
+    "name": "Dalton Kincaid",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-drake-maye",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 124,
+    "name": "Drake Maye",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jake-bates",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 125,
+    "name": "Jake Bates",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-cj-stroud",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 126,
+    "name": "C.J. Stroud",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-cameron-dicker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 127,
+    "name": "Cameron Dicker",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-tank-bigsby",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 128,
+    "name": "Tank Bigsby",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-DEF-pittsburgh-steelers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 129,
+    "name": "Pittsburgh Steelers",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-kyle-pitts-sr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 130,
+    "name": "Kyle Pitts Sr",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-najee-harris",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 131,
+    "name": "Najee Harris",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-DEF-buffalo-bills",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 132,
+    "name": "Buffalo Bills",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-nick-chubb",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 133,
+    "name": "Nick Chubb",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jordan-love",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 134,
+    "name": "Jordan Love",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jake-ferguson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 135,
+    "name": "Jake Ferguson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-darnell-mooney",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 136,
+    "name": "Darnell Mooney",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-DEF-houston-texans",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 137,
+    "name": "Houston Texans",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-jaydon-blue",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 138,
+    "name": "Jaydon Blue",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-dallas-goedert",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 139,
+    "name": "Dallas Goedert",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-rachaad-white",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 140,
+    "name": "Rachaad White",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jj-mccarthy",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 141,
+    "name": "J.J. McCarthy",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-brandon-aiyuk",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 142,
+    "name": "Brandon Aiyuk",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-rashid-shaheed",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 143,
+    "name": "Rashid Shaheed",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-DEF-minnesota-vikings",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 144,
+    "name": "Minnesota Vikings",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-braelon-allen",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 145,
+    "name": "Braelon Allen",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-chase-mclaughlin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 146,
+    "name": "Chase McLaughlin",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-jayden-higgins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 147,
+    "name": "Jayden Higgins",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-keenan-allen",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 148,
+    "name": "Keenan Allen",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jonnu-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 149,
+    "name": "Jonnu Smith",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-christian-kirk",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 150,
+    "name": "Christian Kirk",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-marvin-mims-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 151,
+    "name": "Marvin Mims Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-bhayshul-tuten",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 152,
+    "name": "Bhayshul Tuten",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-zach-ertz",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 153,
+    "name": "Zach Ertz",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-trey-benson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 154,
+    "name": "Trey Benson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-trevor-lawrence",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 155,
+    "name": "Trevor Lawrence",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-chris-boswell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 156,
+    "name": "Chris Boswell",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-jerome-ford",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 157,
+    "name": "Jerome Ford",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-hunter-henry",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 158,
+    "name": "Hunter Henry",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-adam-thielen",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 159,
+    "name": "Adam Thielen",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-marquise-brown",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 160,
+    "name": "Marquise Brown",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kaimi-fairbairn",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 161,
+    "name": "Ka'imi Fairbairn",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-tyler-allgeier",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 162,
+    "name": "Tyler Allgeier",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tyjae-spears",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 163,
+    "name": "Tyjae Spears",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-DEF-detroit-lions",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 164,
+    "name": "Detroit Lions",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-DEF-san-francisco-49ers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 165,
+    "name": "San Francisco 49ers",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-luther-burden",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 166,
+    "name": "Luther Burden",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jake-elliott",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 167,
+    "name": "Jake Elliott",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-tua-tagovailoa",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 168,
+    "name": "Tua Tagovailoa",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-rashod-bateman",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 169,
+    "name": "Rashod Bateman",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ray-davis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 170,
+    "name": "Ray Davis",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tyler-bass",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 171,
+    "name": "Tyler Bass",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-harrison-butker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 172,
+    "name": "Harrison Butker",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-cam-ward",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 173,
+    "name": "Cam Ward",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-DEF-kansas-city-chiefs",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 174,
+    "name": "Kansas City Chiefs",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-matthew-stafford",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 175,
+    "name": "Matthew Stafford",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-xavier-legette",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 176,
+    "name": "Xavier Legette",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-DEF-green-bay-packers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 177,
+    "name": "Green Bay Packers",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-ollie-gordon",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 178,
+    "name": "Ollie Gordon",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-cam-little",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 179,
+    "name": "Cam Little",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-dylan-sampson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 180,
+    "name": "Dylan Sampson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-isaiah-likely",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 181,
+    "name": "Isaiah Likely",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-michael-penix-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 182,
+    "name": "Michael Penix Jr",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-bryce-young",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 183,
+    "name": "Bryce Young",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-wandale-robinson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 184,
+    "name": "Wan'Dale Robinson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tyler-loop",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 185,
+    "name": "Tyler Loop",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-DEF-seattle-seahawks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 186,
+    "name": "Seattle Seahawks",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-wil-lutz",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 187,
+    "name": "Wil Lutz",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-darren-waller",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 188,
+    "name": "Darren Waller",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-geno-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 189,
+    "name": "Geno Smith",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-brenton-strange",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 190,
+    "name": "Brenton Strange",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-cedric-tillman",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 191,
+    "name": "Cedric Tillman",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jaylen-wright",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 192,
+    "name": "Jaylen Wright",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-DEF-arizona-cardinals",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 193,
+    "name": "Arizona Cardinals",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-evan-mcpherson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 194,
+    "name": "Evan McPherson",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-DEF-los-angeles-chargers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 195,
+    "name": "Los Angeles Chargers",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-DEF-dallas-cowboys",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 196,
+    "name": "Dallas Cowboys",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-DEF-washington-commanders",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 197,
+    "name": "Washington Commanders",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-DEF-new-york-giants",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 198,
+    "name": "New York Giants",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-amari-cooper",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 199,
+    "name": "Amari Cooper",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-will-shipley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 200,
+    "name": "Will Shipley",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-DEF-los-angeles-rams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 201,
+    "name": "Los Angeles Rams",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-DEF-new-york-jets",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 202,
+    "name": "New York Jets",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-jason-sanders",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 203,
+    "name": "Jason Sanders",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-rico-dowdle",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 204,
+    "name": "Rico Dowdle",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-isaac-guerendo",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 205,
+    "name": "Isaac Guerendo",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-matt-gay",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 206,
+    "name": "Matt Gay",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-kareem-hunt",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 207,
+    "name": "Kareem Hunt",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-DEF-tampa-bay-buccaneers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 208,
+    "name": "Tampa Bay Buccaneers",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-pat-freiermuth",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 209,
+    "name": "Pat Freiermuth",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-younghoe-koo",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 210,
+    "name": "Younghoe Koo",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-cade-otton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 211,
+    "name": "Cade Otton",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-sam-darnold",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 212,
+    "name": "Sam Darnold",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-romeo-doubs",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 213,
+    "name": "Romeo Doubs",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-demario-douglas",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 214,
+    "name": "DeMario Douglas",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-aaron-rodgers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 215,
+    "name": "Aaron Rodgers",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-DEF-new-england-patriots",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 216,
+    "name": "New England Patriots",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-DEF-chicago-bears",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 217,
+    "name": "Chicago Bears",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-daniel-carlson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 218,
+    "name": "Daniel Carlson",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-raheem-mostert",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 219,
+    "name": "Raheem Mostert",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-isaac-teslaa",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 220,
+    "name": "Isaac TeSlaa",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tre-harris",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 221,
+    "name": "Tre' Harris",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-will-reichard",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 222,
+    "name": "Will Reichard",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-brandon-mcmanus",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 223,
+    "name": "Brandon McManus",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-jake-moody",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 224,
+    "name": "Jake Moody",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-roschon-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 225,
+    "name": "Roschon Johnson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-kendre-miller",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 226,
+    "name": "Kendre Miller",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-deandre-hopkins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 227,
+    "name": "DeAndre Hopkins",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-joshua-palmer",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 228,
+    "name": "Joshua Palmer",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kyle-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 229,
+    "name": "Kyle Williams",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-chig-okonkwo",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 230,
+    "name": "Chig Okonkwo",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-blake-corum",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 231,
+    "name": "Blake Corum",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jack-bech",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 232,
+    "name": "Jack Bech",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-donte-thornton-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 233,
+    "name": "Dont'e Thornton Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-justice-hill",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 234,
+    "name": "Justice Hill",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-DEF-cincinnati-bengals",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 235,
+    "name": "Cincinnati Bengals",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-quentin-johnston",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 236,
+    "name": "Quentin Johnston",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jaxson-dart",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 237,
+    "name": "Jaxson Dart",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-shedeur-sanders",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 238,
+    "name": "Shedeur Sanders",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-mason-taylor",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 239,
+    "name": "Mason Taylor",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-dalton-schultz",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 240,
+    "name": "Dalton Schultz",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-elijah-arroyo",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 241,
+    "name": "Elijah Arroyo",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-tory-horton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 242,
+    "name": "Tory Horton",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-woody-marks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 243,
+    "name": "Woody Marks",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-alec-pierce",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 244,
+    "name": "Alec Pierce",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-anthony-richardson-sr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 245,
+    "name": "Anthony Richardson Sr",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-russell-wilson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 246,
+    "name": "Russell Wilson",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-miles-sanders",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 247,
+    "name": "Miles Sanders",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-dj-giddens",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 248,
+    "name": "DJ Giddens",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-keaton-mitchell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 249,
+    "name": "Keaton Mitchell",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-cole-kmet",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 250,
+    "name": "Cole Kmet",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-kyle-monangai",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 251,
+    "name": "Kyle Monangai",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jalen-coker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 252,
+    "name": "Jalen Coker",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-daniel-jones",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 253,
+    "name": "Daniel Jones",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-marshawn-lloyd",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 254,
+    "name": "MarShawn Lloyd",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-DEF-miami-dolphins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 255,
+    "name": "Miami Dolphins",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-elijah-mitchell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 256,
+    "name": "Elijah Mitchell",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-noah-gray",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 257,
+    "name": "Noah Gray",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-brashard-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 258,
+    "name": "Brashard Smith",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-DEF-indianapolis-colts",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 259,
+    "name": "Indianapolis Colts",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-DEF-las-vegas-raiders",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 260,
+    "name": "Las Vegas Raiders",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-joe-flacco",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 261,
+    "name": "Joe Flacco",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-DEF-new-orleans-saints",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 262,
+    "name": "New Orleans Saints",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-pat-bryant",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 263,
+    "name": "Pat Bryant",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-justin-tucker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 264,
+    "name": "Justin Tucker",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-zack-moss",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 265,
+    "name": "Zack Moss",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-DEF-cleveland-browns",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 266,
+    "name": "Cleveland Browns",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-tahj-brooks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 267,
+    "name": "Tahj Brooks",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jalen-milroe",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 268,
+    "name": "Jalen Milroe",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-mike-gesicki",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 269,
+    "name": "Mike Gesicki",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-DEF-atlanta-falcons",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 270,
+    "name": "Atlanta Falcons",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-jarquez-hunter",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 271,
+    "name": "Jarquez Hunter",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-DEF-tennessee-titans",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 272,
+    "name": "Tennessee Titans",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-terrance-ferguson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 273,
+    "name": "Terrance Ferguson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-tyler-lockett",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 274,
+    "name": "Tyler Lockett",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tyler-conklin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 275,
+    "name": "Tyler Conklin",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-cairo-santos",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 276,
+    "name": "Cairo Santos",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-elic-ayomanor",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 277,
+    "name": "Elic Ayomanor",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jalen-mcmillan",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 278,
+    "name": "Jalen McMillan",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dontayvion-wicks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 279,
+    "name": "Dontayvion Wicks",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-calvin-austin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 280,
+    "name": "Calvin Austin",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-taysom-hill",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 281,
+    "name": "Taysom Hill",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jatavion-sanders",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 282,
+    "name": "Ja'Tavion Sanders",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-andrei-iosivas",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 283,
+    "name": "Andrei Iosivas",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dameon-pierce",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 284,
+    "name": "Dameon Pierce",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-graham-gano",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 285,
+    "name": "Graham Gano",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-juwan-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 286,
+    "name": "Juwan Johnson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jaylin-noel",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 287,
+    "name": "Jaylin Noel",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-harold-fannin-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 288,
+    "name": "Harold Fannin Jr",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jaleel-mclaughlin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 289,
+    "name": "Jaleel McLaughlin",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-theo-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 290,
+    "name": "Theo Johnson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-luke-mccaffrey",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 291,
+    "name": "Luke McCaffrey",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-darius-slayton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 292,
+    "name": "Darius Slayton",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kirk-cousins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 293,
+    "name": "Kirk Cousins",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-michael-wilson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 294,
+    "name": "Michael Wilson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-chris-rodriguez-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 295,
+    "name": "Chris Rodriguez Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-adonai-mitchell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 296,
+    "name": "Adonai Mitchell",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ray-ray-mccloud",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 297,
+    "name": "Ray-Ray McCloud",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-andy-borregales",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 298,
+    "name": "Andy Borregales",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-dawson-knox",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 299,
+    "name": "Dawson Knox",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-diontae-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 300,
+    "name": "Diontae Johnson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-DEF-jacksonville-jaguars",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 301,
+    "name": "Jacksonville Jaguars",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-dyami-brown",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 302,
+    "name": "Dyami Brown",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jalen-royals",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 303,
+    "name": "Jalen Royals",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-troy-franklin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 304,
+    "name": "Troy Franklin",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-audric-estime",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 305,
+    "name": "Audric Estime",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-juju-smith-schuster",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 306,
+    "name": "JuJu Smith-Schuster",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-blake-grupe",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 307,
+    "name": "Blake Grupe",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-marquez-valdes-scantling",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 308,
+    "name": "Marquez Valdes-Scantling",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tyler-higbee",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 309,
+    "name": "Tyler Higbee",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-trevor-etienne",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 310,
+    "name": "Trevor Etienne",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-DEF-carolina-panthers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 311,
+    "name": "Carolina Panthers",
+    "pos": "DEF",
+    "nflTeam": "DST"
+  },
+  {
+    "id": "2025-K-tyler-shough",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 312,
+    "name": "Tyler Shough",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jameis-winston",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 313,
+    "name": "Jameis Winston",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jordan-james",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 314,
+    "name": "Jordan James",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-elijah-moore",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 315,
+    "name": "Elijah Moore",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tank-dell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 316,
+    "name": "Tank Dell",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-zamir-white",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 317,
+    "name": "Zamir White",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tutu-atwell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 318,
+    "name": "Tutu Atwell",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-luke-musgrave",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 319,
+    "name": "Luke Musgrave",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-joey-slye",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 320,
+    "name": "Joey Slye",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-spencer-shrader",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 321,
+    "name": "Spencer Shrader",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-noah-fant",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 322,
+    "name": "Noah Fant",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-dustin-hopkins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 323,
+    "name": "Dustin Hopkins",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-jason-myers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 324,
+    "name": "Jason Myers",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-jahan-dotson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 325,
+    "name": "Jahan Dotson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-efton-chism",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 326,
+    "name": "Efton Chism",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-aj-dillon",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 327,
+    "name": "A.J. Dillon",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-roman-wilson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 328,
+    "name": "Roman Wilson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-joshua-karty",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 329,
+    "name": "Joshua Karty",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-keandre-lambert-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 330,
+    "name": "KeAndre Lambert-Smith",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-hunter-renfrow",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 331,
+    "name": "Hunter Renfrow",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-olamide-zaccheaus",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 332,
+    "name": "Olamide Zaccheaus",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-michael-mayer",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 333,
+    "name": "Michael Mayer",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-christian-watson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 334,
+    "name": "Christian Watson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-darnell-washington",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 335,
+    "name": "Darnell Washington",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-joe-milton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 336,
+    "name": "Joe Milton",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-chad-ryland",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 337,
+    "name": "Chad Ryland",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-tez-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 338,
+    "name": "Tez Johnson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-will-dissly",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 339,
+    "name": "Will Dissly",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-devin-neal",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 340,
+    "name": "Devin Neal",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-kavontae-turpin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 341,
+    "name": "KaVontae Turpin",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jalen-tolbert",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 342,
+    "name": "Jalen Tolbert",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-devin-singletary",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 343,
+    "name": "Devin Singletary",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-kayshon-boutte",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 344,
+    "name": "Kayshon Boutte",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-john-metchie",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 345,
+    "name": "John Metchie",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-austin-hooper",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 346,
+    "name": "Austin Hooper",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-mitchell-tinsley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 347,
+    "name": "Mitchell Tinsley",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jimmy-garoppolo",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 348,
+    "name": "Jimmy Garoppolo",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jermar-jefferson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 349,
+    "name": "Jermar Jefferson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tre-tucker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 350,
+    "name": "Tre Tucker",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-sean-tucker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 351,
+    "name": "Sean Tucker",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-damien-martinez",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 352,
+    "name": "Damien Martinez",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-josh-oliver",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 353,
+    "name": "Josh Oliver",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-antonio-gibson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 354,
+    "name": "Antonio Gibson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tim-patrick",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 355,
+    "name": "Tim Patrick",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ryan-fitzgerald",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 356,
+    "name": "Ryan Fitzgerald",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-mason-rudolph",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 357,
+    "name": "Mason Rudolph",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jimmy-horn-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 358,
+    "name": "Jimmy Horn Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jake-bobo",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 359,
+    "name": "Jake Bobo",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-nick-westbrook-ikhine",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 360,
+    "name": "Nick Westbrook-Ikhine",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-grant-calcaterra",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 361,
+    "name": "Grant Calcaterra",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-lajohntay-wester",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 362,
+    "name": "LaJohntay Wester",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-craig-reynolds",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 363,
+    "name": "Craig Reynolds",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-xavier-restrepo",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 364,
+    "name": "Xavier Restrepo",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-brock-wright",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 365,
+    "name": "Brock Wright",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-carson-wentz",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 366,
+    "name": "Carson Wentz",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-odell-beckham-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 367,
+    "name": "Odell Beckham Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ty-chandler",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 368,
+    "name": "Ty Chandler",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-elijah-higgins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 369,
+    "name": "Elijah Higgins",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jalin-hyatt",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 370,
+    "name": "Jalin Hyatt",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-deshaun-watson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 371,
+    "name": "Deshaun Watson",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jalen-nailor",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 372,
+    "name": "Jalen Nailor",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-brandin-cooks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 373,
+    "name": "Brandin Cooks",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ty-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 374,
+    "name": "Ty Johnson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jj-taylor",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 375,
+    "name": "J.J. Taylor",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-malik-willis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 376,
+    "name": "Malik Willis",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-matthew-wright",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 377,
+    "name": "Matthew Wright",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-parker-romo",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 378,
+    "name": "Parker Romo",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-ben-sinnott",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 379,
+    "name": "Ben Sinnott",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-tanner-mckee",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 380,
+    "name": "Tanner McKee",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-devaughn-vele",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 381,
+    "name": "Devaughn Vele",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-allen-lazard",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 382,
+    "name": "Allen Lazard",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-gardner-minshew",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 383,
+    "name": "Gardner Minshew",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-mack-hollins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 384,
+    "name": "Mack Hollins",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jordan-whittington",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 385,
+    "name": "Jordan Whittington",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-oronde-gadsden",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 386,
+    "name": "Oronde Gadsden",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-samaje-perine",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 387,
+    "name": "Samaje Perine",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-caden-davis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 388,
+    "name": "Caden Davis",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-skyy-moore",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 389,
+    "name": "Skyy Moore",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kalif-raymond",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 390,
+    "name": "Kalif Raymond",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-joshua-dobbs",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 391,
+    "name": "Joshua Dobbs",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-luke-schoonmaker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 392,
+    "name": "Luke Schoonmaker",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-aj-barner",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 393,
+    "name": "AJ Barner",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jude-mcatamney",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 394,
+    "name": "Jude McAtamney",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-cooper-rush",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 395,
+    "name": "Cooper Rush",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-nick-folk",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 396,
+    "name": "Nick Folk",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-carson-steele",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 397,
+    "name": "Carson Steele",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-julian-hill",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 398,
+    "name": "Julian Hill",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-will-howard",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 399,
+    "name": "Will Howard",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-isaiah-bond",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 400,
+    "name": "Isaiah Bond",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-darius-cooper",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 401,
+    "name": "Darius Cooper",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-mitchell-trubisky",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 402,
+    "name": "Mitchell Trubisky",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-deuce-vaughn",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 403,
+    "name": "Deuce Vaughn",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-adam-trautman",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 404,
+    "name": "Adam Trautman",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-mac-jones",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 405,
+    "name": "Mac Jones",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-emanuel-wilson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 406,
+    "name": "Emanuel Wilson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jarrett-stidham",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 407,
+    "name": "Jarrett Stidham",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-andre-szmyt",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 408,
+    "name": "Andre Szmyt",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-kenneth-gainwell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 409,
+    "name": "Kenneth Gainwell",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-harrison-mevis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 410,
+    "name": "Harrison Mevis",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-khalil-herbert",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 411,
+    "name": "Khalil Herbert",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-quinn-ewers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 412,
+    "name": "Quinn Ewers",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-gunnar-helm",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 413,
+    "name": "Gunnar Helm",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-cam-akers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 414,
+    "name": "Cam Akers",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-greg-joseph",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 415,
+    "name": "Greg Joseph",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-malik-washington",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 416,
+    "name": "Malik Washington",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-parker-washington",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 417,
+    "name": "Parker Washington",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jake-browning",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 418,
+    "name": "Jake Browning",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-spencer-rattler",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 419,
+    "name": "Spencer Rattler",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-greg-zuerlein",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 420,
+    "name": "Greg Zuerlein",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-mitchell-evans",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 421,
+    "name": "Mitchell Evans",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-demarcus-robinson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 422,
+    "name": "Demarcus Robinson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dewayne-mcbride",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 423,
+    "name": "DeWayne McBride",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-kyle-juszczyk",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 424,
+    "name": "Kyle Juszczyk",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jhaquan-jackson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 425,
+    "name": "Jha'Quan Jackson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-scott-matlock",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 426,
+    "name": "Scott Matlock",
+    "pos": "K",
+    "nflTeam": "DT"
+  },
+  {
+    "id": "2025-K-kyle-allen",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 427,
+    "name": "Kyle Allen",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-marcus-mariota",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 428,
+    "name": "Marcus Mariota",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-tommy-devito",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 429,
+    "name": "Tommy DeVito",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-sterling-shepard",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 430,
+    "name": "Sterling Shepard",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jermaine-burton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 431,
+    "name": "Jermaine Burton",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-matt-barkley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 432,
+    "name": "Matt Barkley",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jody-fortson-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 433,
+    "name": "Jody Fortson Jr",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jerell-adams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 434,
+    "name": "Jerell Adams",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-braxton-berrios",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 435,
+    "name": "Braxton Berrios",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-cj-ham",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 436,
+    "name": "C.J. Ham",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-connor-heyward",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 437,
+    "name": "Connor Heyward",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-stephen-anderson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 438,
+    "name": "Stephen Anderson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-mason-crosby",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 439,
+    "name": "Mason Crosby",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-jordan-travis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 440,
+    "name": "Jordan Travis",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-equanimeous-st-brown",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 441,
+    "name": "Equanimeous St. Brown",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tyquan-thornton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 442,
+    "name": "Tyquan Thornton",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-zach-wilson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 443,
+    "name": "Zach Wilson",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-vyncint-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 444,
+    "name": "Vyncint Smith",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kadarius-toney",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 445,
+    "name": "Kadarius Toney",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jeremy-mcnichols",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 446,
+    "name": "Jeremy McNichols",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-sam-howell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 447,
+    "name": "Sam Howell",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-john-samuel-shenker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 448,
+    "name": "John Samuel Shenker",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-savion-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 449,
+    "name": "Savion Williams",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-david-bell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 450,
+    "name": "David Bell",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-stephen-sullivan",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 451,
+    "name": "Stephen Sullivan",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-tyson-bagent",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 452,
+    "name": "Tyson Bagent",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-cody-core",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 453,
+    "name": "Cody Core",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-drew-lock",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 454,
+    "name": "Drew Lock",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-ezekiel-elliott",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 455,
+    "name": "Ezekiel Elliott",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-darrell-stewart-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 456,
+    "name": "Darrell Stewart Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-alex-erickson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 457,
+    "name": "Alex Erickson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-frank-gore-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 458,
+    "name": "Frank Gore Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tommy-tremble",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 459,
+    "name": "Tommy Tremble",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-kenny-pickett",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 460,
+    "name": "Kenny Pickett",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-noah-brown",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 461,
+    "name": "Noah Brown",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-austin-seibert",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 462,
+    "name": "Austin Seibert",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-dalvin-cook",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 463,
+    "name": "Dalvin Cook",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-mo-alie-cox",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 464,
+    "name": "Mo Alie-Cox",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-greg-bell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 465,
+    "name": "Greg Bell",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tyrell-shavers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 466,
+    "name": "Tyrell Shavers",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-darrell-henderson-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 467,
+    "name": "Darrell Henderson Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-richie-james-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 468,
+    "name": "Richie James Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jeff-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 469,
+    "name": "Jeff Smith",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-daniel-bellinger",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 470,
+    "name": "Daniel Bellinger",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-leonard-fournette",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 471,
+    "name": "Leonard Fournette",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tai-felton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 472,
+    "name": "Tai Felton",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-zane-gonzalez",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 473,
+    "name": "Zane Gonzalez",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-john-bates",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 474,
+    "name": "John Bates",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jacob-kibodi",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 475,
+    "name": "Jacob Kibodi",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-dj-montgomery",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 476,
+    "name": "D.J. Montgomery",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jaylin-lane",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 477,
+    "name": "Jaylin Lane",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jermaine-jackson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 478,
+    "name": "Jermaine Jackson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-curtis-samuel",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 479,
+    "name": "Curtis Samuel",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-duke-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 480,
+    "name": "Duke Williams",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-andy-dalton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 481,
+    "name": "Andy Dalton",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-hendon-hooker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 482,
+    "name": "Hendon Hooker",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-patrick-ricard",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 483,
+    "name": "Patrick Ricard",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-john-ross",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 484,
+    "name": "John Ross",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-alex-armah-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 485,
+    "name": "Alex Armah Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-liljordan-humphrey",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 486,
+    "name": "Lil'Jordan Humphrey",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-brett-maher",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 487,
+    "name": "Brett Maher",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-eddy-pineiro",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 488,
+    "name": "Eddy Pineiro",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-stetson-bennett",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 489,
+    "name": "Stetson Bennett",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-gabe-davis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 490,
+    "name": "Gabe Davis",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-travis-wilson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 491,
+    "name": "Travis Wilson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-lucky-jackson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 492,
+    "name": "Lucky Jackson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ross-travis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 493,
+    "name": "Ross Travis",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-nathan-rourke",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 494,
+    "name": "Nathan Rourke",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-ricky-white",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 495,
+    "name": "Ricky White",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kenny-stills",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 496,
+    "name": "Kenny Stills",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-cade-stover",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 497,
+    "name": "Cade Stover",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-david-moore",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 498,
+    "name": "David Moore",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-robert-woods",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 499,
+    "name": "Robert Woods",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-max-duggan",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 500,
+    "name": "Max Duggan",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-josh-reynolds",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 501,
+    "name": "Josh Reynolds",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-cyril-grayson-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 502,
+    "name": "Cyril Grayson Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-brandon-allen",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 503,
+    "name": "Brandon Allen",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-anders-carlson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 504,
+    "name": "Anders Carlson",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-matt-prater",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 505,
+    "name": "Matt Prater",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-michael-badgley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 506,
+    "name": "Michael Badgley",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-lenny-krieg",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 507,
+    "name": "Lenny Krieg",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-randy-bullock",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 508,
+    "name": "Randy Bullock",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-kenjon-barner",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 509,
+    "name": "Kenjon Barner",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-anthony-brown-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 510,
+    "name": "Anthony Brown Jr",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-justin-watson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 511,
+    "name": "Justin Watson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-john-fitzpatrick",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 512,
+    "name": "John FitzPatrick",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-theo-riddick",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 513,
+    "name": "Theo Riddick",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-ben-dinucci",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 514,
+    "name": "Ben DiNucci",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-tevin-jones",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 515,
+    "name": "Tevin Jones",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kyle-mccord",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 516,
+    "name": "Kyle McCord",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-cade-york",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 517,
+    "name": "Cade York",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-damion-willis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 518,
+    "name": "Damion Willis",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ian-book",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 519,
+    "name": "Ian Book",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-colby-parkinson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 520,
+    "name": "Colby Parkinson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-isaac-rex",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 521,
+    "name": "Isaac Rex",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-tylan-wallace",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 522,
+    "name": "Tylan Wallace",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dallin-holker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 523,
+    "name": "Dallin Holker",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-george-campbell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 524,
+    "name": "George Campbell",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-blake-proehl",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 525,
+    "name": "Blake Proehl",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-scotty-miller",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 526,
+    "name": "Scotty Miller",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-julio-jones",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 527,
+    "name": "Julio Jones",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kazmeir-allen",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 528,
+    "name": "Kazmeir Allen",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-derius-davis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 529,
+    "name": "Derius Davis",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jordan-moore",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 530,
+    "name": "Jordan Moore",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-devontez-walker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 531,
+    "name": "Devontez Walker",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-julius-chestnut",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 532,
+    "name": "Julius Chestnut",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-marcus-major-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 533,
+    "name": "Marcus Major Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-cole-beasley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 534,
+    "name": "Cole Beasley",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-noah-cain",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 535,
+    "name": "Noah Cain",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-mikey-daniel",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 536,
+    "name": "Mikey Daniel",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jalen-white",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 537,
+    "name": "Jalen White",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-raheim-sanders",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 538,
+    "name": "Raheim Sanders",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-luke-farrell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 539,
+    "name": "Luke Farrell",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-ellis-merriweather",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 540,
+    "name": "Ellis Merriweather",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-nikko-remigio",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 541,
+    "name": "Nikko Remigio",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-cam-newton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 542,
+    "name": "Cam Newton",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-robert-foster",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 543,
+    "name": "Robert Foster",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kirk-merritt",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 544,
+    "name": "Kirk Merritt",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-konata-mumpfield",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 545,
+    "name": "Konata Mumpfield",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-joe-horn-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 546,
+    "name": "Joe Horn Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-wendell-smallwood",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 547,
+    "name": "Wendell Smallwood",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-van-jefferson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 548,
+    "name": "Van Jefferson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-trey-lance",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 549,
+    "name": "Trey Lance",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-riley-leonard",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 550,
+    "name": "Riley Leonard",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-rasheen-ali",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 551,
+    "name": "Rasheen Ali",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tyler-badie",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 552,
+    "name": "Tyler Badie",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-kylen-granson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 553,
+    "name": "Kylen Granson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-teddy-bridgewater",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 554,
+    "name": "Teddy Bridgewater",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-seth-green",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 555,
+    "name": "Seth Green",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jaylen-samuels",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 556,
+    "name": "Jaylen Samuels",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jahdae-walker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 557,
+    "name": "Jahdae Walker",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-giovani-bernard",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 558,
+    "name": "Giovani Bernard",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-dj-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 559,
+    "name": "D.J. Williams",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jalen-guyton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 560,
+    "name": "Jalen Guyton",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jared-wayne",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 561,
+    "name": "Jared Wayne",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jason-brownlee",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 562,
+    "name": "Jason Brownlee",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jaren-hall",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 563,
+    "name": "Jaren Hall",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-phil-mafah",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 564,
+    "name": "Phil Mafah",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-rob-gronkowski",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 565,
+    "name": "Rob Gronkowski",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-trent-taylor",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 566,
+    "name": "Trent Taylor",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jack-coan",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 567,
+    "name": "Jack Coan",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-thomas-fidone",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 568,
+    "name": "Thomas Fidone",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-kalel-mullings",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 569,
+    "name": "Kalel Mullings",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-robert-griffin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 570,
+    "name": "Robert Griffin",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-boston-scott",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 571,
+    "name": "Boston Scott",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-dominique-dafney",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 572,
+    "name": "Dominique Dafney",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-mecole-hardman-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 573,
+    "name": "Mecole Hardman Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-sarodorick-thompson-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 574,
+    "name": "SaRodorick Thompson Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-zay-jones",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 575,
+    "name": "Zay Jones",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-beaux-collins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 576,
+    "name": "Beaux Collins",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-davis-allen",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 577,
+    "name": "Davis Allen",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-greg-dortch",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 578,
+    "name": "Greg Dortch",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-avery-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 579,
+    "name": "Avery Williams",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-nick-mullens",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 580,
+    "name": "Nick Mullens",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-gus-edwards",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 581,
+    "name": "Gus Edwards",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-louis-rees-zammit",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 582,
+    "name": "Louis Rees-Zammit",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jared-wiley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 583,
+    "name": "Jared Wiley",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-tanner-brown",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 584,
+    "name": "Tanner Brown",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-drew-sample",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 585,
+    "name": "Drew Sample",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-donovan-edwards",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 586,
+    "name": "Donovan Edwards",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-robbie-chosen",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 587,
+    "name": "Robbie Chosen",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dominic-lovett",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 588,
+    "name": "Dominic Lovett",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-cedrick-wilson-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 589,
+    "name": "Cedrick Wilson Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-charlie-jones",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 590,
+    "name": "Charlie Jones",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dillon-gabriel",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 591,
+    "name": "Dillon Gabriel",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-phillip-dorsett",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 592,
+    "name": "Phillip Dorsett",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jamari-thrash",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 593,
+    "name": "Jamari Thrash",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tyree-jackson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 594,
+    "name": "Tyree Jackson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-keith-kirkwood",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 595,
+    "name": "Keith Kirkwood",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-james-robinson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 596,
+    "name": "James Robinson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-charlie-kolar",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 597,
+    "name": "Charlie Kolar",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-ainias-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 598,
+    "name": "Ainias Smith",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-henry-pearson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 599,
+    "name": "Henry Pearson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-trey-sermon",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 600,
+    "name": "Trey Sermon",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-arian-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 601,
+    "name": "Arian Smith",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-michael-carter",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 602,
+    "name": "Michael Carter",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-sione-vaki",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 603,
+    "name": "Sione Vaki",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tommy-mellott",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 604,
+    "name": "Tommy Mellott",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ryan-tannehill",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 605,
+    "name": "Ryan Tannehill",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-michael-burton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 606,
+    "name": "Michael Burton",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-zach-pascal",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 607,
+    "name": "Zach Pascal",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tyreik-mcallister",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 608,
+    "name": "Tyreik McAllister",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-clyde-edwards-helaire",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 609,
+    "name": "Clyde Edwards-Helaire",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-trey-palmer",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 610,
+    "name": "Trey Palmer",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-gavin-bartholomew",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 611,
+    "name": "Gavin Bartholomew",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-kendrick-bourne",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 612,
+    "name": "Kendrick Bourne",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-brenden-rice",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 613,
+    "name": "Brenden Rice",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-emari-demercado",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 614,
+    "name": "Emari Demercado",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-matt-ammendola",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 615,
+    "name": "Matt Ammendola",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-dylan-laube",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 616,
+    "name": "Dylan Laube",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-ej-jenkins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 617,
+    "name": "E.J. Jenkins",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-hunter-luepke",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 618,
+    "name": "Hunter Luepke",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jeremy-ruckert",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 619,
+    "name": "Jeremy Ruckert",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-chris-brooks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 620,
+    "name": "Chris Brooks",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-brayden-narveson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 621,
+    "name": "Brayden Narveson",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-river-cracraft",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 622,
+    "name": "River Cracraft",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-george-holani",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 623,
+    "name": "George Holani",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-laquon-treadwell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 624,
+    "name": "Laquon Treadwell",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-josh-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 625,
+    "name": "Josh Johnson",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jacorey-brooks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 626,
+    "name": "Ja'Corey Brooks",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-isaiah-davis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 627,
+    "name": "Isaiah Davis",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jimmy-graham",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 628,
+    "name": "Jimmy Graham",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jonathan-mingo",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 629,
+    "name": "Jonathan Mingo",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-nathan-peterman",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 630,
+    "name": "Nathan Peterman",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-colson-yankoff",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 631,
+    "name": "Colson Yankoff",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-ian-thomas",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 632,
+    "name": "Ian Thomas",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-devin-duvernay",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 633,
+    "name": "Devin Duvernay",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-travis-homer",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 634,
+    "name": "Travis Homer",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-rashaad-penny",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 635,
+    "name": "Rashaad Penny",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jonathan-ward",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 636,
+    "name": "Jonathan Ward",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jordan-watkins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 637,
+    "name": "Jordan Watkins",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-gunner-olszewski",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 638,
+    "name": "Gunner Olszewski",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kimani-vidal",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 639,
+    "name": "Kimani Vidal",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-irv-smith-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 640,
+    "name": "Irv Smith Jr",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-tyler-goodson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 641,
+    "name": "Tyler Goodson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-hassan-haskins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 642,
+    "name": "Hassan Haskins",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-robbie-ouzts",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 643,
+    "name": "Robbie Ouzts",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-foster-moreau",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 644,
+    "name": "Foster Moreau",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-cam-miller",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 645,
+    "name": "Cam Miller",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-josh-whyle",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 646,
+    "name": "Josh Whyle",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-trayveon-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 647,
+    "name": "Trayveon Williams",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-sincere-mccormick",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 648,
+    "name": "Sincere McCormick",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-chimere-dike",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 649,
+    "name": "Chimere Dike",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jake-funk",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 650,
+    "name": "Jake Funk",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-dorian-thompson-robinson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 651,
+    "name": "Dorian Thompson-Robinson",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-armani-rogers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 652,
+    "name": "Armani Rogers",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jamaal-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 653,
+    "name": "Jamaal Williams",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-matt-corral",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 654,
+    "name": "Matt Corral",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-xavier-hutchinson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 655,
+    "name": "Xavier Hutchinson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-donovan-peoples-jones",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 656,
+    "name": "Donovan Peoples-Jones",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-aidan-oconnell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 657,
+    "name": "Aidan O'Connell",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-darrell-daniels",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 658,
+    "name": "Darrell Daniels",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jonathon-brooks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 659,
+    "name": "Jonathon Brooks",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jalin-conyers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 660,
+    "name": "Jalin Conyers",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-ben-sauls",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 661,
+    "name": "Ben Sauls",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-malik-heath",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 662,
+    "name": "Malik Heath",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-charlie-smyth",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 663,
+    "name": "Charlie Smyth",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-jacob-cowing",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 664,
+    "name": "Jacob Cowing",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-raheem-blackshear",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 665,
+    "name": "Raheem Blackshear",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-nick-nash",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 666,
+    "name": "Nick Nash",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jason-cabinda",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 667,
+    "name": "Jason Cabinda",
+    "pos": "K",
+    "nflTeam": "LB"
+  },
+  {
+    "id": "2025-K-tyler-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 668,
+    "name": "Tyler Johnson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tre-mckitty",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 669,
+    "name": "Tre' McKitty",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-terrell-jennings",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 670,
+    "name": "Terrell Jennings",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-ashton-dulin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 671,
+    "name": "Ashton Dulin",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tyrod-taylor",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 672,
+    "name": "Tyrod Taylor",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-cordarrelle-patterson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 673,
+    "name": "Cordarrelle Patterson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tanner-hudson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 674,
+    "name": "Tanner Hudson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-brittain-brown",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 675,
+    "name": "Brittain Brown",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jacoby-brissett",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 676,
+    "name": "Jacoby Brissett",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-andrew-beck",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 677,
+    "name": "Andrew Beck",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-case-keenum",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 678,
+    "name": "Case Keenum",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-eric-saubert",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 679,
+    "name": "Eric Saubert",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-baylor-cupp",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 680,
+    "name": "Baylor Cupp",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jake-fromm",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 681,
+    "name": "Jake Fromm",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-lequint-allen-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 682,
+    "name": "LeQuint Allen Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-johnny-mundt",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 683,
+    "name": "Johnny Mundt",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-kyle-trask",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 684,
+    "name": "Kyle Trask",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-robert-tonyan",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 685,
+    "name": "Robert Tonyan",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-dare-ogunbowale",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 686,
+    "name": "Dare Ogunbowale",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-kj-hamler",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 687,
+    "name": "KJ Hamler",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-michael-gallup",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 688,
+    "name": "Michael Gallup",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tyler-scott",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 689,
+    "name": "Tyler Scott",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-keaontay-ingram",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 690,
+    "name": "Keaontay Ingram",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-riley-patterson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 691,
+    "name": "Riley Patterson",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-deon-jackson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 692,
+    "name": "Deon Jackson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-lucas-havrisik",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 693,
+    "name": "Lucas Havrisik",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-jeff-wilson-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 694,
+    "name": "Jeff Wilson Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tre-watson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 695,
+    "name": "Tre Watson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-alec-ingold",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 696,
+    "name": "Alec Ingold",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jakob-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 697,
+    "name": "Jakob Johnson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-harrison-bryant",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 698,
+    "name": "Harrison Bryant",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-deejay-dallas",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 699,
+    "name": "DeeJay Dallas",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tim-jones",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 700,
+    "name": "Tim Jones",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-terrace-marshall-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 701,
+    "name": "Terrace Marshall Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-maddux-trujillo",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 702,
+    "name": "Maddux Trujillo",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-ben-skowronek",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 703,
+    "name": "Ben Skowronek",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-drew-ogletree",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 704,
+    "name": "Drew Ogletree",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-pierre-strong-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 705,
+    "name": "Pierre Strong Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tyrion-davis-price",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 706,
+    "name": "Tyrion Davis-Price",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jalen-brooks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 707,
+    "name": "Jalen Brooks",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ronnie-bell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 708,
+    "name": "Ronnie Bell",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-payne-durham",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 709,
+    "name": "Payne Durham",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-nate-adkins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 710,
+    "name": "Nate Adkins",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-javon-baker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 711,
+    "name": "Javon Baker",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jaheim-bell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 712,
+    "name": "Jaheim Bell",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-kendall-milton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 713,
+    "name": "Kendall Milton",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-mark-mcnamee",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 714,
+    "name": "Mark McNamee",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-bryce-oliver",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 715,
+    "name": "Bryce Oliver",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-terique-owens",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 716,
+    "name": "Terique Owens",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-mitch-van-vooren",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 717,
+    "name": "Mitch Van Vooren",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jonathan-kim",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 718,
+    "name": "Jonathan Kim",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-caden-prieskorn",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 719,
+    "name": "Caden Prieskorn",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jaquinden-jackson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 720,
+    "name": "Ja'Quinden Jackson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-trevor-siemian",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 721,
+    "name": "Trevor Siemian",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-deandre-carter",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 722,
+    "name": "DeAndre Carter",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-taylor-heinicke",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 723,
+    "name": "Taylor Heinicke",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-chris-moore",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 724,
+    "name": "Chris Moore",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-nate-sudfeld",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 725,
+    "name": "Nate Sudfeld",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-tyler-boyd",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 726,
+    "name": "Tyler Boyd",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jamal-agnew",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 727,
+    "name": "Jamal Agnew",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-pharaoh-brown",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 728,
+    "name": "Pharaoh Brown",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-royce-freeman",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 729,
+    "name": "Royce Freeman",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-john-kelly-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 730,
+    "name": "John Kelly Jr",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-anthony-miller",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 731,
+    "name": "Anthony Miller",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dante-pettis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 732,
+    "name": "Dante Pettis",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-durham-smythe",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 733,
+    "name": "Durham Smythe",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-mike-white",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 734,
+    "name": "Mike White",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-ross-dwelley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 735,
+    "name": "Ross Dwelley",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-phil-lutz",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 736,
+    "name": "Phil Lutz",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tim-boyle",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 737,
+    "name": "Tim Boyle",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-trent-sherfield-sr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 738,
+    "name": "Trent Sherfield Sr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-khadarel-hodge",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 739,
+    "name": "KhaDarel Hodge",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kelvin-harmon",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 740,
+    "name": "Kelvin Harmon",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-miles-boykin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 741,
+    "name": "Miles Boykin",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-brett-rypien",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 742,
+    "name": "Brett Rypien",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-trenton-irwin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 743,
+    "name": "Trenton Irwin",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-juwann-winfree",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 744,
+    "name": "Juwann Winfree",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-malik-taylor",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 745,
+    "name": "Malik Taylor",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-steven-sims-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 746,
+    "name": "Steven Sims Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-elijah-young",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 747,
+    "name": "Elijah Young",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-alex-bachman",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 748,
+    "name": "Alex Bachman",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tom-kennedy",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 749,
+    "name": "Tom Kennedy",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tyler-huntley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 750,
+    "name": "Tyler Huntley",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-isaiah-hodgins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 751,
+    "name": "Isaiah Hodgins",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-giovanni-ricci",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 752,
+    "name": "Giovanni Ricci",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-scotty-washington",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 753,
+    "name": "Scotty Washington",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-max-brosmer",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 754,
+    "name": "Max Brosmer",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-keyshawn-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 755,
+    "name": "Key'Shawn Smith",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-patrick-herbert",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 756,
+    "name": "Patrick Herbert",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-laviska-shenault-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 757,
+    "name": "Laviska Shenault Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-trishton-jackson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 758,
+    "name": "Trishton Jackson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-bryce-perkins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 759,
+    "name": "Bryce Perkins",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-kj-osborn",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 760,
+    "name": "K.J. Osborn",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jalen-reagor",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 761,
+    "name": "Jalen Reagor",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-chase-claypool",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 762,
+    "name": "Chase Claypool",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dj-uiagalelei",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 763,
+    "name": "DJ Uiagalelei",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-jamycal-hasty",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 764,
+    "name": "JaMycal Hasty",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-charlie-woerner",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 765,
+    "name": "Charlie Woerner",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-corey-kiner",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 766,
+    "name": "Corey Kiner",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-reggie-gilliam",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 767,
+    "name": "Reggie Gilliam",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-lawrence-cager",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 768,
+    "name": "Lawrence Cager",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jacardia-wright",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 769,
+    "name": "Jacardia Wright",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tarik-black",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 770,
+    "name": "Tarik Black",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kenny-yeboah",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 771,
+    "name": "Kenny Yeboah",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-simi-fehoko",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 772,
+    "name": "Simi Fehoko",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dez-fitzpatrick",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 773,
+    "name": "Dez Fitzpatrick",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-davis-mills",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 774,
+    "name": "Davis Mills",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-sam-ehlinger",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 775,
+    "name": "Sam Ehlinger",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-cornell-powell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 776,
+    "name": "Cornell Powell",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jacob-harris",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 777,
+    "name": "Jacob Harris",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-zach-davidson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 778,
+    "name": "Zach Davidson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-kene-nwangwu",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 779,
+    "name": "Kene Nwangwu",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-gary-brightwell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 780,
+    "name": "Gary Brightwell",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-dee-eskridge",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 781,
+    "name": "Dee Eskridge",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jaden-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 782,
+    "name": "Jaden Smith",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-austin-trammell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 783,
+    "name": "Austin Trammell",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jack-stoll",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 784,
+    "name": "Jack Stoll",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jaret-patterson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 785,
+    "name": "Jaret Patterson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-shane-zylstra",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 786,
+    "name": "Shane Zylstra",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-desmond-ridder",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 787,
+    "name": "Desmond Ridder",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-velus-jones-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 788,
+    "name": "Velus Jones Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-michael-woods",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 789,
+    "name": "Michael Woods",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-greg-dulcich",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 790,
+    "name": "Greg Dulcich",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jelani-woods",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 791,
+    "name": "Jelani Woods",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-skylar-thompson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 792,
+    "name": "Skylar Thompson",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-nick-muse",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 793,
+    "name": "Nick Muse",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-bailey-zappe",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 794,
+    "name": "Bailey Zappe",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-zonovan-knight",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 795,
+    "name": "Zonovan Knight",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-britain-covey",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 796,
+    "name": "Britain Covey",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-bo-melton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 797,
+    "name": "Bo Melton",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dareke-young",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 798,
+    "name": "Dareke Young",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-justyn-ross",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 799,
+    "name": "Justyn Ross",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kaden-davis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 800,
+    "name": "Kaden Davis",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-brandon-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 801,
+    "name": "Brandon Johnson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kevin-austin-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 802,
+    "name": "Kevin Austin Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-braylon-sanders",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 803,
+    "name": "Braylon Sanders",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-lucas-krull",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 804,
+    "name": "Lucas Krull",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jashaun-corbin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 805,
+    "name": "Jashaun Corbin",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-ronnie-rivers",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 806,
+    "name": "Ronnie Rivers",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-stone-smartt",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 807,
+    "name": "Stone Smartt",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jake-briningstool",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 808,
+    "name": "Jake Briningstool",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-tucker-fisk",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 809,
+    "name": "Tucker Fisk",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-justin-shorter",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 810,
+    "name": "Justin Shorter",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-elijhah-badger",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 811,
+    "name": "Elijhah Badger",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ketron-jackson-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 812,
+    "name": "Ketron Jackson Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-evan-hull",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 813,
+    "name": "Evan Hull",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-will-mallory",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 814,
+    "name": "Will Mallory",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-zach-evans",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 815,
+    "name": "Zach Evans",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-dresser-winn",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 816,
+    "name": "Dresser Winn",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-xavier-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 817,
+    "name": "Xavier Smith",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jake-haener",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 818,
+    "name": "Jake Haener",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-eric-gray",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 819,
+    "name": "Eric Gray",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-brock-lampe",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 820,
+    "name": "Brock Lampe",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-israel-abanikanda",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 821,
+    "name": "Israel Abanikanda",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-brayden-willis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 822,
+    "name": "Brayden Willis",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-silas-bolden",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 823,
+    "name": "Silas Bolden",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ben-wooldridge",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 824,
+    "name": "Ben Wooldridge",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-zavier-scott",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 825,
+    "name": "Zavier Scott",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-marcus-yarns",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 826,
+    "name": "Marcus Yarns",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-xavier-gipson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 827,
+    "name": "Xavier Gipson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ben-vansumeren",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 828,
+    "name": "Ben VanSumeren",
+    "pos": "K",
+    "nflTeam": "LB"
+  },
+  {
+    "id": "2025-K-brady-russell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 829,
+    "name": "Brady Russell",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jordan-mims",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 830,
+    "name": "Jordan Mims",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-shedrick-jackson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 831,
+    "name": "Shedrick Jackson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ajou-ajou",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 832,
+    "name": "Ajou Ajou",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-princeton-fant",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 833,
+    "name": "Princeton Fant",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-giles-jackson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 834,
+    "name": "Giles Jackson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jj-galbreath",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 835,
+    "name": "JJ Galbreath",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-max-hurleman",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 836,
+    "name": "Max Hurleman",
+    "pos": "K",
+    "nflTeam": "CB"
+  },
+  {
+    "id": "2025-K-shunderrick-powell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 837,
+    "name": "ShunDerrick Powell",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-elijah-cooks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 838,
+    "name": "Elijah Cooks",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-blake-whiteheart",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 839,
+    "name": "Blake Whiteheart",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-thayer-thomas",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 840,
+    "name": "Thayer Thomas",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-malik-knowles",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 841,
+    "name": "Malik Knowles",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-roc-taylor",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 842,
+    "name": "Roc Taylor",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-johnny-lumpkin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 843,
+    "name": "Johnny Lumpkin",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-brady-cook",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 844,
+    "name": "Brady Cook",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-rakim-jarrett",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 845,
+    "name": "Rakim Jarrett",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ryan-miller",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 846,
+    "name": "Ryan Miller",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-junior-bergen",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 847,
+    "name": "Junior Bergen",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jase-mcclellan",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 848,
+    "name": "Jase McClellan",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-casey-washington",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 849,
+    "name": "Casey Washington",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-devin-leary",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 850,
+    "name": "Devin Leary",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-erick-all-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 851,
+    "name": "Erick All Jr",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-ryan-flournoy",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 852,
+    "name": "Ryan Flournoy",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-nick-kallerup",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 853,
+    "name": "Nick Kallerup",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-anthony-gould",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 854,
+    "name": "Anthony Gould",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-keilan-robinson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 855,
+    "name": "Keilan Robinson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-josh-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 856,
+    "name": "Josh Williams",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-bub-means",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 857,
+    "name": "Bub Means",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-dante-miller",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 858,
+    "name": "Dante Miller",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-malachi-corley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 859,
+    "name": "Malachi Corley",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tip-reiman",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 860,
+    "name": "Tip Reiman",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-devin-culp",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 861,
+    "name": "Devin Culp",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-ryan-coe",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 862,
+    "name": "Ryan Coe",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-jarveon-howard",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 863,
+    "name": "Jarveon Howard",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-emory-jones",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 864,
+    "name": "Emory Jones",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-emani-bailey",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 865,
+    "name": "Emani Bailey",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-winston-wright",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 866,
+    "name": "Winston Wright",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-austin-reed",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 867,
+    "name": "Austin Reed",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-ian-wheeler",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 868,
+    "name": "Ian Wheeler",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-cole-burgess",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 869,
+    "name": "Cole Burgess",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-cam-grandy",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 870,
+    "name": "Cam Grandy",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-brevyn-spann-ford",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 871,
+    "name": "Brevyn Spann-Ford",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-blake-watson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 872,
+    "name": "Blake Watson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-thomas-yassmin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 873,
+    "name": "Thomas Yassmin",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-isaiah-williams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 874,
+    "name": "Isaiah Williams",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kedon-slovis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 875,
+    "name": "Kedon Slovis",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-mason-tipton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 876,
+    "name": "Mason Tipton",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-xavier-weaver",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 877,
+    "name": "Xavier Weaver",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-david-martin-robinson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 878,
+    "name": "David Martin-Robinson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jabari-small",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 879,
+    "name": "Jabari Small",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-tanner-mordecai",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 880,
+    "name": "Tanner Mordecai",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-cody-schrader",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 881,
+    "name": "Cody Schrader",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-kameron-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 882,
+    "name": "Kameron Johnson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-sam-hartman",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 883,
+    "name": "Sam Hartman",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-british-brooks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 884,
+    "name": "British Brooks",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-shawn-bowman",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 885,
+    "name": "Shawn Bowman",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-alex-hale",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 886,
+    "name": "Alex Hale",
+    "pos": "K",
+    "nflTeam": ""
+  },
+  {
+    "id": "2025-K-jahmal-banks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 887,
+    "name": "Jahmal Banks",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jackson-hawes",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 888,
+    "name": "Jackson Hawes",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-kayron-lynch-adams",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 889,
+    "name": "Kayron Lynch-Adams",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-deion-hankins",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 890,
+    "name": "Deion Hankins",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-quali-conley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 891,
+    "name": "Quali Conley",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-jamoi-mayes",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 892,
+    "name": "Jamoi Mayes",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-luke-floriea",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 893,
+    "name": "Luke Floriea",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-ahmani-marshall",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 894,
+    "name": "Ahmani Marshall",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-rivaldo-fairweather",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 895,
+    "name": "Rivaldo Fairweather",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-traeshon-holden",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 896,
+    "name": "Traeshon Holden",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-courtney-jackson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 897,
+    "name": "Courtney Jackson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-caleb-lohner",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 898,
+    "name": "Caleb Lohner",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-amar-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 899,
+    "name": "Amar Johnson",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-micah-bernard",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 900,
+    "name": "Micah Bernard",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-graham-mertz",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 901,
+    "name": "Graham Mertz",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-nick-vannett",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 902,
+    "name": "Nick Vannett",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-gerald-everett",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 903,
+    "name": "Gerald Everett",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-dj-chark-jr",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 904,
+    "name": "DJ Chark Jr",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-mike-boone",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 905,
+    "name": "Mike Boone",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-malik-turner",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 906,
+    "name": "Malik Turner",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-john-wolford",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 907,
+    "name": "John Wolford",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-myles-gaskin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 908,
+    "name": "Myles Gaskin",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-will-grier",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 909,
+    "name": "Will Grier",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-andy-isabella",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 910,
+    "name": "Andy Isabella",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-hunter-long",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 911,
+    "name": "Hunter Long",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-ihmir-smith-marsette",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 912,
+    "name": "Ihmir Smith-Marsette",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kawaan-baker",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 913,
+    "name": "Kawaan Baker",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-quintin-morris",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 914,
+    "name": "Quintin Morris",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-brandon-smith",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 915,
+    "name": "Brandon Smith",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-adam-prentice",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 916,
+    "name": "Adam Prentice",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-shane-buechele",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 917,
+    "name": "Shane Buechele",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-michael-bandy",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 918,
+    "name": "Michael Bandy",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-sal-cannella",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 919,
+    "name": "Sal Cannella",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-michael-jacobson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 920,
+    "name": "Michael Jacobson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jake-tonges",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 921,
+    "name": "Jake Tonges",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-montrell-washington",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 922,
+    "name": "Montrell Washington",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-james-mitchell",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 923,
+    "name": "James Mitchell",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-samori-toure",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 924,
+    "name": "Samori Toure",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-teagan-quitoriano",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 925,
+    "name": "Teagan Quitoriano",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-lance-mccutcheon",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 926,
+    "name": "Lance McCutcheon",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-erik-ezukanma",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 927,
+    "name": "Erik Ezukanma",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kevin-harris",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 928,
+    "name": "Kevin Harris",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-irvin-charles",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 929,
+    "name": "Irvin Charles",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-chris-oladokun",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 930,
+    "name": "Chris Oladokun",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-ko-kieft",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 931,
+    "name": "Ko Kieft",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-kendric-pryor",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 932,
+    "name": "Kendric Pryor",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-zaire-mitchell-paden",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 933,
+    "name": "Zaire Mitchell-Paden",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-malik-davis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 934,
+    "name": "Malik Davis",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-dennis-houston",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 935,
+    "name": "Dennis Houston",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-aaron-shampklin",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 936,
+    "name": "Aaron Shampklin",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-xavier-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 937,
+    "name": "Xavier Johnson",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jack-plummer",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 938,
+    "name": "Jack Plummer",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-brenden-bates",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 939,
+    "name": "Brenden Bates",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-treyton-welch",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 940,
+    "name": "Treyton Welch",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jason-bean",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 941,
+    "name": "Jason Bean",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-joshua-cephus",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 942,
+    "name": "Joshua Cephus",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-carter-bradley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 943,
+    "name": "Carter Bradley",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-steven-stilianos",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 944,
+    "name": "Steven Stilianos",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-john-jiles",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 945,
+    "name": "John Jiles",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-john-rhys-plumlee",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 946,
+    "name": "John Rhys Plumlee",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-mason-pline",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 947,
+    "name": "Mason Pline",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-michael-wiley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 948,
+    "name": "Michael Wiley",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-neal-johnson",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 949,
+    "name": "Neal Johnson",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-drake-stoops",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 950,
+    "name": "Drake Stoops",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-hayden-rucci",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 951,
+    "name": "Hayden Rucci",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jaelen-gill",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 952,
+    "name": "Jaelen Gill",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kevin-foelsch",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 953,
+    "name": "Kevin Foelsch",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-georquarius-spivey",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 954,
+    "name": "Geor'Quarius Spivey",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-joshua-simon",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 955,
+    "name": "Joshua Simon",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-lucas-scott",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 956,
+    "name": "Lucas Scott",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-kelly-akharaiyi",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 957,
+    "name": "Kelly Akharaiyi",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-keleki-latu",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 958,
+    "name": "Keleki Latu",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-hal-presley",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 959,
+    "name": "Hal Presley",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-bryce-pierre",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 960,
+    "name": "Bryce Pierre",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-rashod-owens",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 961,
+    "name": "Rashod Owens",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-payton-thorne",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 962,
+    "name": "Payton Thorne",
+    "pos": "K",
+    "nflTeam": "QB"
+  },
+  {
+    "id": "2025-K-gage-larvadain",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 963,
+    "name": "Gage Larvadain",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jaseem-reed",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 964,
+    "name": "Ja'seem Reed",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-josh-kelly",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 965,
+    "name": "Josh Kelly",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-tyler-neville",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 966,
+    "name": "Tyler Neville",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-joaquin-davis",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 967,
+    "name": "Joaquin Davis",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jerjuan-newton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 968,
+    "name": "Jerjuan Newton",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-kyrese-rowan",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 969,
+    "name": "Kyrese Rowan",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-zach-horton",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 970,
+    "name": "Zach Horton",
+    "pos": "K",
+    "nflTeam": "TE"
+  },
+  {
+    "id": "2025-K-jakobie-keeney-james",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 971,
+    "name": "Jakobie Keeney-James",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-jackson-meeks",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 972,
+    "name": "Jackson Meeks",
+    "pos": "K",
+    "nflTeam": "WR"
+  },
+  {
+    "id": "2025-K-anthony-tyus",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 973,
+    "name": "Anthony Tyus",
+    "pos": "K",
+    "nflTeam": "RB"
+  },
+  {
+    "id": "2025-K-drake-dabney",
+    "season": 2025,
+    "source": "FantasyPros ADP",
+    "rank": 974,
+    "name": "Drake Dabney",
+    "pos": "K",
+    "nflTeam": "TE"
+  }
+]

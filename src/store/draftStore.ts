@@ -209,11 +209,33 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
     },
 
     setPlayers: (players: Player[]) => {
-      set((state) => ({
-        ...state,
-        players,
-        playersLoaded: true,
-      }));
+      console.log('[DraftStore] Setting players:', players.length);
+      const firstPlayer = players[0];
+      if (firstPlayer) {
+        console.log('[DraftStore] First player:', {
+          id: firstPlayer.id,
+          name: firstPlayer.name,
+          pos: firstPlayer.pos,
+          nflTeam: firstPlayer.nflTeam,
+          rank: firstPlayer.rank
+        });
+      }
+      iSet((draft) => {
+        draft.players = players;
+        draft.playersLoaded = true;
+      });
+      // Verify the players were set
+      const updatedPlayers = get().players;
+      console.log('[DraftStore] Players after set:', updatedPlayers.length);
+      if (updatedPlayers.length > 0) {
+        console.log('[DraftStore] First player after set:', {
+          id: updatedPlayers[0]?.id,
+          name: updatedPlayers[0]?.name,
+          pos: updatedPlayers[0]?.pos,
+          nflTeam: updatedPlayers[0]?.nflTeam,
+          rank: updatedPlayers[0]?.rank
+        });
+      }
     },
 
     setTeams: (teams: Team[]) => {
