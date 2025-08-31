@@ -223,6 +223,7 @@ export default function DraftBoard() {
   };
 
   const { onOpen: onSettingsOpen } = useDisclosure();
+  const [searchQuery, setSearchQuery] = useState('');
   const pendingAssignment = useDraftStore(state => state.pendingAssignment);
   
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -244,7 +245,19 @@ export default function DraftBoard() {
         <HStack justify="space-between" align="center">
           <Heading size="lg" color="white">Draft Board</Heading>
           <HStack>
-            <PlayerSearch />
+            <Box position="relative" width="100%" maxW="400px">
+              <PlayerSearch 
+                placeholder="Search players..."
+                filterUndrafted={true}
+                maxResults={8}
+                onSearchChange={(e) => setSearchQuery(e.target.value)}
+                searchQuery={searchQuery}
+                onSelect={(player) => {
+                  console.log('Selected player:', player);
+                  // Handle player selection if needed
+                }}
+              />
+            </Box>
             <Button
               leftIcon={<FaCog />}
               onClick={onSettingsOpen}

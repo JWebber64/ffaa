@@ -24,9 +24,9 @@ function isValidPosition(pos: string): pos is Position {
 
 function processPlayerData(raw: Raw, index: number): Player | null {
   try {
-    // In this specific dataset, the 'pos' field is always 'K' (kicker) and the actual position is in 'nflTeam'
-    const pos = (raw.nflTeam as Position) || 'UNK';
-    const nflTeam = raw.pos || 'FA';
+    // Use the position and team directly from the raw data
+    const pos = raw.pos;
+    const nflTeam = raw.nflTeam || 'FA';
     
     // Validate position
     if (!isValidPosition(pos)) {

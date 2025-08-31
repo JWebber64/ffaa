@@ -49,6 +49,19 @@ export function useGlobalPlayers() {
         const storePlayers = useDraftStore.getState().players;
         console.log(`[useGlobalPlayers] Players in store after set:`, storePlayers.length);
         
+        // Log first few players to verify data
+        if (storePlayers.length > 0) {
+          console.log('[useGlobalPlayers] First 3 players in store:', 
+            storePlayers.slice(0, 3).map(p => ({
+              id: p.id,
+              name: p.name,
+              pos: p.pos,
+              nflTeam: p.nflTeam,
+              rank: p.rank
+            }))
+          );
+        }
+        
       } catch (error) {
         console.error('Failed to load FantasyPros players:', error);
       } finally {

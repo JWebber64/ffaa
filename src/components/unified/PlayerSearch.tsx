@@ -28,11 +28,22 @@ import {
   Spinner,
   Skeleton,
   VStack,
+  Select,
 } from '@chakra-ui/react';
 import { FaSearch } from 'react-icons/fa';
-import { useDraftStore } from '../../store/draftStore';
+import { useDraftSelectors } from '../../store/draftStore';
 import type { Player } from '../../store/draftStore';
 import { formatPositionForDisplay } from '../../utils/positionUtils';
+import type { BasePosition } from '../../types/draft';
+
+type SearchFilter = {
+  /** The text query */
+  q: string;
+  /** Position filter */
+  position: BasePosition | 'ALL';
+  /** Team filter */
+  team: string | 'ALL';
+};
 
 type PlayerSearchProps = {
   /** Array of players to search through. If not provided, will use players from store */
@@ -59,6 +70,10 @@ type PlayerSearchProps = {
   showBidButton?: boolean;
   /** Show starting bid input (default: false) */
   showStartingBid?: boolean;
+  /** Current search query */
+  searchQuery?: string;
+  /** Called when the search query changes */
+  onSearchChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 const POSITION_COLORS: Record<string, string> = {
@@ -76,31 +91,66 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
   selectedPlayer = null,
   startingBid = '1',
   onSetStartingBid,
+  onBid,
   filterUndrafted = true,
   maxResults = 8,
   debounceMs = 150,
-  onBid,
   placeholder = 'Search players… (name, team, position)',
   showBidButton = false,
   showStartingBid = false,
+  searchQuery = '',
+  onSearchChange = () => {},
 }) => {
   // State
-  const [query, setQuery] = useState('');
+  const [searchState, setSearchState] = useState<SearchFilter>({
+    q: searchQuery || '',
+    position: 'ALL',
+    team: 'ALL'
+  });
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [bidAmount, setBidAmount] = useState(1);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [selectedPlayerState, setSelectedPlayerState] = useState<Player | null>(selectedPlayer);
+  const [selectedPlayerState, setSelectedPlayerState] = useState<Player | null>(null);
 
   // Get players from store if not provided via props
-  const storePlayers = useDraftStore(s => s.players);
+  const selectors = useDraftSelectors();
+  const storePlayers = selectors.undraftedPlayers();
   const players = externalPlayers || storePlayers;
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('[PlayerSearch] Players count:', players.length);
+    if (players.length > 0) {
+      console.log('[PlayerSearch] First 3 players:', players.slice(0, 3).map(p => ({
+        id: p.id,
+        name: p.name,
+        pos: p.pos,
+        nflTeam: p.nflTeam,
+        rank: p.rank,
+        draftedBy: p.draftedBy
+      })));
+    }
+  }, [players]);
+
+  // Get unique positions and teams for filters
+  const positions = useMemo(() => {
+    const posSet = new Set<BasePosition>();
+    players.forEach((p: Player) => p.pos && posSet.add(p.pos as BasePosition));
+    return Array.from(posSet).sort();
+  }, [players]);
+  
+  const teams = useMemo(() => {
+    const teamSet = new Set<string>();
+    players.forEach((p: Player) => p.nflTeam && teamSet.add(p.nflTeam));
+    return Array.from(teamSet).sort();
+  }, [players]);
 
   // Debounce search with loading state
   useEffect(() => {
-    if (query.trim()) {
+    if (searchState.q.trim()) {
       setIsSearching(true);
       const timer = setTimeout(() => {
         setIsSearching(false);
@@ -109,7 +159,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
     }
     setIsSearching(false);
     return undefined;
-  }, [query, debounceMs]);
+  }, [searchState.q, debounceMs]);
 
   // Simulate loading state when data is being fetched
   useEffect(() => {
@@ -122,26 +172,67 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
     return undefined;
   }, [players]);
 
-  // Filter players based on query and other criteria
+  // Filter players based on search criteria
   const filteredPlayers = useMemo(() => {
-    const searchTerm = query.trim().toLowerCase();
     let result = [...players];
 
+    // Filter out drafted players if needed
     if (filterUndrafted) {
       result = result.filter(p => !p.draftedBy);
     }
 
+    // Apply search filters
+    const { q, position, team } = searchState;
+    const searchTerm = q.toLowerCase().trim();
+
     if (searchTerm) {
-      result = result.filter(p => {
-        const name = p.name?.toLowerCase() || '';
-        const team = p.nflTeam?.toLowerCase() || '';
-        const pos = p.pos?.toLowerCase() || '';
-        return name.includes(searchTerm) || team.includes(searchTerm) || pos.includes(searchTerm);
-      });
+      result = result.filter(p =>
+        p.name?.toLowerCase().includes(searchTerm) ||
+        p.nflTeam?.toLowerCase().includes(searchTerm) ||
+        p.pos?.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    if (position !== 'ALL') {
+      result = result.filter(p => p.pos === position);
+    }
+
+    if (team !== 'ALL') {
+      result = result.filter(p => p.nflTeam === team);
     }
 
     return result.slice(0, maxResults);
-  }, [query, players, filterUndrafted, maxResults]);
+  }, [players, searchState, filterUndrafted, maxResults]);
+
+  // Loading state for debounced search
+
+  // Handle search input changes
+  useEffect(() => {
+    if (searchQuery !== undefined && searchQuery !== searchState.q) {
+      setSearchState(prev => ({ ...prev, q: searchQuery }));
+    }
+  }, [searchQuery, searchState.q]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchState(prev => ({ ...prev, q: value }));
+    if (onSearchChange) {
+      onSearchChange(e);
+    }
+    setFocusedIndex(-1);
+  };
+  
+  // Handle position filter change
+  const handlePositionChange = (pos: BasePosition | 'ALL') => {
+    setSearchState(prev => ({ ...prev, position: pos }));
+    setFocusedIndex(-1);
+  };
+  
+  // Handle team filter change
+  const handleTeamChange = (team: string | 'ALL') => {
+    setSearchState(prev => ({ ...prev, team }));
+    setFocusedIndex(-1);
+  };
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -163,8 +254,9 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
         }
         break;
       case 'Escape':
-        setQuery('');
+        setSearchState(prev => ({ ...prev, q: '' }));
         setFocusedIndex(-1);
+        inputRef.current?.focus();
         break;
     }
   };
@@ -178,14 +270,27 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
       onOpen();
     } else if (onSelect) {
       onSelect(player);
-      setQuery('');
+      setSearchState(prev => ({
+        ...prev,
+        q: '',
+        position: 'ALL',
+        team: 'ALL'
+      }));
       setFocusedIndex(-1);
+      inputRef.current?.focus();
     }
   };
 
   // Update selected player state when selectedPlayer prop changes
   useEffect(() => {
     setSelectedPlayerState(selectedPlayer);
+    if (selectedPlayer) {
+      setSearchState(prev => ({
+        ...prev,
+        position: selectedPlayer.pos as BasePosition || 'ALL',
+        team: selectedPlayer.nflTeam || 'ALL'
+      }));
+    }
   }, [selectedPlayer]);
 
   // Handle bid placement
@@ -205,36 +310,74 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
 
   return (
     <Box position="relative" width="100%">
-      <InputGroup>
-        <InputLeftElement pointerEvents="none">
-          {isSearching ? (
-            <Spinner size="sm" />
-          ) : (
+      <VStack spacing={2} width="100%">
+        <InputGroup>
+          <InputLeftElement pointerEvents="none">
             <FaSearch color="gray.300" />
-          )}
-        </InputLeftElement>
-        <Input
-          ref={inputRef}
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder={placeholder}
-          onFocus={() => setFocusedIndex(-1)}
-          onKeyDown={handleKeyDown}
-          autoComplete="off"
-          aria-label="Search for players"
-          isDisabled={isLoading}
-          variant="outline"
-          size="md"
-          width="100%"
-          bg="white"
-          _dark={{
-            bg: 'gray.800',
-            borderColor: 'gray.700',
-            _hover: { borderColor: 'gray.600' },
-            _focus: { borderColor: 'blue.500', boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)' },
-          }}
-        />
-      </InputGroup>
+          </InputLeftElement>
+          <Input
+            ref={inputRef}
+            type="text"
+            placeholder={placeholder}
+            value={searchState.q}
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyDown}
+            onFocus={() => {
+              // Reset focus index when input is focused
+              setFocusedIndex(-1);
+            }}
+            autoComplete="off"
+            _dark={{
+              bg: 'gray.800',
+              borderColor: 'gray.700',
+              _hover: { borderColor: 'gray.600' },
+              _focus: { borderColor: 'blue.500', boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)' },
+            }}
+          />
+        </InputGroup>
+        
+        <HStack width="100%" spacing={2}>
+          <Select
+            size="sm"
+            value={searchState.position}
+            onChange={(e) => handlePositionChange(e.target.value as BasePosition | 'ALL')}
+            flexShrink={1}
+            minW="100px"
+            _dark={{
+              bg: 'gray.800',
+              borderColor: 'gray.700',
+              _hover: { borderColor: 'gray.600' },
+            }}
+          >
+            <option value="ALL">All Positions</option>
+            {positions.map(pos => (
+              <option key={pos} value={pos}>
+                {pos}
+              </option>
+            ))}
+          </Select>
+          
+          <Select
+            size="sm"
+            value={searchState.team}
+            onChange={(e) => handleTeamChange(e.target.value)}
+            flexShrink={1}
+            minW="120px"
+            _dark={{
+              bg: 'gray.800',
+              borderColor: 'gray.700',
+              _hover: { borderColor: 'gray.600' },
+            }}
+          >
+            <option value="ALL">All Teams</option>
+            {teams.map(team => (
+              <option key={team} value={team}>
+                {team}
+              </option>
+            ))}
+          </Select>
+        </HStack>
+      </VStack>
 
       {showStartingBid && onSetStartingBid && (
         <HStack mt={2}>
@@ -256,7 +399,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
         </HStack>
       )}
 
-      {query && (
+      {searchState.q && (
         <Box
           position="absolute"
           width="100%"

@@ -673,6 +673,15 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
           return;
         }
 
+        // Prevent double-drafting
+        if (player.draftedBy != null && player.draftedBy !== teamId) {
+          draft.pushLog({
+            type: 'ASSIGN_REJECTED',
+            message: `${player.name} has already been drafted by another team`,
+          });
+          return;
+        }
+
         // If this is an admin override, skip validation
         if (!options.isAdmin) {
           // Check if team has enough budget
@@ -684,13 +693,16 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
             return;
           }
 
-          // Check if position is valid
-          if (slot && !getValidSlots(team, player).includes(slot)) {
-            draft.pushLog({
-              type: 'ASSIGN_REJECTED',
-              message: `Cannot assign ${player.name} to ${slot}: Invalid position`,
-            });
-            return;
+          // Check if position is valid if slot is provided
+          if (slot) {
+            const validSlots = getValidSlots(team, player);
+            if (!validSlots.includes(slot)) {
+              draft.pushLog({
+                type: 'ASSIGN_REJECTED',
+                message: `Cannot assign ${player.name} to ${slot}: Invalid position. Valid positions: ${validSlots.join(', ')}`,
+              });
+              return;
+            }
           }
         } else if (price > team.budget) {
           // For admin overrides, just log a warning but allow it
@@ -704,17 +716,25 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
         const actualPrice = Math.min(price, team.budget);
         team.budget -= actualPrice;
         
-        // Add player to team
-        team.players.push(playerId);
+        // Add player to team if not already on it
+        if (!team.players.includes(playerId)) {
+          team.players.push(playerId);
+        }
+        
+        // Update player info
         player.draftedBy = teamId;
         player.price = actualPrice;
         
-        // Assign to specific slot if provided
+        // Assign to specific slot if provided and valid
         if (slot) {
           player.slot = slot;
-          if (slot in team.roster) {
-            team.roster[slot]--;
+          // Only decrement roster count for non-bench slots
+          if (slot !== 'BENCH' && slot in team.roster) {
+            team.roster[slot] = Math.max(0, (team.roster[slot] ?? 0) - 1);
           }
+        } else if (player.slot) {
+          // If no slot provided but player has a slot, clear it
+          delete player.slot;
         }
         
         // Add to assignment history
@@ -732,7 +752,7 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
         
         draft.pushLog({
           type: options.isAdmin ? 'ADMIN_ASSIGN' : 'INSTANT_ASSIGN',
-          message: `${player.name} assigned to ${team.name} for $${actualPrice}${slot ? ` (${slot})` : ''}${options.isAdmin ? ' (admin override)' : ''}`,
+          message: `${player.name} (${player.pos}) assigned to ${team.name} for $${actualPrice}${slot ? ` (${slot})` : ''}${options.isAdmin ? ' (admin override)' : ''}`,
         });
       });
     },
@@ -834,28 +854,22 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
 
     /* -------------------------------- Selectors bag ------------------------------- */
     selectors: {
-      undraftedPlayers: (state: { players: Player[] }) => state.players.filter((p: Player) => p.draftedBy === undefined),
+      undraftedPlayers: (state: { players: Player[] }) => state.players.filter(p => p.draftedBy == null),
+      
       topAvailable: (state: { players: Player[] }, limit = 300) =>
-        state.players
-          .filter((p: Player) => p.draftedBy === undefined)
-          .sort((a: Player, b: Player) => (a.rank ?? 0) - (b.rank ?? 0))
-          .slice(0, limit),
+        state.players.filter(p => p.draftedBy == null).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).slice(0, limit),
+        
       topAvailableByPos: (state: { players: Player[] }, pos: Position, limit = 100) =>
-        state.players
-          .filter((p: Player) => p.draftedBy === undefined && (p.pos as Position) === pos)
-          .sort((a: Player, b: Player) => (a.rank ?? 0) - (b.rank ?? 0))
-          .slice(0, limit),
+        state.players.filter(p => p.draftedBy == null && p.pos === pos).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).slice(0, limit),
+        
       topAvailableByMultiPos: (state: { players: Player[] }, positions: Position[], limit = 100) =>
-        state.players
-          .filter((p: Player) => p.draftedBy === undefined && positions.includes(p.pos as Position))
-          .sort((a: Player, b: Player) => (a.rank ?? 0) - (b.rank ?? 0))
-          .slice(0, limit),
+        state.players.filter(p => p.draftedBy == null && p.pos && positions.includes(p.pos as Position)).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).slice(0, limit),
+        
       topAvailableForFlex: (state: { players: Player[] }, limit = 100, includeTE = true) => {
-        const flexPositions: Position[] = ['RB', 'WR'];
-        if (includeTE) flexPositions.push('TE');
+        const flexPositions: Position[] = ['RB', 'WR', ...(includeTE ? ['TE' as const] : [])];
         return state.players
-          .filter((p: Player) => p.draftedBy === undefined && flexPositions.includes(p.pos as Position))
-          .sort((a: Player, b: Player) => (a.rank ?? 0) - (b.rank ?? 0))
+          .filter(p => p.draftedBy == null && p.pos && flexPositions.includes(p.pos as any))
+          .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
           .slice(0, limit);
       },
     },

@@ -1,5 +1,6 @@
-import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Divider, Heading, Stack, Text } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
+import { ResetDraftButton } from "../components/auction/ResetDraftButton";
 
 export default function Home() {
   return (
@@ -23,6 +24,10 @@ export default function Home() {
         <NavLink to="/results" style={{ textDecoration: "none" }}>
           <Button variant="outline" width="100%">Results</Button>
         </NavLink>
+        
+        <Divider my={4} borderColor="gray.600" />
+        
+        <ResetDraftButton />
       </Stack>
     </Box>
   );

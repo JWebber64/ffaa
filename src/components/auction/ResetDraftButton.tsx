@@ -8,15 +8,26 @@ export const ResetDraftButton = () => {
   const resetDraft = useDraftStore(state => state.resetDraft);
   const toast = useToast();
 
-  const handleReset = () => {
-    resetDraft();
-    onClose();
-    toast({
-      title: 'Draft reset successfully',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
+  const handleReset = async () => {
+    try {
+      await resetDraft({ isAdmin: true });
+      onClose();
+      toast({
+        title: 'Draft reset successfully',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Error resetting draft:', error);
+      toast({
+        title: 'Error resetting draft',
+        description: 'An error occurred while resetting the draft.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
