@@ -31,12 +31,48 @@ interface Team extends Omit<BaseTeam, 'roster'> {
  * - Body: fixed number of slots per roster position
  */
 
-// Placeholder components for missing UI elements
-const BidButton = () => (
-  <Button size="xs" colorScheme="blue" mt={1} w="100%">
-    Bid
-  </Button>
-);
+// Bid button component for placing bids
+const BidButton = ({ team, player }: { team: Team; player: Player | null | undefined }) => {
+  const { bidState, placeBid } = useDraftStore(s => ({
+    bidState: s.bidState,
+    placeBid: s.placeBid
+  }));
+
+  const handleBid = async () => {
+    if (!bidState.isLive || !bidState.playerId) {
+      console.error('No active auction');
+      return;
+    }
+
+    if (!player) {
+      console.error('No player selected');
+      return;
+    }
+
+    try {
+      const currentBid = bidState.highBid || bidState.startingBid;
+      const newBid = currentBid + 1; // Default bid increment by 1
+      
+      await placeBid(player.id, team.id, newBid);
+      console.log(`Bid placed: $${newBid} on ${player.name} by ${team.name}`);
+    } catch (error) {
+      console.error('Failed to place bid:', error);
+    }
+  };
+
+  return (
+    <Button 
+      size="xs" 
+      colorScheme="blue" 
+      mt={1} 
+      w="100%"
+      onClick={handleBid}
+      isDisabled={!bidState.isLive || !player}
+    >
+      {bidState.isLive ? `Bid $${(bidState.highBid || bidState.startingBid) + 1}` : 'Bid'}
+    </Button>
+  );
+};
 
 const SelectButton = () => (
   <Button size="xs" colorScheme="green" mt={1} w="100%">
@@ -52,17 +88,50 @@ const NominateBar = () => (
 
 
 export default function DraftBoard() {
-  const { players, templateRoster, teams } = useDraftStore(s => ({
+  const { 
+    players, 
+    templateRoster, 
+    teams, 
+    placeBid,
+    bidState
+  } = useDraftStore(s => ({
     players: s.players,
     templateRoster: s.templateRoster,
-    teams: s.teams as Team[]
+    teams: s.teams as Team[],
+    bidState: s.bidState,
+    placeBid: s.placeBid
   }), shallow);
+  
+  // Get the current user's team (simplified - in a real app, this would come from auth)
+  const currentUserTeam = teams[0]; // Assuming first team is the current user for now
 
   // Local state: simple on-device claim + rename
   const [claimed, setClaimed] = useState<Record<number, boolean>>({});
   const [editing, setEditing] = useState<number | null>(null);
   const [nameDraft, setNameDraft] = useState("");
   
+  // Get valid slots for a player on a team
+  const getValidSlotsForPlayer = (playerId: string, teamId: number): Position[] => {
+    const player = players.find(p => p.id === playerId);
+    const team = teams.find(t => t.id === teamId);
+    
+    if (!player || !team) return [];
+    
+    // Get all positions the player is eligible for
+    const eligiblePositions: Position[] = [player.pos];
+    if (player.slot) {
+      eligiblePositions.push(player.slot);
+    }
+    
+    // Filter to only include positions that have available slots on the team
+    return eligiblePositions.filter(pos => {
+      const currentCount = Object.entries(team.roster)
+        .filter(([p, count]) => p === pos && count > 0)
+        .length;
+      return currentCount > 0;
+    });
+  };
+
   // Remove unused function since we're not using it
   // function getMinColumnWidth() {
   //   if (typeof window === 'undefined') return 80;
@@ -223,8 +292,12 @@ export default function DraftBoard() {
   };
 
   const { onOpen: onSettingsOpen } = useDisclosure();
-  const [searchQuery, setSearchQuery] = useState('');
   const pendingAssignment = useDraftStore(state => state.pendingAssignment);
+  
+  // Clear pending assignment when modal is closed
+  const handleCloseModal = () => {
+    useDraftStore.setState({ pendingAssignment: null });
+  };
   
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNameDraft(e.target.value);
@@ -242,22 +315,56 @@ export default function DraftBoard() {
   return (
     <Container maxW="container.xl" py={4} bg="transparent">
       <Stack spacing={4}>
+        {/* Live Auction Bar - shows current player being bid on */}
+        <LiveAuctionBar />
+        
         <HStack justify="space-between" align="center">
           <Heading size="lg" color="white">Draft Board</Heading>
           <HStack>
-            <Box position="relative" width="100%" maxW="400px">
-              <PlayerSearch 
-                placeholder="Search players..."
-                filterUndrafted={true}
-                maxResults={8}
-                onSearchChange={(e) => setSearchQuery(e.target.value)}
-                searchQuery={searchQuery}
-                onSelect={(player) => {
-                  console.log('Selected player:', player);
-                  // Handle player selection if needed
-                }}
-              />
-            </Box>
+            <PlayerSearch 
+              onSelect={(player) => {
+                console.log('Selected player:', player);
+              }}
+              onBid={async (player, amount) => {
+                try {
+                  if (!currentUserTeam) {
+                    console.error('No team found for the current user');
+                    // TODO: Show error toast to user
+                    return;
+                  }
+                  
+                  // If there's no active auction, nominate the player first
+                  if (!bidState.isLive) {
+                    // Nominate the player with the starting bid
+                    useDraftStore.getState().nominate(player.id, amount);
+                    // Then place the initial bid
+                    await placeBid(player.id, currentUserTeam.id, amount);
+                  } 
+                  // If there is an active auction, just place the bid
+                  else if (bidState.playerId === player.id) {
+                    // Check if the bid is valid (higher than current bid)
+                    if (amount <= (bidState.highBid || 0)) {
+                      console.error(`Bid must be higher than current bid of $${bidState.highBid || 0}`);
+                      // TODO: Show error toast to user
+                      return;
+                    }
+                    await placeBid(player.id, currentUserTeam.id, amount);
+                  } else {
+                    console.error('Cannot bid on this player - another auction is in progress');
+                    // TODO: Show error toast to user
+                    return;
+                  }
+                  
+                  console.log(`Successfully placed bid of $${amount} on ${player.name}`);
+                  // TODO: Show success toast to user
+                } catch (error) {
+                  console.error('Failed to place bid:', error);
+                  // TODO: Show error toast to user
+                }
+              }}
+              showBidButton={true}
+              showStartingBid={true}
+            />
             <Button
               leftIcon={<FaCog />}
               onClick={onSettingsOpen}
@@ -366,7 +473,10 @@ export default function DraftBoard() {
                         {team.name}
                       </Heading>
                     )}
-                    <BidButton />
+                    <BidButton 
+                      team={team} 
+                      player={bidState.isLive ? players.find(p => p.id === bidState.playerId) ?? null : null} 
+                    />
                     <SelectButton />
                   </VStack>
                 </Stack>
@@ -395,11 +505,11 @@ export default function DraftBoard() {
       {/* Position Picker Modal - Only show if pendingAssignment exists */}
       {pendingAssignment && (
         <PositionPickerModal
-          isOpen={!!pendingAssignment}
-          onClose={() => {}}
+          isOpen={true}
+          onClose={handleCloseModal}
           teamId={pendingAssignment.teamId}
           playerId={pendingAssignment.playerId}
-          validSlots={pendingAssignment.validSlots}
+          validSlots={getValidSlotsForPlayer(pendingAssignment.playerId, pendingAssignment.teamId)}
         />
       )}
     </Container>

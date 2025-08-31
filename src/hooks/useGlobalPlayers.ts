@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useDraftStore } from './useDraftStore';
-import { loadFantasyProsPlayers } from '../data/loadFantasyProsPlayers';
+import { loadPlayerPool } from '../data/loadPlayerPool';
 
 // Track if we've already loaded players to prevent duplicate loads
 let playersLoaded = false;
@@ -21,7 +21,7 @@ export function useGlobalPlayers() {
   useEffect(() => {
     const loadPlayers = async () => {
       // Skip if already loaded or currently loading
-      if (players.length > 0 || playersLoaded || isLoading) {
+      if (playersLoaded || isLoading) {
         console.log(`[useGlobalPlayers] Players already loaded or loading:`, { 
           playersCount: players.length, 
           playersLoaded, 
@@ -32,50 +32,74 @@ export function useGlobalPlayers() {
 
       try {
         setIsLoading(true);
-        console.log('[useGlobalPlayers] Loading FantasyPros players...');
+        console.log('[useGlobalPlayers] Loading player pool...');
         
         // Load and process players
-        const fantasyProsPlayers = loadFantasyProsPlayers();
-        console.log(`[useGlobalPlayers] Loaded ${fantasyProsPlayers.length} players from FantasyPros`);
+        const loadedPlayers = await loadPlayerPool();
+        console.log(`[useGlobalPlayers] Loaded ${loadedPlayers.length} players from player pool`);
         
-        // Log first few players for debugging
-        console.log('[useGlobalPlayers] Sample players:', fantasyProsPlayers.slice(0, 3));
-        
-        // Update the store with the loaded players
-        setPlayers(fantasyProsPlayers);
-        playersLoaded = true;
-        
-        // Verify the players were set in the store
-        const storePlayers = useDraftStore.getState().players;
-        console.log(`[useGlobalPlayers] Players in store after set:`, storePlayers.length);
-        
-        // Log first few players to verify data
-        if (storePlayers.length > 0) {
-          console.log('[useGlobalPlayers] First 3 players in store:', 
-            storePlayers.slice(0, 3).map(p => ({
-              id: p.id,
-              name: p.name,
-              pos: p.pos,
-              nflTeam: p.nflTeam,
-              rank: p.rank
-            }))
-          );
+        if (loadedPlayers.length > 0) {
+          // Log first player for debugging
+          const firstPlayer = loadedPlayers[0];
+          if (firstPlayer) {
+            const playerInfo = {
+              id: firstPlayer.id,
+              name: firstPlayer.name,
+              pos: firstPlayer.pos,
+              nflTeam: firstPlayer.nflTeam,
+              rank: firstPlayer.rank
+            };
+            console.log('[useGlobalPlayers] Sample player:', playerInfo);
+          }
+          
+          // Update the store with the loaded players
+          setPlayers(loadedPlayers);
+          playersLoaded = true;
+          
+          // Verify the players were set in the store
+          const storePlayers = useDraftStore.getState().players;
+          console.log(`[useGlobalPlayers] Players in store after set:`, storePlayers.length);
+          
+          if (storePlayers.length === 0) {
+            console.error('[useGlobalPlayers] No players were set in the store!');
+          } else if (process.env.NODE_ENV === 'development') {
+            // In development, log the first few players for debugging
+            console.log('[useGlobalPlayers] First few players in store:', 
+              storePlayers.slice(0, 3).map(p => ({
+                id: p.id,
+                name: p.name,
+                pos: p.pos,
+                team: p.nflTeam,
+                rank: p.rank
+              }))
+            );
+          }
+        } else {
+          console.warn('[useGlobalPlayers] No players were loaded from the pool');
         }
-        
       } catch (error) {
-        console.error('Failed to load FantasyPros players:', error);
+        console.error('[useGlobalPlayers] Error loading players:', error);
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     loadPlayers();
   }, [setPlayers, isLoading, players.length]);
 
-  return {
-    players,
-    filteredPlayers,
-    setPlayers,
-    isLoading
+  return { 
+    players, 
+    filteredPlayers, 
+    isLoading,
+    refreshPlayers: async () => {
+      setIsLoading(true);
+      try {
+        const loadedPlayers = await loadPlayerPool();
+        setPlayers(loadedPlayers);
+        return loadedPlayers;
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 }
