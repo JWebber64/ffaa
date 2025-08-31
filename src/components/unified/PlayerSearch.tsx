@@ -26,6 +26,7 @@ import {
   NumberDecrementStepper,
   Spinner,
   VStack,
+  Portal,
 } from '@chakra-ui/react';
 import { FaSearch } from 'react-icons/fa';
 import { useDraftStore } from '../../store/draftStore';
@@ -89,15 +90,14 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [selectedPlayerState, setSelectedPlayerState] = useState<Player | null>(selectedPlayer);
   const [showResults, setShowResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
-  // Get players from store if not provided via props
-  const storePlayers = useDraftStore(
-    (s) => s.players,
-    (a, b) => a === b
-  );
+  // Get players and selectors from store if not provided via props
+  const storePlayers = useDraftStore((s) => s.players);
+  const topAvailable = useDraftStore((s) => s.selectors.topAvailable(s, 50));
   const players = externalPlayers || storePlayers;
 
   // Debounce search with loading state
@@ -127,24 +127,30 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
   // Filter players based on query and other criteria
   const filteredPlayers = useMemo(() => {
     const searchTerm = query.trim().toLowerCase();
-    if (!searchTerm) return [];
-    
-    let result = [...players];
+
+    // Base list: if no search yet, show top available so the user
+    // immediately sees players and knows it works
+    let result = searchTerm ? [...players] : [...topAvailable];
 
     if (filterUndrafted) {
       result = result.filter(p => !p.draftedBy);
     }
 
-    result = result.filter(p => {
-      const name = p.name?.toLowerCase() || '';
-      const team = p.nflTeam?.toLowerCase() || '';
-      const pos = p.pos?.toLowerCase() || '';
-      return name.includes(searchTerm) || team.includes(searchTerm) || pos.includes(searchTerm);
-    });
+    if (searchTerm) {
+      result = result.filter(p => {
+        const name = p.name?.toLowerCase() || '';
+        const team = p.nflTeam?.toLowerCase() || '';
+        const pos = (p.pos as string)?.toLowerCase() || '';
+        return name.includes(searchTerm) || team.includes(searchTerm) || pos.includes(searchTerm);
+      });
+    }
 
-    return result.slice(0, maxResults);
-  }, [query, players, filterUndrafted, maxResults]);
-  
+    // stable sort by rank if present and apply maxResults limit
+    return result
+      .sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999))
+      .slice(0, maxResults);
+  }, [players, topAvailable, query, filterUndrafted]);
+
   // Show results when query changes
   useEffect(() => {
     setShowResults(query.trim().length > 0);
@@ -228,7 +234,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
 
   return (
     <Box position="relative" width="100%" maxW="400px">
-      <InputGroup>
+      <InputGroup ref={containerRef} position="relative">
         <InputLeftElement pointerEvents="none">
           <FaSearch color="gray.300" />
         </InputLeftElement>
@@ -246,6 +252,19 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
           aria-autocomplete="list"
           aria-controls="player-search-results"
         />
+        <Text 
+          position="absolute" 
+          right="8px" 
+          top="50%" 
+          transform="translateY(-50%)" 
+          fontSize="xs" 
+          color="gray.500"
+          bg="white"
+          px={1}
+          borderRadius="md"
+        >
+          {players.length} players
+        </Text>
       </InputGroup>
 
       {showStartingBid && onSetStartingBid && (
@@ -278,62 +297,61 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
       )}
       
       {showResults && !isSearching && !isLoading && filteredPlayers.length > 0 && (
-        <Box 
-          ref={resultsRef}
-          position="absolute" 
-          width="100%" 
-          mt={1} 
-          bg="gray.800"
-          border="1px"
-          borderColor="gray.700"
-          borderRadius="md" 
-          boxShadow="dark-lg"
-          zIndex={10}
-          maxH="300px"
-          overflowY="auto"
-          id="player-search-results"
-          role="listbox"
-        >
-          <List spacing={0}>
-            {filteredPlayers.map((player, index) => (
-              <ListItem
-                key={player.id}
-                p={2}
-                bg={focusedIndex === index ? 'gray.700' : 'transparent'}
-                _hover={{ bg: 'gray.700', cursor: 'pointer' }}
-                onClick={() => handleSelect(player)}
-                onMouseEnter={() => setFocusedIndex(index)}
-                borderBottom="1px"
-                borderColor="gray.700"
-                role="option"
-                aria-selected={focusedIndex === index}
-              >
-                <HStack justify="space-between">
-                  <Box>
-                    <Text fontWeight="medium">{player.name}</Text>
-                    <HStack spacing={2} mt={1}>
-                      <Badge colorScheme={POSITION_COLORS[player.pos] || 'gray'}>{player.pos}</Badge>
-                      {player.nflTeam && <Badge variant="outline">{player.nflTeam}</Badge>}
-                      {player.rank && <Text fontSize="sm" color="gray.500">#{player.rank}</Text>}
-                    </HStack>
-                  </Box>
-                  {showBidButton && (
-                    <Button 
-                      size="sm" 
-                      colorScheme="blue"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSelect(player);
-                      }}
-                    >
-                      Bid
-                    </Button>
-                  )}
-                </HStack>
-              </ListItem>
-            ))}
-          </List>
-        </Box>
+        <Portal>
+          <Box
+            position="absolute"
+            zIndex={1000}
+            width={`${inputRef.current?.offsetWidth}px`}
+            mt={1}
+            bg="white"
+            boxShadow="lg"
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="gray.200"
+            maxH="400px"
+            overflowY="auto"
+          >
+            <List spacing={0}>
+              {filteredPlayers.map((player, index) => (
+                <ListItem
+                  key={player.id}
+                  p={2}
+                  bg={focusedIndex === index ? 'gray.700' : 'transparent'}
+                  _hover={{ bg: 'gray.700', cursor: 'pointer' }}
+                  onClick={() => handleSelect(player)}
+                  onMouseEnter={() => setFocusedIndex(index)}
+                  borderBottom="1px"
+                  borderColor="gray.700"
+                  role="option"
+                  aria-selected={focusedIndex === index}
+                >
+                  <HStack justify="space-between">
+                    <Box>
+                      <Text fontWeight="medium">{player.name}</Text>
+                      <HStack spacing={2} mt={1}>
+                        <Badge colorScheme={POSITION_COLORS[player.pos] || 'gray'}>{player.pos}</Badge>
+                        {player.nflTeam && <Badge variant="outline">{player.nflTeam}</Badge>}
+                        {player.rank && <Text fontSize="sm" color="gray.500">#{player.rank}</Text>}
+                      </HStack>
+                    </Box>
+                    {showBidButton && (
+                      <Button 
+                        size="sm" 
+                        colorScheme="blue"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelect(player);
+                        }}
+                      >
+                        Bid
+                      </Button>
+                    )}
+                  </HStack>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Portal>
       )}
       
       {showResults && !isSearching && !isLoading && query && filteredPlayers.length === 0 && (

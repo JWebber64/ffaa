@@ -1,5 +1,5 @@
 import type { Player, Position } from "@/types/draft";
-import pool from "./player-pool-2025.json" assert { type: 'json' };
+import pool from "./player-pool-2025.json";
 
 // Valid NFL team abbreviations
 const VALID_TEAMS = new Set([
