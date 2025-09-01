@@ -94,6 +94,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
   const [selectedPlayerState, setSelectedPlayerState] = useState<Player | null>(selectedPlayer);
   const [showResults, setShowResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [menuPos, setMenuPos] = useState<{top: number; left: number; width: number}>({top: 0, left: 0, width: 0});
 
   // Get players and selectors from store if not provided via props
   const storePlayers = useDraftStore((s) => s.players);
@@ -133,7 +134,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
     let result = searchTerm ? [...players] : [...topAvailable];
 
     if (filterUndrafted) {
-      result = result.filter(p => !p.draftedBy);
+      result = result.filter(p => p.draftedBy == null);
     }
 
     if (searchTerm) {
@@ -151,10 +152,41 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
       .slice(0, maxResults);
   }, [players, topAvailable, query, filterUndrafted]);
 
-  // Show results when query changes
+  // Compute menu position based on input element
+  const computeMenuPos = () => {
+    const el = inputRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    setMenuPos({
+      top: rect.bottom + window.scrollY,
+      left: rect.left + window.scrollX,
+      width: rect.width,
+    });
+  };
+
+  // Update menu position when results are shown or window resizes
   useEffect(() => {
-    setShowResults(query.trim().length > 0);
-  }, [query]);
+    if (!showResults) return;
+    
+    computeMenuPos();
+    
+    const handleResize = () => computeMenuPos();
+    const handleScroll = () => computeMenuPos();
+    
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll, true);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [showResults]);
+
+  // Show results when input is focused or query changes
+  const handleFocus = () => {
+    computeMenuPos();
+    setShowResults(true);
+  };
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -233,24 +265,27 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
   }, []);
 
   return (
-    <Box position="relative" width="100%" maxW="400px">
+    <Box position="relative" width="100%" maxW="500px">
       <InputGroup ref={containerRef} position="relative">
         <InputLeftElement pointerEvents="none">
           <FaSearch color="gray.300" />
         </InputLeftElement>
         <Input
           ref={inputRef}
-          placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onFocus={handleFocus}
           onKeyDown={handleKeyDown}
-          onFocus={() => setShowResults(true)}
-          bg="gray.800"
-          color="white"
-          _placeholder={{ color: 'gray.400' }}
+          placeholder={placeholder}
           autoComplete="off"
-          aria-autocomplete="list"
-          aria-controls="player-search-results"
+          spellCheck="false"
+          bg="white"
+          _dark={{
+            bg: 'gray.800',
+            _placeholder: { color: 'gray.400' }
+          }}
+          pr="8"
+          width="100%"
         />
         <Text 
           position="absolute" 
@@ -260,11 +295,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
           fontSize="xs" 
           color="gray.500"
           bg="white"
-          px={1}
-          borderRadius="md"
-        >
-          {players.length} players
-        </Text>
+        />
       </InputGroup>
 
       {showStartingBid && onSetStartingBid && (
@@ -300,16 +331,21 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
         <Portal>
           <Box
             position="absolute"
-            zIndex={1000}
-            width={`${inputRef.current?.offsetWidth}px`}
-            mt={1}
+            top={`${menuPos.top}px`}
+            left={`${menuPos.left}px`}
+            width={`${menuPos.width}px`}
+            zIndex={2000}
             bg="white"
-            boxShadow="lg"
-            borderRadius="md"
+            _dark={{
+              bg: 'gray.800',
+              borderColor: 'gray.700',
+            }}
             borderWidth="1px"
-            borderColor="gray.200"
+            borderRadius="md"
+            boxShadow="lg"
             maxH="400px"
             overflowY="auto"
+            ref={resultsRef}
           >
             <List spacing={0}>
               {filteredPlayers.map((player, index) => (

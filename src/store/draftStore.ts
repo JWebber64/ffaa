@@ -969,27 +969,27 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
 
     /* -------------------------------- Selectors bag ------------------------------- */
     selectors: {
-      undraftedPlayers: (state: { players: Player[] }) => state.players.filter((p: Player) => !p.draftedBy),
+      undraftedPlayers: (state: { players: Player[] }) => state.players.filter((p: Player) => p.draftedBy == null),
       topAvailable: (state: { players: Player[] }, limit = 300) =>
         state.players
-          .filter((p: Player) => !p.draftedBy)
+          .filter((p: Player) => p.draftedBy == null)
           .sort((a: Player, b: Player) => (a.rank ?? 999) - (b.rank ?? 999))
           .slice(0, limit),
       topAvailableByPos: (state: { players: Player[] }, pos: Position, limit = 100) =>
         state.players
-          .filter((p: Player) => !p.draftedBy && (p.pos as Position) === pos)
+          .filter((p: Player) => p.draftedBy == null && (p.pos as Position) === pos)
           .sort((a: Player, b: Player) => (a.rank ?? 999) - (b.rank ?? 999))
           .slice(0, limit),
       topAvailableByMultiPos: (state: { players: Player[] }, positions: Position[], limit = 100) =>
         state.players
-          .filter((p: Player) => !p.draftedBy && positions.includes(p.pos as Position))
+          .filter((p: Player) => p.draftedBy == null && positions.includes(p.pos as Position))
           .sort((a: Player, b: Player) => (a.rank ?? 999) - (b.rank ?? 999))
           .slice(0, limit),
       topAvailableForFlex: (state: { players: Player[] }, limit = 100, includeTE = true) => {
         const flexPositions: Position[] = ['RB', 'WR'];
         if (includeTE) flexPositions.push('TE');
         return state.players
-          .filter((p: Player) => !p.draftedBy && flexPositions.includes(p.pos as Position))
+          .filter((p: Player) => p.draftedBy == null && flexPositions.includes(p.pos as Position))
           .sort((a: Player, b: Player) => (a.rank ?? 999) - (b.rank ?? 999))
           .slice(0, limit);
       },

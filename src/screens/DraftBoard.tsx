@@ -1,4 +1,4 @@
-import { Box, Button, Container, HStack, VStack, Heading, Stack, Text, useDisclosure, Input } from "@chakra-ui/react";
+import { Box, Button, Container, HStack, VStack, Heading, Stack, Text, useDisclosure, Input, Badge } from "@chakra-ui/react";
 import { useMemo, useState, KeyboardEvent, ChangeEvent } from "react";
 import { useDraftStore } from '../store/draftStore';
 import { shallow } from 'zustand/shallow';
@@ -86,6 +86,88 @@ const NominateBar = () => (
   </Box>
 );
 
+interface SlotBoxProps {
+  label: string;
+  player: Player | null;
+}
+
+const SlotBox = ({ label, player }: SlotBoxProps) => {
+  const POSITION_COLORS: Record<string, string> = {
+    QB: 'blue',
+    RB: 'green',
+    WR: 'purple',
+    TE: 'orange',
+    K: 'yellow',
+    DEF: 'gray',
+    FLEX: 'pink',
+    BENCH: 'gray',
+  };
+
+  const positionColor = POSITION_COLORS[label] || 'gray';
+  
+  if (player) {
+    return (
+      <Box
+        bg="transparent"
+        border="1px solid #2d3748"
+        rounded="md"
+        height="48px"
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        px={3}
+      >
+        <Box style={{ minWidth: 0 }}>
+          <Text
+            fontWeight={600}
+            color="white"
+            style={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: "150px",
+              fontSize: "0.7rem",
+            }}
+          >
+            {player.name}
+          </Text>
+          <HStack spacing={1} mt={1}>
+            <Badge colorScheme={POSITION_COLORS[player.pos] || 'gray'} fontSize="0.65rem" px={1}>{player.pos}</Badge>
+            {player.slot && player.slot !== player.pos && (
+              <Badge colorScheme={POSITION_COLORS[player.slot] || 'gray'} fontSize="0.65rem" px={1}>{player.slot}</Badge>
+            )}
+            {player.nflTeam && <Badge variant="outline" fontSize="0.65rem" px={1}>{player.nflTeam}</Badge>}
+          </HStack>
+        </Box>
+        <Text fontWeight={700} color="white" fontSize="0.75rem">${player.price ?? 0}</Text>
+      </Box>
+    );
+  }
+
+  return (
+    <Box
+      bg="transparent"
+      border="1px solid #2d3748"
+      rounded="md"
+      height="56px"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      px={3}
+    >
+      <Badge 
+        colorScheme={positionColor}
+        variant="outline"
+        fontSize="sm"
+        px={2}
+        py={1}
+        opacity={0.7}
+      >
+        {label}
+      </Badge>
+    </Box>
+  );
+};
 
 export default function DraftBoard() {
   const { 
@@ -110,27 +192,6 @@ export default function DraftBoard() {
   const [editing, setEditing] = useState<number | null>(null);
   const [nameDraft, setNameDraft] = useState("");
   
-  // Get valid slots for a player on a team
-  const getValidSlotsForPlayer = (playerId: string, teamId: number): Position[] => {
-    const player = players.find(p => p.id === playerId);
-    const team = teams.find(t => t.id === teamId);
-    
-    if (!player || !team) return [];
-    
-    // Get all positions the player is eligible for
-    const eligiblePositions: Position[] = [player.pos];
-    if (player.slot) {
-      eligiblePositions.push(player.slot);
-    }
-    
-    // Filter to only include positions that have available slots on the team
-    return eligiblePositions.filter(pos => {
-      const currentCount = Object.entries(team.roster)
-        .filter(([p, count]) => p === pos && count > 0)
-        .length;
-      return currentCount > 0;
-    });
-  };
 
   // Remove unused function since we're not using it
   // function getMinColumnWidth() {
@@ -238,7 +299,7 @@ export default function DraftBoard() {
     const k = takeFrom(drafted, (p) => p.pos === 'K', team.roster.K ?? 0);
     const def = takeFrom(drafted, (p) => p.pos === 'DEF', team.roster.DEF ?? 0);
 
-    // Initialize with all position types to prevent undefined access
+
     const pile: Record<Position, Player[]> = {
       QB: qb,
       RB: rb,
@@ -294,13 +355,12 @@ export default function DraftBoard() {
   const { onOpen: onSettingsOpen } = useDisclosure();
   const pendingAssignment = useDraftStore(state => state.pendingAssignment);
   
-  // Clear pending assignment when modal is closed
-  const handleCloseModal = () => {
-    useDraftStore.setState({ pendingAssignment: null });
-  };
-  
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNameDraft(e.target.value);
+  };
+  
+  const handleCloseModal = () => {
+    useDraftStore.setState({ pendingAssignment: null });
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>, team: Team) => {
@@ -509,59 +569,9 @@ export default function DraftBoard() {
           onClose={handleCloseModal}
           teamId={pendingAssignment.teamId}
           playerId={pendingAssignment.playerId}
-          validSlots={getValidSlotsForPlayer(pendingAssignment.playerId, pendingAssignment.teamId)}
+          validSlots={[]} // TODO: Re-implement getValidSlotsForPlayer if needed
         />
       )}
     </Container>
-  );
-}
-
-interface SlotBoxProps {
-  label: string;
-  player: Player | null;
-}
-
-function SlotBox({ label, player }: SlotBoxProps) {
-  return (
-    <Box
-      bg="transparent"
-      border="1px solid #2d3748"
-      rounded="md"
-      height="56px"
-      display="flex"
-      alignItems="center"
-      justifyContent="space-between"
-      px={3}
-    >
-      {player && player !== null ? (
-        <>
-          <Box style={{ minWidth: 0 }}>
-            <Text
-              fontWeight={600}
-              color="white"
-              // CSS truncation instead of `noOfLines`
-              style={{
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                maxWidth: "150px",
-              }}
-            >
-              {player.name}
-            </Text>
-            <Text fontSize="xs" color="white" opacity={0.8}>
-              {player.pos}
-              {player.slot && player.slot !== player.pos ? ` → ${player.slot}` : ""}
-              {player.nflTeam && ` • ${player.nflTeam}`}
-            </Text>
-          </Box>
-          <Text fontWeight={700} color="white">${player.price ?? 0}</Text>
-        </>
-      ) : (
-        <Text color="white" opacity={0.7} textAlign="center" width="100%">
-          {label}
-        </Text>
-      )}
-    </Box>
   );
 }
