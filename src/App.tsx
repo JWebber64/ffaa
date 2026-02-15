@@ -7,6 +7,9 @@ import DraftBoard from './screens/DraftBoard';
 import Auctioneer from './screens/Auctioneer';
 import Results from './screens/Results';
 import PlayerPool from './components/PlayerPool';
+import LobbyHost from './screens/LobbyHost';
+import LobbyJoin from './screens/LobbyJoin';
+import PingTest from './screens/PingTest';
 import { useGlobalPlayers } from './hooks/useGlobalPlayers';
 import { useDraftStore } from './store/draftStore';
 import { ConfigProvider } from './contexts/ConfigContext';
@@ -16,6 +19,7 @@ import TopNav from './components/TopNav';
 import RequireConfiguredDraft from './routes/RequireConfiguredDraft';
 import AuctionTimer from './components/AuctionTimer';
 import { useAuctionSubscriber } from './hooks/useAuctionSubscriber';
+import AppFooter from './components/AppFooter';
 
 function App() {
   // Load Sleeper → store.players once for the whole app
@@ -37,9 +41,12 @@ function App() {
             <Box position="fixed" top="64px" left={0} right={0} zIndex={10} px={4} bg="white" shadow="sm">
               <AuctionTimer />
             </Box>
-            <Box as="main" pt="104px">
+            <Box as="main" pt="104px" pb="40px">
               <Routes>
                 <Route index element={<Home />} />
+                <Route path="/host" element={<LobbyHost />} />
+                <Route path="/join" element={<LobbyJoin />} />
+                <Route path="/ping" element={<PingTest />} />
                 <Route path="/setup" element={<Setup />} />
                 <Route path="/player-pool" element={
                   <RequireConfiguredDraft>
@@ -64,6 +71,7 @@ function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Box>
+            <AppFooter />
           </Box>
         </BrowserRouter>
       </RoleProvider>

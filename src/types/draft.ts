@@ -104,6 +104,8 @@ export interface CurrentAuction {
   highBidder: number | null;
 }
 
+export type DraftStatus = 'lobby' | 'settings' | 'live' | 'paused' | 'complete';
+
 export interface DraftState {
   // data
   players: Player[];
@@ -131,6 +133,19 @@ export interface DraftState {
   
   // logs
   logs: LogEvent[];
+  
+  // multiplayer fields
+  draftId?: string;              // Room ID for multiplayer
+  hostUserId?: string;           // User ID of the host
+  status?: DraftStatus;          // Current draft status
+  createdAt?: number;            // Creation timestamp
+  updatedAt?: number;            // Last update timestamp
+  lastMutationId?: number;       // For sync ordering
+  lastMutationAt?: number;       // For sync ordering
+  processedActionIds?: Set<string>; // Host-only de-dupe set
+  timerEndsAt?: number;         // Timer end timestamp instead of seconds remaining
+  lastPingAt?: number;          // For PING test action
+  lastPingFromUserId?: string;   // For PING test action
 }
 
 export interface AdminOptions {
@@ -181,6 +196,12 @@ export interface DraftActions {
   // Logging
   pushLog: (event: Omit<LogEvent, 'id' | 'ts'>) => void;
   clearLogs: (options?: AdminOptions) => void;
+  
+  // Multiplayer methods
+  exportDraftState: () => any;
+  importDraftState: (snapshot: any) => void;
+  applyIncomingAction: (row: any) => void;
+  markActionProcessed: (actionId: string) => void;
   
   // Selectors
   selectors: {

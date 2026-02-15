@@ -968,7 +968,7 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
         const nominatorId = firstNominatorTeamId ?? teamIds[0] ?? undefined;
         
         draft.runtime = {
-          currentNominatorTeamId: nominatorId,
+          currentNominatorTeamId: nominatorId || null,
           nominationOrder: teamIds,
           baseOrder: teamIds,
           round: 1,
@@ -981,6 +981,159 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
           message: `Draft initialized with ${draft.teams.find(t => t.id === nominatorId)?.name || 'Unknown'} as first nominator`,
         });
       });
+    },
+
+    /* -------------------------------- Multiplayer Methods ------------------------------- */
+    exportDraftState: () => {
+      const s = get();
+      return {
+        // Core draft data
+        players: s.players,
+        teams: s.teams,
+        assignmentHistory: s.assignmentHistory,
+        
+        // Auction state
+        auctionSettings: s.auctionSettings,
+        bidState: s.bidState,
+        runtime: s.runtime,
+        nominationQueue: s.nominationQueue,
+        currentAuction: s.currentAuction,
+        currentNominatedId: s.currentNominatedId,
+        currentBidder: s.currentBidder,
+        
+        // Configuration
+        baseBudget: s.baseBudget,
+        teamCount: s.teamCount,
+        templateRoster: s.templateRoster,
+        
+        // UI state
+        pendingAssignment: s.pendingAssignment,
+        logs: s.logs,
+        
+        // Multiplayer fields
+        draftId: s.draftId,
+        hostUserId: s.hostUserId,
+        status: s.status || 'lobby',
+        createdAt: s.createdAt || Date.now(),
+        updatedAt: s.updatedAt || Date.now(),
+        lastMutationId: s.lastMutationId || 0,
+        lastMutationAt: s.lastMutationAt || Date.now(),
+        timerEndsAt: s.timerEndsAt,
+        
+        // Load flags
+        playersLoaded: s.playersLoaded,
+        adpLoaded: s.adpLoaded,
+      };
+    },
+
+    importDraftState: (snapshot: any) => {
+      if (!snapshot || typeof snapshot !== 'object') return;
+      set({
+        // Core draft data
+        players: snapshot.players || [],
+        teams: snapshot.teams || [],
+        assignmentHistory: snapshot.assignmentHistory || [],
+        
+        // Auction state
+        auctionSettings: snapshot.auctionSettings || DEFAULT_AUCTION_SETTINGS,
+        bidState: { ...DEFAULT_BID_STATE, ...snapshot.bidState },
+        runtime: snapshot.runtime || initialRuntime,
+        nominationQueue: snapshot.nominationQueue || [],
+        currentAuction: snapshot.currentAuction || null,
+        currentNominatedId: snapshot.currentNominatedId || null,
+        currentBidder: snapshot.currentBidder,
+        
+        // Configuration
+        baseBudget: snapshot.baseBudget || 200,
+        teamCount: snapshot.teamCount || 12,
+        templateRoster: snapshot.templateRoster || DEFAULT_ROSTER,
+        
+        // UI state
+        pendingAssignment: snapshot.pendingAssignment || null,
+        logs: snapshot.logs || [],
+        
+        // Multiplayer fields
+        draftId: snapshot.draftId,
+        hostUserId: snapshot.hostUserId,
+        status: snapshot.status || 'lobby',
+        createdAt: snapshot.createdAt,
+        updatedAt: snapshot.updatedAt || Date.now(),
+        lastMutationId: snapshot.lastMutationId || 0,
+        lastMutationAt: snapshot.lastMutationAt || Date.now(),
+        timerEndsAt: snapshot.timerEndsAt,
+        processedActionIds: snapshot.processedActionIds || new Set(),
+        
+        // Load flags
+        playersLoaded: snapshot.playersLoaded || false,
+        adpLoaded: snapshot.adpLoaded || false,
+      });
+    },
+
+    applyIncomingAction: (row: any) => {
+      // row: { id, draft_id, action_id, user_id, type, payload, created_at }
+      const s = get();
+
+      // De-dupe if we keep a set of processed action_ids
+      if (s.processedActionIds?.has(row.action_id)) return;
+
+      switch (row.type) {
+        case "PING":
+          // Test action for vertical slice validation
+          const { t } = row.payload;
+          set({
+            lastPingAt: t,
+            lastPingFromUserId: row.user_id
+          });
+          break;
+
+        case "NOMINATE_PLAYER":
+          // call your existing nominate logic using row.payload
+          const { playerId, startingBid } = row.payload;
+          s.nominate(playerId, startingBid);
+          break;
+
+        case "PLACE_BID":
+          // call your existing bid logic
+          const { playerId: bidPlayerId, byTeamId, amount } = row.payload;
+          s.placeBid(bidPlayerId, byTeamId, amount);
+          break;
+
+        case "START_DRAFT":
+          // host-only typically
+          const { firstNominatorTeamId } = row.payload;
+          s.initializeDraft(firstNominatorTeamId);
+          break;
+
+        case "SET_AUCTIONEER_STYLE":
+          // host-only typically - not implemented yet
+          break;
+
+        case "ASSIGN_PLAYER":
+          // admin assignment
+          const { playerId: assignPlayerId, teamId, price, slot, isAdmin } = row.payload;
+          s.assignPlayer(assignPlayerId, teamId, price, slot, { isAdmin });
+          break;
+
+        case "RESET_DRAFT":
+          s.resetDraft({ isAdmin: true });
+          break;
+
+        default:
+          console.warn(`Unknown action type: ${row.type}`);
+          break;
+      }
+
+      // Mark processed action id (host only)
+      s.markActionProcessed(row.action_id);
+
+      // bump mutation id so clients can detect new snapshots
+      set({ lastMutationId: row.action_id, updatedAt: Date.now() });
+    },
+
+    markActionProcessed: (actionId: string) => {
+      set((state) => ({
+        processedActionIds: new Set([...(state.processedActionIds || []), actionId])
+      }));
     },
 
     /* -------------------------------- Utils ------------------------------- */
@@ -1106,4 +1259,101 @@ export function normalizeImportedDraftState(input: unknown): unknown {
   if (obj.draft && typeof obj.draft === "object") return obj.draft;
 
   return obj;
+}
+
+/* Multiplayer serialization functions */
+export function exportDraftState(state: DraftState): string {
+  const exportData = {
+    __type: "ffaa_draft_export",
+    version: "1.0.0",
+    exportedAt: Date.now(),
+    state: {
+      // Core draft data
+      players: state.players,
+      teams: state.teams,
+      assignmentHistory: state.assignmentHistory,
+      
+      // Auction state
+      auctionSettings: state.auctionSettings,
+      bidState: state.bidState,
+      runtime: state.runtime,
+      nominationQueue: state.nominationQueue,
+      currentAuction: state.currentAuction,
+      currentNominatedId: state.currentNominatedId,
+      currentBidder: state.currentBidder,
+      
+      // Configuration
+      baseBudget: state.baseBudget,
+      teamCount: state.teamCount,
+      templateRoster: state.templateRoster,
+      
+      // UI state
+      pendingAssignment: state.pendingAssignment,
+      logs: state.logs,
+      
+      // Multiplayer fields
+      draftId: state.draftId,
+      hostUserId: state.hostUserId,
+      status: state.status || 'lobby',
+      createdAt: state.createdAt || Date.now(),
+      updatedAt: state.updatedAt || Date.now(),
+      lastMutationId: state.lastMutationId || 0,
+      lastMutationAt: state.lastMutationAt || Date.now(),
+      
+      // Load flags
+      playersLoaded: state.playersLoaded,
+      adpLoaded: state.adpLoaded,
+    }
+  };
+  
+  return JSON.stringify(exportData);
+}
+
+export function importDraftState(exportedState: string): DraftState {
+  try {
+    const parsed = JSON.parse(exportedState);
+    const normalized = normalizeImportedDraftState(parsed);
+    
+    if (!normalized || typeof normalized !== 'object') {
+      throw new Error('Invalid draft state format');
+    }
+    
+    const state = normalized as Partial<DraftState>;
+    
+    // Ensure required fields have defaults
+    return {
+      players: state.players || [],
+      playersLoaded: state.playersLoaded || false,
+      adpLoaded: state.adpLoaded || false,
+      teams: state.teams || [],
+      assignmentHistory: state.assignmentHistory || [],
+      
+      auctionSettings: state.auctionSettings || DEFAULT_AUCTION_SETTINGS,
+      bidState: { ...DEFAULT_BID_STATE, ...state.bidState },
+      runtime: state.runtime || initialRuntime,
+      nominationQueue: state.nominationQueue || [],
+      currentAuction: state.currentAuction || null,
+      currentNominatedId: state.currentNominatedId || null,
+      currentBidder: state.currentBidder,
+      
+      baseBudget: state.baseBudget || 200,
+      teamCount: state.teamCount || 12,
+      templateRoster: state.templateRoster || DEFAULT_ROSTER,
+      
+      pendingAssignment: state.pendingAssignment || null,
+      logs: state.logs || [],
+      
+      // Multiplayer fields
+      draftId: state.draftId,
+      hostUserId: state.hostUserId,
+      status: state.status || 'lobby',
+      createdAt: state.createdAt,
+      updatedAt: state.updatedAt || Date.now(),
+      lastMutationId: state.lastMutationId || 0,
+      lastMutationAt: state.lastMutationAt || Date.now(),
+    } as DraftState;
+  } catch (error) {
+    console.error('Failed to import draft state:', error);
+    throw new Error(`Failed to import draft state: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
