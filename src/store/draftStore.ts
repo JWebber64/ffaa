@@ -308,13 +308,8 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
     scoring?: 'standard' | 'ppr' | 'half-ppr';
     useCache?: boolean;
     signal?: AbortSignal;
-    isAdmin?: boolean;
   } = {}) => {
-      const { year = 2023, teams = 12, scoring = 'ppr', useCache = true, signal, isAdmin } = opts;
-      
-      if (!isAdmin) {
-        throw new Error('Admin privileges required to load ADP data');
-      }
+      const { year = 2023, teams = 12, scoring = 'ppr', useCache = true, signal } = opts;
       
       try {
         const fetchOptions = { year, teams, scoring, useCache };
@@ -945,6 +940,27 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
         draft.pushLog({
           type: 'DRAFT_RESET',
           message: 'Draft has been reset',
+        });
+      });
+    },
+
+    initializeDraft: (firstNominatorTeamId?: number | null) => {
+      iSet((draft) => {
+        const teamIds = draft.teams.map(t => t.id);
+        const nominatorId = firstNominatorTeamId ?? teamIds[0] ?? undefined;
+        
+        draft.runtime = {
+          currentNominatorTeamId: nominatorId,
+          nominationOrder: teamIds,
+          baseOrder: teamIds,
+          round: 1,
+        };
+        
+        draft.currentBidder = nominatorId;
+        
+        draft.pushLog({
+          type: 'AUCTION_STARTED',
+          message: `Draft initialized with ${draft.teams.find(t => t.id === nominatorId)?.name || 'Unknown'} as first nominator`,
         });
       });
     },

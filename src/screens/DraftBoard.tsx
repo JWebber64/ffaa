@@ -74,12 +74,6 @@ const BidButton = ({ team, player }: { team: Team; player: Player | null | undef
   );
 };
 
-const SelectButton = () => (
-  <Button size="xs" colorScheme="green" mt={1} w="100%">
-    Select
-  </Button>
-);
-
 const NominateBar = () => (
   <Box>
     <Text fontSize="sm" textAlign="center">Nominate Player</Text>
@@ -94,60 +88,78 @@ interface SlotBoxProps {
 const SlotBox = ({ label, player }: SlotBoxProps) => {
   const POSITION_COLORS: Record<string, string> = {
     QB: 'blue',
-    RB: 'green',
-    WR: 'purple',
+    RB: 'red',
+    WR: 'green',
     TE: 'orange',
     K: 'yellow',
-    DEF: 'gray',
-    FLEX: 'pink',
+    DEF: 'blue',
+    FLEX: 'purple',
     BENCH: 'gray',
   };
 
   const positionColor = POSITION_COLORS[label] || 'gray';
+  // Use lighter gray for bench, lighter yellow for kicker, lighter blue for defense
+  const bgColor = label === 'BENCH' ? 'gray.700' : label === 'K' ? 'yellow.600' : label === 'DEF' ? 'blue.500' : `${positionColor}.900`;
+  const borderColor = label === 'BENCH' ? 'gray.500' : label === 'K' ? 'yellow.400' : label === 'DEF' ? 'blue.300' : `${positionColor}.600`;
   
   if (player) {
     return (
       <Box
-        bg="transparent"
-        border="1px solid #2d3748"
+        bg={bgColor}
+        border="1px solid"
+        borderColor={borderColor}
         rounded="md"
-        height="48px"
+        height="56px"
         display="flex"
-        alignItems="center"
+        flexDirection="column"
         justifyContent="space-between"
-        px={3}
+        p={1}
+        lineHeight="1"
       >
-        <Box style={{ minWidth: 0 }}>
+        {/* Top row: Name left, Price right */}
+        <HStack justify="space-between" align="flex-start" spacing={1}>
           <Text
             fontWeight={600}
             color="white"
-            style={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              maxWidth: "150px",
-              fontSize: "0.7rem",
-            }}
+            fontSize="0.65rem"
+            lineHeight="1.1"
+            flex={1}
+            noOfLines={2}
           >
             {player.name}
           </Text>
-          <HStack spacing={1} mt={1}>
-            <Badge colorScheme={POSITION_COLORS[player.pos] || 'gray'} fontSize="0.65rem" px={1}>{player.pos}</Badge>
-            {player.slot && player.slot !== player.pos && (
-              <Badge colorScheme={POSITION_COLORS[player.slot] || 'gray'} fontSize="0.65rem" px={1}>{player.slot}</Badge>
-            )}
-            {player.nflTeam && <Badge variant="outline" fontSize="0.65rem" px={1}>{player.nflTeam}</Badge>}
-          </HStack>
-        </Box>
-        <Text fontWeight={700} color="white" fontSize="0.75rem">${player.price ?? 0}</Text>
+          <Text fontWeight={700} color="white" fontSize="0.65rem" flexShrink={0}>
+            ${player.price ?? 0}
+          </Text>
+        </HStack>
+        
+        {/* Bottom row: Badges evenly spaced */}
+        <HStack justify="space-between" spacing={0.5} mt={0.5}>
+          <Badge colorScheme={POSITION_COLORS[player.pos] || 'gray'} fontSize="0.55rem" px={1} minW="24px" textAlign="center">
+            {player.pos}
+          </Badge>
+          {player.slot && player.slot !== player.pos && (
+            <Badge colorScheme={POSITION_COLORS[player.slot] || 'gray'} fontSize="0.55rem" px={1} minW="24px" textAlign="center">
+              {player.slot}
+            </Badge>
+          )}
+          {player.nflTeam ? (
+            <Badge variant="outline" fontSize="0.55rem" px={1} minW="24px" textAlign="center" color="whiteAlpha.900">
+              {player.nflTeam}
+            </Badge>
+          ) : (
+            <Box minW="24px" />
+          )}
+        </HStack>
       </Box>
     );
   }
 
   return (
     <Box
-      bg="transparent"
-      border="1px solid #2d3748"
+      bg={bgColor}
+      border="1px solid"
+      borderColor={borderColor}
       rounded="md"
       height="56px"
       display="flex"
@@ -155,16 +167,9 @@ const SlotBox = ({ label, player }: SlotBoxProps) => {
       justifyContent="center"
       px={3}
     >
-      <Badge 
-        colorScheme={positionColor}
-        variant="outline"
-        fontSize="sm"
-        px={2}
-        py={1}
-        opacity={0.7}
-      >
+      <Text fontWeight="bold" color="white" fontSize="sm">
         {label}
-      </Badge>
+      </Text>
     </Box>
   );
 };
@@ -274,10 +279,10 @@ export default function DraftBoard() {
     const drafted = draftedByTeam[team.id] ?? [];
 
     // Get players by position, respecting their assigned slots
-    const qb = takeFrom(drafted, (p) => p.slot === 'QB', team.roster.QB ?? 0);
-    const rb = takeFrom(drafted, (p) => p.slot === 'RB', team.roster.RB ?? 0);
-    const wr = takeFrom(drafted, (p) => p.slot === 'WR', team.roster.WR ?? 0);
-    const te = takeFrom(drafted, (p) => p.slot === 'TE', team.roster.TE ?? 0);
+    const qb = takeFrom(drafted, (p) => p.slot === 'QB' || p.pos === 'QB', team.roster.QB ?? 0);
+    const rb = takeFrom(drafted, (p) => p.slot === 'RB' || p.pos === 'RB', team.roster.RB ?? 0);
+    const wr = takeFrom(drafted, (p) => p.slot === 'WR' || p.pos === 'WR', team.roster.WR ?? 0);
+    const te = takeFrom(drafted, (p) => p.slot === 'TE' || p.pos === 'TE', team.roster.TE ?? 0);
 
     // Track used player IDs to avoid duplicates
     const used = new Set<string>([...qb, ...rb, ...wr, ...te].map((p) => p.id));
@@ -424,6 +429,7 @@ export default function DraftBoard() {
               }}
               showBidButton={true}
               showStartingBid={true}
+              maxResults={100}
             />
             <Button
               leftIcon={<FaCog />}
@@ -447,30 +453,10 @@ export default function DraftBoard() {
         <Box width="100%" p={2}>
           <Box
             display="grid"
-            gridTemplateColumns={{
-              base: 'repeat(auto-fill, minmax(120px, 1fr))',
-              md: `repeat(${Math.max(1, Math.min(teams.length, 8))}, minmax(120px, 1fr))`,
-              lg: `repeat(${Math.max(1, Math.min(teams.length, 12))}, minmax(100px, 1fr))`
-            }}
+            gridTemplateColumns={`repeat(${teams.length}, minmax(0, 1fr))`}
             gap={2}
             width="100%"
-            overflowX="auto"
-            sx={{
-              '&::-webkit-scrollbar': {
-                height: '8px',
-              },
-              '&::-webkit-scrollbar-track': {
-                background: 'gray.800',
-                borderRadius: '4px',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: 'gray.600',
-                borderRadius: '4px',
-                '&:hover': {
-                  background: 'gray.500',
-                },
-              },
-            }}
+            minWidth="0"
           >
             {teams.map((team) => (
               <Box
@@ -537,7 +523,6 @@ export default function DraftBoard() {
                       team={team} 
                       player={bidState.isLive ? players.find(p => p.id === bidState.playerId) ?? null : null} 
                     />
-                    <SelectButton />
                   </VStack>
                 </Stack>
 

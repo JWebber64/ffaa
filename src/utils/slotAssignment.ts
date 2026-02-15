@@ -1,4 +1,4 @@
-import type { Position, Player, Team, DraftState } from '../types/draft';
+import type { Position, DraftState } from '../types/draft';
 
 export function getOpenSlotsForTeamAndPlayer(
   state: DraftState,
@@ -13,13 +13,13 @@ export function getOpenSlotsForTeamAndPlayer(
   const openSlots: Position[] = [];
   const pos = player.pos;
   
-  // Check primary position slot
+  // Check primary position slot first
   if (team.roster[pos] > 0) {
     openSlots.push(pos);
   }
   
-  // Check FLEX if player is RB, WR, or TE
-  if ((pos === 'RB' || pos === 'WR' || pos === 'TE') && team.roster.FLEX > 0) {
+  // Check FLEX only if primary position is not available
+  if ((pos === 'RB' || pos === 'WR' || pos === 'TE') && team.roster.FLEX > 0 && team.roster[pos] <= 0) {
     openSlots.push('FLEX');
   }
   
@@ -53,10 +53,10 @@ export function assignPlayerToSlot(
   // Update player
   player.draftedBy = teamId;
   player.price = price;
-  player.slot = slot;
+  player.slot = slot!;
   
   // Update team roster
-  if (team.roster[slot] > 0) {
+  if (slot && team.roster[slot] > 0) {
     team.roster[slot]--;
   }
   

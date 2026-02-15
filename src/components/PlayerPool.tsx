@@ -232,6 +232,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
   const activeTabBg = useColorModeValue('blue.500', 'blue.600');
   const tabHoverBg = useColorModeValue('gray.200', 'gray.600');
   const activeTabColor = 'white';
+  const inactiveTabColor = useColorModeValue('gray.800', 'gray.200');
 
   // Force re-render when tab changes or when forceUpdate changes
   const tabKey = `tab-${activeTab}-${forceUpdate}`;
@@ -290,7 +291,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
                   variant={isActive ? 'solid' : 'ghost'}
                   colorScheme={isActive ? 'blue' : 'gray'}
                   bg={isActive ? activeTabBg : tabBg}
-                  color={isActive ? activeTabColor : 'gray.200'}
+                  color={isActive ? activeTabColor : inactiveTabColor}
                   _hover={{
                     bg: isActive ? 'blue.500' : tabHoverBg,
                   }}

@@ -61,11 +61,13 @@ type PlayerSearchProps = {
 
 const POSITION_COLORS: Record<string, string> = {
   QB: 'blue',
-  RB: 'green',
-  WR: 'purple',
+  RB: 'red',
+  WR: 'green',
   TE: 'orange',
   K: 'yellow',
-  DEF: 'gray',
+  DEF: 'blue',
+  FLEX: 'purple',
+  BENCH: 'gray',
 };
 
 export const PlayerSearch: React.FC<PlayerSearchProps> = ({
@@ -98,7 +100,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
 
   // Get players and selectors from store if not provided via props
   const storePlayers = useDraftStore((s) => s.players);
-  const topAvailable = useDraftStore((s) => s.selectors.topAvailable(s, 50));
+  const topAvailable = useDraftStore((s) => s.selectors.topAvailable(s, 100));
   const players = externalPlayers || storePlayers;
 
   // Debounce search with loading state
@@ -352,10 +354,11 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                 <ListItem
                   key={player.id}
                   p={2}
-                  bg={focusedIndex === index ? 'gray.700' : 'transparent'}
-                  _hover={{ bg: 'gray.700', cursor: 'pointer' }}
+                  bg={focusedIndex === index ? 'gray.700' : `${POSITION_COLORS[player.pos] || 'gray'}.900`}
+                  _hover={{ bg: `${POSITION_COLORS[player.pos] || 'gray'}.700`, cursor: 'pointer' }}
                   onClick={() => handleSelect(player)}
                   onMouseEnter={() => setFocusedIndex(index)}
+                  onMouseLeave={() => setFocusedIndex(-1)}
                   borderBottom="1px"
                   borderColor="gray.700"
                   role="option"
@@ -363,11 +366,11 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                 >
                   <HStack justify="space-between">
                     <Box>
-                      <Text fontWeight="medium">{player.name}</Text>
+                      <Text fontWeight="medium" color="white">{player.name}</Text>
                       <HStack spacing={2} mt={1}>
                         <Badge colorScheme={POSITION_COLORS[player.pos] || 'gray'}>{player.pos}</Badge>
                         {player.nflTeam && <Badge variant="outline">{player.nflTeam}</Badge>}
-                        {player.rank && <Text fontSize="sm" color="gray.500">#{player.rank}</Text>}
+                        {player.rank && <Text fontSize="sm" color="whiteAlpha.700">#{player.rank}</Text>}
                       </HStack>
                     </Box>
                     {showBidButton && (
@@ -411,12 +414,12 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
       {showBidButton && selectedPlayerState && (
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
-          <ModalContent _dark={{ bg: 'gray.800' }}>
+          <ModalContent bg="gray.800">
             <ModalHeader>Place Bid</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <VStack spacing={4}>
-                <Text>Player: {selectedPlayerState.name} ({selectedPlayerState.pos})</Text>
+                <Text color="white">Player: {selectedPlayerState.name} ({selectedPlayerState.pos})</Text>
                 <NumberInput
                   value={bidAmount}
                   onChange={(value) => setBidAmount(Number(value))}
@@ -427,8 +430,8 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                 >
                   <NumberInputField />
                   <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
+                    <NumberIncrementStepper color="white" />
+                    <NumberDecrementStepper color="white" />
                   </NumberInputStepper>
                 </NumberInput>
               </VStack>
