@@ -6,7 +6,10 @@ import path from "node:path";
 import slugify from "slugify";
 import * as cheerio from "cheerio";
 import { stringify } from "csv-stringify";
-import type { Position } from "@/types/draft";
+import type { Position as DraftPosition } from "../src/types/draft";
+
+// Local type that includes UNK for internal processing
+type Position = "QB" | "RB" | "WR" | "TE" | "K" | "DEF" | "FLEX" | "BENCH" | "UNK";
 
 // Team mapping for normalization
 const teamMap: Record<string, string> = {
@@ -290,18 +293,22 @@ function parseBackup(html: string): Row[] {
       }
       
       // Ensure pos is a valid Position type
-      type Position = "QB" | "RB" | "WR" | "TE" | "K" | "DEF" | "UNK";
       const validPos: Position = pos as Position;
       
-      rows.push({
-        id: `2025-${validPos}-${toSlug(name)}`,
-        season: 2025,
-        source: "FantasyPros ADP",
-        rank,
-        name,
-        pos: validPos,
-        nflTeam: team
-      });
+      // Convert to DraftPosition, filtering out UNK
+      const draftPos: DraftPosition | null = validPos === "UNK" ? null : validPos as DraftPosition;
+      
+      if (draftPos) {
+        rows.push({
+          id: `2025-${draftPos}-${toSlug(name)}`,
+          season: 2025,
+          source: "FantasyPros ADP",
+          rank,
+          name,
+          pos: draftPos,
+          nflTeam: team
+        });
+      }
     } catch (error) {
       console.error('Error parsing row:', error);
     }

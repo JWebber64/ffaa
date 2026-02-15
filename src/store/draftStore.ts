@@ -19,6 +19,7 @@ import type {
   DraftStore as DraftStoreType,
   AssignmentHistory,
   NominationOrderMode,
+  DraftState,
 } from '../types/draft';
 
 // Re-export for compatibility (prevents unused-type lint noise elsewhere)
@@ -169,6 +170,23 @@ function getValidSlots(team: Team, player: Player, includeTEinFlex = true): Posi
   }
   
   return out;
+}
+
+export type RosterSlotId = string;
+
+export function getValidSlotsForPlayer(params: {
+  team: Team;
+  player: Player;
+}): RosterSlotId[] {
+  const { team, player } = params;
+
+  // Get valid positions using existing logic
+  const validPositions = getValidSlots(team, player, true);
+  
+  // Convert positions to slot IDs
+  // Since the current system uses positions as slot identifiers,
+  // we'll return the position strings as slot IDs
+  return validPositions.map(pos => String(pos));
 }
 
 /* ---------------------------------------------------------------------------------------------- */
@@ -1019,6 +1037,12 @@ export const useDraftStore = create<DraftStore>()(
     persist(creator, {
       name: 'draft-store',
       version: 1,
+      migrate: (persistedState: unknown, _fromVersion: number): DraftState => {
+        if (persistedState && typeof persistedState === 'object') {
+          return persistedState as DraftState;
+        }
+        return persistedState as DraftState;
+      },
       storage: createJSONStorage(() => window.localStorage),
       partialize: (state) => ({
         // Save all player data, not just a subset of fields
@@ -1068,3 +1092,18 @@ export const useDraftSelectors = () => {
       selectors.topAvailableForFlex(state, limit, includeTE),
   };
 };
+
+export function normalizeImportedDraftState(input: unknown): unknown {
+  if (!input || typeof input !== "object") return null;
+  const obj = input as Record<string, unknown>;
+
+  // Preferred export format
+  if (obj.__type === "ffaa_draft_export" && typeof obj.state === "object" && obj.state) {
+    return obj.state;
+  }
+
+  // Legacy unwraps
+  if (obj.draft && typeof obj.draft === "object") return obj.draft;
+
+  return obj;
+}

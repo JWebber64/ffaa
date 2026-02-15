@@ -1,81 +1,55 @@
-import React, { createContext, useContext, ReactNode, useState, useCallback } from 'react';
-import { useToast } from '@chakra-ui/react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-type RoleContextType = {
+type RoleContextValue = {
   isAdmin: boolean;
-  login: (password: string) => boolean;
-  logout: () => void;
+  enableAdminMode: () => void;
+  disableAdminMode: () => void;
 };
 
-const RoleContext = createContext<RoleContextType | undefined>(undefined);
+const RoleContext = createContext<RoleContextValue | undefined>(undefined);
 
-export const RoleProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const toast = useToast();
+const STORAGE_KEY = "ffaa_admin_mode"; // local preference only (NOT security)
 
-  // In a real app, this would be handled by a proper auth service
-  const login = useCallback((password: string): boolean => {
-    // Check against the admin password from environment variables
-    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || '';
-    const isAuthenticated = password === adminPassword;
-    
-    if (isAuthenticated) {
-      setIsAdmin(true);
-      localStorage.setItem('isAdmin', 'true');
-      toast({
-        title: 'Admin access granted',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
-    } else {
-      toast({
-        title: 'Invalid admin password',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-    
-    return isAuthenticated;
-  }, [toast]);
+export function RoleProvider({ children }: { children: React.ReactNode }) {
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const logout = useCallback(() => {
-    setIsAdmin(false);
-    localStorage.removeItem('isAdmin');
-    toast({
-      title: 'Logged out of admin',
-      status: 'info',
-      duration: 3000,
-      isClosable: true,
-    });
-  }, [toast]);
-
-  // Check for existing session on mount
-  React.useEffect(() => {
-    const adminStatus = localStorage.getItem('isAdmin') === 'true';
-    if (adminStatus) {
-      setIsAdmin(true);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      setIsAdmin(raw === "true");
+    } catch {
+      // ignore
     }
   }, []);
 
-  return (
-    <RoleContext.Provider value={{ isAdmin, login, logout }}>
-      {children}
-    </RoleContext.Provider>
+  const enableAdminMode = useCallback(() => {
+    setIsAdmin(true);
+    try {
+      localStorage.setItem(STORAGE_KEY, "true");
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const disableAdminMode = useCallback(() => {
+    setIsAdmin(false);
+    try {
+      localStorage.setItem(STORAGE_KEY, "false");
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const value = useMemo(
+    () => ({ isAdmin, enableAdminMode, disableAdminMode }),
+    [isAdmin, enableAdminMode, disableAdminMode]
   );
-};
 
-export const useRole = (): RoleContextType => {
-  const context = useContext(RoleContext);
-  if (context === undefined) {
-    throw new Error('useRole must be used within a RoleProvider');
-  }
-  return context;
-};
+  return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;
+}
 
-// Helper hook for components that need admin access
-export const useAdmin = (): { isAdmin: boolean } => {
-  const context = useContext(RoleContext);
-  return { isAdmin: context?.isAdmin ?? false };
-};
+export function useRole(): RoleContextValue {
+  const ctx = useContext(RoleContext);
+  if (!ctx) throw new Error("useRole must be used within a RoleProvider");
+  return ctx;
+}

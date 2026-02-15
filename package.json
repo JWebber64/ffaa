@@ -12,8 +12,8 @@
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
     "preview": "vite preview",
-    "espn:pull": "tsx src/scripts/fetch-espn-cheatsheet.ts",
-    "players:pull": "tsx src/scripts/build-player-pool.ts --top=300",
+    "espn:pull": "tsx scripts/fetch-espn-cheatsheet.ts",
+    "players:pull": "tsx scripts/build-player-pool.ts --top=300",
     "players:check": "node -e \"console.log(require('./src/data/player-pool-2025.json').length + ' players')\"",
     "test:script": "node dist/scripts/test-script.js"
   },
@@ -28,6 +28,7 @@
     "h3": "^1.15.4",
     "immer": "^10.1.1",
     "lucide-react": "^0.542.0",
+    "nanoid": "^5.0.7",
     "node-fetch": "^2.7.0",
     "pdf-parse": "^1.1.1",
     "pdf2json": "^3.2.0",

@@ -14,44 +14,40 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import { useDraftStore } from '../../hooks/useDraftStore';
-import type { Position } from '../../types/draft';
-import type { DraftState } from '../../types/draft';
+
+type SlotOption = {
+  id: string;
+  position: string;
+  label?: string; // optional, if you want UI-friendly text
+};
 
 type PositionPickerModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  teamId: number;
-  playerId: string;
-  validSlots: Position[];
+  player: any | null; // replace with your Player type if available
+  team: any | null;   // replace with your Team type if available
+  validSlots: SlotOption[];
+  onConfirm: (slotId: string) => void;
 };
 
 export default function PositionPickerModal({
   isOpen,
   onClose,
-  teamId,
-  playerId,
+  player,
+  team,
   validSlots,
+  onConfirm,
 }: PositionPickerModalProps) {
   const toast = useToast();
-  const { players, teams } = useDraftStore((s: DraftState) => ({
-    players: s.players,
-    teams: s.teams,
-  }));
-  
-  const assignPlayer = useDraftStore(state => state.assignPlayer);
-  
-  const [selectedSlot, setSelectedSlot] = useState<Position | ''>('');
+  const [selectedSlotId, setSelectedSlotId] = useState<string>('');
   
   const handleSlotChange = (value: string) => {
-    setSelectedSlot(value as Position);
+    setSelectedSlotId(value);
   };
 
-  const player = players.find((p: { id: string }) => p.id === playerId);
-  const team = teams.find((t: { id: number }) => t.id === teamId);
 
-  const onAssign = () => {
-    if (!selectedSlot) {
+  const handleConfirm = () => {
+    if (!selectedSlotId) {
       toast({ status: 'warning', title: 'Please select a position slot' });
       return;
     }
@@ -61,18 +57,8 @@ export default function PositionPickerModal({
       return;
     }
 
-    // Use the store's assignPlayer action to handle the assignment
-    assignPlayer(playerId, teamId, player.price || 0, selectedSlot);
-    
-    // Log the assignment
-    toast({ 
-      status: 'success', 
-      title: `Assigned to ${selectedSlot}`,
-      description: `${player.name} has been assigned to ${selectedSlot} position`
-    });
-    
-    // Reset and close
-    setSelectedSlot('');
+    // Call the onConfirm callback with the selected slot ID
+    onConfirm(selectedSlotId);
     onClose();
   };
 
@@ -92,13 +78,13 @@ export default function PositionPickerModal({
           
           <RadioGroup 
             onChange={handleSlotChange} 
-            value={selectedSlot}
+            value={selectedSlotId}
             mb={4}
           >
             <Stack spacing={3}>
               {validSlots.map((slot) => (
-                <Radio key={slot} value={slot} size="lg" colorScheme="blue">
-                  <Text fontSize="lg">{slot}</Text>
+                <Radio key={slot.id} value={slot.id} size="lg" colorScheme="blue">
+                  <Text fontSize="lg">{slot.label ?? slot.position}</Text>
                 </Radio>
               ))}
             </Stack>
@@ -115,8 +101,8 @@ export default function PositionPickerModal({
           </Button>
           <Button 
             colorScheme="blue" 
-            onClick={onAssign} 
-            isDisabled={!selectedSlot}
+            onClick={handleConfirm} 
+            isDisabled={!selectedSlotId}
             px={6}
           >
             Confirm

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-// File: src/scripts/build-player-pool.ts
+// File: scripts/build-player-pool.ts
 import fs from "node:fs/promises";
 import path from "node:path";
 import { load as loadHTML } from "cheerio";
@@ -63,8 +63,8 @@ function parseFpAdpPpr(html: string): Row[] {
 
   // 1) Header map (don't assume fixed column order)
   const heads: string[] = [];
-  $("table thead tr th").each(function() {
-    heads.push($(this).text().trim().toLowerCase());
+  $("table thead tr th").each((_, element) => {
+    heads.push($(element).text().trim().toLowerCase());
   });
 
   const findIdx = (...needles: (string | RegExp)[]) => {

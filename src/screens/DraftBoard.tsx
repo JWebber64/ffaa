@@ -1,5 +1,5 @@
-import { Box, Button, Container, HStack, VStack, Heading, Stack, Text, useDisclosure, Input, Badge } from "@chakra-ui/react";
-import { useMemo, useState, KeyboardEvent, ChangeEvent } from "react";
+import { Box, Button, Container, HStack, VStack, Heading, Stack, Text, useDisclosure, Input, Badge, useToast } from "@chakra-ui/react";
+import { useMemo, useState, KeyboardEvent, ChangeEvent, useEffect } from "react";
 import { useDraftStore } from '../store/draftStore';
 import { shallow } from 'zustand/shallow';
 import PlayerSearch from '../components/unified/PlayerSearch';
@@ -7,6 +7,9 @@ import NominationIndicator from '../components/NominationIndicator';
 import LiveAuctionBar from '../components/LiveAuctionBar';
 import { FaCog } from 'react-icons/fa';
 import PositionPickerModal from '../components/modals/PositionPickerModal';
+import { getValidSlotsForPlayer } from '../store/draftStore';
+import { toastError } from '../utils/toastError';
+import DraftStateIO from '../components/DraftStateIO';
 
 import type { Position, Player as BasePlayer, Team as BaseTeam } from '../types/draft';
 
@@ -175,6 +178,7 @@ const SlotBox = ({ label, player }: SlotBoxProps) => {
 };
 
 export default function DraftBoard() {
+  const toast = useToast();
   const { 
     players, 
     templateRoster, 
@@ -376,6 +380,62 @@ export default function DraftBoard() {
     }
   };
 
+  // Compute valid slots for the pending assignment
+  const validSlotIds = useMemo(() => {
+    if (!pendingAssignment) return [];
+    
+    const team = teams.find(t => t.id === pendingAssignment.teamId);
+    const player = players.find(p => p.id === pendingAssignment.playerId);
+    
+    if (!team || !player) return [];
+    
+    return getValidSlotsForPlayer({ team, player });
+  }, [pendingAssignment, teams, players]);
+
+  const validSlots = useMemo(() => {
+    if (!pendingAssignment || !validSlotIds.length) return [];
+    
+    const team = teams.find(t => t.id === pendingAssignment.teamId);
+    if (!team) return [];
+    
+    // Create slot objects from the team's roster configuration
+    const slots: Array<{ id: string; position: string; label?: string }> = [];
+    
+    // For each valid slot ID, create a slot object
+    validSlotIds.forEach(slotId => {
+      slots.push({
+        id: slotId,
+        position: slotId,
+        label: slotId, // Use position as label for now
+      });
+    });
+    
+    return slots;
+  }, [pendingAssignment, validSlotIds, teams]);
+
+  // Auto-assign when exactly one valid slot exists
+  useEffect(() => {
+    if (!pendingAssignment || validSlotIds.length !== 1) return;
+    
+    const team = teams.find(t => t.id === pendingAssignment.teamId);
+    const player = players.find(p => p.id === pendingAssignment.playerId);
+    
+    if (!team || !player) return;
+    
+    // Auto-assign to the single valid slot
+    try {
+      const assignPlayer = useDraftStore.getState().assignPlayer;
+      assignPlayer(player.id, team.id, player.price || 0, validSlotIds[0] as Position);
+      
+      // Clear the pending assignment
+      useDraftStore.setState({ pendingAssignment: null });
+    } catch (err) {
+      toast(toastError("Failed to assign player", err));
+      // Clear the pending assignment even on error to prevent stuck state
+      useDraftStore.setState({ pendingAssignment: null });
+    }
+  }, [pendingAssignment, validSlotIds, teams, players, toast]);
+
 
   return (
     <Container maxW="container.xl" py={4} bg="transparent">
@@ -385,7 +445,7 @@ export default function DraftBoard() {
         
         <HStack justify="space-between" align="center">
           <Heading size="lg" color="white">Draft Board</Heading>
-          <HStack>
+          <HStack spacing={2}>
             <PlayerSearch 
               onSelect={(player) => {
                 console.log('Selected player:', player);
@@ -394,7 +454,7 @@ export default function DraftBoard() {
                 try {
                   if (!currentUserTeam) {
                     console.error('No team found for the current user');
-                    // TODO: Show error toast to user
+                    toast(toastError('No team found', 'Current user team not found'));
                     return;
                   }
                   
@@ -410,21 +470,27 @@ export default function DraftBoard() {
                     // Check if the bid is valid (higher than current bid)
                     if (amount <= (bidState.highBid || 0)) {
                       console.error(`Bid must be higher than current bid of $${bidState.highBid || 0}`);
-                      // TODO: Show error toast to user
+                      toast(toastError('Invalid bid amount', `Bid must be higher than current bid of $${bidState.highBid || 0}`));
                       return;
                     }
                     await placeBid(player.id, currentUserTeam.id, amount);
                   } else {
                     console.error('Cannot bid on this player - another auction is in progress');
-                    // TODO: Show error toast to user
+                    toast(toastError('Auction in progress', 'Cannot bid on this player - another auction is in progress'));
                     return;
                   }
                   
                   console.log(`Successfully placed bid of $${amount} on ${player.name}`);
-                  // TODO: Show success toast to user
+                  toast({
+                    title: 'Bid placed successfully',
+                    description: `Bid of $${amount} placed on ${player.name}`,
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                  });
                 } catch (error) {
                   console.error('Failed to place bid:', error);
-                  // TODO: Show error toast to user
+                  toast(toastError('Failed to place bid', error));
                 }
               }}
               showBidButton={true}
@@ -442,6 +508,7 @@ export default function DraftBoard() {
             >
               Settings
             </Button>
+            <DraftStateIO />
           </HStack>
         </HStack>
         
@@ -547,14 +614,27 @@ export default function DraftBoard() {
         </HStack>
       </Stack>
 
-      {/* Position Picker Modal - Only show if pendingAssignment exists */}
-      {pendingAssignment && (
+      {/* Position Picker Modal - Only show if pendingAssignment exists and multiple valid slots */}
+      {pendingAssignment && validSlots.length > 1 && (
         <PositionPickerModal
           isOpen={true}
           onClose={handleCloseModal}
-          teamId={pendingAssignment.teamId}
-          playerId={pendingAssignment.playerId}
-          validSlots={[]} // TODO: Re-implement getValidSlotsForPlayer if needed
+          player={players.find(p => p.id === pendingAssignment.playerId) || null}
+          team={teams.find(t => t.id === pendingAssignment.teamId) || null}
+          validSlots={validSlots}
+          onConfirm={(slotId) => {
+            try {
+              const assignPlayer = useDraftStore.getState().assignPlayer;
+              const player = players.find(p => p.id === pendingAssignment.playerId);
+              if (player) {
+                assignPlayer(player.id, pendingAssignment.teamId, player.price || 0, slotId as Position);
+              }
+              useDraftStore.setState({ pendingAssignment: null });
+            } catch (err) {
+              toast(toastError("Failed to assign player", err));
+              useDraftStore.setState({ pendingAssignment: null });
+            }
+          }}
         />
       )}
     </Container>

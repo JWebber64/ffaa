@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "noEmit": true,
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -19,14 +20,11 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "noEmit": false,
-    "outDir": "./dist/scripts",
     "baseUrl": ".",
-    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "typeRoots": ["../src/types", "../node_modules/@types"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["../src/*"]
     }
   },
-  "include": ["scripts/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["./**/*.ts"]
 }

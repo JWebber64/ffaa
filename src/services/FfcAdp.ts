@@ -1,5 +1,7 @@
 type FfcScoring = 'ppr' | 'half' | 'standard';
 
+const FFC_API_BASE = (import.meta.env.VITE_FFC_API_BASE as string | undefined) ?? "/ffc-api";
+
 interface FfcAdpOptions {
   year: number;
   teams: number;
@@ -33,7 +35,7 @@ function normTeam(t?: string) {
 }
 
 class FfcAdp {
-  constructor(private base = 'https://fantasyfootballcalculator.com/api/v1') {}
+  constructor() {}
 
   private key(o: FfcAdpOptions) { return `${CACHE_PREFIX}${o.scoring}:${o.teams}:${o.year}`; }
 
@@ -55,7 +57,7 @@ class FfcAdp {
       }
     }
 
-    const url = `${this.base}/adp/${scoring}?year=${year}&teams=${teams}`;
+    const url = `${FFC_API_BASE}/adp/${scoring}?year=${year}&teams=${teams}`;
     const fetchOptions: RequestInit = {
       headers: { accept: 'application/json' }
     };
@@ -65,7 +67,15 @@ class FfcAdp {
     }
     
     const res = await fetch(url, fetchOptions);
-    if (!res.ok) throw new Error(`FFC ADP fetch failed: ${res.status} ${res.statusText}`);
+    if (!res.ok) {
+      let body = "";
+      try {
+        body = await res.text();
+      } catch {
+        // ignore
+      }
+      throw new Error(`FFC request failed (${res.status}): ${body || res.statusText}`);
+    }
     const json = await res.json();
     interface FfcApiPlayer {
       name?: string;

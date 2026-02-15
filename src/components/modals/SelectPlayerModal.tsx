@@ -15,6 +15,7 @@ import { PlayerSearch } from '../unified/PlayerSearch';
 import { useDraftStore } from '../../store/draftStore';
 import { useRole } from '../../contexts/RoleContext';
 import type { Player } from '../../types/draft';
+import { toastError } from '../../utils/toastError';
 
 type SelectPlayerModalProps = {
   teamId: number;
@@ -38,10 +39,14 @@ export default function SelectPlayerModal({ teamId, isOpen, onClose }: SelectPla
       return;
     }
     // Using 0 as price since this is an admin assignment, not an auction
-    assignPlayer(selectedPlayer.id, teamId, 0, 'BENCH');
-    toast({ status: 'success', title: `${selectedPlayer.name} assigned to team.` });
-    setSelectedPlayer(null);
-    onClose();
+    try {
+      assignPlayer(selectedPlayer.id, teamId, 0, 'BENCH');
+      toast({ status: 'success', title: `${selectedPlayer.name} assigned to team.` });
+      setSelectedPlayer(null);
+      onClose();
+    } catch (err) {
+      toast(toastError('Failed to assign player', err));
+    }
   };
 
   return (

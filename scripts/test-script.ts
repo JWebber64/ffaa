@@ -2,7 +2,7 @@ console.log('Test script is running!');
 console.log('This is a test to verify script execution.');
 
 // Test async/await
-async function test() {
+async function testScript() {
   return new Promise(resolve => {
     setTimeout(() => {
       console.log('Async test completed!');
@@ -12,6 +12,6 @@ async function test() {
 }
 
 (async () => {
-  await test();
+  await testScript();
   console.log('All tests completed!');
 })();

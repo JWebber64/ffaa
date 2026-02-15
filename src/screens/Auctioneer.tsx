@@ -28,6 +28,7 @@ import AuctionSettings from '../components/AuctionSettings';
 import { useNavigate } from 'react-router-dom';
 import { useDisclosure } from '@chakra-ui/react';
 import { useAuctionSound } from '../hooks/useAuctionSound';
+import { toastError } from '../utils/toastError';
 
 const Auctioneer: React.FC = () => {
   const toast = useToast();
@@ -144,14 +145,8 @@ const Auctioneer: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to load ADP data:', error);
-      toast({
-        title: 'ADP unavailable',
-        description: 'List may be unranked',
-        status: 'warning',
-        duration: 5000,
-        isClosable: true,
-        position: 'top',
-      });
+      toast(toastError("ADP load failed", error));
+      // IMPORTANT: do not throw; allow user to proceed without ADP
     } finally {
       setIsLoadingAdp(false);
     }
