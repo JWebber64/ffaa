@@ -20,6 +20,20 @@ export async function requireUserId(): Promise<string> {
 export async function createDraftRoom(displayName: string, draftConfig: DraftConfigV2) {
   const userId = await requireUserId();
 
+  // Safety assertion: ensure teamBudgets length matches teamCount
+  if (draftConfig.draftType === 'auction' && draftConfig.auctionSettings) {
+    if (draftConfig.auctionSettings.teamBudgets.length !== draftConfig.teamCount) {
+      // Normalize by creating default budgets
+      draftConfig = {
+        ...draftConfig,
+        auctionSettings: {
+          ...draftConfig.auctionSettings,
+          teamBudgets: Array(draftConfig.teamCount).fill(draftConfig.auctionSettings.defaultBudget)
+        }
+      };
+    }
+  }
+
   // Retry room code collisions a few times
   for (let i = 0; i < 5; i++) {
     const code = makeRoomCode(6);
@@ -37,7 +51,6 @@ export async function createDraftRoom(displayName: string, draftConfig: DraftCon
           lockedAt: new Date().toISOString()
         },
         snapshot: {}, // host will write real snapshot once initialized
-        draft_config: draftConfig,
         draft_type: draftConfig.draftType,
         team_count: draftConfig.teamCount,
       })
@@ -155,14 +168,14 @@ export async function getDraftByCode(code: string) {
 export async function getDraftConfig(draftId: string): Promise<DraftConfigV2> {
   const { data, error } = await supabase
     .from("drafts")
-    .select("draft_config")
+    .select("settings")
     .eq("id", draftId)
     .single();
   
   if (error) throw error;
-  if (!data?.draft_config) throw new Error("Draft config not found");
+  if (!data?.settings) throw new Error("Draft config not found");
   
-  return data.draft_config as DraftConfigV2;
+  return data.settings as DraftConfigV2;
 }
 
 export async function listParticipants(draftId: string) {

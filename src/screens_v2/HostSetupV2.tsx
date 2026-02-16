@@ -1,35 +1,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Select,
-  VStack,
-  HStack,
-  Text,
-  Heading,
-  Divider,
-  useColorModeValue,
-  Grid,
-  GridItem,
-} from "@chakra-ui/react";
 import { DEFAULT_CONFIG_AUCTION_12 } from "../types/draftConfig";
-import { DraftConfigV2, LeagueType, DraftTypeV2, ScoringType, TeamCountV2 } from "../types/draftConfig";
-import RosterBuilder from "../components/premium/RosterBuilder";
-import AuctionSettingsForm from "../components/premium/AuctionSettingsForm";
-import SnakeSettingsForm from "../components/premium/SnakeSettingsForm";
+import { DraftConfigV2, LeagueType, DraftTypeV2, ScoringType, TeamCountV2, RosterSlot, SlotType } from "../types/draftConfig";
+import { Card } from "../ui/Card";
+import { Button } from "../ui/Button";
+import { Divider } from "../ui/Divider";
+import { cn } from "../ui/cn";
 
 export default function HostSetupV2() {
   const navigate = useNavigate();
   const [config, setConfig] = useState<DraftConfigV2>(DEFAULT_CONFIG_AUCTION_12);
   const [creating, setCreating] = useState(false);
 
-  const bgColor = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.600');
-  const cardBgColor = useColorModeValue('gray.50', 'gray.700');
-
   const updateConfig = <K extends keyof DraftConfigV2>(key: K, val: DraftConfigV2[K]) => {
-    setConfig({ ...config, [key]: val });
+    if (key === 'teamCount') {
+      const newTeamCount = val as TeamCountV2;
+      const updatedConfig = { ...config, [key]: val };
+      
+      // Resize budgets array for auction drafts
+      if (config.draftType === 'auction' && config.auctionSettings) {
+        updatedConfig.auctionSettings = {
+          ...config.auctionSettings,
+          teamBudgets: Array(newTeamCount).fill(config.auctionSettings.defaultBudget)
+        };
+      }
+      
+      setConfig(updatedConfig);
+    } else {
+      setConfig({ ...config, [key]: val });
+    }
   };
 
   const updateAuctionSettings = (settings: typeof config.auctionSettings) => {
@@ -41,6 +40,33 @@ export default function HostSetupV2() {
   const updateSnakeSettings = (settings: typeof config.snakeSettings) => {
     if (settings) {
       setConfig({ ...config, snakeSettings: settings });
+    }
+  };
+
+  // Roster Builder inline implementation
+  const updateRosterSlot = (index: number, updates: Partial<RosterSlot>) => {
+    const newSlots = [...config.rosterSlots];
+    newSlots[index] = { ...newSlots[index], ...updates };
+    updateConfig('rosterSlots', newSlots);
+  };
+
+  const addRosterSlot = () => {
+    const newSlot: RosterSlot = { slot: 'BENCH', count: 1 };
+    updateConfig('rosterSlots', [...config.rosterSlots, newSlot]);
+  };
+
+  const removeRosterSlot = (index: number) => {
+    const newSlots = config.rosterSlots.filter((_, i) => i !== index);
+    updateConfig('rosterSlots', newSlots);
+  };
+
+  const updateFlexEligibility = (index: number, position: SlotType, checked: boolean) => {
+    const slot = config.rosterSlots[index];
+    if (slot.slot === 'FLEX' || slot.slot === 'IDP_FLEX') {
+      const eligible = checked 
+        ? [...(slot.flexEligible || []), position]
+        : (slot.flexEligible || []).filter(p => p !== position);
+      updateRosterSlot(index, { flexEligible: eligible });
     }
   };
 
@@ -56,173 +82,413 @@ export default function HostSetupV2() {
   }
 
   return (
-    <Box minH="100vh" bg={cardBgColor} py={8}>
-      <Box maxW="4xl" mx="auto" px={4}>
-        <VStack spacing={8} align="stretch">
+    <div className="min-h-screen bg-panel py-8">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="space-y-8">
           {/* Header */}
-          <Box textAlign="center">
-            <Heading size="2xl" mb={4}>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold mb-4 text-fg0">
               Setup Your Draft
-            </Heading>
-            <Text color="gray.600" fontSize="lg">
+            </h1>
+            <p className="text-lg text-fg2">
               Configure your draft settings and create your lobby
-            </Text>
-          </Box>
+            </p>
+          </div>
 
           {/* Configuration Form */}
-          <Box bg={bgColor} border="1px" borderColor={borderColor} borderRadius="lg" p={8}>
-            <VStack spacing={8} align="stretch">
+          <Card className="p-8">
+            <div className="space-y-8">
               {/* League Basics */}
-              <Box>
-                <Heading size="md" mb={6}>
+              <div>
+                <h2 className="text-lg font-semibold mb-6 text-fg0">
                   League Basics
-                </Heading>
+                </h2>
                 
-                <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6}>
-                  <GridItem>
-                    <VStack align="stretch" spacing={2}>
-                      <Text fontSize="sm" fontWeight="medium">
-                        League Type
-                      </Text>
-                      <Select
-                        value={config.leagueType}
-                        onChange={(e) => updateConfig('leagueType', e.target.value as LeagueType)}
-                        size="md"
-                      >
-                        <option value="redraft">Redraft</option>
-                        <option value="keeper">Keeper</option>
-                        <option value="dynasty">Dynasty</option>
-                      </Select>
-                    </VStack>
-                  </GridItem>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-fg1">
+                      League Type
+                    </label>
+                    <select
+                      value={config.leagueType}
+                      onChange={(e) => updateConfig('leagueType', e.target.value as LeagueType)}
+                      className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
+                    >
+                      <option value="redraft">Redraft</option>
+                      <option value="keeper">Keeper</option>
+                      <option value="dynasty">Dynasty</option>
+                    </select>
+                  </div>
 
-                  <GridItem>
-                    <VStack align="stretch" spacing={2}>
-                      <Text fontSize="sm" fontWeight="medium">
-                        Scoring
-                      </Text>
-                      <Select
-                        value={config.scoring}
-                        onChange={(e) => updateConfig('scoring', e.target.value as ScoringType)}
-                        size="md"
-                      >
-                        <option value="standard">Standard</option>
-                        <option value="half_ppr">Half PPR</option>
-                        <option value="ppr">PPR</option>
-                      </Select>
-                    </VStack>
-                  </GridItem>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-fg1">
+                      Scoring
+                    </label>
+                    <select
+                      value={config.scoring}
+                      onChange={(e) => updateConfig('scoring', e.target.value as ScoringType)}
+                      className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
+                    >
+                      <option value="standard">Standard</option>
+                      <option value="half_ppr">Half PPR</option>
+                      <option value="ppr">PPR</option>
+                    </select>
+                  </div>
 
-                  <GridItem>
-                    <VStack align="stretch" spacing={2}>
-                      <Text fontSize="sm" fontWeight="medium">
-                        Draft Type
-                      </Text>
-                      <Select
-                        value={config.draftType}
-                        onChange={(e) => updateConfig('draftType', e.target.value as DraftTypeV2)}
-                        size="md"
-                      >
-                        <option value="auction">Auction Draft</option>
-                        <option value="snake">Snake Draft</option>
-                      </Select>
-                    </VStack>
-                  </GridItem>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-fg1">
+                      Draft Type
+                    </label>
+                    <select
+                      value={config.draftType}
+                      onChange={(e) => updateConfig('draftType', e.target.value as DraftTypeV2)}
+                      className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
+                    >
+                      <option value="auction">Auction Draft</option>
+                      <option value="snake">Snake Draft</option>
+                    </select>
+                  </div>
 
-                  <GridItem>
-                    <VStack align="stretch" spacing={2}>
-                      <Text fontSize="sm" fontWeight="medium">
-                        Team Count
-                      </Text>
-                      <Select
-                        value={config.teamCount}
-                        onChange={(e) => updateConfig('teamCount', parseInt(e.target.value) as TeamCountV2)}
-                        size="md"
-                      >
-                        <option value={8}>8 Teams</option>
-                        <option value={10}>10 Teams</option>
-                        <option value={12}>12 Teams</option>
-                        <option value={14}>14 Teams</option>
-                        <option value={16}>16 Teams</option>
-                      </Select>
-                    </VStack>
-                  </GridItem>
-                </Grid>
-              </Box>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-fg1">
+                      Team Count
+                    </label>
+                    <select
+                      value={config.teamCount}
+                      onChange={(e) => updateConfig('teamCount', parseInt(e.target.value) as TeamCountV2)}
+                      className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
+                    >
+                      <option value={8}>8 Teams</option>
+                      <option value={10}>10 Teams</option>
+                      <option value={12}>12 Teams</option>
+                      <option value={14}>14 Teams</option>
+                      <option value={16}>16 Teams</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
               <Divider />
 
               {/* Roster Builder */}
-              <Box>
-                <Heading size="md" mb={4}>
+              <div>
+                <h2 className="text-lg font-semibold mb-4 text-fg0">
                   Roster Configuration
-                </Heading>
-                <RosterBuilder
-                  value={config.rosterSlots}
-                  onChange={(slots) => updateConfig('rosterSlots', slots)}
-                  allowIdp={true}
-                />
-              </Box>
+                </h2>
+                <div className="space-y-3">
+                  {config.rosterSlots.map((slot, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 rounded-lg border border-stroke bg-[rgba(255,255,255,0.02)]">
+                      <select
+                        value={slot.slot}
+                        onChange={(e) => updateRosterSlot(index, { slot: e.target.value as SlotType })}
+                        className="h-10 rounded border border-stroke bg-[rgba(255,255,255,0.04)] px-2 text-sm text-fg0 focus:border-stroke2 focus:outline-none"
+                      >
+                        <option value="QB">QB</option>
+                        <option value="RB">RB</option>
+                        <option value="WR">WR</option>
+                        <option value="TE">TE</option>
+                        <option value="FLEX">FLEX</option>
+                        <option value="K">K</option>
+                        <option value="DST">DST</option>
+                        <option value="BENCH">BENCH</option>
+                        <option value="IR">IR</option>
+                        <option value="DL">DL</option>
+                        <option value="LB">LB</option>
+                        <option value="DB">DB</option>
+                        <option value="IDP_FLEX">IDP_FLEX</option>
+                      </select>
+                      
+                      <input
+                        type="number"
+                        min="0"
+                        max="20"
+                        value={slot.count}
+                        onChange={(e) => updateRosterSlot(index, { count: parseInt(e.target.value) || 0 })}
+                        className="w-20 h-10 rounded border border-stroke bg-[rgba(255,255,255,0.04)] px-2 text-sm text-fg0 focus:border-stroke2 focus:outline-none"
+                      />
+                      
+                      {slot.slot === 'FLEX' && (
+                        <div className="flex items-center gap-2 ml-2">
+                          {['RB', 'WR', 'TE'].map(pos => (
+                            <label key={pos} className="flex items-center gap-1 text-sm text-fg1">
+                              <input
+                                type="checkbox"
+                                checked={slot.flexEligible?.includes(pos as SlotType) || false}
+                                onChange={(e) => updateFlexEligibility(index, pos as SlotType, e.target.checked)}
+                                className="rounded border-stroke bg-[rgba(255,255,255,0.04)]"
+                              />
+                              {pos}
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {slot.slot === 'IDP_FLEX' && (
+                        <div className="flex items-center gap-2 ml-2">
+                          {['DL', 'LB', 'DB'].map(pos => (
+                            <label key={pos} className="flex items-center gap-1 text-sm text-fg1">
+                              <input
+                                type="checkbox"
+                                checked={slot.flexEligible?.includes(pos as SlotType) || false}
+                                onChange={(e) => updateFlexEligibility(index, pos as SlotType, e.target.checked)}
+                                className="rounded border-stroke bg-[rgba(255,255,255,0.04)]"
+                              />
+                              {pos}
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                      
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeRosterSlot(index)}
+                        className="ml-auto"
+                      >
+                        ×
+                      </Button>
+                    </div>
+                  ))}
+                  
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={addRosterSlot}
+                    className="w-full"
+                  >
+                    + Add Roster Slot
+                  </Button>
+                </div>
+              </div>
 
               <Divider />
 
               {/* Draft-Specific Settings */}
-              <Box>
-                <Heading size="md" mb={4}>
+              <div>
+                <h2 className="text-lg font-semibold mb-4 text-fg0">
                   {config.draftType === 'auction' ? 'Auction Settings' : 'Snake Settings'}
-                </Heading>
+                </h2>
                 
                 {config.draftType === 'auction' && config.auctionSettings && (
-                  <AuctionSettingsForm
-                    value={config.auctionSettings}
-                    onChange={updateAuctionSettings}
-                    teamCount={config.teamCount}
-                  />
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-fg1">
+                          Default Budget
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="10000"
+                          value={config.auctionSettings.defaultBudget}
+                          onChange={(e) => updateAuctionSettings({
+                            ...config.auctionSettings,
+                            defaultBudget: parseInt(e.target.value) || 0
+                          })}
+                          className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-fg1">
+                          Nomination Seconds
+                        </label>
+                        <input
+                          type="number"
+                          min="5"
+                          max="120"
+                          value={config.auctionSettings.nominationSeconds}
+                          onChange={(e) => updateAuctionSettings({
+                            ...config.auctionSettings,
+                            nominationSeconds: parseInt(e.target.value) || 30
+                          })}
+                          className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-fg1">
+                          Bid Reset Seconds
+                        </label>
+                        <input
+                          type="number"
+                          min="3"
+                          max="30"
+                          value={config.auctionSettings.bidResetSeconds}
+                          onChange={(e) => updateAuctionSettings({
+                            ...config.auctionSettings,
+                            bidResetSeconds: parseInt(e.target.value) || 10
+                          })}
+                          className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-fg1">
+                          Min Increment
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="10"
+                          value={config.auctionSettings.minIncrement}
+                          onChange={(e) => updateAuctionSettings({
+                            ...config.auctionSettings,
+                            minIncrement: parseInt(e.target.value) || 1
+                          })}
+                          className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="text-sm font-medium text-fg1">
+                          Nomination Order Mode
+                        </label>
+                        <select
+                          value={config.auctionSettings.nominationOrderMode}
+                          onChange={(e) => updateAuctionSettings({
+                            ...config.auctionSettings,
+                            nominationOrderMode: e.target.value as any
+                          })}
+                          className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
+                        >
+                          <option value="random_first_rotate">Random First, Then Rotate</option>
+                          <option value="fixed">Fixed Order</option>
+                          <option value="random_each">Random Each Time</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Team Budgets Grid */}
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="text-sm font-medium text-fg1">
+                          Per-Team Budgets
+                        </label>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => updateAuctionSettings({
+                            ...config.auctionSettings,
+                            teamBudgets: Array(config.teamCount).fill(config.auctionSettings.defaultBudget)
+                          })}
+                        >
+                          Fill All with Default
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+                        {config.auctionSettings.teamBudgets.map((budget, index) => (
+                          <div key={index} className="space-y-1">
+                            <label className="text-xs text-fg2">Team {index + 1}</label>
+                            <input
+                              type="number"
+                              min="0"
+                              max="10000"
+                              value={budget}
+                              onChange={(e) => {
+                                const newBudgets = [...config.auctionSettings.teamBudgets];
+                                newBudgets[index] = parseInt(e.target.value) || 0;
+                                updateAuctionSettings({
+                                  ...config.auctionSettings,
+                                  teamBudgets: newBudgets
+                                });
+                              }}
+                              className="w-full h-9 rounded border border-stroke bg-[rgba(255,255,255,0.04)] px-2 text-sm text-fg0 focus:border-stroke2 focus:outline-none"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 )}
                 
                 {config.draftType === 'snake' && config.snakeSettings && (
-                  <SnakeSettingsForm
-                    value={config.snakeSettings}
-                    onChange={updateSnakeSettings}
-                  />
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-fg1">
+                          Pick Seconds
+                        </label>
+                        <input
+                          type="number"
+                          min="10"
+                          max="300"
+                          value={config.snakeSettings.pickSeconds}
+                          onChange={(e) => updateSnakeSettings({
+                            ...config.snakeSettings,
+                            pickSeconds: parseInt(e.target.value) || 60
+                          })}
+                          className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-4">
+                        <label className="flex items-center gap-3 text-sm text-fg1">
+                          <input
+                            type="checkbox"
+                            checked={config.snakeSettings.autopick}
+                            onChange={(e) => updateSnakeSettings({
+                              ...config.snakeSettings,
+                              autopick: e.target.checked
+                            })}
+                            className="rounded border-stroke bg-[rgba(255,255,255,0.04)]"
+                          />
+                          Enable Autopick
+                        </label>
+
+                        <label className="flex items-center gap-3 text-sm text-fg1">
+                          <input
+                            type="checkbox"
+                            checked={config.snakeSettings.pauseBetweenRounds}
+                            onChange={(e) => updateSnakeSettings({
+                              ...config.snakeSettings,
+                              pauseBetweenRounds: e.target.checked
+                            })}
+                            className="rounded border-stroke bg-[rgba(255,255,255,0.04)]"
+                          />
+                          Pause Between Rounds
+                        </label>
+                      </div>
+                    </div>
+                  </div>
                 )}
-              </Box>
+              </div>
 
               {/* Create Lobby Button */}
-              <Box pt={4}>
+              <div className="pt-4">
                 <Button
                   onClick={onCreateLobby}
                   disabled={creating}
                   isLoading={creating}
                   size="lg"
-                  colorScheme="blue"
-                  width="full"
+                  variant="primary"
+                  className="w-full"
                 >
                   {creating ? 'Creating Lobby...' : 'Create Lobby'}
                 </Button>
-              </Box>
-            </VStack>
-          </Box>
+              </div>
+            </div>
+          </Card>
 
           {/* Info Box */}
-          <Box bg={bgColor} border="1px" borderColor={borderColor} borderRadius="lg" p={6}>
-            <HStack spacing={4} align="start">
-              <Box color="blue.500" mt={1}>
+          <Card className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="text-blue-400 mt-1">
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
-              </Box>
-              <VStack align="start" spacing={2} flex={1}>
-                <Text fontWeight="medium">Next Steps</Text>
-                <Text fontSize="sm" color="gray.600">
+              </div>
+              <div className="flex-1 space-y-2">
+                <h3 className="font-medium text-fg0">Next Steps</h3>
+                <p className="text-sm text-fg2">
                   After creating the lobby, you'll get a room code to share with other managers. 
                   The draft configuration will be locked once the lobby is created.
-                </Text>
-              </VStack>
-            </HStack>
-          </Box>
-        </VStack>
-      </Box>
-    </Box>
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 }
