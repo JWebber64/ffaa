@@ -1061,7 +1061,7 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
         lastMutationId: snapshot.lastMutationId || 0,
         lastMutationAt: snapshot.lastMutationAt || Date.now(),
         timerEndsAt: snapshot.timerEndsAt,
-        processedActionIds: snapshot.processedActionIds || new Set(),
+        processedActionIds: new Set(),
         
         // Load flags
         playersLoaded: snapshot.playersLoaded || false,

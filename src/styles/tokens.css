@@ -1,0 +1,36 @@
+:root {
+  /* Backgrounds */
+  --bg0: #070A10;
+  --bg1: #0B1020;
+  --panel: rgba(255, 255, 255, 0.06);
+  --glass: rgba(255, 255, 255, 0.08);
+
+  /* Strokes */
+  --stroke: rgba(255, 255, 255, 0.10);
+  --stroke2: rgba(255, 255, 255, 0.16);
+
+  /* Text */
+  --fg0: rgba(255, 255, 255, 0.92);
+  --fg1: rgba(255, 255, 255, 0.78);
+  --fg2: rgba(255, 255, 255, 0.60);
+
+  /* Accents */
+  --accent: #7C3AED;   /* premium violet */
+  --accent2: #22D3EE;  /* cyan highlight */
+
+  /* Status */
+  --danger: #FB7185;
+  --success: #34D399;
+  --warning: #FBBF24;
+
+  /* Radius */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+
+  /* Shadows (soft) */
+  --shadow1: 0 6px 24px rgba(0,0,0,0.35);
+  --shadow2: 0 10px 36px rgba(0,0,0,0.45);
+  --shadow3: 0 18px 60px rgba(0,0,0,0.55);
+}

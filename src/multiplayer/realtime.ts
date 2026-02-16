@@ -23,7 +23,15 @@ export function subscribeHostToActions(
     .on(
       "postgres_changes",
       { event: "INSERT", schema: "public", table: "draft_actions", filter: `draft_id=eq.${draftId}` },
-      (payload) => onAction(payload.new)
+      (payload) => {
+        // Ensure the callback receives the full row with action_id and created_at
+        const actionRow = payload.new;
+        if (!actionRow.action_id || !actionRow.created_at) {
+          console.error("Action row missing required fields:", actionRow);
+          return;
+        }
+        onAction(actionRow);
+      }
     )
     .subscribe();
 }

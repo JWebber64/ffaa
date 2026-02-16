@@ -5,6 +5,7 @@ import { useDraftStore } from "@/store/draftStore";
 
 export function useDraftSnapshotSubscription(draftId: string) {
   useEffect(() => {
+    if (!draftId) return;
     const ch = subscribeToDraftSnapshot(draftId, (snapshot) => {
       useDraftStore.getState().importDraftState(snapshot);
     });

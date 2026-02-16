@@ -1,76 +1,128 @@
+-- =========================================
 -- RLS Policies for multiplayer draft system
+-- (Corrected row correlation + auth scoping)
+-- =========================================
 
--- Drafts table policies
--- Allow users to read drafts they participate in
-CREATE POLICY "Users can view drafts they participate in" ON public.drafts
-  FOR SELECT USING (
-    auth.uid() IN (
-      SELECT user_id FROM public.draft_participants 
-      WHERE draft_id = id
-    )
-  );
+-- Clean slate (safe re-run)
+drop policy if exists "Users can view drafts they participate in" on public.drafts;
+drop policy if exists "Hosts can update their drafts" on public.drafts;
+drop policy if exists "Users can create drafts" on public.drafts;
 
--- Allow users to update drafts they host
-CREATE POLICY "Hosts can update their drafts" ON public.drafts
-  FOR UPDATE USING (
-    auth.uid() = host_user_id
-  );
+drop policy if exists "Users can view participants in their drafts" on public.draft_participants;
+drop policy if exists "Users can join drafts" on public.draft_participants;
+drop policy if exists "Users can update their participation" on public.draft_participants;
+drop policy if exists "Users can leave drafts" on public.draft_participants;
 
--- Allow anyone to insert drafts (will be constrained by app logic)
-CREATE POLICY "Users can create drafts" ON public.drafts
-  FOR INSERT WITH CHECK (true);
+drop policy if exists "Users can view actions in their drafts" on public.draft_actions;
+drop policy if exists "Users can create actions in their drafts" on public.draft_actions;
+drop policy if exists "No updates to actions" on public.draft_actions;
+drop policy if exists "No deletes to actions" on public.draft_actions;
 
--- Draft participants table policies
--- Allow users to read participants for drafts they participate in
-CREATE POLICY "Users can view participants in their drafts" ON public.draft_participants
-  FOR SELECT USING (
-    auth.uid() IN (
-      SELECT user_id FROM public.draft_participants 
-      WHERE draft_id = draft_id
-    )
-  );
+-- -----------------------------------------
+-- drafts
+-- -----------------------------------------
 
--- Allow users to insert themselves as participants
-CREATE POLICY "Users can join drafts" ON public.draft_participants
-  FOR INSERT WITH CHECK (
-    auth.uid() = user_id
-  );
+create policy "Users can view drafts they participate in"
+on public.drafts
+for select
+to authenticated
+using (
+  exists (
+    select 1
+    from public.draft_participants dp
+    where dp.draft_id = drafts.id
+      and dp.user_id = auth.uid()
+  )
+);
 
--- Allow users to update their own participant record
-CREATE POLICY "Users can update their participation" ON public.draft_participants
-  FOR UPDATE USING (
-    auth.uid() = user_id
-  );
+create policy "Hosts can update their drafts"
+on public.drafts
+for update
+to authenticated
+using (auth.uid() = drafts.host_user_id)
+with check (auth.uid() = drafts.host_user_id);
 
--- Allow users to delete their own participation
-CREATE POLICY "Users can leave drafts" ON public.draft_participants
-  FOR DELETE USING (
-    auth.uid() = user_id
-  );
+create policy "Users can create drafts"
+on public.drafts
+for insert
+to authenticated
+with check (auth.uid() = host_user_id);
 
--- Draft actions table policies
--- Allow users to read actions for drafts they participate in
-CREATE POLICY "Users can view actions in their drafts" ON public.draft_actions
-  FOR SELECT USING (
-    auth.uid() IN (
-      SELECT user_id FROM public.draft_participants 
-      WHERE draft_id = draft_id
-    )
-  );
+-- -----------------------------------------
+-- draft_participants
+-- -----------------------------------------
 
--- Allow users to insert actions for drafts they participate in
-CREATE POLICY "Users can create actions in their drafts" ON public.draft_actions
-  FOR INSERT WITH CHECK (
-    auth.uid() = user_id AND
-    auth.uid() IN (
-      SELECT user_id FROM public.draft_participants 
-      WHERE draft_id = draft_id
-    )
-  );
+create policy "Users can view participants in their drafts"
+on public.draft_participants
+for select
+to authenticated
+using (
+  exists (
+    select 1
+    from public.draft_participants me
+    where me.draft_id = draft_participants.draft_id
+      and me.user_id = auth.uid()
+  )
+);
 
--- No one should update or delete actions (immutable audit log)
-CREATE POLICY "No updates to actions" ON public.draft_actions
-  FOR UPDATE USING (false);
+create policy "Users can join drafts"
+on public.draft_participants
+for insert
+to authenticated
+with check (auth.uid() = user_id);
 
-CREATE POLICY "No deletes to actions" ON public.draft_actions
-  FOR DELETE USING (false);
+create policy "Users can update their participation"
+on public.draft_participants
+for update
+to authenticated
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
+
+create policy "Users can leave drafts"
+on public.draft_participants
+for delete
+to authenticated
+using (auth.uid() = user_id);
+
+-- -----------------------------------------
+-- draft_actions (append-only)
+-- -----------------------------------------
+
+create policy "Users can view actions in their drafts"
+on public.draft_actions
+for select
+to authenticated
+using (
+  exists (
+    select 1
+    from public.draft_participants dp
+    where dp.draft_id = draft_actions.draft_id
+      and dp.user_id = auth.uid()
+  )
+);
+
+create policy "Users can create actions in their drafts"
+on public.draft_actions
+for insert
+to authenticated
+with check (
+  auth.uid() = user_id
+  and exists (
+    select 1
+    from public.draft_participants dp
+    where dp.draft_id = draft_actions.draft_id
+      and dp.user_id = auth.uid()
+  )
+);
+
+create policy "No updates to actions"
+on public.draft_actions
+for update
+to authenticated
+using (false);
+
+create policy "No deletes to actions"
+on public.draft_actions
+for delete
+to authenticated
+using (false);

@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "./tokens.css";
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(1200px 800px at 20% 0%, rgba(124, 58, 237, 0.18), transparent 55%),
+              radial-gradient(900px 700px at 90% 10%, rgba(34, 211, 238, 0.10), transparent 50%),
+              linear-gradient(180deg, var(--bg0), var(--bg1));
+  color: var(--fg0);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+/* Always-visible focus ring */
+:focus-visible {
+  outline: 2px solid rgba(34, 211, 238, 0.75);
+  outline-offset: 2px;
+}
