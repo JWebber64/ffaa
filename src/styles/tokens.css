@@ -1,52 +1,36 @@
 :root {
-  /* FFAA Hybrid Theme - Background Layers */
-  --bg-0: #0A0F1C;     /* page background */
-  --bg-1: #141B2D;     /* panels */
-  --bg-2: #1E293B;     /* raised surfaces */
-  
-  /* Text */
-  --text-0: rgba(255, 255, 255, 0.95);     /* primary */
-  --text-1: rgba(255, 255, 255, 0.70);     /* muted */
+  /* --- Dark base --- */
+  --bg-0: #070A10;        /* page */
+  --bg-1: #0B1020;        /* deep surface */
+  --bg-2: #0F1630;        /* raised surface */
 
-  /* Borders */
-  --line-0: rgba(255, 255, 255, 0.08);     /* hairline */
+  --text-0: rgba(255,255,255,0.92);
+  --text-1: rgba(255,255,255,0.68);
 
-  /* Neon Accents */
-  --neon-blue: #3B82F6;      /* electric blue */
-  --neon-green: #10B981;     /* vibrant green */
+  /* --- Material-ish ambient accents (subtle) --- */
+  --accent-1: #7C3AED;    /* purple */
+  --accent-2: #14B8A6;    /* teal */
 
-  /* Status */
-  --ok: #10B981;            /* success */
-  --warn: #F59E0B;          /* warning */
-  --bad: #EF4444;           /* error */
+  /* --- Glass (rgba so backdrop blur works) --- */
+  --glass-1: rgba(255,255,255,0.06);  /* card */
+  --glass-2: rgba(255,255,255,0.08);  /* panel */
+  --glass-3: rgba(255,255,255,0.10);  /* pill */
 
-  /* Legacy variables for compatibility */
-  --bg0: #0A0F1C;     /* deepest stage */
-  --bg1: #0F172A;     /* main background */
-  --bg2: #1E293B;     /* elevated surfaces */
-  --panel: rgba(30, 41, 59, 0.50);        /* translucent panel */
-  --glass: rgba(255, 255, 255, 0.08);    /* glass effect */
+  --line-1: rgba(255,255,255,0.10);   /* hairline border */
 
-  --fg0: rgba(255, 255, 255, 0.95);     /* primary */
-  --fg1: rgba(255, 255, 255, 0.78);     /* secondary */
-  --fg2: rgba(255, 255, 255, 0.60);     /* muted */
+  /* Specular highlights (top sheen) */
+  --spec-1: rgba(255,255,255,0.18);
+  --spec-2: rgba(255,255,255,0.06);
 
-  /* Neon Accents - Vegas Style */
-  --accent: #7C3AED;         /* premium violet */
-  --accent2: #22D3EE;        /* cyan highlight */
+  /* Blur */
+  --blur-sm: 8px;
+  --blur-md: 14px;
+  --blur-lg: 20px;
 
-  /* Status Colors */
-  --success: #10B981;        /* green */
-  --danger: #EF4444;         /* red */
+  /* Shadows (soft, diffused) */
+  --shadow-glass-1: 0 12px 40px rgba(0,0,0,0.35);
+  --shadow-glass-2: 0 18px 70px rgba(0,0,0,0.45);
 
-  /* Radius */
-  --r-sm: 10px;
-  --r-md: 14px;
-  --r-lg: 18px;
-  --r-xl: 24px;
-
-  /* Shadows (soft) */
-  --shadow1: 0 6px 24px rgba(0,0,0,0.35);
-  --shadow2: 0 10px 36px rgba(0,0,0,0.45);
-  --shadow3: 0 18px 60px rgba(0,0,0,0.55);
+  /* Focus ring */
+  --focus: rgba(20,184,166,0.35);
 }

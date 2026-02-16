@@ -29,7 +29,7 @@ export default function AppShellV2() {
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-[var(--bg-0)]">
+      <div className="ffaa-bg min-h-screen">
       <header className="sticky top-0 z-50 border-b border-[var(--line-0)] bg-[var(--bg-1)]/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
           <div className="flex items-center gap-4">

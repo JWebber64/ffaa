@@ -4,32 +4,86 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Clean dark theme without Chakra conflicts */
+/* Base canvas */
 html, body, #root {
   height: 100%;
-  background-color: var(--bg-0);
+  background: var(--bg-0);
   color: var(--text-0);
 }
 
 body {
-  margin: 0;
-  background: var(--bg-0);
-  background-image: 
-    radial-gradient(circle at 50% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.08) 0%, transparent 35%),
-    radial-gradient(circle at 20% 80%, rgba(124, 58, 237, 0.06) 0%, transparent 30%);
-  color: var(--text-0);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
+/* Material-glass ambient background (dark-base) */
+.ffaa-bg {
+  position: relative;
+  background: radial-gradient(1200px 800px at 20% 10%, rgba(124,58,237,0.22), transparent 60%),
+              radial-gradient(900px 700px at 85% 20%, rgba(20,184,166,0.18), transparent 55%),
+              radial-gradient(1200px 900px at 55% 85%, rgba(124,58,237,0.14), transparent 60%),
+              linear-gradient(180deg, rgba(255,255,255,0.02), transparent 25%),
+              var(--bg-0);
+}
 
-/* Always-visible focus ring */
-:focus-visible {
-  outline: 2px solid rgba(34, 211, 238, 0.75);
+/* Optional subtle grain (keep opacity LOW) */
+.ffaa-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+/* --- Glass primitives --- */
+.glass-panel,
+.glass-card,
+.glass-pill {
+  position: relative;
+  border: 1px solid var(--line-1);
+  backdrop-filter: blur(var(--blur-md));
+  -webkit-backdrop-filter: blur(var(--blur-md));
+  box-shadow: var(--shadow-glass-1);
+}
+
+/* Specular sheen */
+.glass-panel::before,
+.glass-card::before,
+.glass-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(180deg, var(--spec-1), transparent 22%, transparent 70%, var(--spec-2));
+  opacity: 0.85;
+}
+
+.glass-panel {
+  background: var(--glass-2);
+  border-radius: 18px;
+}
+
+.glass-card {
+  background: var(--glass-1);
+  border-radius: 16px;
+  backdrop-filter: blur(var(--blur-sm));
+  -webkit-backdrop-filter: blur(var(--blur-sm));
+}
+
+.glass-pill {
+  background: var(--glass-3);
+  border-radius: 999px;
+  backdrop-filter: blur(var(--blur-lg));
+  -webkit-backdrop-filter: blur(var(--blur-lg));
+  box-shadow: none; /* pills should be lighter */
+}
+
+/* Focus ring for inputs/buttons */
+.ffaa-focus:focus-visible {
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
-}
-
-/* Radial gradient utility for spotlight effects */
-.bg-gradient-radial {
-  background: radial-gradient(circle at center, var(--tw-gradient-stops));
 }
