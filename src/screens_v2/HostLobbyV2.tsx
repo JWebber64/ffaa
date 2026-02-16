@@ -1,17 +1,7 @@
 import { useMemo, useState } from "react";
-import { Card, CardBody, CardHeader } from "../ui/Card";
-import { Button } from "../ui/Button";
-import { Badge } from "../ui/Badge";
-import { SectionTitle } from "../ui/SectionTitle";
-import { Input } from "../ui/Input";
-import { createDraftRoom, updateTeamNumber } from "../multiplayer/api";
+import { createDraftRoom } from "../multiplayer/api";
 import { useLobbyRoom } from "../hooks/useLobbyRoom";
 import { appendDraftAction } from "../multiplayer/api";
-
-function initials(name: string) {
-  const parts = name.trim().split(/\s+/).slice(0, 2);
-  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("");
-}
 
 export default function HostLobbyV2() {
   const [displayName, setDisplayName] = useState("");
@@ -20,17 +10,11 @@ export default function HostLobbyV2() {
   const [draftId, setDraftId] = useState<string | null>(null);
   const [roomCode, setRoomCode] = useState<string | null>(null);
 
-  const { participants, loading, error } = useLobbyRoom(draftId);
+  const { participants } = useLobbyRoom(draftId);
 
   const readyCount = useMemo(() => participants.filter((p) => p.is_ready).length, [participants]);
   const totalCount = participants.length;
   const canStart = totalCount >= 2 && readyCount === totalCount;
-  
-  // Check if current user is host and draft phase
-  const isHost = participants.some(p => p.is_host);
-  const draftNotStarted = true; // We'll assume lobby phase for now
-
-  const [copied, setCopied] = useState(false);
 
   async function onCreate() {
     if (!displayName.trim()) return;
@@ -55,215 +39,192 @@ export default function HostLobbyV2() {
     }
   }
 
-  async function copyCode() {
-    if (!roomCode) return;
-    try {
-      await navigator.clipboard.writeText(roomCode);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1100);
-    } catch {
-      // ignore
-    }
-  }
+  const getDraftState = () => {
+    if (!draftId) return "Not created";
+    if (!canStart) return "Lobby";
+    return "Ready";
+  };
+
+  const managersData = participants.map(p => ({
+    id: p.user_id,
+    displayName: p.display_name,
+    isReady: p.is_ready,
+    isHost: p.is_host
+  }));
 
   return (
-    <div className="space-y-5">
-      {/* HERO */}
-      <div className="rounded-xl border border-stroke bg-[linear-gradient(135deg,rgba(124,58,237,0.14),rgba(34,211,238,0.06))] shadow-s2">
-        <div className="p-5 sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <div className="text-[22px] font-semibold text-fg0 leading-7">Host Lobby</div>
-              <div className="mt-1 text-sm text-fg2">
-                Create a room, share the code, confirm ready states, then start the draft.
-              </div>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <Badge tone="host">ROLE: HOST</Badge>
-                {draftId ? (
-                  <>
-                    <Badge tone="neutral">Managers: {totalCount}</Badge>
-                    <Badge tone={readyCount === totalCount ? "success" : "warning"}>
-                      Ready: {readyCount}/{totalCount}
-                    </Badge>
-                  </>
-                ) : (
-                  <Badge tone="neutral">Not created yet</Badge>
-                )}
-              </div>
+    <div className="space-y-8">
+      {/* Page Header Strip */}
+      <div className="ffaa-panel px-8 py-6">
+        <div className="flex flex-wrap items-center justify-between gap-6">
+          <div>
+            <h1 className="text-4xl font-bold text-[var(--text-0)] mb-2 tracking-tight">Host Lobby</h1>
+            <p className="text-[var(--text-1)] leading-relaxed">
+              Create a room, share the code, and start when everyone is ready
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="px-3 py-1.5 rounded-full bg-[var(--bg-2)] border border-[var(--line-0)]">
+              <span className="text-[11px] font-semibold text-[var(--text-0)]">
+                Managers {totalCount}/8
+              </span>
             </div>
-
-            <div className="flex flex-col items-end gap-2">
-              <Button
-                variant={canStart ? "primary" : "secondary"}
-                disabled={!canStart}
-                className="min-w-[190px]"
-                title={!canStart ? "Waiting for all managers to ready up" : "Start the draft"}
-                onClick={canStart ? startDraft : undefined}
-              >
-                {canStart ? "Start Draft" : `Waiting on ${Math.max(0, totalCount - readyCount)} manager(s)`}
-              </Button>
-              <div className="text-xs text-fg2">Start flow wired in Step 6.</div>
+            <div className={`px-3 py-1.5 rounded-full border font-medium ${
+              canStart 
+                ? "bg-[var(--ok)]/20 border-[var(--ok)]/40 text-[var(--ok)]" 
+                : "bg-[var(--warn)]/20 border-[var(--warn)]/40 text-[var(--warn)]"
+            }`}>
+              <span className="text-[11px]">
+                {getDraftState()}
+              </span>
+            </div>
+            <div className="px-3 py-1.5 rounded-full bg-[var(--bg-2)] border border-[var(--line-0)]">
+              <span className="text-[11px] font-semibold text-[var(--text-0)]">
+                HOST
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* BEFORE CREATE */}
-      {!draftId ? (
-        <div className="mx-auto max-w-[560px]">
-          <Card>
-            <CardHeader className="pb-0">
-              <SectionTitle title="Create Room" subtitle="Pick a display name for the host device." />
-            </CardHeader>
-            <CardBody className="space-y-3">
-              <Input
-                label="Host display name"
-                placeholder="Commissioner"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-              />
-              <Button isLoading={creating} onClick={onCreate} disabled={!displayName.trim()}>
-                Create Room
-              </Button>
-              <div className="text-xs text-fg2">
-                Uses Supabase: <span className="text-fg1">drafts</span> +{" "}
-                <span className="text-fg1">draft_participants</span>.
+      {/* The Stage */}
+      <div className="ffaa-stage p-10">
+        <div className="space-y-8">
+          {!draftId ? (
+            <div className="text-center space-y-8 max-w-md mx-auto">
+              <h2 className="text-3xl font-bold text-[var(--text-0)] mb-4 tracking-tight">
+                Create Your Auction Room
+              </h2>
+              <p className="text-[var(--text-1)] leading-relaxed mb-6">
+                Set your display name to create the lobby
+              </p>
+              
+              <div className="space-y-4">
+                <input
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="Your display name"
+                  className="w-full px-5 py-4 bg-[var(--bg-2)] border border-[var(--line-0)] rounded-xl text-[var(--text-0)] placeholder-[var(--text-1)] focus:outline-none focus:border-[var(--neon-blue)] transition-all text-lg"
+                />
               </div>
-            </CardBody>
-          </Card>
-        </div>
-      ) : (
-        <div className="grid gap-4 lg:grid-cols-3">
-          {/* CODE CARD */}
-          <Card className="lg:col-span-2 overflow-hidden">
-            <CardHeader className="pb-0">
-              <SectionTitle
-                title="Room Code"
-                subtitle="Managers enter this on /join."
-                right={
-                  <div className="flex items-center gap-2">
-                    <Badge tone="neutral">live</Badge>
-                    {copied ? <Badge tone="success">Copied</Badge> : null}
-                  </div>
-                }
-              />
-            </CardHeader>
-            <CardBody className="space-y-4">
-              <div className="rounded-xl border border-stroke bg-[rgba(255,255,255,0.04)] p-4 sm:p-5">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <div className="text-xs uppercase tracking-wider text-fg2">Invite code</div>
-                    <div className="mt-1 font-semibold text-[34px] tracking-[0.22em] text-fg0">
-                      {roomCode}
-                    </div>
-                    <div className="mt-2 text-sm text-fg2">
-                      Copy and paste into your group chat.
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2 min-w-[180px]">
-                    <Button onClick={copyCode}>Copy Code</Button>
-                    <Button variant="secondary" disabled title="Optional later: share URL with code prefilled">
-                      Share Link
-                    </Button>
-                  </div>
-                </div>
+              
+              <div className="flex justify-center">
+                <button
+                  onClick={onCreate}
+                  disabled={!displayName.trim() || creating}
+                  className={`px-10 py-4 text-xl font-bold rounded-xl transition-all duration-200 ${
+                    !displayName.trim() || creating
+                      ? "bg-[var(--bg-2)] text-[var(--text-1)] cursor-not-allowed"
+                      : "btn-primary bg-gradient-to-r from-[var(--neon-blue)] to-[var(--neon-green)] hover:from-[var(--neon-green)] hover:to-[var(--neon-blue)] text-white shadow-lg"
+                  }`}
+                >
+                  {creating ? "Creating..." : "Create Room"}
+                </button>
               </div>
-
-              {error ? (
-                <div className="text-sm text-[rgba(251,113,133,0.95)]">
-                  Participants error: {error}
+            </div>
+          ) : (
+            <div className="text-center space-y-8 max-w-md mx-auto">
+              <div>
+                <h2 className="text-3xl font-bold text-[var(--text-0)] mb-6 tracking-tight">
+                  Ready to Start Draft
+                </h2>
+                <div className="text-6xl font-mono font-bold text-[var(--text-0)] tracking-widest mb-6" style={{
+                  textShadow: '0 0 30px rgba(59, 130, 246, 0.8), 0 0 60px rgba(59, 130, 246, 0.4)'
+                }}>
+                  {roomCode}
                 </div>
-              ) : (
-                <div className="text-xs text-fg2">
-                  Participants update in realtime (draft_participants).
+                <p className="text-[var(--text-1)] leading-relaxed">
+                  Share this code with managers so they can join
+                </p>
+              </div>
+              
+              <div className="flex justify-center">
+                <button
+                  onClick={startDraft}
+                  disabled={!canStart}
+                  className={`px-10 py-4 text-xl font-bold rounded-xl transition-all duration-200 ${
+                    !canStart
+                      ? "bg-[var(--bg-2)] text-[var(--text-1)] cursor-not-allowed"
+                      : "btn-primary bg-gradient-to-r from-[var(--neon-green)] to-[var(--ok)] hover:from-[var(--ok)] hover:to-[var(--neon-green)] text-white shadow-lg"
+                  }`}
+                >
+                  Start Draft
+                </button>
+              </div>
+              
+              {!canStart && (
+                <div className="text-center text-[var(--text-1)] mt-4 font-medium">
+                  Waiting for all managers to be ready...
                 </div>
               )}
-            </CardBody>
-          </Card>
-
-          {/* STATUS */}
-          <Card>
-            <CardHeader className="pb-0">
-              <SectionTitle title="Status" subtitle="Lobby readiness gate." />
-            </CardHeader>
-            <CardBody className="space-y-3">
-              <div className="rounded-lg border border-stroke bg-[rgba(255,255,255,0.04)] p-3">
-                <div className="text-xs text-fg2">Participants</div>
-                <div className="mt-1 text-base font-semibold text-fg0">
-                  {loading ? "Loading…" : `${totalCount} joined`}
-                </div>
-              </div>
-              <div className="rounded-lg border border-stroke bg-[rgba(255,255,255,0.04)] p-3">
-                <div className="text-xs text-fg2">Ready</div>
-                <div className="mt-1 text-base font-semibold text-fg0">
-                  {readyCount}/{totalCount}
-                </div>
-              </div>
-              <div className="text-xs text-fg2">
-                Start draft enabled when everyone is ready (Step 6 will wire actual start).
-              </div>
-            </CardBody>
-          </Card>
-        </div>
-      )}
-
-      {/* PARTICIPANTS LIST */}
-      {draftId ? (
-        <Card>
-          <CardHeader className="pb-0">
-            <SectionTitle
-              title="Participants"
-              subtitle="Managers must ready up before starting."
-              right={<Badge tone="neutral">{participants.length}</Badge>}
-            />
-          </CardHeader>
-          <CardBody>
-            <div className="divide-y divide-[rgba(255,255,255,0.08)] overflow-hidden rounded-xl border border-stroke bg-[rgba(255,255,255,0.03)]">
-              {participants.map((p) => (
-                <div key={p.id} className="flex items-center justify-between gap-3 p-3 sm:p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg border border-stroke bg-[rgba(255,255,255,0.04)] grid place-items-center text-sm font-semibold text-fg0">
-                      {initials(p.display_name)}
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <div className="text-sm font-semibold text-fg0">{p.display_name}</div>
-                        {p.is_host ? <Badge tone="host">Host</Badge> : <Badge tone="neutral">Manager</Badge>}
-                        <Badge tone={p.is_ready ? "success" : "warning"}>
-                          {p.is_ready ? "Ready" : "Not ready"}
-                        </Badge>
-                        {p.team_number ? <Badge tone="neutral">Team {p.team_number}</Badge> : null}
-                      </div>
-                      <div className="mt-1 text-xs text-fg2">{p.user_id}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    {isHost && draftNotStarted && (
-                      <select
-                        value={p.team_number ?? ""}
-                        onChange={(e) =>
-                          updateTeamNumber(p.user_id, Number(e.target.value))
-                        }
-                        className="h-8 rounded border border-stroke bg-[rgba(255,255,255,0.05)] px-2 text-xs"
-                      >
-                        {Array.from({ length: 16 }).map((_, i) => (
-                          <option key={i+1} value={i+1}>
-                            Team {i+1}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                    <div className="text-xs text-fg2">
-                      {p.is_host ? "authoritative device" : "manager device"}
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
-          </CardBody>
-        </Card>
-      ) : null}
+          )}
+        </div>
+      </div>
+
+      {/* The Pit - Managers Grid */}
+      <div className="ffaa-panel p-8">
+        <h3 className="text-xl font-semibold text-[var(--text-0)] mb-6">
+          Managers ({totalCount}/8)
+        </h3>
+        
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {managersData.map((manager) => (
+            <div
+              key={manager.id}
+              className={`card-hover bg-[var(--bg-2)] border rounded-xl p-4 transition-all duration-200 ${
+                manager.isReady 
+                  ? "border-[var(--ok)]/60 shadow-[0_0_16px_rgba(16,185,129,0.4)]" 
+                  : "border-[var(--line-0)]"
+              }`}
+              style={manager.isReady ? {
+                animation: 'pulse-border 2s ease-in-out infinite'
+              } : {}}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div
+                  className={`h-3 w-3 rounded-full ${
+                    manager.isReady
+                      ? "bg-[var(--ok)] shadow-[0_0_8px_var(--ok)]"
+                      : "bg-[var(--text-1)]"
+                  }`}
+                />
+                {manager.isHost && (
+                  <div className="px-2 py-1 bg-[var(--neon-blue)] rounded text-xs text-white font-bold">
+                    HOST
+                  </div>
+                )}
+              </div>
+              
+              <div className="text-base font-semibold text-[var(--text-0)] truncate mb-1">
+                {manager.displayName}
+              </div>
+              
+              <div className="text-sm text-[var(--text-1)]">
+                {manager.isReady ? "Ready" : "Not ready"}
+              </div>
+            </div>
+          ))}
+          
+          {Array.from({ length: 8 - totalCount }).map((_, index) => (
+            <div
+              key={`empty-${index}`}
+              className="bg-[var(--bg-2)] border border-dashed border-[var(--line-0)]/30 rounded-xl p-4 flex items-center justify-center min-h-[80px]"
+            >
+              <div className="text-sm text-[var(--text-1)] text-center font-medium">
+                Open Slot
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {totalCount === 0 && (
+          <div className="text-center py-12 text-[var(--text-1)] text-lg">
+            No managers connected yet
+          </div>
+        )}
+      </div>
     </div>
   );
 }

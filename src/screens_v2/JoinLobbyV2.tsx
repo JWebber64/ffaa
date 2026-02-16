@@ -1,16 +1,10 @@
 import { useState } from "react";
-import { Card, CardBody, CardHeader } from "../ui/Card";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
-import { Badge } from "../ui/Badge";
-import { SectionTitle } from "../ui/SectionTitle";
 import { joinDraftRoom, setMyReady } from "../multiplayer/api";
 import { useLobbyRoom } from "../hooks/useLobbyRoom";
-
-function initials(name: string) {
-  const parts = name.trim().split(/\s+/).slice(0, 2);
-  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("");
-}
+import StatusPill from "../components/premium/StatusPill";
+import ManagersGrid from "../components/premium/ManagersGrid";
+import InputWithIcon from "../components/InputWithIcon";
+import { Button } from "../ui/Button";
 
 export default function JoinLobbyV2() {
   const [code, setCode] = useState("");
@@ -20,7 +14,7 @@ export default function JoinLobbyV2() {
   const [draftId, setDraftId] = useState<string | null>(null);
   const [roomCode, setRoomCode] = useState<string | null>(null);
 
-  const { participants, loading, error } = useLobbyRoom(draftId);
+  const { participants, error } = useLobbyRoom(draftId);
 
   const [ready, setReady] = useState(false);
   const [toggling, setToggling] = useState(false);
@@ -49,24 +43,79 @@ export default function JoinLobbyV2() {
     }
   }
 
+  const managersData = participants.map(p => ({
+    id: p.user_id,
+    displayName: p.display_name,
+    isReady: p.is_ready,
+    isHost: p.is_host
+  }));
+
   return (
-    <div className="mx-auto max-w-[700px] space-y-4">
-      <Card>
-        <CardHeader className="pb-0">
-          <SectionTitle
-            title={draftId ? "Lobby" : "Join Lobby"}
-            subtitle={draftId ? "You're connected. Set your ready state." : "Enter room code + your display name."}
-            right={<Badge tone="neutral">MANAGER</Badge>}
-          />
-        </CardHeader>
-        <CardBody className="space-y-3">
-          {!draftId ? (
-            <>
-              <Input label="Room code" placeholder="F7AA" value={code} onChange={(e) => setCode(e.target.value)} />
-              <Input label="Display name" placeholder="Alex" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-              <div className="flex gap-2">
-                <Button className="flex-1" isLoading={joining} onClick={onJoin} disabled={!code.trim() || !displayName.trim()}>
-                  Join
+    <div className="space-y-8">
+      {/* Top Status Strip */}
+      <div className="bg-[var(--panel)] border border-[var(--border)] rounded-2xl p-6 backdrop-blur-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-[var(--fg0)] mb-2">
+              {draftId ? "Lobby" : "Join Lobby"}
+            </h1>
+            <p className="text-[var(--fg2)] text-sm">
+              {draftId ? "You're connected. Set your ready state." : "Enter room code + your display name."}
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            <StatusPill variant="default">
+              MANAGER
+            </StatusPill>
+            {draftId && (
+              <StatusPill 
+                variant={ready ? "success" : "warn"} 
+                dot
+              >
+                {ready ? "Ready" : "Not ready"}
+              </StatusPill>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Center Broadcast Stage */}
+      <div className="space-y-6">
+        {!draftId ? (
+          <div className="bg-[var(--panel)] border border-[var(--border)] rounded-2xl p-8 backdrop-blur-sm stage-gradient hover-lift">
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-[var(--fg0)] mb-2">
+                  Join Auction Room
+                </h2>
+                <p className="text-[var(--fg2)]">
+                  Enter the room code and your display name
+                </p>
+              </div>
+              
+              <div className="max-w-sm mx-auto space-y-4">
+                <InputWithIcon
+                  value={code}
+                  onChange={(e: any) => setCode(e.target.value)}
+                  placeholder="Room code (e.g., F7AA)"
+                  className="w-full"
+                />
+                <InputWithIcon
+                  value={displayName}
+                  onChange={(e: any) => setDisplayName(e.target.value)}
+                  placeholder="Your display name"
+                  className="w-full"
+                />
+              </div>
+              
+              <div className="flex justify-center gap-3">
+                <Button
+                  onClick={onJoin}
+                  disabled={!code.trim() || !displayName.trim() || joining}
+                  className="px-8 py-3 text-lg font-semibold bg-gradient-to-r from-[var(--neon-blue)] to-[var(--accent)] hover:from-[var(--neon-cyan)] hover:to-[var(--neon-blue)] transition-all duration-300 shadow-lg hover:shadow-xl focus-ring"
+                >
+                  {joining ? "Joining..." : "Join Room"}
                 </Button>
                 <Button
                   variant="secondary"
@@ -78,70 +127,57 @@ export default function JoinLobbyV2() {
                       // ignore
                     }
                   }}
+                  className="px-6 py-3 focus-ring"
                 >
                   Paste
                 </Button>
               </div>
-              <div className="text-xs text-fg2">Uses Supabase drafts + draft_participants.</div>
-            </>
-          ) : (
-            <>
-              <div className="rounded-xl border border-stroke bg-[rgba(255,255,255,0.04)] p-4">
-                <div className="text-xs uppercase tracking-wider text-fg2">Room code</div>
-                <div className="mt-1 font-semibold text-[30px] tracking-[0.18em] text-fg0">{roomCode}</div>
-                <div className="mt-2 flex items-center gap-2">
-                  <Badge tone={ready ? "success" : "warning"}>{ready ? "Ready" : "Not ready"}</Badge>
-                  <Button size="sm" variant={ready ? "secondary" : "primary"} isLoading={toggling} onClick={toggleReady}>
-                    {ready ? "Unready" : "Mark Ready"}
-                  </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-[var(--panel)] border border-[var(--border)] rounded-2xl p-8 backdrop-blur-sm hover-lift">
+            <div className="text-center space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold text-[var(--fg0)] mb-2">
+                  Connected to Room
+                </h2>
+                <div className="text-4xl font-mono font-bold text-[var(--fg0)] tracking-wider mb-4">
+                  {roomCode}
                 </div>
               </div>
+              
+              <div className="flex justify-center">
+                <Button
+                  onClick={toggleReady}
+                  disabled={toggling}
+                  variant={ready ? "secondary" : "primary"}
+                  className={`px-8 py-3 text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl focus-ring ${
+                    ready 
+                      ? "bg-[var(--bg2)] text-[var(--fg1)]" 
+                      : "bg-gradient-to-r from-[var(--neon-green)] to-[var(--success)] hover:from-[var(--neon-cyan)] hover:to-[var(--neon-green)] glow-ready"
+                  }`}
+                >
+                  {toggling ? "Updating..." : ready ? "Unready" : "Mark Ready"}
+                </Button>
+              </div>
 
-              {error ? <div className="text-sm text-[rgba(251,113,133,0.95)]">{error}</div> : null}
-            </>
-          )}
-        </CardBody>
-      </Card>
-
-      {draftId ? (
-        <Card>
-          <CardHeader className="pb-0">
-            <SectionTitle
-              title="Participants"
-              subtitle="Updates in realtime."
-              right={<Badge tone="neutral">{loading ? "…" : String(participants.length)}</Badge>}
-            />
-          </CardHeader>
-          <CardBody>
-            <div className="divide-y divide-[rgba(255,255,255,0.08)] overflow-hidden rounded-xl border border-stroke bg-[rgba(255,255,255,0.03)]">
-              {participants.map((p) => (
-                <div key={p.id} className="flex items-center justify-between gap-3 p-3 sm:p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg border border-stroke bg-[rgba(255,255,255,0.04)] grid place-items-center text-sm font-semibold text-fg0">
-                      {initials(p.display_name)}
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <div className="text-sm font-semibold text-fg0">{p.display_name}</div>
-                        {p.is_host ? <Badge tone="host">Host</Badge> : <Badge tone="neutral">Manager</Badge>}
-                        <Badge tone={p.is_ready ? "success" : "warning"}>
-                          {p.is_ready ? "Ready" : "Not ready"}
-                        </Badge>
-                        {p.team_number ? <Badge tone="neutral">Team {p.team_number}</Badge> : null}
-                      </div>
-                      <div className="mt-1 text-xs text-fg2">{p.user_id}</div>
-                    </div>
-                  </div>
+              {error && (
+                <div className="text-sm text-[var(--danger)]">
+                  {error}
                 </div>
-              ))}
+              )}
             </div>
+          </div>
+        )}
+      </div>
 
-            <div className="mt-3 text-xs text-fg2">
-              Start draft is host-only. When it starts, you'll be routed to the Draft Room (Step 6).
-            </div>
-          </CardBody>
-        </Card>
-      ) : null}
+      {/* Managers Grid */}
+      {draftId && (
+        <ManagersGrid 
+          managers={managersData}
+          maxManagers={8}
+        />
+      )}
     </div>
   );
 }

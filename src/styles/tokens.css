@@ -1,27 +1,43 @@
 :root {
-  /* Backgrounds */
-  --bg0: #070A10;
-  --bg1: #0B1020;
-  --panel: rgba(255, 255, 255, 0.06);
-  --glass: rgba(255, 255, 255, 0.08);
-
-  /* Strokes */
-  --stroke: rgba(255, 255, 255, 0.10);
-  --stroke2: rgba(255, 255, 255, 0.16);
-
+  /* FFAA Hybrid Theme - Background Layers */
+  --bg-0: #0A0F1C;     /* page background */
+  --bg-1: #141B2D;     /* panels */
+  --bg-2: #1E293B;     /* raised surfaces */
+  
   /* Text */
-  --fg0: rgba(255, 255, 255, 0.92);
-  --fg1: rgba(255, 255, 255, 0.78);
-  --fg2: rgba(255, 255, 255, 0.60);
+  --text-0: rgba(255, 255, 255, 0.95);     /* primary */
+  --text-1: rgba(255, 255, 255, 0.70);     /* muted */
 
-  /* Accents */
-  --accent: #7C3AED;   /* premium violet */
-  --accent2: #22D3EE;  /* cyan highlight */
+  /* Borders */
+  --line-0: rgba(255, 255, 255, 0.08);     /* hairline */
+
+  /* Neon Accents */
+  --neon-blue: #3B82F6;      /* electric blue */
+  --neon-green: #10B981;     /* vibrant green */
 
   /* Status */
-  --danger: #FB7185;
-  --success: #34D399;
-  --warning: #FBBF24;
+  --ok: #10B981;            /* success */
+  --warn: #F59E0B;          /* warning */
+  --bad: #EF4444;           /* error */
+
+  /* Legacy variables for compatibility */
+  --bg0: #0A0F1C;     /* deepest stage */
+  --bg1: #0F172A;     /* main background */
+  --bg2: #1E293B;     /* elevated surfaces */
+  --panel: rgba(30, 41, 59, 0.50);        /* translucent panel */
+  --glass: rgba(255, 255, 255, 0.08);    /* glass effect */
+
+  --fg0: rgba(255, 255, 255, 0.95);     /* primary */
+  --fg1: rgba(255, 255, 255, 0.78);     /* secondary */
+  --fg2: rgba(255, 255, 255, 0.60);     /* muted */
+
+  /* Neon Accents - Vegas Style */
+  --accent: #7C3AED;         /* premium violet */
+  --accent2: #22D3EE;        /* cyan highlight */
+
+  /* Status Colors */
+  --success: #10B981;        /* green */
+  --danger: #EF4444;         /* red */
 
   /* Radius */
   --r-sm: 10px;

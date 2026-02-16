@@ -3,14 +3,18 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: dark;
+  color: var(--text-0);
+  background-color: var(--bg-0);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  background-color: var(--bg-0);
 }
 
 a {
@@ -28,6 +32,12 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--bg-0);
+  background-image: 
+    radial-gradient(circle at 50% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.08) 0%, transparent 35%),
+    radial-gradient(circle at 20% 80%, rgba(124, 58, 237, 0.06) 0%, transparent 30%);
+  color: var(--text-0);
 }
 
 h1 {
@@ -44,17 +54,152 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #ffffff;
+    background-color: var(--bg-0);
   }
   a:hover {
     color: #747bff;
   }
   button {
-    background-color: #f9f9f9;
+    background-color: var(--bg-2);
   }
 }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Esports/Vegas Motion Styles */
+.hover-lift {
+  transition: all 0.2s ease-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.glow-ready {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  transition: box-shadow 0.2s ease-out;
+}
+
+.glow-ready:hover {
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+}
+
+.stage-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.02) 0%,
+    rgba(16, 185, 129, 0.02) 50%,
+    rgba(124, 58, 237, 0.02) 100%
+  );
+  animation: stageShift 8s ease-in-out infinite;
+}
+
+@keyframes stageShift {
+  0%, 100% { 
+    background-position: 0% 50%;
+    opacity: 0.3;
+  }
+  50% { 
+    background-position: 100% 50%;
+    opacity: 0.5;
+  }
+}
+
+/* Focus states for accessibility */
+.focus-ring:focus {
+  outline: 2px solid var(--neon-blue);
+  outline-offset: 2px;
+}
+
+/* Pulse animation for room codes */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Micro-motion for buttons */
+.btn-primary {
+  transition: all 0.2s ease-out;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0px);
+}
+
+/* Micro-motion for cards */
+.card-hover {
+  transition: all 0.2s ease-out;
+}
+
+.card-hover:hover {
+  border-color: var(--neon-blue);
+  transform: translateY(-1px);
+}
+
+/* FFAA Hybrid Utility Classes */
+.ffaa-panel {
+  background: var(--bg-1);
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.ffaa-stage {
+  background: var(--bg-1);
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-xl);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.ffaa-stage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at 50% 20%,
+    rgba(59, 130, 246, 0.15) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ffaa-stage > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Pulse border animation for ready states */
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: rgba(16, 185, 129, 0.6);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    border-color: rgba(16, 185, 129, 0.8);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  }
 }

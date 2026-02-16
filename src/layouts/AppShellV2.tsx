@@ -1,5 +1,4 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { useDebugDrawerState } from "../hooks/useDebugDrawer";
 import DebugDrawer from "../components/DebugDrawer";
@@ -14,43 +13,63 @@ export default function AppShellV2() {
 
   const ensured = useEnsureSupabaseSession();
 
-  const realtimeLabel = "realtime: lobby";
+  const realtimeLabel = "lobby";
   const pathIsHost = loc.pathname.startsWith("/host");
   const roleLabel = pathIsHost ? "HOST" : role.isAdmin ? "HOST" : "MANAGER";
+  
+  const getRouteLabel = () => {
+    if (loc.pathname.startsWith("/host")) return "Host";
+    if (loc.pathname.startsWith("/join")) return "Join";
+    if (loc.pathname.startsWith("/auction")) return "Auction";
+    return "FFAA";
+  };
 
   return (
     <ToastProvider>
-      <div className="min-h-screen">
-      <header className="sticky top-0 z-50 border-b border-stroke bg-[rgba(5,8,14,0.55)] backdrop-blur-[14px]">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
+      <div className="min-h-screen bg-[var(--bg-0)]">
+      <header className="sticky top-0 z-50 border-b border-[var(--line-0)] bg-[var(--bg-1)]/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
+          <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-md bg-[rgba(124,58,237,0.18)] border border-[rgba(124,58,237,0.30)] shadow-s1" />
+              <div className="h-6 w-6 rounded bg-gradient-to-br from-[var(--neon-blue)] to-[var(--neon-green)] shadow-md" />
               <div>
-                <div className="text-[13px] font-semibold tracking-wide text-fg0 leading-4">
-                  FFAA Draft
+                <div className="text-xs font-bold text-[var(--text-0)] leading-tight">
+                  FFAA
                 </div>
-                <div className="text-[12px] text-fg2 leading-4">
-                  Auction • realtime
+                <div className="text-[10px] text-[var(--text-1)] leading-tight">
+                  {getRouteLabel()}
                 </div>
               </div>
             </div>
 
-            <Badge tone={roleLabel === "HOST" ? "host" : "neutral"}>{roleLabel}</Badge>
-            <Badge tone="neutral">{realtimeLabel}</Badge>
+            <div className="flex items-center gap-1">
+              <div className="h-1.5 w-1.5 rounded-full bg-[var(--ok)] shadow-[0_0_4px_var(--ok)]" />
+              <span className="text-[10px] text-[var(--text-1)]">{realtimeLabel}</span>
+            </div>
 
             {!ensured.isReady ? (
-              <Badge tone="warning">auth: connecting…</Badge>
+              <div className="flex items-center gap-1">
+                <div className="h-1.5 w-1.5 rounded-full bg-[var(--warn)] shadow-[0_0_4px_var(--warn)]" />
+                <span className="text-[10px] text-[var(--text-1)]">connecting…</span>
+              </div>
             ) : ensured.error ? (
-              <Badge tone="danger">auth: error</Badge>
+              <div className="flex items-center gap-1">
+                <div className="h-1.5 w-1.5 rounded-full bg-[var(--bad)] shadow-[0_0_4px_var(--bad)]" />
+                <span className="text-[10px] text-[var(--text-1)]">error</span>
+              </div>
             ) : (
-              <Badge tone="success">auth: ok</Badge>
+              <div className="flex items-center gap-1">
+                <div className="h-1.5 w-1.5 rounded-full bg-[var(--ok)] shadow-[0_0_4px_var(--ok)]" />
+                <span className="text-[10px] text-[var(--text-1)]">auth</span>
+              </div>
             )}
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="hidden text-sm text-fg2 sm:block">
-              {loc.pathname}
+            <div className="px-2 py-0.5 rounded-full bg-[var(--bg-2)] border border-[var(--line-0)]">
+              <span className="text-[10px] font-medium text-[var(--text-0)]">
+                {roleLabel}
+              </span>
             </div>
             <Button variant="secondary" size="sm" onClick={dbg.toggle}>
               Debug
@@ -59,13 +78,9 @@ export default function AppShellV2() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-[1200px] px-4 py-7">
+      <main className="mx-auto w-full max-w-7xl px-4 py-6">
         <Outlet />
       </main>
-
-      <footer className="mx-auto max-w-[1200px] px-4 pb-8 pt-2 text-sm text-fg2">
-        Premium UI v2 • Ctrl+Shift+D debug
-      </footer>
 
       <DebugDrawer
         isOpen={dbg.isOpen}

@@ -4,17 +4,27 @@
 
 @import "./tokens.css";
 
+/* Clean dark theme without Chakra conflicts */
 html, body, #root {
   height: 100%;
+  background-color: var(--bg-0);
+  color: var(--text-0);
 }
 
 body {
   margin: 0;
-  background: radial-gradient(1200px 800px at 20% 0%, rgba(124, 58, 237, 0.18), transparent 55%),
-              radial-gradient(900px 700px at 90% 10%, rgba(34, 211, 238, 0.10), transparent 50%),
-              linear-gradient(180deg, var(--bg0), var(--bg1));
-  color: var(--fg0);
+  background: var(--bg-0);
+  background-image: 
+    radial-gradient(circle at 50% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.08) 0%, transparent 35%),
+    radial-gradient(circle at 20% 80%, rgba(124, 58, 237, 0.06) 0%, transparent 30%);
+  color: var(--text-0);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+/* Override any remaining white backgrounds */
+.bg-white, [class*="bg-white"] {
+  background-color: var(--bg-1) !important;
 }
 
 /* Always-visible focus ring */

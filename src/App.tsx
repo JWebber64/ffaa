@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Box } from '@chakra-ui/react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import Home from './screens/Home';
@@ -32,29 +31,31 @@ import JoinLobbyV2 from './screens_v2/JoinLobbyV2';
 import DraftRoomV2 from './screens_v2/DraftRoomV2';
 
 function LegacyFrame({ children }: { children: React.ReactNode }) {
-  // Legacy UI wrapper stays Chakra-based for now.
+  // Legacy UI wrapper - now using plain divs instead of Chakra
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <Box minH="100vh">
+    <div style={{ minHeight: '100vh' }}>
       <TopNav onMenu={() => setIsMenuOpen(!isMenuOpen)} />
-      <Box
-        position="fixed"
-        top="64px"
-        left={0}
-        right={0}
-        zIndex={10}
-        px={4}
-        bg="white"
-        shadow="sm"
+      <div
+        style={{
+          position: 'fixed',
+          top: '64px',
+          left: 0,
+          right: 0,
+          zIndex: 10,
+          padding: '0 16px',
+          background: 'var(--bg-1)',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+        }}
       >
         <AuctionTimer />
-      </Box>
-      <Box as="main" pt="104px" pb="40px">
+      </div>
+      <div style={{ paddingTop: '104px', paddingBottom: '40px' }}>
         {children}
-      </Box>
+      </div>
       <AppFooter />
-    </Box>
+    </div>
   );
 }
 
