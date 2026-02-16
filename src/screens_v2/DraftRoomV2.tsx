@@ -10,7 +10,7 @@ import { Input } from "../ui/Input";
 import { cn } from "../ui/cn";
 import { ModalLite } from "../ui/ModalLite";
 import { useDraftSnapshot } from "../hooks/useDraftSnapshot";
-import { appendDraftAction } from "../multiplayer/api";
+import { appendDraftAction, getDraftConfig } from "../multiplayer/api";
 import { startHostEngine } from "../engine/hostEngine";
 import { supabase } from "../lib/supabase";
 import { useMyParticipant } from "../hooks/useMyParticipant";
@@ -21,6 +21,7 @@ import { useAuctionAudio } from "../audio/useAuctionAudio";
 import { useToast } from "../ui/ToastProvider";
 import { DraftLogEntry } from "../components/DraftLogEntry";
 import { CountdownRing } from "../components/CountdownRing";
+import { DraftConfigV2 } from "../types/draftConfig";
 
 // Temporary types for Step 6
 type DraftSnapshot = {
@@ -103,11 +104,21 @@ export default function DraftRoomV2() {
   const { snapshot: snap } = useDraftSnapshot(draftId);
   const [isHost, setIsHost] = useState(false);
   const [pendingBid, setPendingBid] = useState<number | null>(null);
+  const [draftConfig, setDraftConfig] = useState<DraftConfigV2 | null>(null);
   const me = useMyParticipant(draftId);
   const toast = useToast();
   const [pulse, setPulse] = useState(false);
   const [connected, setConnected] = useState(true);
   let engine: any = null;
+
+  // Load draft config
+  useEffect(() => {
+    if (draftId) {
+      getDraftConfig(draftId)
+        .then(setDraftConfig)
+        .catch(console.error);
+    }
+  }, [draftId]);
 
   // Audio system
   useAuctionAudio(snap, isHost);
@@ -254,6 +265,42 @@ export default function DraftRoomV2() {
   const hb = snap?.engine?.heartbeat_at ? new Date(snap.engine.heartbeat_at).getTime() : null;
   const hbAgeMs = hb ? Date.now() - hb : null;
   const hostSeemsOffline = hbAgeMs != null && hbAgeMs > 10000;
+  const draftType = draftConfig?.draftType || snap?.settings?.draftType || snap?.draft_type || 'auction';
+
+  // Snake Draft Stub UI
+  if (draftType === 'snake') {
+    return (
+      <div className="space-y-4">
+        {/* PAGE HEADER */}
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-[22px] font-semibold text-fg0 leading-7">Snake Draft Room</div>
+            <div className="mt-1 text-sm text-fg2">
+              Draft <span className="text-fg1">{draftId}</span> • {snap?.settings?.teamCount || snap?.team_count || 12} Teams
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge tone={isHost ? "host" : "neutral"}>You: {isHost ? "HOST" : `MANAGER (Team ${me?.team_number ?? "?"})`}</Badge>
+          </div>
+        </div>
+
+        {/* SNAKE DRAFT CONTENT */}
+        <div className="rounded-lg border border-stroke bg-panel p-8 text-center">
+          <div className="space-y-4">
+            <div className="text-6xl">🐍</div>
+            <h2 className="text-2xl font-bold text-fg0">Snake Draft UI</h2>
+            <p className="text-fg2 max-w-md mx-auto">
+              Snake draft interface is coming next! This will support traditional turn-based drafting with reverse order each round.
+            </p>
+            <div className="space-y-2 text-sm text-fg1">
+              <p>Current Pick: Round 1, Pick 1</p>
+              <p>Your turn: Coming up...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

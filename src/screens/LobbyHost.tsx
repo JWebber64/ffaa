@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { createDraftRoom } from '@/multiplayer/api';
 import { startHostEngine } from '@/multiplayer/hostEngine';
 import { useDraftStore } from '@/store/draftStore';
+import { DEFAULT_CONFIG_AUCTION_12 } from '@/types/draftConfig';
 
 export default function LobbyHost() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export default function LobbyHost() {
 
     setIsCreating(true);
     try {
-      const draft = await createDraftRoom(displayName.trim());
+      const draft = await createDraftRoom(displayName.trim(), DEFAULT_CONFIG_AUCTION_12);
       setRoomCode(draft.code);
       
       // Initialize store with draft info

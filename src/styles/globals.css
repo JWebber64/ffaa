@@ -1,8 +1,8 @@
+@import "./tokens.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import "./tokens.css";
 
 /* Clean dark theme without Chakra conflicts */
 html, body, #root {
@@ -22,13 +22,14 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
-/* Override any remaining white backgrounds */
-.bg-white, [class*="bg-white"] {
-  background-color: var(--bg-1) !important;
-}
 
 /* Always-visible focus ring */
 :focus-visible {
   outline: 2px solid rgba(34, 211, 238, 0.75);
   outline-offset: 2px;
+}
+
+/* Radial gradient utility for spotlight effects */
+.bg-gradient-radial {
+  background: radial-gradient(circle at center, var(--tw-gradient-stops));
 }

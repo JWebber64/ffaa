@@ -29,6 +29,9 @@ import AppShellV2 from './layouts/AppShellV2';
 import HostLobbyV2 from './screens_v2/HostLobbyV2';
 import JoinLobbyV2 from './screens_v2/JoinLobbyV2';
 import DraftRoomV2 from './screens_v2/DraftRoomV2';
+import LandingV2 from './screens_v2/LandingV2';
+import HostSetupV2 from './screens_v2/HostSetupV2';
+import ResultsV2 from './screens_v2/ResultsV2';
 
 function LegacyFrame({ children }: { children: React.ReactNode }) {
   // Legacy UI wrapper - now using plain divs instead of Chakra
@@ -77,10 +80,12 @@ function App() {
           <Routes>
             {/* v2 routes */}
             <Route element={<AppShellV2 />}>
-              <Route index element={<Navigate to="/host" replace />} />
+              <Route index element={<LandingV2 />} />
+              <Route path="/host/setup" element={<HostSetupV2 />} />
               <Route path="/host" element={<HostLobbyV2 />} />
               <Route path="/join" element={<JoinLobbyV2 />} />
               <Route path="/draft/:draftId" element={<DraftRoomV2 />} />
+              <Route path="/results/:draftId" element={<ResultsV2 />} />
             </Route>
 
             {/* legacy routes */}

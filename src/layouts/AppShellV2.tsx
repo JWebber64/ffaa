@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
 import { useDebugDrawerState } from "../hooks/useDebugDrawer";
 import DebugDrawer from "../components/DebugDrawer";
@@ -10,6 +10,7 @@ export default function AppShellV2() {
   const dbg = useDebugDrawerState();
   const role = useRole();
   const loc = useLocation();
+  const navigate = useNavigate();
 
   const ensured = useEnsureSupabaseSession();
 
@@ -18,9 +19,11 @@ export default function AppShellV2() {
   const roleLabel = pathIsHost ? "HOST" : role.isAdmin ? "HOST" : "MANAGER";
   
   const getRouteLabel = () => {
+    if (loc.pathname === "/") return "Home";
     if (loc.pathname.startsWith("/host")) return "Host";
     if (loc.pathname.startsWith("/join")) return "Join";
-    if (loc.pathname.startsWith("/auction")) return "Auction";
+    if (loc.pathname.startsWith("/draft")) return "Draft";
+    if (loc.pathname.startsWith("/results")) return "Results";
     return "FFAA";
   };
 
@@ -30,7 +33,10 @@ export default function AppShellV2() {
       <header className="sticky top-0 z-50 border-b border-[var(--line-0)] bg-[var(--bg-1)]/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate("/")}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
               <div className="h-6 w-6 rounded bg-gradient-to-br from-[var(--neon-blue)] to-[var(--neon-green)] shadow-md" />
               <div>
                 <div className="text-xs font-bold text-[var(--text-0)] leading-tight">
@@ -40,7 +46,7 @@ export default function AppShellV2() {
                   {getRouteLabel()}
                 </div>
               </div>
-            </div>
+            </button>
 
             <div className="flex items-center gap-1">
               <div className="h-1.5 w-1.5 rounded-full bg-[var(--ok)] shadow-[0_0_4px_var(--ok)]" />

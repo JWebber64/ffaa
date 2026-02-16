@@ -1,3 +1,18 @@
+export type DraftType = 'auction' | 'snake';
+export type TeamCount = 8 | 10 | 12 | 14 | 16;
+
+export interface DraftConfig {
+  draftType: DraftType;
+  teamCount: TeamCount;
+  createdAt?: number;
+  name?: string;
+}
+
+export const DEFAULT_DRAFT_CONFIG: DraftConfig = {
+  draftType: 'auction',
+  teamCount: 12,
+};
+
 export type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF' | 'FLEX' | 'BENCH';
 export type BasePosition = Exclude<Position, 'FLEX' | 'BENCH'>;
 

@@ -14,7 +14,7 @@ export function useDraftSnapshot(draftId: string | undefined) {
 
     const { data, error } = await supabase
       .from("drafts")
-      .select("snapshot")
+      .select("snapshot, draft_type, team_count, settings")
       .eq("id", draftId)
       .single();
 
@@ -24,7 +24,17 @@ export function useDraftSnapshot(draftId: string | undefined) {
       return;
     }
 
-    setSnapshot(data?.snapshot ?? null);
+    if (!data) {
+      setSnapshot(null);
+      setLoading(false);
+      return;
+    }
+
+    setSnapshot({
+      ...data.snapshot,
+      draft_type: data.settings?.draftType || data.draft_type,
+      team_count: data.settings?.teamCount || data.team_count,
+    });
     setLoading(false);
   }
 

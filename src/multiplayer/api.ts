@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { v4 as uuidv4 } from "uuid";
+import { DraftConfigV2 } from "@/types/draftConfig";
 
 function makeRoomCode(len = 6) {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -16,7 +17,7 @@ export async function requireUserId(): Promise<string> {
   return id;
 }
 
-export async function createDraftRoom(displayName: string) {
+export async function createDraftRoom(displayName: string, draftConfig: DraftConfigV2) {
   const userId = await requireUserId();
 
   // Retry room code collisions a few times
@@ -29,8 +30,16 @@ export async function createDraftRoom(displayName: string) {
         code,
         host_user_id: userId,
         status: "lobby",
-        settings: {},
+        settings: {
+          ...draftConfig,
+          version: 1,
+          locked: true,
+          lockedAt: new Date().toISOString()
+        },
         snapshot: {}, // host will write real snapshot once initialized
+        draft_config: draftConfig,
+        draft_type: draftConfig.draftType,
+        team_count: draftConfig.teamCount,
       })
       .select("*")
       .single();
@@ -69,14 +78,30 @@ export async function joinDraftRoom(code: string, displayName: string) {
 
   if (draftErr) throw draftErr;
 
-  // Get current participants
-  const { data: participants } = await supabase
+  // Get current participants count
+  const { data: participants, error: partErr } = await supabase
+    .from("draft_participants")
+    .select("user_id")
+    .eq("draft_id", draft.id);
+
+  if (partErr) throw partErr;
+
+  const currentCount = participants?.length || 0;
+  const teamCount = draft.settings?.teamCount || draft.team_count || 12;
+
+  // Check if room is full
+  if (currentCount >= teamCount) {
+    throw new Error(`Room is full (${teamCount}/${teamCount} managers joined)`);
+  }
+
+  // Get current team numbers
+  const { data: teamNumbers } = await supabase
     .from("draft_participants")
     .select("team_number")
     .eq("draft_id", draft.id);
 
   const taken = new Set(
-    (participants ?? [])
+    (teamNumbers ?? [])
       .map((p) => p.team_number)
       .filter(Boolean)
   );
@@ -125,6 +150,19 @@ export async function getDraftByCode(code: string) {
     .single();
   if (error) throw error;
   return data;
+}
+
+export async function getDraftConfig(draftId: string): Promise<DraftConfigV2> {
+  const { data, error } = await supabase
+    .from("drafts")
+    .select("draft_config")
+    .eq("id", draftId)
+    .single();
+  
+  if (error) throw error;
+  if (!data?.draft_config) throw new Error("Draft config not found");
+  
+  return data.draft_config as DraftConfigV2;
 }
 
 export async function listParticipants(draftId: string) {

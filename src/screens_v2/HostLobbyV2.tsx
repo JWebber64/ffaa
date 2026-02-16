@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
-import { createDraftRoom } from "../multiplayer/api";
+import { useMemo, useState, useEffect } from "react";
+import { createDraftRoom, getDraftConfig } from "../multiplayer/api";
 import { useLobbyRoom } from "../hooks/useLobbyRoom";
 import { appendDraftAction } from "../multiplayer/api";
+import { DraftConfigV2 } from "../types/draftConfig";
 
 export default function HostLobbyV2() {
   const [displayName, setDisplayName] = useState("");
@@ -9,20 +10,41 @@ export default function HostLobbyV2() {
 
   const [draftId, setDraftId] = useState<string | null>(null);
   const [roomCode, setRoomCode] = useState<string | null>(null);
+  const [draftConfig, setDraftConfig] = useState<DraftConfigV2 | null>(null);
 
   const { participants } = useLobbyRoom(draftId);
 
   const readyCount = useMemo(() => participants.filter((p) => p.is_ready).length, [participants]);
   const totalCount = participants.length;
-  const canStart = totalCount >= 2 && readyCount === totalCount;
+  const teamCount = draftConfig?.teamCount || 12;
+  const canStart = totalCount === teamCount && readyCount === totalCount && totalCount >= 2;
+
+  // Load draft config from sessionStorage on mount, then from DB after draft is created
+  useEffect(() => {
+    const stored = sessionStorage.getItem('draftConfigV2');
+    if (stored) {
+      setDraftConfig(JSON.parse(stored));
+    }
+  }, []);
+
+  // Load draft config from database after draft is created
+  useEffect(() => {
+    if (draftId && !draftConfig) {
+      getDraftConfig(draftId)
+        .then(setDraftConfig)
+        .catch(console.error);
+    }
+  }, [draftId, draftConfig]);
 
   async function onCreate() {
-    if (!displayName.trim()) return;
+    if (!displayName.trim() || !draftConfig) return;
     setCreating(true);
     try {
-      const draft = await createDraftRoom(displayName.trim());
+      const draft = await createDraftRoom(displayName.trim(), draftConfig);
       setDraftId(draft.id);
       setRoomCode(draft.code);
+      // Clear sessionStorage after using the config
+      sessionStorage.removeItem('draftConfigV2');
     } finally {
       setCreating(false);
     }
@@ -62,12 +84,32 @@ export default function HostLobbyV2() {
             <p className="text-[var(--text-1)] leading-relaxed">
               Create a room, share the code, and start when everyone is ready
             </p>
+            {draftConfig && (
+              <div className="flex flex-wrap gap-4 mt-3 text-sm">
+                <div className="px-3 py-1 bg-[var(--bg-2)] rounded-full border border-[var(--line-0)]">
+                  <span className="text-[var(--text-1)]">Type:</span>
+                  <span className="ml-1 font-semibold text-[var(--text-0)] capitalize">{draftConfig.draftType}</span>
+                </div>
+                <div className="px-3 py-1 bg-[var(--bg-2)] rounded-full border border-[var(--line-0)]">
+                  <span className="text-[var(--text-1)]">League:</span>
+                  <span className="ml-1 font-semibold text-[var(--text-0)] capitalize">{draftConfig.leagueType}</span>
+                </div>
+                <div className="px-3 py-1 bg-[var(--bg-2)] rounded-full border border-[var(--line-0)]">
+                  <span className="text-[var(--text-1)]">Scoring:</span>
+                  <span className="ml-1 font-semibold text-[var(--text-0)] capitalize">{draftConfig.scoring.replace('_', ' ')}</span>
+                </div>
+                <div className="px-3 py-1 bg-[var(--bg-2)] rounded-full border border-[var(--line-0)]">
+                  <span className="text-[var(--text-1)]">Teams:</span>
+                  <span className="ml-1 font-semibold text-[var(--text-0)]">{draftConfig.teamCount}</span>
+                </div>
+              </div>
+            )}
           </div>
           
           <div className="flex flex-wrap items-center gap-3">
             <div className="px-3 py-1.5 rounded-full bg-[var(--bg-2)] border border-[var(--line-0)]">
               <span className="text-[11px] font-semibold text-[var(--text-0)]">
-                Managers {totalCount}/8
+                Managers {totalCount}/{teamCount}
               </span>
             </div>
             <div className={`px-3 py-1.5 rounded-full border font-medium ${
@@ -89,8 +131,12 @@ export default function HostLobbyV2() {
       </div>
 
       {/* The Stage */}
-      <div className="ffaa-stage p-10">
-        <div className="space-y-8">
+      <div className="relative">
+        {/* Spotlight radial gradient background */}
+        <div className="absolute inset-0 bg-gradient-radial from-[var(--neon-blue)]/10 via-transparent to-transparent pointer-events-none" />
+        
+        <div className="ffaa-stage p-10 backdrop-blur-sm bg-[var(--bg-1)]/70 shadow-[0_0_40px_rgba(59,130,246,0.15)] border border-[var(--line-0)]/20 rounded-2xl">
+          <div className="space-y-8">
           {!draftId ? (
             <div className="text-center space-y-8 max-w-md mx-auto">
               <h2 className="text-3xl font-bold text-[var(--text-0)] mb-4 tracking-tight">
@@ -113,10 +159,10 @@ export default function HostLobbyV2() {
                 <button
                   onClick={onCreate}
                   disabled={!displayName.trim() || creating}
-                  className={`px-10 py-4 text-xl font-bold rounded-xl transition-all duration-200 ${
+                  className={`px-12 py-5 text-2xl font-bold rounded-xl transition-all duration-300 transform hover:scale-105 ${
                     !displayName.trim() || creating
                       ? "bg-[var(--bg-2)] text-[var(--text-1)] cursor-not-allowed"
-                      : "btn-primary bg-gradient-to-r from-[var(--neon-blue)] to-[var(--neon-green)] hover:from-[var(--neon-green)] hover:to-[var(--neon-blue)] text-white shadow-lg"
+                      : "bg-gradient-to-r from-[var(--neon-blue)] to-[var(--neon-green)] hover:from-[var(--neon-green)] hover:to-[var(--neon-blue)] text-white shadow-[0_0_30px_rgba(59,130,246,0.5)] hover:shadow-[0_0_40px_rgba(16,185,129,0.6)]"
                   }`}
                 >
                   {creating ? "Creating..." : "Create Room"}
@@ -129,8 +175,8 @@ export default function HostLobbyV2() {
                 <h2 className="text-3xl font-bold text-[var(--text-0)] mb-6 tracking-tight">
                   Ready to Start Draft
                 </h2>
-                <div className="text-6xl font-mono font-bold text-[var(--text-0)] tracking-widest mb-6" style={{
-                  textShadow: '0 0 30px rgba(59, 130, 246, 0.8), 0 0 60px rgba(59, 130, 246, 0.4)'
+                <div className="text-7xl font-mono font-bold text-[var(--text-0)] tracking-widest mb-6" style={{
+                  textShadow: '0 0 40px rgba(59, 130, 246, 0.8), 0 0 80px rgba(59, 130, 246, 0.4), 0 0 120px rgba(59, 130, 246, 0.2)'
                 }}>
                   {roomCode}
                 </div>
@@ -143,10 +189,10 @@ export default function HostLobbyV2() {
                 <button
                   onClick={startDraft}
                   disabled={!canStart}
-                  className={`px-10 py-4 text-xl font-bold rounded-xl transition-all duration-200 ${
+                  className={`px-12 py-5 text-2xl font-bold rounded-xl transition-all duration-300 transform hover:scale-105 ${
                     !canStart
                       ? "bg-[var(--bg-2)] text-[var(--text-1)] cursor-not-allowed"
-                      : "btn-primary bg-gradient-to-r from-[var(--neon-green)] to-[var(--ok)] hover:from-[var(--ok)] hover:to-[var(--neon-green)] text-white shadow-lg"
+                      : "bg-gradient-to-r from-[var(--neon-green)] to-[var(--ok)] hover:from-[var(--ok)] hover:to-[var(--neon-green)] text-white shadow-[0_0_30px_rgba(16,185,129,0.5)] hover:shadow-[0_0_40px_rgba(34,197,94,0.6)]"
                   }`}
                 >
                   Start Draft
@@ -160,13 +206,14 @@ export default function HostLobbyV2() {
               )}
             </div>
           )}
+          </div>
         </div>
       </div>
 
       {/* The Pit - Managers Grid */}
       <div className="ffaa-panel p-8">
         <h3 className="text-xl font-semibold text-[var(--text-0)] mb-6">
-          Managers ({totalCount}/8)
+          Managers ({totalCount}/{teamCount})
         </h3>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -207,7 +254,7 @@ export default function HostLobbyV2() {
             </div>
           ))}
           
-          {Array.from({ length: 8 - totalCount }).map((_, index) => (
+          {Array.from({ length: teamCount - totalCount }).map((_, index) => (
             <div
               key={`empty-${index}`}
               className="bg-[var(--bg-2)] border border-dashed border-[var(--line-0)]/30 rounded-xl p-4 flex items-center justify-center min-h-[80px]"

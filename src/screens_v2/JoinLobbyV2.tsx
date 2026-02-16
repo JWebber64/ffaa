@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { joinDraftRoom, setMyReady } from "../multiplayer/api";
+import { joinDraftRoom, setMyReady, getDraftConfig } from "../multiplayer/api";
 import { useLobbyRoom } from "../hooks/useLobbyRoom";
 import StatusPill from "../components/premium/StatusPill";
 import ManagersGrid from "../components/premium/ManagersGrid";
 import InputWithIcon from "../components/InputWithIcon";
 import { Button } from "../ui/Button";
+import { DraftConfigV2 } from "../types/draftConfig";
 
 export default function JoinLobbyV2() {
   const [code, setCode] = useState("");
@@ -18,14 +19,29 @@ export default function JoinLobbyV2() {
 
   const [ready, setReady] = useState(false);
   const [toggling, setToggling] = useState(false);
+  const [joinError, setJoinError] = useState<string | null>(null);
+  const [draftInfo, setDraftInfo] = useState<any>(null);
+  const [draftConfig, setDraftConfig] = useState<DraftConfigV2 | null>(null);
 
   async function onJoin() {
     if (!code.trim() || !displayName.trim()) return;
     setJoining(true);
+    setJoinError(null);
     try {
       const draft = await joinDraftRoom(code.trim().toUpperCase(), displayName.trim());
       setDraftId(draft.id);
       setRoomCode(draft.code);
+      setDraftInfo(draft);
+      
+      // Load full draft config
+      try {
+        const config = await getDraftConfig(draft.id);
+        setDraftConfig(config);
+      } catch (configError) {
+        console.error("Failed to load draft config:", configError);
+      }
+    } catch (error) {
+      setJoinError(error instanceof Error ? error.message : 'Failed to join room');
     } finally {
       setJoining(false);
     }
@@ -109,6 +125,11 @@ export default function JoinLobbyV2() {
                 />
               </div>
               
+              {joinError && (
+                <div className="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                  <p className="text-red-400 text-sm font-medium">{joinError}</p>
+                </div>
+              )}
               <div className="flex justify-center gap-3">
                 <Button
                   onClick={onJoin}
@@ -144,6 +165,26 @@ export default function JoinLobbyV2() {
                 <div className="text-4xl font-mono font-bold text-[var(--fg0)] tracking-wider mb-4">
                   {roomCode}
                 </div>
+                {draftConfig && (
+                  <div className="flex justify-center gap-4 text-sm flex-wrap">
+                    <div className="px-3 py-1 bg-[var(--bg2)] rounded-full border border-[var(--border)]">
+                      <span className="text-[var(--fg2)]">Type:</span>
+                      <span className="ml-1 font-semibold text-[var(--fg1)] capitalize">{draftConfig.draftType}</span>
+                    </div>
+                    <div className="px-3 py-1 bg-[var(--bg2)] rounded-full border border-[var(--border)]">
+                      <span className="text-[var(--fg2)]">League:</span>
+                      <span className="ml-1 font-semibold text-[var(--fg1)] capitalize">{draftConfig.leagueType}</span>
+                    </div>
+                    <div className="px-3 py-1 bg-[var(--bg2)] rounded-full border border-[var(--border)]">
+                      <span className="text-[var(--fg2)]">Scoring:</span>
+                      <span className="ml-1 font-semibold text-[var(--fg1)] capitalize">{draftConfig.scoring.replace('_', ' ')}</span>
+                    </div>
+                    <div className="px-3 py-1 bg-[var(--bg2)] rounded-full border border-[var(--border)]">
+                      <span className="text-[var(--fg2)]">Teams:</span>
+                      <span className="ml-1 font-semibold text-[var(--fg1)]">{draftConfig.teamCount}</span>
+                    </div>
+                  </div>
+                )}
               </div>
               
               <div className="flex justify-center">
@@ -175,7 +216,7 @@ export default function JoinLobbyV2() {
       {draftId && (
         <ManagersGrid 
           managers={managersData}
-          maxManagers={8}
+          maxManagers={draftConfig?.teamCount || draftInfo?.settings?.teamCount || draftInfo?.team_count || 12}
         />
       )}
     </div>
