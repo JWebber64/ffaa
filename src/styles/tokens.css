@@ -17,15 +17,22 @@
   --glow-a2: rgba(20,184,166,0.30);
   --glow-a3: rgba(96,165,250,0.25);
 
-  /* --- Position colors --- */
-  --pos-qb: #60A5FA;   /* sky */
-  --pos-rb: #34D399;   /* emerald */
-  --pos-wr: #A78BFA;   /* violet */
-  --pos-te: #FBBF24;   /* amber */
-  --pos-flex: #22D3EE; /* cyan */
-  --pos-k: #FB7185;    /* rose */
-  --pos-dst: #F97316;  /* orange */
-  --pos-bench: #94A3B8;/* slate */
+  /* --- Position colors (jewel tones, broadcast-safe) --- */
+  --pos-qb:   #3B82F6; /* Royal Blue */
+  --pos-rb:   #16A34A; /* Emerald Green */
+  --pos-wr:   #7C3AED; /* Deep Violet */
+  --pos-te:   #D97706; /* Burnt Amber */
+  --pos-flex: #0891B2; /* Deep Cyan */
+  --pos-k:    #BE123C; /* Crimson */
+  --pos-dst:  #C2410C; /* Rust */
+  --pos-bench:#64748B; /* Slate */
+
+  /* IDP / misc */
+  --pos-ir:     #475569; /* Dark slate */
+  --pos-dl:     #B45309; /* Dark amber */
+  --pos-lb:     #15803D; /* Deep green */
+  --pos-db:     #6D28D9; /* Indigo-violet */
+  --pos-idpflex:#0E7490; /* Deep cyan */
 
   /* --- Glass (rgba so backdrop blur works) --- */
   --glass-1: rgba(255,255,255,0.06);  /* card */

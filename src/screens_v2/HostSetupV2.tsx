@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DEFAULT_CONFIG_AUCTION_12 } from "../types/draftConfig";
-import { DraftConfigV2, LeagueType, DraftTypeV2, ScoringType, TeamCountV2, RosterSlot, SlotType } from "../types/draftConfig";
-import { Card } from "../ui/Card";
+import { DraftConfigV2, LeagueType, DraftTypeV2, ScoringType, TeamCountV2 } from "../types/draftConfig";
 import { Button } from "../ui/Button";
 import { Divider } from "../ui/Divider";
-import { cn } from "../ui/cn";
 import { SelectWrapper, SelectItem } from "../ui/SelectWrapper";
-import { GlassPanel, GlassCard, GlassPill } from "../components/premium";
+import { GlassPanel, GlassCard } from "../components/premium";
+import RosterBuilder from "../components/premium/RosterBuilder";
+import { Input } from "../ui/Input";
 
 export default function HostSetupV2() {
   const navigate = useNavigate();
@@ -42,33 +42,6 @@ export default function HostSetupV2() {
   const updateSnakeSettings = (settings: typeof config.snakeSettings) => {
     if (settings) {
       setConfig({ ...config, snakeSettings: settings });
-    }
-  };
-
-  // Roster Builder inline implementation
-  const updateRosterSlot = (index: number, updates: Partial<RosterSlot>) => {
-    const newSlots = [...config.rosterSlots];
-    newSlots[index] = { ...newSlots[index], ...updates };
-    updateConfig('rosterSlots', newSlots);
-  };
-
-  const addRosterSlot = () => {
-    const newSlot: RosterSlot = { slot: 'BENCH', count: 1 };
-    updateConfig('rosterSlots', [...config.rosterSlots, newSlot]);
-  };
-
-  const removeRosterSlot = (index: number) => {
-    const newSlots = config.rosterSlots.filter((_, i) => i !== index);
-    updateConfig('rosterSlots', newSlots);
-  };
-
-  const updateFlexEligibility = (index: number, position: SlotType, checked: boolean) => {
-    const slot = config.rosterSlots[index];
-    if (slot.slot === 'FLEX' || slot.slot === 'IDP_FLEX') {
-      const eligible = checked 
-        ? [...(slot.flexEligible || []), position]
-        : (slot.flexEligible || []).filter(p => p !== position);
-      updateRosterSlot(index, { flexEligible: eligible });
     }
   };
 
@@ -161,95 +134,11 @@ export default function HostSetupV2() {
               <Divider />
 
               {/* Roster Builder */}
-              <div>
-                <h2 className="text-lg font-semibold mb-4 text-fg0">
-                  Roster Configuration
-                </h2>
-                <div className="space-y-3">
-                  {config.rosterSlots.map((slot, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 rounded-lg border border-stroke bg-[rgba(255,255,255,0.02)]">
-                      <SelectWrapper
-                        value={slot.slot}
-                        onValueChange={(value) => updateRosterSlot(index, { slot: value as SlotType })}
-                        className="w-40"
-                      >
-                        <SelectItem value="QB">QB</SelectItem>
-                        <SelectItem value="RB">RB</SelectItem>
-                        <SelectItem value="WR">WR</SelectItem>
-                        <SelectItem value="TE">TE</SelectItem>
-                        <SelectItem value="FLEX">FLEX</SelectItem>
-                        <SelectItem value="K">K</SelectItem>
-                        <SelectItem value="DST">DST</SelectItem>
-                        <SelectItem value="BENCH">BENCH</SelectItem>
-                        <SelectItem value="IR">IR</SelectItem>
-                        <SelectItem value="DL">DL</SelectItem>
-                        <SelectItem value="LB">LB</SelectItem>
-                        <SelectItem value="DB">DB</SelectItem>
-                        <SelectItem value="IDP_FLEX">IDP_FLEX</SelectItem>
-                      </SelectWrapper>
-                      
-                      <input
-                        type="number"
-                        min="0"
-                        max="20"
-                        value={slot.count}
-                        onChange={(e) => updateRosterSlot(index, { count: parseInt(e.target.value) || 0 })}
-                        className="w-20 h-10 rounded border border-stroke bg-[rgba(255,255,255,0.04)] px-2 text-sm text-fg0 focus:border-stroke2 focus:outline-none"
-                      />
-                      
-                      {slot.slot === 'FLEX' && (
-                        <div className="flex items-center gap-2 ml-2">
-                          {['RB', 'WR', 'TE'].map(pos => (
-                            <label key={pos} className="flex items-center gap-1 text-sm text-fg1">
-                              <input
-                                type="checkbox"
-                                checked={slot.flexEligible?.includes(pos as SlotType) || false}
-                                onChange={(e) => updateFlexEligibility(index, pos as SlotType, e.target.checked)}
-                                className="rounded border-stroke bg-[rgba(255,255,255,0.04)]"
-                              />
-                              {pos}
-                            </label>
-                          ))}
-                        </div>
-                      )}
-                      
-                      {slot.slot === 'IDP_FLEX' && (
-                        <div className="flex items-center gap-2 ml-2">
-                          {['DL', 'LB', 'DB'].map(pos => (
-                            <label key={pos} className="flex items-center gap-1 text-sm text-fg1">
-                              <input
-                                type="checkbox"
-                                checked={slot.flexEligible?.includes(pos as SlotType) || false}
-                                onChange={(e) => updateFlexEligibility(index, pos as SlotType, e.target.checked)}
-                                className="rounded border-stroke bg-[rgba(255,255,255,0.04)]"
-                              />
-                              {pos}
-                            </label>
-                          ))}
-                        </div>
-                      )}
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeRosterSlot(index)}
-                        className="ml-auto"
-                      >
-                        ×
-                      </Button>
-                    </div>
-                  ))}
-                  
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={addRosterSlot}
-                    className="w-full"
-                  >
-                    + Add Roster Slot
-                  </Button>
-                </div>
-              </div>
+              <RosterBuilder
+                value={config.rosterSlots}
+                onChange={(next) => setConfig((c) => ({ ...c, rosterSlots: next }))}
+                allowIdp={true}
+              />
 
               <Divider />
 
@@ -262,73 +151,53 @@ export default function HostSetupV2() {
                 {config.draftType === 'auction' && config.auctionSettings && (
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-fg1">
-                          Default Budget
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          max="10000"
-                          value={config.auctionSettings.defaultBudget}
-                          onChange={(e) => updateAuctionSettings({
-                            ...config.auctionSettings,
-                            defaultBudget: parseInt(e.target.value) || 0
-                          })}
-                          className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
-                        />
-                      </div>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="10000"
+                        label="Default Budget"
+                        value={config.auctionSettings.defaultBudget}
+                        onChange={(e) => updateAuctionSettings({
+                          ...config.auctionSettings,
+                          defaultBudget: parseInt(e.target.value) || 0
+                        })}
+                      />
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-fg1">
-                          Nomination Seconds
-                        </label>
-                        <input
-                          type="number"
-                          min="5"
-                          max="120"
-                          value={config.auctionSettings.nominationSeconds}
-                          onChange={(e) => updateAuctionSettings({
-                            ...config.auctionSettings,
-                            nominationSeconds: parseInt(e.target.value) || 30
-                          })}
-                          className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
-                        />
-                      </div>
+                      <Input
+                        type="number"
+                        min="5"
+                        max="120"
+                        label="Nomination Seconds"
+                        value={config.auctionSettings.nominationSeconds}
+                        onChange={(e) => updateAuctionSettings({
+                          ...config.auctionSettings,
+                          nominationSeconds: parseInt(e.target.value) || 30
+                        })}
+                      />
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-fg1">
-                          Bid Reset Seconds
-                        </label>
-                        <input
-                          type="number"
-                          min="3"
-                          max="30"
-                          value={config.auctionSettings.bidResetSeconds}
-                          onChange={(e) => updateAuctionSettings({
-                            ...config.auctionSettings,
-                            bidResetSeconds: parseInt(e.target.value) || 10
-                          })}
-                          className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
-                        />
-                      </div>
+                      <Input
+                        type="number"
+                        min="3"
+                        max="30"
+                        label="Bid Reset Seconds"
+                        value={config.auctionSettings.bidResetSeconds}
+                        onChange={(e) => updateAuctionSettings({
+                          ...config.auctionSettings,
+                          bidResetSeconds: parseInt(e.target.value) || 10
+                        })}
+                      />
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-fg1">
-                          Min Increment
-                        </label>
-                        <input
-                          type="number"
-                          min="1"
-                          max="10"
-                          value={config.auctionSettings.minIncrement}
-                          onChange={(e) => updateAuctionSettings({
-                            ...config.auctionSettings,
-                            minIncrement: parseInt(e.target.value) || 1
-                          })}
-                          className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
-                        />
-                      </div>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="10"
+                        label="Min Increment"
+                        value={config.auctionSettings.minIncrement}
+                        onChange={(e) => updateAuctionSettings({
+                          ...config.auctionSettings,
+                          minIncrement: parseInt(e.target.value) || 1
+                        })}
+                      />
 
                       <div className="space-y-2 md:col-span-2">
                         <SelectWrapper
@@ -393,22 +262,17 @@ export default function HostSetupV2() {
                 {config.draftType === 'snake' && config.snakeSettings && (
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-fg1">
-                          Pick Seconds
-                        </label>
-                        <input
-                          type="number"
-                          min="10"
-                          max="300"
-                          value={config.snakeSettings.pickSeconds}
-                          onChange={(e) => updateSnakeSettings({
-                            ...config.snakeSettings,
-                            pickSeconds: parseInt(e.target.value) || 60
-                          })}
-                          className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
-                        />
-                      </div>
+                      <Input
+                        type="number"
+                        min="10"
+                        max="300"
+                        label="Pick Seconds"
+                        value={config.snakeSettings.pickSeconds}
+                        onChange={(e) => updateSnakeSettings({
+                          ...config.snakeSettings,
+                          pickSeconds: parseInt(e.target.value) || 60
+                        })}
+                      />
 
                       <div className="space-y-4">
                         <label className="flex items-center gap-3 text-sm text-fg1">

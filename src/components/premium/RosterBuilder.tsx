@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '../../ui/Button';
 import { RosterSlot, SLOT_TYPES, FLEX_ELIGIBLE, IDP_FLEX_ELIGIBLE, SlotType } from '../../types/draftConfig';
 import RosterRow from '../roster/RosterRow';
+import { GlassPanel } from './index';
 
 interface RosterBuilderProps {
   value: RosterSlot[];
@@ -18,10 +19,6 @@ export default function RosterBuilder({
     slot: 'BENCH',
     count: 1,
   });
-
-  const bgColor = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.600');
-  const hoverBgColor = useColorModeValue('gray.50', 'gray.700');
 
   const updateSlot = (index: number, updates: Partial<RosterSlot>) => {
     const newSlots = [...value];
@@ -41,7 +38,7 @@ export default function RosterBuilder({
     onChange([...value, { ...newSlotDefault }]);
   };
 
-  const updateFlexEligibility = (index: number, position: SlotType, checked: boolean) => {
+  const updateFlexEligibility = (index: number, position: SlotType) => {
     const slot = value[index];
     if (!slot) return;
     
@@ -49,12 +46,12 @@ export default function RosterBuilder({
       slot.flexEligible = [];
     }
     
-    if (checked) {
-      if (!slot.flexEligible.includes(position)) {
-        slot.flexEligible = [...slot.flexEligible, position];
-      }
-    } else {
+    const isCurrentlyEligible = slot.flexEligible.includes(position);
+    
+    if (isCurrentlyEligible) {
       slot.flexEligible = slot.flexEligible.filter(p => p !== position);
+    } else {
+      slot.flexEligible = [...slot.flexEligible, position];
     }
     
     updateSlot(index, { flexEligible: slot.flexEligible });
@@ -66,8 +63,11 @@ export default function RosterBuilder({
     return [];
   };
 
-  const isFlexSlot = (slotType: SlotType): boolean => {
-    return slotType === 'FLEX' || slotType === 'IDP_FLEX';
+  const handleSlotTypeChange = (index: number, newSlotType: SlotType) => {
+    updateSlot(index, { 
+      slot: newSlotType,
+      flexEligible: (newSlotType === 'FLEX' || newSlotType === 'IDP_FLEX') ? [] : undefined
+    });
   };
 
   // Filter slot types based on IDP allowance
@@ -76,140 +76,61 @@ export default function RosterBuilder({
     : SLOT_TYPES.filter(type => !['DL', 'LB', 'DB', 'IDP_FLEX'].includes(type));
 
   return (
-    <Box bg={bgColor} border="1px" borderColor={borderColor} borderRadius="lg" p={6}>
-      <VStack spacing={4} align="stretch">
-        <HStack justify="space-between">
-          <Text fontSize="lg" fontWeight="semibold">
+    <GlassPanel className="p-6 relative overflow-hidden">
+      <div className="absolute inset-0 rounded-[inherit] opacity-30 pointer-events-none"
+        style={{
+          background: 'linear-gradient(135deg, #09090b 0%, #18181b 50%, #09090b 100%)',
+        }}
+      />
+      <div className="relative space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-[var(--text-0)]">
             Roster Configuration
-          </Text>
+          </h3>
           <Button
-            leftIcon={<AddIcon />}
-            size="sm"
-            colorScheme="blue"
             onClick={addSlot}
+            variant="secondary"
+            size="sm"
           >
-            Add Slot
+            + Add Roster Slot
           </Button>
-        </HStack>
-
-        <Divider />
+        </div>
 
         {value.length === 0 ? (
-          <Box textAlign="center" py={8}>
-            <Text color="gray.500">No roster slots configured</Text>
+          <div className="text-center py-8">
+            <p className="text-[var(--text-1)] mb-4">No roster slots configured</p>
             <Button
-              leftIcon={<AddIcon />}
-              mt={4}
-              colorScheme="blue"
               onClick={addSlot}
+              variant="primary"
             >
               Add First Slot
             </Button>
-          </Box>
+          </div>
         ) : (
-          <VStack spacing={3} align="stretch">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
             {value.map((slot, index) => (
-              <Box
+              <RosterRow
                 key={index}
-                p={4}
-                bg={hoverBgColor}
-                border="1px"
-                borderColor={borderColor}
-                borderRadius="md"
-                _hover={{ borderColor: 'blue.300' }}
-                transition="all 0.2s"
-              >
-                <HStack spacing={4} align="start">
-                  <VStack flex={1} align="stretch" spacing={3}>
-                    <HStack>
-                      <Text fontSize="sm" fontWeight="medium" minW="80px">
-                        Slot Type:
-                      </Text>
-                      <Select
-                        value={slot.slot}
-                        onChange={(e) => updateSlot(index, { slot: e.target.value as SlotType })}
-                        size="sm"
-                        flex={1}
-                      >
-                        {availableSlotTypes.map((type) => (
-                          <option key={type} value={type}>
-                            {type}
-                          </option>
-                        ))}
-                      </Select>
-                    </HStack>
-
-                    <HStack>
-                      <Text fontSize="sm" fontWeight="medium" minW="80px">
-                        Count:
-                      </Text>
-                      <NumberInput
-                        value={slot.count}
-                        onChange={(value) => updateSlot(index, { count: parseInt(value) || 0 })}
-                        min={0}
-                        max={20}
-                        size="sm"
-                        flex={1}
-                      >
-                        <NumberInputField />
-                        <NumberInputStepper>
-                          <NumberIncrementStepper />
-                          <NumberDecrementStepper />
-                        </NumberInputStepper>
-                      </NumberInput>
-                    </HStack>
-
-                    {isFlexSlot(slot.slot) && (
-                      <Box>
-                        <Text fontSize="sm" fontWeight="medium" mb={2}>
-                          Eligible Positions:
-                        </Text>
-                        <Stack direction="row" wrap="wrap">
-                          {getFlexEligiblePositions(slot.slot).map((position) => (
-                            <Checkbox
-                              key={position}
-                              isChecked={slot.flexEligible?.includes(position) || false}
-                              onChange={(e) => updateFlexEligibility(index, position, e.target.checked)}
-                              size="sm"
-                              colorScheme="blue"
-                            >
-                              {position}
-                            </Checkbox>
-                          ))}
-                        </Stack>
-                      </Box>
-                    )}
-                  </VStack>
-
-                  <IconButton
-                    aria-label="Remove slot"
-                    icon={<SmallCloseIcon />}
-                    size="sm"
-                    colorScheme="red"
-                    variant="ghost"
-                    onClick={() => removeSlot(index)}
-                    _hover={{ bg: 'red.50' }}
-                  />
-                </HStack>
-
-                {slot.count === 0 && (
-                  <Text fontSize="xs" color="orange.600" mt={2}>
-                    Slot count is 0 - this slot will be ignored
-                  </Text>
-                )}
-              </Box>
+                slotKey={slot.slot}
+                count={slot.count}
+                onCountChange={(count) => updateSlot(index, { count })}
+                eligibility={slot.flexEligible || []}
+                onEligibilityToggle={(position) => updateFlexEligibility(index, position)}
+                onRemove={() => removeSlot(index)}
+                availablePositions={getFlexEligiblePositions(slot.slot)}
+              />
             ))}
-          </VStack>
+          </div>
         )}
 
         {value.length > 0 && (
-          <Box mt={4}>
-            <Text fontSize="sm" color="gray.600">
+          <div className="mt-4 pt-4 border-t border-[rgba(255,255,255,0.1)]">
+            <p className="text-sm text-[var(--text-1)]">
               Total slots: {value.reduce((sum, slot) => sum + Math.max(0, slot.count), 0)}
-            </Text>
-          </Box>
+            </p>
+          </div>
         )}
-      </VStack>
-    </Box>
+      </div>
+    </GlassPanel>
   );
 }
