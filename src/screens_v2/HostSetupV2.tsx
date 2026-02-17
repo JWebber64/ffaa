@@ -6,6 +6,7 @@ import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Divider } from "../ui/Divider";
 import { cn } from "../ui/cn";
+import { SelectWrapper, SelectItem } from "../ui/SelectWrapper";
 import { GlassPanel, GlassCard, GlassPill } from "../components/premium";
 
 export default function HostSetupV2() {
@@ -106,65 +107,53 @@ export default function HostSetupV2() {
                 </h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <GlassCard className="space-y-2 p-4 transition-all duration-200 ease-out hover:-translate-y-0.5">
-                    <label className="text-sm font-medium text-[var(--text-1)]">
-                      League Type
-                    </label>
-                    <select
+                  <GlassCard className="p-4 transition-all duration-200 ease-out hover:-translate-y-0.5">
+                    <SelectWrapper
+                      label="League Type"
                       value={config.leagueType}
-                      onChange={(e) => updateConfig('leagueType', e.target.value as LeagueType)}
-                      className="w-full h-11 rounded-md border border-[var(--line-1)] bg-[var(--glass-1)] px-3 text-[var(--text-0)] focus:border-[var(--accent-1)] focus:outline-none transition-all duration-200"
+                      onValueChange={(value) => updateConfig('leagueType', value as LeagueType)}
                     >
-                      <option value="redraft">Redraft</option>
-                      <option value="keeper">Keeper</option>
-                      <option value="dynasty">Dynasty</option>
-                    </select>
+                      <SelectItem value="redraft">Redraft</SelectItem>
+                      <SelectItem value="keeper">Keeper</SelectItem>
+                      <SelectItem value="dynasty">Dynasty</SelectItem>
+                    </SelectWrapper>
                   </GlassCard>
 
-                  <GlassCard className="space-y-2 p-4 transition-all duration-200 ease-out hover:-translate-y-0.5">
-                    <label className="text-sm font-medium text-[var(--text-1)]">
-                      Scoring
-                    </label>
-                    <select
+                  <GlassCard className="p-4 transition-all duration-200 ease-out hover:-translate-y-0.5">
+                    <SelectWrapper
+                      label="Scoring"
                       value={config.scoring}
-                      onChange={(e) => updateConfig('scoring', e.target.value as ScoringType)}
-                      className="w-full h-11 rounded-md border border-[var(--line-1)] bg-[var(--glass-1)] px-3 text-[var(--text-0)] focus:border-[var(--accent-1)] focus:outline-none transition-all duration-200"
+                      onValueChange={(value) => updateConfig('scoring', value as ScoringType)}
                     >
-                      <option value="standard">Standard</option>
-                      <option value="half_ppr">Half PPR</option>
-                      <option value="ppr">PPR</option>
-                    </select>
+                      <SelectItem value="standard">Standard</SelectItem>
+                      <SelectItem value="half_ppr">Half PPR</SelectItem>
+                      <SelectItem value="ppr">PPR</SelectItem>
+                    </SelectWrapper>
                   </GlassCard>
 
-                  <GlassCard className="space-y-2 p-4 transition-all duration-200 ease-out hover:-translate-y-0.5">
-                    <label className="text-sm font-medium text-[var(--text-1)]">
-                      Draft Type
-                    </label>
-                    <select
+                  <GlassCard className="p-4 transition-all duration-200 ease-out hover:-translate-y-0.5">
+                    <SelectWrapper
+                      label="Draft Type"
                       value={config.draftType}
-                      onChange={(e) => updateConfig('draftType', e.target.value as DraftTypeV2)}
-                      className="w-full h-11 rounded-md border border-[var(--line-1)] bg-[var(--glass-1)] px-3 text-[var(--text-0)] focus:border-[var(--accent-1)] focus:outline-none transition-all duration-200"
+                      onValueChange={(value) => updateConfig('draftType', value as DraftTypeV2)}
                     >
-                      <option value="auction">Auction Draft</option>
-                      <option value="snake">Snake Draft</option>
-                    </select>
+                      <SelectItem value="auction">Auction Draft</SelectItem>
+                      <SelectItem value="snake">Snake Draft</SelectItem>
+                    </SelectWrapper>
                   </GlassCard>
 
-                  <GlassCard className="space-y-2 p-4 transition-all duration-200 ease-out hover:-translate-y-0.5">
-                    <label className="text-sm font-medium text-[var(--text-1)]">
-                      Team Count
-                    </label>
-                    <select
-                      value={config.teamCount}
-                      onChange={(e) => updateConfig('teamCount', parseInt(e.target.value) as TeamCountV2)}
-                      className="w-full h-11 rounded-md border border-[var(--line-1)] bg-[var(--glass-1)] px-3 text-[var(--text-0)] focus:border-[var(--accent-1)] focus:outline-none transition-all duration-200"
+                  <GlassCard className="p-4 transition-all duration-200 ease-out hover:-translate-y-0.5">
+                    <SelectWrapper
+                      label="Team Count"
+                      value={config.teamCount.toString()}
+                      onValueChange={(value) => updateConfig('teamCount', parseInt(value) as TeamCountV2)}
                     >
-                      <option value={8}>8 Teams</option>
-                      <option value={10}>10 Teams</option>
-                      <option value={12}>12 Teams</option>
-                      <option value={14}>14 Teams</option>
-                      <option value={16}>16 Teams</option>
-                    </select>
+                      <SelectItem value="8">8 Teams</SelectItem>
+                      <SelectItem value="10">10 Teams</SelectItem>
+                      <SelectItem value="12">12 Teams</SelectItem>
+                      <SelectItem value="14">14 Teams</SelectItem>
+                      <SelectItem value="16">16 Teams</SelectItem>
+                    </SelectWrapper>
                   </GlassCard>
                 </div>
               </div>
@@ -179,25 +168,25 @@ export default function HostSetupV2() {
                 <div className="space-y-3">
                   {config.rosterSlots.map((slot, index) => (
                     <div key={index} className="flex items-center gap-3 p-3 rounded-lg border border-stroke bg-[rgba(255,255,255,0.02)]">
-                      <select
+                      <SelectWrapper
                         value={slot.slot}
-                        onChange={(e) => updateRosterSlot(index, { slot: e.target.value as SlotType })}
-                        className="h-10 rounded border border-stroke bg-[rgba(255,255,255,0.04)] px-2 text-sm text-fg0 focus:border-stroke2 focus:outline-none"
+                        onValueChange={(value) => updateRosterSlot(index, { slot: value as SlotType })}
+                        className="w-40"
                       >
-                        <option value="QB">QB</option>
-                        <option value="RB">RB</option>
-                        <option value="WR">WR</option>
-                        <option value="TE">TE</option>
-                        <option value="FLEX">FLEX</option>
-                        <option value="K">K</option>
-                        <option value="DST">DST</option>
-                        <option value="BENCH">BENCH</option>
-                        <option value="IR">IR</option>
-                        <option value="DL">DL</option>
-                        <option value="LB">LB</option>
-                        <option value="DB">DB</option>
-                        <option value="IDP_FLEX">IDP_FLEX</option>
-                      </select>
+                        <SelectItem value="QB">QB</SelectItem>
+                        <SelectItem value="RB">RB</SelectItem>
+                        <SelectItem value="WR">WR</SelectItem>
+                        <SelectItem value="TE">TE</SelectItem>
+                        <SelectItem value="FLEX">FLEX</SelectItem>
+                        <SelectItem value="K">K</SelectItem>
+                        <SelectItem value="DST">DST</SelectItem>
+                        <SelectItem value="BENCH">BENCH</SelectItem>
+                        <SelectItem value="IR">IR</SelectItem>
+                        <SelectItem value="DL">DL</SelectItem>
+                        <SelectItem value="LB">LB</SelectItem>
+                        <SelectItem value="DB">DB</SelectItem>
+                        <SelectItem value="IDP_FLEX">IDP_FLEX</SelectItem>
+                      </SelectWrapper>
                       
                       <input
                         type="number"
@@ -342,21 +331,19 @@ export default function HostSetupV2() {
                       </div>
 
                       <div className="space-y-2 md:col-span-2">
-                        <label className="text-sm font-medium text-fg1">
-                          Nomination Order Mode
-                        </label>
-                        <select
-                          value={config.auctionSettings.nominationOrderMode}
-                          onChange={(e) => updateAuctionSettings({
+                        <SelectWrapper
+                          label="Nomination Order Mode"
+                          value={config.auctionSettings?.nominationOrderMode || 'random_first_rotate'}
+                          onValueChange={(value) => updateAuctionSettings({
                             ...config.auctionSettings,
-                            nominationOrderMode: e.target.value as any
+                            nominationOrderMode: value as any,
+                            defaultBudget: config.auctionSettings?.defaultBudget || 200
                           })}
-                          className="w-full h-11 rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 focus:border-stroke2 focus:outline-none"
                         >
-                          <option value="random_first_rotate">Random First, Then Rotate</option>
-                          <option value="fixed">Fixed Order</option>
-                          <option value="random_each">Random Each Time</option>
-                        </select>
+                          <SelectItem value="random_first_rotate">Random First, Then Rotate</SelectItem>
+                          <SelectItem value="fixed">Fixed Order</SelectItem>
+                          <SelectItem value="random_each">Random Each Time</SelectItem>
+                        </SelectWrapper>
                       </div>
                     </div>
 

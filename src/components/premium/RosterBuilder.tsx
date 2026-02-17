@@ -1,24 +1,7 @@
 import { useState } from 'react';
-import {
-  Box,
-  Button,
-  Select,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-  Checkbox,
-  Stack,
-  Text,
-  HStack,
-  VStack,
-  IconButton,
-  Divider,
-  useColorModeValue,
-} from '@chakra-ui/react';
-import { SmallCloseIcon, AddIcon } from '@chakra-ui/icons';
+import { Button } from '../../ui/Button';
 import { RosterSlot, SLOT_TYPES, FLEX_ELIGIBLE, IDP_FLEX_ELIGIBLE, SlotType } from '../../types/draftConfig';
+import RosterRow from '../roster/RosterRow';
 
 interface RosterBuilderProps {
   value: RosterSlot[];

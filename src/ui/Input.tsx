@@ -10,11 +10,11 @@ export type UIInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
 export function Input({ className, label, hint, error, ...props }: UIInputProps) {
   return (
     <label className="block">
-      {label ? <div className="mb-2 text-sm text-fg1">{label}</div> : null}
+      {label ? <div className="mb-2 text-sm text-[var(--text-1)]">{label}</div> : null}
       <input
         className={cn(
-          "h-11 w-full rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] px-3 text-fg0 " +
-            "placeholder:text-fg2 transition focus:border-stroke2 focus:outline-none",
+          "ffaa-control h-12 w-full rounded-full px-4 text-[var(--text-0)] " +
+            "placeholder:text-[rgba(255,255,255,0.45)] transition-all duration-200 ease-out focus:outline-none",
           error ? "border-[rgba(251,113,133,0.45)]" : "",
           className
         )}
@@ -23,7 +23,7 @@ export function Input({ className, label, hint, error, ...props }: UIInputProps)
       {error ? (
         <div className="mt-2 text-sm text-[rgba(251,113,133,0.95)]">{error}</div>
       ) : hint ? (
-        <div className="mt-2 text-sm text-fg2">{hint}</div>
+        <div className="mt-2 text-sm text-[rgba(255,255,255,0.50)]">{hint}</div>
       ) : null}
     </label>
   );

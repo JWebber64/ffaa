@@ -22,6 +22,7 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@radix-ui/react-select": "^2.2.6",
     "@supabase/supabase-js": "^2.95.3",
     "cheerio": "^1.1.2",
     "csv-stringify": "^6.6.0",

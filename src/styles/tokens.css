@@ -7,9 +7,25 @@
   --text-0: rgba(255,255,255,0.92);
   --text-1: rgba(255,255,255,0.68);
 
-  /* --- Material-ish ambient accents (subtle) --- */
-  --accent-1: #7C3AED;    /* purple */
-  --accent-2: #14B8A6;    /* teal */
+  /* --- Brand accents (Material-ish) --- */
+  --a1: #7C3AED;  /* amethyst */
+  --a2: #14B8A6;  /* teal */
+  --a3: #60A5FA;  /* sky */
+
+  /* --- Soft glows --- */
+  --glow-a1: rgba(124,58,237,0.35);
+  --glow-a2: rgba(20,184,166,0.30);
+  --glow-a3: rgba(96,165,250,0.25);
+
+  /* --- Position colors --- */
+  --pos-qb: #60A5FA;   /* sky */
+  --pos-rb: #34D399;   /* emerald */
+  --pos-wr: #A78BFA;   /* violet */
+  --pos-te: #FBBF24;   /* amber */
+  --pos-flex: #22D3EE; /* cyan */
+  --pos-k: #FB7185;    /* rose */
+  --pos-dst: #F97316;  /* orange */
+  --pos-bench: #94A3B8;/* slate */
 
   /* --- Glass (rgba so backdrop blur works) --- */
   --glass-1: rgba(255,255,255,0.06);  /* card */

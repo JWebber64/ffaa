@@ -7,6 +7,7 @@ import { SectionTitle } from "../ui/SectionTitle";
 import { Divider } from "../ui/Divider";
 import { Tabs } from "../ui/Tabs";
 import { Input } from "../ui/Input";
+import { SelectWrapper, SelectItem } from "../ui/SelectWrapper";
 import { cn } from "../ui/cn";
 import { ModalLite } from "../ui/ModalLite";
 import { useDraftSnapshot } from "../hooks/useDraftSnapshot";
@@ -537,22 +538,22 @@ export default function DraftRoomV2() {
               </Button>
 
               {/* Style Pack Selector */}
-              <select
-                disabled={!isHost}
-                className="h-10 rounded-md border border-stroke bg-[rgba(255,255,255,0.05)] px-3 text-sm text-fg0 sm:col-span-4"
+              <SelectWrapper
                 value={snap?.auctioneer?.style_pack ?? "classic"}
-                onChange={(e) =>
+                onValueChange={(value) =>
                   appendDraftAction(draftId!, "set_style_pack", {
-                    style: e.target.value,
+                    style: value,
                   })
                 }
+                disabled={!isHost}
+                className="sm:col-span-4"
               >
                 {Object.entries(STYLE_PACKS).map(([id, pack]) => (
-                  <option key={id} value={id}>
+                  <SelectItem key={id} value={id}>
                     {pack.label}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
+              </SelectWrapper>
 
               {!isHost ? (
                 <div className="sm:col-span-4 text-xs text-fg2">
