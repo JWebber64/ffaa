@@ -34,9 +34,9 @@ body {
   min-height: 100vh;
   background: var(--bg-0);
   background-image: 
-    radial-gradient(circle at 50% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.08) 0%, transparent 35%),
-    radial-gradient(circle at 20% 80%, rgba(124, 58, 237, 0.06) 0%, transparent 30%);
+    radial-gradient(circle at 50% 30%, rgba(20,184,166,0.12) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(16,185,129,0.08) 0%, transparent 35%),
+    radial-gradient(circle at 20% 80%, rgba(7,13,9,0.06) 0%, transparent 30%);
   color: var(--text-0);
 }
 
@@ -91,9 +91,9 @@ button:focus-visible {
 .stage-gradient {
   background: linear-gradient(
     135deg,
-    rgba(59, 130, 246, 0.02) 0%,
-    rgba(16, 185, 129, 0.02) 50%,
-    rgba(124, 58, 237, 0.02) 100%
+    rgba(20,184,166,0.02) 0%,
+    rgba(16,185,129,0.02) 50%,
+    rgba(7,13,9,0.02) 100%
   );
   animation: stageShift 8s ease-in-out infinite;
 }
@@ -180,7 +180,7 @@ button:focus-visible {
   bottom: 0;
   background: radial-gradient(
     circle at 50% 20%,
-    rgba(59, 130, 246, 0.15) 0%,
+    rgba(16,185,129,0.15) 0%,
     transparent 50%
   );
   pointer-events: none;
