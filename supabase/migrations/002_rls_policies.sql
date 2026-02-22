@@ -27,7 +27,8 @@ on public.drafts
 for select
 to authenticated
 using (
-  exists (
+  auth.uid() = host_user_id
+  or exists (
     select 1
     from public.draft_participants dp
     where dp.draft_id = drafts.id
@@ -94,7 +95,8 @@ on public.draft_actions
 for select
 to authenticated
 using (
-  exists (
+  auth.uid() = user_id
+  or exists (
     select 1
     from public.draft_participants dp
     where dp.draft_id = draft_actions.draft_id

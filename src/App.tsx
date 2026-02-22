@@ -73,9 +73,20 @@ function App() {
   // keep existing subscriber (it should not break v2; we'll tune later)
   useAuctionSubscriber();
   
-  // Don't render anything until session is ready
-  if (!sessionState.isReady) {
-    return null; // or return <div>Loading...</div> for better UX
+  // Don't render until we have a real authenticated session (anon counts as authenticated)
+  if (!sessionState.isReady) return null;
+  if (!sessionState.userId) {
+    return (
+      <div style={{ padding: 24, color: "white" }}>
+        <h2 style={{ fontSize: 18, marginBottom: 8 }}>Auth session not established</h2>
+        <div style={{ opacity: 0.8 }}>
+          {sessionState.error ?? "Unknown error creating Supabase session"}
+        </div>
+        <div style={{ marginTop: 12, opacity: 0.8 }}>
+          Fix: ensure Anonymous Sign-ins is enabled in Supabase and refresh.
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -57,6 +57,7 @@ BEGIN
     host_user_id,
     status,
     settings,
+    snapshot,
     draft_config,
     draft_type,
     team_count
@@ -65,6 +66,7 @@ BEGIN
     v_user_id,
     'lobby',
     p_settings,
+    '{"phase":"lobby"}'::jsonb,
     p_settings,
     p_draft_type,
     p_team_count

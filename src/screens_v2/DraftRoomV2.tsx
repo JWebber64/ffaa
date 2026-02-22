@@ -103,6 +103,12 @@ function TeamRow({ t, highlight }: { t: Team; highlight?: boolean }) {
 export default function DraftRoomV2() {
   const { draftId } = useParams();
   const { snapshot: snap } = useDraftSnapshot(draftId);
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('DraftRoomV2 - snap:', snap);
+    console.log('DraftRoomV2 - draftId:', draftId);
+  }, [snap, draftId]);
   const [isHost, setIsHost] = useState(false);
   const [pendingBid, setPendingBid] = useState<number | null>(null);
   const [draftConfig, setDraftConfig] = useState<DraftConfigV2 | null>(null);
@@ -111,6 +117,10 @@ export default function DraftRoomV2() {
   const toast = useToast();
   const [pulse, setPulse] = useState(false);
   const [connected, setConnected] = useState(true);
+  const [sideTab, setSideTab] = useState<"teams" | "log">("teams");
+  const [search, setSearch] = useState("");
+  const [forceOpen, setForceOpen] = useState(false);
+  const [forceSearch, setForceSearch] = useState("");
   let engine: any = null;
 
   // Safe phase computation
@@ -119,49 +129,20 @@ export default function DraftRoomV2() {
   // Fetch draft row for room code
   useEffect(() => {
     if (draftId) {
-      supabase
-        .from("drafts")
-        .select("code, status")
-        .eq("id", draftId)
-        .single()
-        .then(({ data, error }) => {
+      (async () => {
+        try {
+          const { data, error } = await supabase
+            .from("drafts")
+            .select("code, status")
+            .eq("id", draftId)
+            .single();
           if (!error && data) setDraft(data);
-        })
-        .catch(console.error);
+        } catch (err) {
+          console.error(err);
+        }
+      })();
     }
   }, [draftId]);
-
-  // Show lobby shell if no data yet
-  if (!snap) {
-    return (
-      <div className="p-6">
-        <div className="glass-card p-5">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <div className="text-sm text-white/70">Draft</div>
-              <div className="text-2xl font-semibold">Lobby</div>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-white/70">Room Code</div>
-              <div className="text-xl font-mono tracking-widest">
-                {draft?.code ?? "—"}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 text-white/70">
-            Waiting for managers to join…
-          </div>
-
-          <div className="mt-4 flex gap-2">
-            <button className="btn btn-primary" disabled>
-              Start Draft
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // Load draft config
   useEffect(() => {
@@ -186,7 +167,7 @@ export default function DraftRoomV2() {
   // Toast notifications
   useEffect(() => {
     if (!snap?.log?.length) return;
-    const last = snap.log[snap.log.length - 1];
+    const last = snap?.log?.[snap?.log?.length - 1];
     if (!last) return;
 
     if (last.type === "bid") {
@@ -202,7 +183,7 @@ export default function DraftRoomV2() {
   useEffect(() => {
     if (!snap) return;
     const now = Date.now();
-    const lastUpdate = snap.engine?.last_action_created_at ? new Date(snap.engine.last_action_created_at).getTime() : now;
+    const lastUpdate = snap?.engine?.last_action_created_at ? new Date(snap?.engine?.last_action_created_at).getTime() : now;
     const timeSinceUpdate = now - lastUpdate;
     
     if (timeSinceUpdate > 8000) {
@@ -242,13 +223,10 @@ export default function DraftRoomV2() {
   // Clear pending bid when snapshot reflects the bid
   useEffect(() => {
     if (!snap || pendingBid == null) return;
-    if (snap.auction?.highBidderTeamId === myTeamId && snap.auction?.currentBid === pendingBid) {
+    if (snap?.auction?.highBidderTeamId === myTeamId && snap?.auction?.currentBid === pendingBid) {
       setPendingBid(null);
     }
   }, [snap, pendingBid, myTeamId]);
-
-  // Mobile tabs: switch between "Teams" and "Log"
-  const [sideTab, setSideTab] = useState<"teams" | "log">("teams");
 
   const currentNominator = useMemo(
     () => snap?.teams?.find((t: any) => t.teamId === snap?.order?.currentNominatorTeamId) ?? null,
@@ -264,9 +242,6 @@ export default function DraftRoomV2() {
   const canBid = safePhase === "bidding" && snap?.auction?.player != null && snap?.auction?.call !== "sold";
   const bidDisabledReason = !canBid ? "Bidding is not active." : safePhase === "paused" ? "Draft is paused." : "";
 
-  const [search, setSearch] = useState("");
-  const [forceOpen, setForceOpen] = useState(false);
-  const [forceSearch, setForceSearch] = useState("");
   const mockPlayerResults = useMemo(() => {
     if (!search.trim()) return [];
     const pool = [
@@ -277,6 +252,45 @@ export default function DraftRoomV2() {
     ];
     return pool.filter((p) => p.name.toLowerCase().includes(search.toLowerCase())).slice(0, 4);
   }, [search]);
+
+  // Heartbeat detection
+  const hb = snap?.engine?.heartbeat_at ? new Date(snap?.engine?.heartbeat_at).getTime() : null;
+  const hbAgeMs = hb ? Date.now() - hb : null;
+  const hostSeemsOffline = hbAgeMs != null && hbAgeMs > 10000;
+  const draftType = draftConfig?.draftType || snap?.settings?.draftType || snap?.draft_type || 'auction';
+
+  // Show lobby shell if no draftId
+  if (!draftId) {
+    return (
+      <div className="p-6">
+        <div className="glass-card p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="text-sm text-white/70">Draft</div>
+              <div className="text-2xl font-semibold">Lobby</div>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-white/70">Room Code</div>
+              <div className="text-xl font-mono tracking-widest">
+                {draft?.code ?? "—"}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 text-white/70">
+            Waiting for managers to join…
+          </div>
+
+          <div className="mt-4 flex gap-2">
+            <button className="btn btn-primary" disabled>
+              Start Draft
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
 
   function placeBid(amount: number) {
     if (!canBid || !draftId) return;
@@ -312,12 +326,6 @@ export default function DraftRoomV2() {
     setForceOpen(false);
     setForceSearch("");
   }
-
-  // Heartbeat detection
-  const hb = snap?.engine?.heartbeat_at ? new Date(snap.engine.heartbeat_at).getTime() : null;
-  const hbAgeMs = hb ? Date.now() - hb : null;
-  const hostSeemsOffline = hbAgeMs != null && hbAgeMs > 10000;
-  const draftType = draftConfig?.draftType || snap?.settings?.draftType || snap?.draft_type || 'auction';
 
   // Snake Draft Stub UI
   if (draftType === 'snake') {
@@ -379,7 +387,7 @@ export default function DraftRoomV2() {
 
         <div className="flex items-center gap-2">
           <Badge tone={isHost ? "host" : "neutral"}>You: {isHost ? "HOST" : `MANAGER (Team ${me?.team_number ?? "?"})`}</Badge>
-          <CallLabel call={snap.auction.call} />
+          <CallLabel call={snap?.auction?.call ?? "none"} />
         </div>
       </div>
 
@@ -416,8 +424,8 @@ export default function DraftRoomV2() {
                   <div className="text-xs text-fg2">Timer</div>
                   <div className="mt-2 flex items-center justify-center">
                     <CountdownRing 
-                      secondsLeft={snap.auction.secondsLeft} 
-                      total={safePhase === "bidding" ? (snap.settings?.bidSeconds ?? 20) : (snap.settings?.nominationSeconds ?? 30)} 
+                      secondsLeft={snap?.auction?.secondsLeft ?? 0} 
+                      total={safePhase === "bidding" ? (snap?.settings?.bidSeconds ?? 20) : (snap?.settings?.nominationSeconds ?? 30)} 
                     />
                   </div>
                   <div className="mt-2 text-xs text-fg2 text-center">
@@ -427,21 +435,21 @@ export default function DraftRoomV2() {
 
                 <div className="rounded-lg border border-stroke bg-[rgba(255,255,255,0.04)] p-3 sm:col-span-2">
                   <div className="text-xs text-fg2">Current player</div>
-                  {snap.auction.player ? (
+                  {snap?.auction?.player ? (
                     <>
                       <div className="mt-1 flex flex-wrap items-center gap-2">
                         <div className="text-[18px] font-semibold text-fg0">
-                          {snap.auction.player.name}
+                          {snap?.auction?.player.name}
                         </div>
-                        <Badge tone="neutral">{snap.auction.player.pos ?? "—"}</Badge>
-                        <Badge tone="neutral">{snap.auction.player.team ?? "—"}</Badge>
+                        <Badge tone="neutral">{snap?.auction?.player.pos ?? "—"}</Badge>
+                        <Badge tone="neutral">{snap?.auction?.player.team ?? "—"}</Badge>
                       </div>
                       <div className="mt-2 text-sm text-fg2">
                         High bid{" "}
                         <span className={cn(
                           "font-semibold transition",
                           pulse && "scale-105 text-[rgba(124,58,237,1)]"
-                        )}>{money(snap.auction.currentBid)}</span>
+                        )}>{money(snap?.auction?.currentBid ?? 0)}</span>
                         {highBidder ? (
                           <>
                             {" "}
@@ -450,7 +458,7 @@ export default function DraftRoomV2() {
                         ) : (
                           <span className="text-fg2"> • no leader yet</span>
                         )}
-                        {pendingBid && snap.auction.highBidderTeamId === myTeamId && snap.auction.currentBid === pendingBid && (
+                        {pendingBid && snap?.auction?.highBidderTeamId === myTeamId && snap?.auction?.currentBid === pendingBid && (
                           <span className="ml-2 text-xs text-amber-400">Pending…</span>
                         )}
                       </div>
@@ -476,14 +484,14 @@ export default function DraftRoomV2() {
                   <Button
                     className="sm:col-span-3 h-12 text-base"
                     disabled={!canBid}
-                    onClick={() => placeBid((snap?.auction?.currentBid || 0) + (snap.settings.bidIncrements[0] ?? 1))}
+                    onClick={() => placeBid((snap?.auction?.currentBid || 0) + (snap?.settings?.bidIncrements?.[0] ?? 1))}
                     title={!canBid ? "Bidding disabled" : "Place a bid"}
                   >
-                    Bid +{money(snap.settings.bidIncrements[0] ?? 1)}
+                    Bid +{money(snap?.settings?.bidIncrements?.[0] ?? 1)}
                   </Button>
 
                   <div className="sm:col-span-2 grid grid-cols-3 gap-2">
-                    {(snap.settings.bidIncrements.slice(1, 4) || [2, 5, 10]).map((inc: number) => (
+                    {(snap?.settings?.bidIncrements?.slice(1, 4) || [2, 5, 10]).map((inc: number) => (
                       <Button
                         key={inc}
                         variant="secondary"
@@ -626,8 +634,8 @@ export default function DraftRoomV2() {
               value={sideTab}
               onChange={(v) => setSideTab(v as any)}
               tabs={[
-                { value: "teams", label: "Teams", badge: String(snap.teams.length) },
-                { value: "log", label: "Log", badge: String(snap.log.length) },
+                { value: "teams", label: "Teams", badge: String(snap?.teams?.length ?? 0) },
+                { value: "log", label: "Log", badge: String(snap?.log?.length ?? 0) },
               ]}
             />
           </div>
@@ -638,8 +646,8 @@ export default function DraftRoomV2() {
                 <SectionTitle title="Teams" subtitle="Budgets and quick status." />
               </CardHeader>
               <CardBody className="space-y-2">
-                {snap.teams.slice(0, 8).map((t: Team) => (
-                  <TeamRow key={t.teamId} t={t} highlight={t.teamId === myTeamId || t.teamId === snap.order.currentNominatorTeamId} />
+                {(snap?.teams?.slice(0, 8) || []).map((t: Team) => (
+                  <TeamRow key={t.teamId} t={t} highlight={t.teamId === myTeamId || t.teamId === snap?.order?.currentNominatorTeamId} />
                 ))}
                 <div className="text-xs text-fg2">
                   (show all + roster drawer in Step 6/8)
@@ -654,8 +662,8 @@ export default function DraftRoomV2() {
                 <SectionTitle title="Teams" subtitle="Budgets and quick status." />
               </CardHeader>
               <CardBody className="space-y-2">
-                {snap.teams.slice(0, 6).map((t: Team) => (
-                  <TeamRow key={t.teamId} t={t} highlight={t.teamId === myTeamId || t.teamId === snap.order.currentNominatorTeamId} />
+                {(snap?.teams?.slice(0, 6) || []).map((t: Team) => (
+                  <TeamRow key={t.teamId} t={t} highlight={t.teamId === myTeamId || t.teamId === snap?.order?.currentNominatorTeamId} />
                 ))}
                 <div className="text-xs text-fg2">
                   (show all + roster drawer in Step 6/8)
@@ -667,12 +675,12 @@ export default function DraftRoomV2() {
           {(sideTab === "log" || (typeof window !== "undefined" && window.innerWidth >= 1024)) && (
             <Card className={cn("lg:block", sideTab !== "log" ? "hidden lg:block" : "")}>
               <CardHeader className="pb-0">
-                <SectionTitle title="Draft Log" subtitle="History feed (mock)." right={<Badge tone="neutral">{snap.log.length}</Badge>} />
+                <SectionTitle title="Draft Log" subtitle="History feed (mock)." right={<Badge tone="neutral">{snap?.log?.length ?? 0}</Badge>} />
               </CardHeader>
               <CardBody className="space-y-2">
                 <div className="rounded-xl border border-stroke bg-[rgba(255,255,255,0.03)] overflow-hidden">
                   <div className="divide-y divide-[rgba(255,255,255,0.08)]">
-                    {snap.log.slice().reverse().map((e: any) => (
+                    {(snap?.log?.slice().reverse() || []).map((e: any) => (
                       <DraftLogEntry key={e.id} entry={e} />
                     ))}
                   </div>

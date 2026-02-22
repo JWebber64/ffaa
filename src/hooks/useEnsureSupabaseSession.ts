@@ -32,9 +32,11 @@ export function useEnsureSupabaseSession(): EnsureSessionState {
 
         const id = data.user?.id ?? null;
         if (!mounted) return;
+        console.log("[ensureSession] ready", { hasSession: !!(await supabase.auth.getSession()).data.session, userId: id, error: null });
         setState({ isReady: true, userId: id, error: null });
       } catch (e) {
         const msg = e instanceof Error ? e.message : "Failed to establish session";
+        console.error("[ensureSession] failed", msg);
         if (!mounted) return;
         setState({ isReady: true, userId: null, error: msg });
       }

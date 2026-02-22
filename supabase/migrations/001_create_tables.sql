@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS public.draft_participants (
   is_host BOOLEAN NOT NULL DEFAULT FALSE,
   is_ready BOOLEAN NOT NULL DEFAULT FALSE,
   team_number INTEGER,
+  joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
@@ -32,6 +33,7 @@ CREATE TABLE IF NOT EXISTS public.draft_participants (
 -- Create indexes for participant lookups
 CREATE INDEX IF NOT EXISTS idx_draft_participants_draft_id ON public.draft_participants(draft_id);
 CREATE INDEX IF NOT EXISTS idx_draft_participants_user_id ON public.draft_participants(user_id);
+CREATE INDEX IF NOT EXISTS idx_draft_participants_joined_at ON public.draft_participants(joined_at);
 
 -- Draft actions table - stores all actions that managers send
 CREATE TABLE IF NOT EXISTS public.draft_actions (
