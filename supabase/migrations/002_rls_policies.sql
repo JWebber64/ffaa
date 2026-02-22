@@ -59,10 +59,11 @@ to authenticated
 using (
   exists (
     select 1
-    from public.draft_participants me
-    where me.draft_id = draft_participants.draft_id
-      and me.user_id = auth.uid()
+    from public.drafts d
+    where d.id = draft_participants.draft_id
+      and d.host_user_id = auth.uid()
   )
+  or auth.uid() = draft_participants.user_id
 );
 
 create policy "Users can join drafts"

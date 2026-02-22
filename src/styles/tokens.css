@@ -1,8 +1,14 @@
 :root {
   /* --- Dark base --- */
+  /* Requested page background: #070D09 with subtle emerald glow */
   --bg-0: #070D09;        /* page */
-  --bg-1: #0B1020;        /* deep surface */
-  --bg-2: #0F1630;        /* raised surface */
+  /* Surfaces tuned to the same green-black family (removes blue/purple cast) */
+  --bg-1: #08120B;        /* deep surface */
+  --bg-2: #0B1910;        /* raised surface */
+
+  /* Borders */
+  --line-0: rgba(255,255,255,0.08);
+  --line-1: rgba(255,255,255,0.10);   /* hairline border */
 
   --text-0: rgba(255,255,255,0.92);
   --text-1: rgba(255,255,255,0.68);
@@ -38,8 +44,6 @@
   --glass-1: rgba(255,255,255,0.06);  /* card */
   --glass-2: rgba(255,255,255,0.08);  /* panel */
   --glass-3: rgba(255,255,255,0.10);  /* pill */
-
-  --line-1: rgba(255,255,255,0.10);   /* hairline border */
 
   /* Specular highlights (top sheen) */
   --spec-1: rgba(255,255,255,0.18);

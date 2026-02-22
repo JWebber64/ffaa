@@ -7,7 +7,6 @@
 /* Base canvas */
 html, body, #root {
   height: 100%;
-  background: var(--bg-0);
   color: var(--text-0);
 }
 
@@ -19,11 +18,29 @@ body {
 /* Material-glass ambient background (dark-base) */
 .ffaa-bg {
   position: relative;
-  background: radial-gradient(1200px 800px at 20% 10%, rgba(124,58,237,0.22), transparent 60%),
-              radial-gradient(900px 700px at 85% 20%, rgba(20,184,166,0.18), transparent 55%),
-              radial-gradient(1200px 900px at 55% 85%, rgba(124,58,237,0.14), transparent 60%),
-              linear-gradient(180deg, rgba(255,255,255,0.02), transparent 25%),
-              var(--bg-0);
+  min-height: 100vh;
+  width: 100%;
+
+  /**
+   * You asked for:
+   * - base: #070D09
+   * - emerald glow: rgba(16,185,129,0.08)
+   * - visible green gradient (not "flat")
+   *
+   * So: use real green-black midtones + slightly stronger glows.
+   */
+  background:
+    /* emerald hotspots (more visible) */
+    radial-gradient(1200px 900px at 18% 18%, rgba(16,185,129,0.14), transparent 60%),
+    radial-gradient(1000px 750px at 82% 22%, rgba(16,185,129,0.10), transparent 58%),
+    radial-gradient(1300px 950px at 55% 92%, rgba(16,185,129,0.09), transparent 62%),
+
+    /* the actual "green gradient" layer */
+    linear-gradient(135deg, #070D09 0%, #0B1910 45%, #070D09 100%),
+
+    /* subtle top sheen */
+    linear-gradient(180deg, rgba(255,255,255,0.03), transparent 28%);
+  background-attachment: fixed;
 }
 
 /* Optional subtle grain (keep opacity LOW) */
@@ -79,7 +96,7 @@ body {
   border-radius: 999px;
   backdrop-filter: blur(var(--blur-lg));
   -webkit-backdrop-filter: blur(var(--blur-lg));
-  box-shadow: none; /* pills should be lighter */
+  box-shadow: none;
 }
 
 /* Focus ring for inputs/buttons */
@@ -124,7 +141,6 @@ body {
   pointer-events: none;
 }
 
-/* Tiny highlight for hover */
 .ffaa-hover-bright:hover {
   filter: brightness(1.06);
 }

@@ -26,44 +26,32 @@ a:hover {
   color: #535bf2;
 }
 
+/**
+ * IMPORTANT:
+ * Do NOT set page background here.
+ * The app background is owned by `.ffaa-bg` in `src/styles/globals.css`.
+ *
+ * Also remove the Vite starter "center the app" flex behavior.
+ */
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background: var(--bg-0);
-  background-image: 
-    radial-gradient(circle at 50% 30%, rgba(20,184,166,0.12) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(16,185,129,0.08) 0%, transparent 35%),
-    radial-gradient(circle at 20% 80%, rgba(7,13,9,0.06) 0%, transparent 30%);
+
+  /* Let `.ffaa-bg` be the actual background */
+  background: transparent;
   color: var(--text-0);
+
+  /* Remove Vite centering */
+  display: block;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Ensure root can stretch full height so `.ffaa-bg` fills properly */
+#root {
+  min-height: 100vh;
 }
 
-/* Global button styles removed to prevent conflicts with Chakra UI */
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: var(--bg-0);
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: var(--bg-2);
-  }
-}
-
+/* Keep your existing motion/utility classes (unchanged) */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
@@ -99,19 +87,19 @@ button:focus-visible {
 }
 
 @keyframes stageShift {
-  0%, 100% { 
+  0%, 100% {
     background-position: 0% 50%;
     opacity: 0.3;
   }
-  50% { 
+  50% {
     background-position: 100% 50%;
     opacity: 0.5;
   }
 }
 
-/* Focus states for accessibility */
+/* Focus states for accessibility (fix undefined var) */
 .focus-ring:focus {
-  outline: 2px solid var(--neon-blue);
+  outline: 2px solid var(--a3);
   outline-offset: 2px;
 }
 
@@ -149,7 +137,7 @@ button:focus-visible {
 }
 
 .card-hover:hover {
-  border-color: var(--neon-blue);
+  border-color: var(--a3);
   transform: translateY(-1px);
 }
 
