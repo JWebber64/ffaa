@@ -79,7 +79,7 @@ const SelectContent = React.forwardRef<
       ref={ref}
       className={cn(
         "glass-card p-1 border border-[rgba(255,255,255,0.10)] shadow-[0_20px_70px_rgba(0,0,0,0.65)]",
-        "relative z-50 min-w-[8rem] overflow-hidden rounded-xl",
+        "relative z-50 min-w-[8rem] overflow-hidden rounded-[20px]",
         "text-[var(--text-0)]",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
@@ -130,7 +130,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-lg px-3 py-2",
+      "relative flex w-full cursor-default select-none items-center rounded-[16px] px-3 py-2",
       "text-sm outline-none transition-colors",
       "hover:bg-[rgba(255,255,255,0.08)]",
       "focus:bg-[rgba(255,255,255,0.12)] focus:text-[var(--text-0)]",

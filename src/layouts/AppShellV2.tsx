@@ -84,7 +84,7 @@ export default function AppShellV2() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-7xl px-4 py-6">
+      <main className="mx-auto w-full px-4 py-2">
         <Outlet />
       </main>
 
