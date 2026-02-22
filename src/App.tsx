@@ -64,7 +64,7 @@ function LegacyFrame({ children }: { children: React.ReactNode }) {
 
 function App() {
   // Ensure anonymous auth session
-  useEnsureSupabaseSession();
+  const sessionState = useEnsureSupabaseSession();
   
   // Load Sleeper → store.players once for the whole app
   useGlobalPlayers();
@@ -72,6 +72,11 @@ function App() {
 
   // keep existing subscriber (it should not break v2; we'll tune later)
   useAuctionSubscriber();
+  
+  // Don't render anything until session is ready
+  if (!sessionState.isReady) {
+    return null; // or return <div>Loading...</div> for better UX
+  }
 
   return (
     <ConfigProvider>

@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { createDraftRoom, getDraftConfig } from "../multiplayer/api";
 import { useLobbyRoom } from "../hooks/useLobbyRoom";
 import { appendDraftAction } from "../multiplayer/api";
@@ -6,6 +7,7 @@ import { DraftConfigV2 } from "../types/draftConfig";
 import { GlassPanel, GlassCard, GlassPill } from "../components/premium";
 
 export default function HostLobbyV2() {
+  const navigate = useNavigate();
   const [displayName, setDisplayName] = useState("");
   const [creating, setCreating] = useState(false);
 
@@ -46,6 +48,8 @@ export default function HostLobbyV2() {
       setRoomCode(draft.code);
       // Clear sessionStorage after using the config
       sessionStorage.removeItem('draftConfigV2');
+      // Navigate to draft page immediately
+      navigate(`/draft/${draft.id}`);
     } catch (error) {
       console.error('Failed to create draft room:', error);
       console.error('Error details:', JSON.stringify(error, null, 2));

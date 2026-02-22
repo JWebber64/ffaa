@@ -1,142 +1,69 @@
 import { supabase } from "@/lib/supabase";
-import { v4 as uuidv4 } from "uuid";
 import { DraftConfigV2 } from "@/types/draftConfig";
 
-function makeRoomCode(len = 6) {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let out = "";
-  for (let i = 0; i < len; i++) out += alphabet[Math.floor(Math.random() * alphabet.length)];
-  return out;
-}
+async function requireUserId(): Promise<string> {
+  const { data: s1, error: e1 } = await supabase.auth.getSession();
+  if (e1) throw e1;
 
-export async function requireUserId(): Promise<string> {
-  const { data, error } = await supabase.auth.getUser();
-  if (error) throw error;
-  const id = data.user?.id;
-  if (!id) throw new Error("Not signed in");
-  return id;
+  if (!s1.session) {
+    const { data: s2, error: e2 } = await supabase.auth.signInAnonymously();
+    if (e2) throw e2;
+    const uid = s2.session?.user?.id;
+    if (!uid) throw new Error("Anonymous session missing user id");
+    return uid;
+  }
+
+  const uid = s1.session.user.id;
+  if (!uid) throw new Error("Session missing user id");
+  return uid;
 }
 
 export async function createDraftRoom(displayName: string, draftConfig: DraftConfigV2) {
-  const userId = await requireUserId();
+  await requireUserId();
 
-  // Safety assertion: ensure teamBudgets length matches teamCount
-  if (draftConfig.draftType === 'auction' && draftConfig.auctionSettings) {
+  // normalize budgets (keep your existing normalization)
+  if (draftConfig.draftType === "auction" && draftConfig.auctionSettings) {
     if (draftConfig.auctionSettings.teamBudgets.length !== draftConfig.teamCount) {
-      // Normalize by creating default budgets
       draftConfig = {
         ...draftConfig,
         auctionSettings: {
           ...draftConfig.auctionSettings,
-          teamBudgets: Array(draftConfig.teamCount).fill(draftConfig.auctionSettings.defaultBudget)
-        }
+          teamBudgets: Array(draftConfig.teamCount).fill(draftConfig.auctionSettings.defaultBudget),
+        },
       };
     }
   }
 
-  // Retry room code collisions a few times
-  for (let i = 0; i < 5; i++) {
-    const code = makeRoomCode(6);
+  const settings = {
+    ...draftConfig,
+    version: 1,
+    locked: true,
+    lockedAt: new Date().toISOString(),
+  };
 
-    const { data: draft, error: draftErr } = await supabase
-      .from("drafts")
-      .insert({
-        code,
-        host_user_id: userId,
-        status: "lobby",
-        settings: {
-          ...draftConfig,
-          version: 1,
-          locked: true,
-          lockedAt: new Date().toISOString()
-        },
-        snapshot: {}, // host will write real snapshot once initialized
-        draft_type: draftConfig.draftType,
-        team_count: draftConfig.teamCount,
-      })
-      .select("*")
-      .single();
+  const { data: draft, error } = await supabase.rpc("create_draft_room_v2", {
+    p_display_name: displayName,
+    p_settings: settings,
+    p_draft_type: draftConfig.draftType,
+    p_team_count: draftConfig.teamCount,
+  });
 
-    if (draftErr) {
-      // unique violation -> retry
-      if ((draftErr as any).code === "23505") continue;
-      throw draftErr;
-    }
+  if (error) throw error;
+  if (!draft) throw new Error("Draft not returned from RPC");
 
-    // Insert host participant
-    const { error: partErr } = await supabase.from("draft_participants").insert({
-      draft_id: draft.id,
-      user_id: userId,
-      display_name: displayName,
-      is_host: true,
-      is_ready: true,
-      team_number: 1,
-    });
-    if (partErr) throw partErr;
-
-    return draft; // { id, code, ... }
-  }
-
-  throw new Error("Failed to create room (code collisions)");
+  return draft;
 }
 
 export async function joinDraftRoom(code: string, displayName: string) {
-  const userId = await requireUserId();
+  await requireUserId();
 
-  const { data: draft, error: draftErr } = await supabase
-    .from("drafts")
-    .select("*")
-    .eq("code", code)
-    .single();
+  const { data: draft, error } = await supabase.rpc("join_draft_by_code_v2", {
+    p_code: code,
+    p_display_name: displayName,
+  });
 
-  if (draftErr) throw draftErr;
-
-  // Get current participants count
-  const { data: participants, error: partErr } = await supabase
-    .from("draft_participants")
-    .select("user_id")
-    .eq("draft_id", draft.id);
-
-  if (partErr) throw partErr;
-
-  const currentCount = participants?.length || 0;
-  const teamCount = draft.settings?.teamCount || draft.team_count || 12;
-
-  // Check if room is full
-  if (currentCount >= teamCount) {
-    throw new Error(`Room is full (${teamCount}/${teamCount} managers joined)`);
-  }
-
-  // Get current team numbers
-  const { data: teamNumbers } = await supabase
-    .from("draft_participants")
-    .select("team_number")
-    .eq("draft_id", draft.id);
-
-  const taken = new Set(
-    (teamNumbers ?? [])
-      .map((p) => p.team_number)
-      .filter(Boolean)
-  );
-
-  let teamNumber = 1;
-  while (taken.has(teamNumber)) {
-    teamNumber++;
-  }
-
-  const { error: insertError } = await supabase
-    .from("draft_participants")
-    .insert({
-      draft_id: draft.id,
-      user_id: userId,
-      display_name: displayName,
-      is_host: false,
-      is_ready: false,
-      team_number: teamNumber,
-    });
-
-  // If already joined, ignore unique violation
-  if (insertError && (insertError as any).code !== "23505") throw insertError;
+  if (error) throw error;
+  if (!draft) throw new Error("Draft not returned from RPC");
 
   return draft;
 }
@@ -183,9 +110,23 @@ export async function listParticipants(draftId: string) {
     .from("draft_participants")
     .select("*")
     .eq("draft_id", draftId)
-    .order("created_at", { ascending: true });
+    .order("joined_at", { ascending: true });
 
   if (error) throw error;
+  return data ?? [];
+}
+
+export async function listParticipantsSafe(draftId: string) {
+  const { data, error } = await supabase
+    .from("draft_participants")
+    .select("*")
+    .eq("draft_id", draftId)
+    .order("joined_at", { ascending: true });
+
+  if (error) {
+    console.error("listParticipants failed", error);
+    return [];
+  }
   return data ?? [];
 }
 
@@ -249,7 +190,7 @@ export async function appendDraftAction(
 
   const { error } = await supabase.from("draft_actions").insert({
     draft_id: draftId,
-    action_id: uuidv4(),
+    action_id: crypto.randomUUID(),
     user_id: userId,
     type,
     payload,

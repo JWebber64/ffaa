@@ -106,11 +106,62 @@ export default function DraftRoomV2() {
   const [isHost, setIsHost] = useState(false);
   const [pendingBid, setPendingBid] = useState<number | null>(null);
   const [draftConfig, setDraftConfig] = useState<DraftConfigV2 | null>(null);
+  const [draft, setDraft] = useState<any>(null);
   const me = useMyParticipant(draftId);
   const toast = useToast();
   const [pulse, setPulse] = useState(false);
   const [connected, setConnected] = useState(true);
   let engine: any = null;
+
+  // Safe phase computation
+  const safePhase = snap?.phase ?? "lobby";
+
+  // Fetch draft row for room code
+  useEffect(() => {
+    if (draftId) {
+      supabase
+        .from("drafts")
+        .select("code, status")
+        .eq("id", draftId)
+        .single()
+        .then(({ data, error }) => {
+          if (!error && data) setDraft(data);
+        })
+        .catch(console.error);
+    }
+  }, [draftId]);
+
+  // Show lobby shell if no data yet
+  if (!snap) {
+    return (
+      <div className="p-6">
+        <div className="glass-card p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="text-sm text-white/70">Draft</div>
+              <div className="text-2xl font-semibold">Lobby</div>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-white/70">Room Code</div>
+              <div className="text-xl font-mono tracking-widest">
+                {draft?.code ?? "—"}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 text-white/70">
+            Waiting for managers to join…
+          </div>
+
+          <div className="mt-4 flex gap-2">
+            <button className="btn btn-primary" disabled>
+              Start Draft
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Load draft config
   useEffect(() => {
@@ -210,8 +261,8 @@ export default function DraftRoomV2() {
   );
 
   const isMyTurnToNominate = myTeamId === snap?.order?.currentNominatorTeamId;
-  const canBid = snap?.phase === "bidding" && snap?.auction?.player != null && snap?.auction?.call !== "sold";
-  const bidDisabledReason = !canBid ? "Bidding is not active." : snap?.phase === "paused" ? "Draft is paused." : "";
+  const canBid = safePhase === "bidding" && snap?.auction?.player != null && snap?.auction?.call !== "sold";
+  const bidDisabledReason = !canBid ? "Bidding is not active." : safePhase === "paused" ? "Draft is paused." : "";
 
   const [search, setSearch] = useState("");
   const [forceOpen, setForceOpen] = useState(false);
@@ -322,7 +373,7 @@ export default function DraftRoomV2() {
           <div className="text-[22px] font-semibold text-fg0 leading-7">Draft Room</div>
           <div className="mt-1 text-sm text-fg2">
             Draft <span className="text-fg1">{draftId}</span> • Phase{" "}
-            <span className="text-fg1">{snap.phase}</span>
+            <span className="text-fg1">{safePhase}</span>
           </div>
         </div>
 
@@ -366,11 +417,11 @@ export default function DraftRoomV2() {
                   <div className="mt-2 flex items-center justify-center">
                     <CountdownRing 
                       secondsLeft={snap.auction.secondsLeft} 
-                      total={snap.phase === "bidding" ? (snap.settings?.bidSeconds ?? 20) : (snap.settings?.nominationSeconds ?? 30)} 
+                      total={safePhase === "bidding" ? (snap.settings?.bidSeconds ?? 20) : (snap.settings?.nominationSeconds ?? 30)} 
                     />
                   </div>
                   <div className="mt-2 text-xs text-fg2 text-center">
-                    {snap.phase === "bidding" ? "Bid clock" : "Nomination"}
+                    {safePhase === "bidding" ? "Bid clock" : "Nomination"}
                   </div>
                 </div>
 
