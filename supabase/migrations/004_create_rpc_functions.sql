@@ -40,11 +40,15 @@ BEGIN
       SELECT string_agg(substr(chars, (random() * length(chars) + 1)::integer, 1), '')
       FROM (
         SELECT 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' AS chars
+        UNION ALL SELECT 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+        UNION ALL SELECT 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+        UNION ALL SELECT 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+        UNION ALL SELECT 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+        UNION ALL SELECT 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
       ) t
-      WHERE generate_series(1, 6) IS NOT NULL
     );
     
-    EXIT WHEN NOT EXISTS (SELECT 1 FROM drafts WHERE code = v_room_code);
+    EXIT WHEN NOT EXISTS (SELECT 1 FROM drafts d WHERE d.code = v_room_code);
     v_attempts := v_attempts + 1;
     IF v_attempts > 10 THEN
       RAISE EXCEPTION 'Failed to generate unique room code after 10 attempts';
@@ -125,8 +129,8 @@ DECLARE
 BEGIN
   -- Get draft and lock it
   SELECT id INTO v_draft_id
-  FROM drafts
-  WHERE code = p_code AND status = 'lobby'
+  FROM drafts d
+  WHERE d.code = p_code AND d.status = 'lobby'
   FOR UPDATE;
   
   IF NOT FOUND THEN

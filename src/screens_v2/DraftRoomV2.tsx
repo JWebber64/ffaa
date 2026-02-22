@@ -21,8 +21,8 @@ import { STYLE_PACKS } from "../auctioneer/stylePacks";
 import { useAuctionAudio } from "../audio/useAuctionAudio";
 import { useToast } from "../ui/ToastProvider";
 import { DraftLogEntry } from "../components/DraftLogEntry";
-import { CountdownRing } from "../components/CountdownRing";
 import { DraftConfigV2 } from "../types/draftConfig";
+import TeamBoard from "../components/draft/TeamBoard";
 
 // Temporary types for Step 6
 type DraftSnapshot = {
@@ -40,9 +40,15 @@ type DraftSnapshot = {
   settings: {
     bidSeconds: number;
     bidIncrements: number[];
+    nominationSeconds?: number;
+    teamCount?: number;
+    draftType?: string;
   };
   teams: Team[];
   log: any[];
+  auctioneer?: {
+    style_pack?: string;
+  };
   engine?: {
     host_user_id: string;
     heartbeat_at: string;
@@ -51,6 +57,8 @@ type DraftSnapshot = {
     undo_stack: any[];
     paused_from: string | null;
   };
+  draft_type?: string;
+  team_count?: number;
 };
 
 type Team = {
@@ -65,6 +73,17 @@ function money(n: number) {
   return `$${n}`;
 }
 
+function pad2(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+function formatClock(s: number) {
+  const sec = Math.max(0, Math.floor(s || 0));
+  const mm = Math.floor(sec / 60);
+  const ss = sec % 60;
+  return `${pad2(mm)}:${pad2(ss)}`;
+}
+
 function callTone(call: DraftSnapshot["auction"]["call"]) {
   if (call === "once") return "warning";
   if (call === "twice") return "danger";
@@ -74,28 +93,127 @@ function callTone(call: DraftSnapshot["auction"]["call"]) {
 
 function CallLabel({ call }: { call: DraftSnapshot["auction"]["call"] }) {
   const label =
-    call === "none" ? "Live" : call === "once" ? "Going once" : call === "twice" ? "Going twice" : "Sold";
+    call === "none" ? "LIVE" : call === "once" ? "ONCE" : call === "twice" ? "TWICE" : "SOLD";
   return <Badge tone={callTone(call)}>{label}</Badge>;
 }
 
-function TeamRow({ t, highlight }: { t: Team; highlight?: boolean }) {
-  const remaining = t.budget - t.spent;
+function sumRosterSlots(cfg: DraftConfigV2 | null) {
+  // DraftConfigV2 differs across zips; keep safe and permissive.
+  // @ts-ignore
+  const slots = cfg?.rosterSlots ?? cfg?.roster_slots ?? [];
+  if (!Array.isArray(slots) || !slots.length) return 0;
+  return slots.reduce((acc: number, s: any) => acc + (s?.count ?? 0), 0);
+}
+
+function slotsLabel(cfg: DraftConfigV2 | null) {
+  // @ts-ignore
+  const slots = cfg?.rosterSlots ?? cfg?.roster_slots ?? [];
+  if (!Array.isArray(slots) || !slots.length) return "QB1 RB2 WR2 TE1 FLEX1 K1 DST1 BENCH";
+
+  const order = ["QB", "RB", "WR", "TE", "FLEX", "K", "DST", "DL", "LB", "DB", "IDP_FLEX", "BENCH", "IR"];
+  const map = new Map<string, number>();
+  for (const s of slots as any[]) {
+    if (!s?.slot) continue;
+    map.set(String(s.slot), Number(s.count ?? 0));
+  }
+  return order
+    .filter((k) => map.has(k))
+    .map((k) => `${k}${map.get(k)}`)
+    .join(" ");
+}
+
+function calcMaxBid(params: {
+  remaining: number;
+  rosterSize: number;
+  filled: number;
+  minIncrement: number;
+}) {
+  const { remaining, rosterSize, filled, minIncrement } = params;
+  const spotsLeft = Math.max(0, rosterSize - filled);
+  const reserve = Math.max(0, spotsLeft - 1) * minIncrement;
+  return Math.max(0, remaining - reserve);
+}
+
+function TeamTile(props: {
+  t: Team;
+  cfg: DraftConfigV2 | null;
+  isMe?: boolean;
+  isNominator?: boolean;
+}) {
+  const { t, cfg, isMe, isNominator } = props;
+
+  const total = t.budget;
+  const spent = t.spent;
+  const remaining = total - spent;
+
+  const rosterSize = sumRosterSlots(cfg) || 16;
+  const filled = t.roster?.length ?? 0;
+
+  // @ts-ignore
+  const minInc = cfg?.auctionSettings?.minIncrement ?? cfg?.auction_settings?.min_increment ?? 1;
+  const maxBid = calcMaxBid({ remaining, rosterSize, filled, minIncrement: minInc });
+
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-3 rounded-md border p-3 transition",
-        highlight
-          ? "border-[rgba(34,211,238,0.40)] bg-[rgba(34,211,238,0.10)]"
-          : "border-stroke bg-[rgba(255,255,255,0.03)]"
+        "relative rounded-lg border px-2.5 py-2",
+        "bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]",
+        "shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
+        isNominator
+          ? "border-[rgba(245,158,11,0.55)] shadow-[0_0_0_1px_rgba(245,158,11,0.22),0_0_26px_rgba(245,158,11,0.14)]"
+          : "border-stroke",
+        isMe ? "ring-1 ring-[rgba(34,211,238,0.22)]" : ""
       )}
     >
-      <div>
-        <div className="text-sm font-semibold text-fg0">{t.name}</div>
-        <div className="mt-1 text-xs text-fg2">
-          Spent {money(t.spent)} • Remaining <span className="text-fg1">{money(remaining)}</span>
+      {/* top row */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="truncate text-[12px] font-semibold text-fg0">
+            {t.name || t.teamId}
+          </div>
+          <div className="mt-0.5 text-[10px] text-fg2">
+            TEAM <span className="text-fg1">{t.teamId}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          {isNominator ? <Badge tone="warning">ON</Badge> : null}
+          {isMe ? <Badge tone="accent">YOU</Badge> : null}
         </div>
       </div>
-      <Badge tone="neutral">{t.roster.length} roster</Badge>
+
+      {/* budgets row (sportsbook style: stacked, dense) */}
+      <div className="mt-2 grid grid-cols-3 gap-1.5">
+        <div className="rounded-md border border-stroke bg-[rgba(0,0,0,0.14)] px-2 py-1">
+          <div className="text-[9px] text-fg2">TOTAL</div>
+          <div className="text-[11px] font-semibold text-fg1">{money(total)}</div>
+        </div>
+        <div className="rounded-md border border-stroke bg-[rgba(0,0,0,0.14)] px-2 py-1">
+          <div className="text-[9px] text-fg2">LEFT</div>
+          <div className="text-[11px] font-semibold text-fg0">{money(remaining)}</div>
+        </div>
+        <div className="rounded-md border border-stroke bg-[rgba(0,0,0,0.14)] px-2 py-1">
+          <div className="text-[9px] text-fg2">MAX</div>
+          <div className="text-[11px] font-semibold text-fg0">{money(maxBid)}</div>
+        </div>
+      </div>
+
+      {/* slots */}
+      <div className="mt-2 rounded-md border border-stroke bg-[rgba(0,0,0,0.14)] px-2 py-1">
+        <div className="text-[9px] text-fg2">SLOTS</div>
+        <div className="mt-0.5 text-[10px] text-fg1 leading-4">
+          {slotsLabel(cfg)}
+        </div>
+      </div>
+
+      {/* fill */}
+      <div className="mt-2 flex items-center justify-between text-[10px] text-fg2">
+        <div>
+          FILLED <span className="text-fg1">{filled}</span>/<span className="text-fg1">{rosterSize}</span>
+        </div>
+        <div className="text-fg2">
+          SPENT <span className="text-fg1">{money(spent)}</span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -103,12 +221,6 @@ function TeamRow({ t, highlight }: { t: Team; highlight?: boolean }) {
 export default function DraftRoomV2() {
   const { draftId } = useParams();
   const { snapshot: snap } = useDraftSnapshot(draftId);
-  
-  // Debug logging
-  useEffect(() => {
-    console.log('DraftRoomV2 - snap:', snap);
-    console.log('DraftRoomV2 - draftId:', draftId);
-  }, [snap, draftId]);
   const [isHost, setIsHost] = useState(false);
   const [pendingBid, setPendingBid] = useState<number | null>(null);
   const [draftConfig, setDraftConfig] = useState<DraftConfigV2 | null>(null);
@@ -117,40 +229,35 @@ export default function DraftRoomV2() {
   const toast = useToast();
   const [pulse, setPulse] = useState(false);
   const [connected, setConnected] = useState(true);
-  const [sideTab, setSideTab] = useState<"teams" | "log">("teams");
   const [search, setSearch] = useState("");
   const [forceOpen, setForceOpen] = useState(false);
   const [forceSearch, setForceSearch] = useState("");
+  const [showLog, setShowLog] = useState(false);
   let engine: any = null;
 
-  // Safe phase computation
   const safePhase = snap?.phase ?? "lobby";
 
   // Fetch draft row for room code
   useEffect(() => {
-    if (draftId) {
-      (async () => {
-        try {
-          const { data, error } = await supabase
-            .from("drafts")
-            .select("code, status")
-            .eq("id", draftId)
-            .single();
-          if (!error && data) setDraft(data);
-        } catch (err) {
-          console.error(err);
-        }
-      })();
-    }
+    if (!draftId) return;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("drafts")
+          .select("code, status")
+          .eq("id", draftId)
+          .single();
+        if (!error && data) setDraft(data);
+      } catch (err) {
+        console.error(err);
+      }
+    })();
   }, [draftId]);
 
   // Load draft config
   useEffect(() => {
-    if (draftId) {
-      getDraftConfig(draftId)
-        .then(setDraftConfig)
-        .catch(console.error);
-    }
+    if (!draftId) return;
+    getDraftConfig(draftId).then(setDraftConfig).catch(console.error);
   }, [draftId]);
 
   // Audio system
@@ -160,7 +267,7 @@ export default function DraftRoomV2() {
   useEffect(() => {
     if (!snap?.auction?.currentBid) return;
     setPulse(true);
-    const t = setTimeout(() => setPulse(false), 400);
+    const t = setTimeout(() => setPulse(false), 420);
     return () => clearTimeout(t);
   }, [snap?.auction?.currentBid]);
 
@@ -170,27 +277,19 @@ export default function DraftRoomV2() {
     const last = snap?.log?.[snap?.log?.length - 1];
     if (!last) return;
 
-    if (last.type === "bid") {
-      toast.push(last.text);
-    }
-
-    if (last.type === "sold") {
-      toast.push("SOLD!");
-    }
+    if (last.type === "bid") toast.push(last.text);
+    if (last.type === "sold") toast.push("SOLD!");
   }, [snap, toast]);
 
   // Connection detection
   useEffect(() => {
     if (!snap) return;
     const now = Date.now();
-    const lastUpdate = snap?.engine?.last_action_created_at ? new Date(snap?.engine?.last_action_created_at).getTime() : now;
+    const lastUpdate = snap?.engine?.last_action_created_at
+      ? new Date(snap?.engine?.last_action_created_at).getTime()
+      : now;
     const timeSinceUpdate = now - lastUpdate;
-    
-    if (timeSinceUpdate > 8000) {
-      setConnected(false);
-    } else {
-      setConnected(true);
-    }
+    setConnected(timeSinceUpdate <= 8000);
   }, [snap]);
 
   // Determine if current user is host and start engine if so
@@ -234,10 +333,14 @@ export default function DraftRoomV2() {
   );
 
   const highBidder = useMemo(
-    () => (snap?.auction?.highBidderTeamId ? snap?.teams?.find((t: any) => t.teamId === snap?.auction?.highBidderTeamId) : null),
+    () =>
+      snap?.auction?.highBidderTeamId
+        ? snap?.teams?.find((t: any) => t.teamId === snap?.auction?.highBidderTeamId)
+        : null,
     [snap]
   );
 
+  const rosterSlots = draftConfig?.rosterSlots ?? [];
   const isMyTurnToNominate = myTeamId === snap?.order?.currentNominatorTeamId;
   const canBid = safePhase === "bidding" && snap?.auction?.player != null && snap?.auction?.call !== "sold";
   const bidDisabledReason = !canBid ? "Bidding is not active." : safePhase === "paused" ? "Draft is paused." : "";
@@ -257,9 +360,10 @@ export default function DraftRoomV2() {
   const hb = snap?.engine?.heartbeat_at ? new Date(snap?.engine?.heartbeat_at).getTime() : null;
   const hbAgeMs = hb ? Date.now() - hb : null;
   const hostSeemsOffline = hbAgeMs != null && hbAgeMs > 10000;
-  const draftType = draftConfig?.draftType || snap?.settings?.draftType || snap?.draft_type || 'auction';
 
-  // Show lobby shell if no draftId
+  const draftType = draftConfig?.draftType || snap?.settings?.draftType || snap?.draft_type || "auction";
+
+  // lobby shell if no draftId
   if (!draftId) {
     return (
       <div className="p-6">
@@ -271,15 +375,11 @@ export default function DraftRoomV2() {
             </div>
             <div className="text-right">
               <div className="text-sm text-white/70">Room Code</div>
-              <div className="text-xl font-mono tracking-widest">
-                {draft?.code ?? "—"}
-              </div>
+              <div className="text-xl font-mono tracking-widest">{draft?.code ?? "—"}</div>
             </div>
           </div>
 
-          <div className="mt-4 text-white/70">
-            Waiting for managers to join…
-          </div>
+          <div className="mt-4 text-white/70">Waiting for managers to join…</div>
 
           <div className="mt-4 flex gap-2">
             <button className="btn btn-primary" disabled>
@@ -291,36 +391,27 @@ export default function DraftRoomV2() {
     );
   }
 
-
   function placeBid(amount: number) {
     if (!canBid || !draftId) return;
     setPendingBid(amount);
-    appendDraftAction(draftId, "bid", {
-      amount,
-      teamId: myTeamId
-    });
+    appendDraftAction(draftId, "bid", { amount, teamId: myTeamId });
   }
 
   function nominatePlayer(p: { playerId: string; name: string; pos?: string; team?: string }) {
     if (!isMyTurnToNominate || !draftId) return;
-    appendDraftAction(draftId, "nominate", {
-      player: p
-    });
+    appendDraftAction(draftId, "nominate", { player: p });
     setSearch("");
   }
 
   async function hostPause() {
     await appendDraftAction(draftId!, "pause_draft", {});
   }
-
   async function hostResume() {
     await appendDraftAction(draftId!, "resume_draft", {});
   }
-
   async function hostUndo() {
     await appendDraftAction(draftId!, "undo_last", {});
   }
-
   async function hostForceNominate(player: any) {
     await appendDraftAction(draftId!, "force_nominate", { player });
     setForceOpen(false);
@@ -328,29 +419,31 @@ export default function DraftRoomV2() {
   }
 
   // Snake Draft Stub UI
-  if (draftType === 'snake') {
+  if (draftType === "snake") {
     return (
       <div className="space-y-4">
-        {/* PAGE HEADER */}
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-[22px] font-semibold text-fg0 leading-7">Snake Draft Room</div>
             <div className="mt-1 text-sm text-fg2">
-              Draft <span className="text-fg1">{draftId}</span> • {snap?.settings?.teamCount || snap?.team_count || 12} Teams
+              Draft <span className="text-fg1">{draftId}</span> •{" "}
+              {snap?.settings?.teamCount || snap?.team_count || 12} Teams
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge tone={isHost ? "host" : "neutral"}>You: {isHost ? "HOST" : `MANAGER (Team ${me?.team_number ?? "?"})`}</Badge>
+            <Badge tone={isHost ? "host" : "neutral"}>
+              You: {isHost ? "HOST" : `MANAGER (Team ${me?.team_number ?? "?"})`}
+            </Badge>
           </div>
         </div>
 
-        {/* SNAKE DRAFT CONTENT */}
         <div className="rounded-lg border border-stroke bg-panel p-8 text-center">
           <div className="space-y-4">
             <div className="text-6xl">🐍</div>
             <h2 className="text-2xl font-bold text-fg0">Snake Draft UI</h2>
             <p className="text-fg2 max-w-md mx-auto">
-              Snake draft interface is coming next! This will support traditional turn-based drafting with reverse order each round.
+              Snake draft interface is coming next! This will support traditional turn-based drafting with reverse
+              order each round.
             </p>
             <div className="space-y-2 text-sm text-fg1">
               <p>Current Pick: Round 1, Pick 1</p>
@@ -362,12 +455,16 @@ export default function DraftRoomV2() {
     );
   }
 
+  const incs = snap?.settings?.bidIncrements?.length ? snap.settings.bidIncrements : [1, 2, 5, 10];
+  const secLeft = snap?.auction?.secondsLeft ?? 0;
+
   return (
-    <div className="space-y-4">
-      {/* Host offline/reconnecting banner */}
+    <div className="space-y-3">
+      {/* banners */}
       {hostSeemsOffline ? (
         <div className="rounded-lg border border-[rgba(251,113,133,0.35)] bg-[rgba(251,113,133,0.12)] p-3 text-sm text-fg0">
-          Host connection looks offline (last heartbeat {Math.round(hbAgeMs!/1000)}s ago). Draft actions may be delayed.
+          Host connection looks offline (last heartbeat {Math.round((hbAgeMs || 0) / 1000)}s ago). Draft actions may be
+          delayed.
         </div>
       ) : !connected ? (
         <div className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 p-3 text-sm text-fg0">
@@ -375,237 +472,141 @@ export default function DraftRoomV2() {
         </div>
       ) : null}
 
-      {/* PAGE HEADER */}
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <div className="text-[22px] font-semibold text-fg0 leading-7">Draft Room</div>
-          <div className="mt-1 text-sm text-fg2">
-            Draft <span className="text-fg1">{draftId}</span> • Phase{" "}
-            <span className="text-fg1">{safePhase}</span>
+      {/* sticky sportsbook strip */}
+      <div
+        className={cn(
+          "sticky top-0 z-30",
+          "border border-stroke rounded-xl overflow-hidden",
+          "backdrop-blur-md",
+          "bg-[linear-gradient(180deg,rgba(0,0,0,0.36),rgba(0,0,0,0.18))]",
+          "shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+        )}
+      >
+        <div className="px-3 py-2 flex items-center gap-2">
+          {/* Left cluster */}
+          <div className="flex items-center gap-2 min-w-[260px]">
+            <Badge tone="neutral">PHASE: {safePhase.toUpperCase()}</Badge>
+            <div className={cn(
+              "px-2 py-1 rounded-md border text-[12px] font-mono tracking-wide",
+              "bg-[rgba(0,0,0,0.22)]",
+              safePhase === "bidding" ? "border-[rgba(34,211,238,0.28)] text-fg0" : "border-stroke text-fg1"
+            )}>
+              {formatClock(secLeft)}
+            </div>
+            <Badge tone={isMyTurnToNominate ? "warning" : "neutral"}>
+              {isMyTurnToNominate ? "YOU ON THE CLOCK" : `ON: ${currentNominator?.name ?? "—"}`}
+            </Badge>
           </div>
-        </div>
 
-        <div className="flex items-center gap-2">
-          <Badge tone={isHost ? "host" : "neutral"}>You: {isHost ? "HOST" : `MANAGER (Team ${me?.team_number ?? "?"})`}</Badge>
-          <CallLabel call={snap?.auction?.call ?? "none"} />
-        </div>
-      </div>
-
-      {/* AUCTION PHRASE BANNER */}
-      <AuctionPhraseBanner phrase={phrase} />
-
-      {/* MAIN GRID */}
-      <div className="grid gap-4 lg:grid-cols-3">
-        {/* LEFT/CENTER: LIVE AUCTION + ACTIONS */}
-        <div className="space-y-4 lg:col-span-2">
-          {/* NOW UP */}
-          <Card className={cn(
-            "overflow-hidden transition",
-            snap?.auction?.call === "sold" && "shadow-[0_0_20px_rgba(251,191,36,0.7)]"
-          )}>
-            <CardHeader className="pb-0">
-              <SectionTitle
-                title="Now Up"
-                subtitle="Who nominates next and what you can do right now."
-                right={
-                  <div className="flex items-center gap-2">
-                    <Badge tone={isMyTurnToNominate ? "success" : "neutral"}>
-                      {isMyTurnToNominate ? "Your turn" : "Waiting"}
-                    </Badge>
-                    <Badge tone="neutral">Nominator: {currentNominator?.name ?? "—"}</Badge>
-                  </div>
-                }
-              />
-            </CardHeader>
-
-            <CardBody className="space-y-3">
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-lg border border-stroke bg-[rgba(255,255,255,0.04)] p-3">
-                  <div className="text-xs text-fg2">Timer</div>
-                  <div className="mt-2 flex items-center justify-center">
-                    <CountdownRing 
-                      secondsLeft={snap?.auction?.secondsLeft ?? 0} 
-                      total={safePhase === "bidding" ? (snap?.settings?.bidSeconds ?? 20) : (snap?.settings?.nominationSeconds ?? 30)} 
-                    />
-                  </div>
-                  <div className="mt-2 text-xs text-fg2 text-center">
-                    {safePhase === "bidding" ? "Bid clock" : "Nomination"}
-                  </div>
-                </div>
-
-                <div className="rounded-lg border border-stroke bg-[rgba(255,255,255,0.04)] p-3 sm:col-span-2">
-                  <div className="text-xs text-fg2">Current player</div>
-                  {snap?.auction?.player ? (
-                    <>
-                      <div className="mt-1 flex flex-wrap items-center gap-2">
-                        <div className="text-[18px] font-semibold text-fg0">
-                          {snap?.auction?.player.name}
-                        </div>
-                        <Badge tone="neutral">{snap?.auction?.player.pos ?? "—"}</Badge>
-                        <Badge tone="neutral">{snap?.auction?.player.team ?? "—"}</Badge>
-                      </div>
-                      <div className="mt-2 text-sm text-fg2">
-                        High bid{" "}
-                        <span className={cn(
-                          "font-semibold transition",
-                          pulse && "scale-105 text-[rgba(124,58,237,1)]"
-                        )}>{money(snap?.auction?.currentBid ?? 0)}</span>
-                        {highBidder ? (
-                          <>
-                            {" "}
-                            by <span className="text-fg1">{highBidder.name}</span>
-                          </>
-                        ) : (
-                          <span className="text-fg2"> • no leader yet</span>
-                        )}
-                        {pendingBid && snap?.auction?.highBidderTeamId === myTeamId && snap?.auction?.currentBid === pendingBid && (
-                          <span className="ml-2 text-xs text-amber-400">Pending…</span>
-                        )}
-                      </div>
-                    </>
-                  ) : (
-                    <div className="mt-2 text-sm text-fg2">
-                      Waiting for nomination.
-                    </div>
-                  )}
-                </div>
+          {/* Center cluster: current bid headline */}
+          <div className="flex-1 min-w-0 flex items-center justify-center gap-3">
+            <div className="min-w-0 text-center">
+              <div className="text-[11px] text-fg2">CURRENT PLAYER</div>
+              <div className="truncate text-[16px] font-semibold text-fg0">
+                {snap?.auction?.player ? snap.auction.player.name : "Waiting for nomination"}
               </div>
+            </div>
 
-              <Divider />
-
-              {/* BID CONTROLS */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold text-fg1">Bidding</div>
-                  {!canBid ? <div className="text-xs text-fg2">{bidDisabledReason}</div> : null}
-                </div>
-
-                <div className="grid gap-2 sm:grid-cols-5">
-                  <Button
-                    className="sm:col-span-3 h-12 text-base"
-                    disabled={!canBid}
-                    onClick={() => placeBid((snap?.auction?.currentBid || 0) + (snap?.settings?.bidIncrements?.[0] ?? 1))}
-                    title={!canBid ? "Bidding disabled" : "Place a bid"}
-                  >
-                    Bid +{money(snap?.settings?.bidIncrements?.[0] ?? 1)}
-                  </Button>
-
-                  <div className="sm:col-span-2 grid grid-cols-3 gap-2">
-                    {(snap?.settings?.bidIncrements?.slice(1, 4) || [2, 5, 10]).map((inc: number) => (
-                      <Button
-                        key={inc}
-                        variant="secondary"
-                        className="h-12"
-                        disabled={!canBid}
-                        onClick={() => placeBid((snap?.auction?.currentBid || 0) + inc)}
-                      >
-                        +{money(inc)}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="text-xs text-fg2">
-                  Mobile-first: one big bid button + quick increments.
-                </div>
+            <div className="flex items-center gap-2">
+              <CallLabel call={snap?.auction?.call ?? "none"} />
+              <div
+                className={cn(
+                  "px-2.5 py-1 rounded-md border font-mono text-[16px] tracking-wide",
+                  "bg-[rgba(0,0,0,0.24)]",
+                  snap?.auction?.call === "sold"
+                    ? "border-[rgba(34,197,94,0.45)] text-[rgba(34,197,94,1)]"
+                    : "border-[rgba(245,158,11,0.35)] text-fg0",
+                  pulse && "scale-[1.03]"
+                )}
+              >
+                {money(snap?.auction?.currentBid ?? 0)}
               </div>
-            </CardBody>
-          </Card>
-
-          {/* NOMINATE */}
-          <Card>
-            <CardHeader className="pb-0">
-              <SectionTitle
-                title="Nominate"
-                subtitle={
-                  isMyTurnToNominate
-                    ? "Search a player and nominate to start bidding."
-                    : `Only ${currentNominator?.name ?? "the nominator"} can nominate right now.` 
-                }
-                right={<Badge tone={isMyTurnToNominate ? "success" : "neutral"}>{isMyTurnToNominate ? "Enabled" : "Locked"}</Badge>}
-              />
-            </CardHeader>
-
-            <CardBody className="space-y-3">
-              <Input
-                label="Player search"
-                placeholder="Type a player name…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-
-              <div className="rounded-xl border border-stroke bg-[rgba(255,255,255,0.03)] overflow-hidden">
-                {mockPlayerResults.length === 0 ? (
-                  <div className="p-4 text-sm text-fg2">
-                    {search.trim()
-                      ? "No matches (mock pool). Try \"Patrick\" or \"CeeDee\"."
-                      : "Start typing to search. (Mock results for UI slice.)"}
-                  </div>
+              <div className="text-[11px] text-fg2">
+                {highBidder ? (
+                  <>
+                    LEADER <span className="text-fg1 font-semibold">{highBidder.name}</span>
+                  </>
                 ) : (
-                  <div className="divide-y divide-[rgba(255,255,255,0.08)]">
-                    {mockPlayerResults.map((p) => (
-                      <button
-                        key={p.playerId}
-                        className={cn(
-                          "w-full text-left p-3 hover:bg-[rgba(255,255,255,0.06)] transition flex items-center justify-between gap-3",
-                          !isMyTurnToNominate ? "opacity-60 cursor-not-allowed" : ""
-                        )}
-                        onClick={() => isMyTurnToNominate && nominatePlayer(p)}
-                        disabled={!isMyTurnToNominate}
-                      >
-                        <div>
-                          <div className="text-sm font-semibold text-fg0">{p.name}</div>
-                          <div className="mt-1 text-xs text-fg2">
-                            {p.pos} • {p.team}
-                          </div>
-                        </div>
-                        <Badge tone="accent">Nominate</Badge>
-                      </button>
-                    ))}
-                  </div>
+                  "NO LEADER"
                 )}
               </div>
+            </div>
+          </div>
 
-              <div className="text-xs text-fg2">
-                In Step 6 this becomes real player pool + action dispatch.
-              </div>
-            </CardBody>
-          </Card>
+          {/* Right cluster: actions */}
+          <div className="flex items-center gap-2 justify-end min-w-[520px]">
+            <Badge tone={isHost ? "host" : "neutral"}>
+              {isHost ? "HOST" : `MGR ${me?.team_number ?? "?"}`}
+            </Badge>
 
-          {/* HOST CONTROL SURFACE */}
-          <Card>
-            <CardHeader className="pb-0">
-              <SectionTitle
-                title="Host Controls"
-                subtitle={isHost ? "Live controls (pause/resume/undo/force nominate)." : "Host only."}
-                right={<Badge tone={isHost ? "host" : "neutral"}>{isHost ? "HOST" : "LOCKED"}</Badge>}
+            <div className="flex items-center gap-1.5">
+              <Button
+                className="h-9 px-3 text-sm"
+                disabled={!canBid}
+                onClick={() => placeBid((snap?.auction?.currentBid || 0) + (incs[0] ?? 1))}
+                title={!canBid ? bidDisabledReason : "Bid"}
+              >
+                +{money(incs[0] ?? 1)}
+              </Button>
+              {incs.slice(1, 4).map((inc: number) => (
+                <Button
+                  key={inc}
+                  variant="secondary"
+                  className="h-9 px-3 text-sm"
+                  disabled={!canBid}
+                  onClick={() => placeBid((snap?.auction?.currentBid || 0) + inc)}
+                >
+                  +{money(inc)}
+                </Button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 w-[320px]">
+              <Input
+                label=""
+                placeholder={isMyTurnToNominate ? "Search & nominate…" : "Nomination locked"}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                disabled={!isMyTurnToNominate}
               />
-            </CardHeader>
+              <Button
+                variant="secondary"
+                className="h-9 px-3"
+                disabled={!isMyTurnToNominate || mockPlayerResults.length === 0}
+                onClick={() => {
+                  const p = mockPlayerResults[0];
+                  if (p) nominatePlayer(p);
+                }}
+                title="Nominate top search result (temporary)"
+              >
+                Nom
+              </Button>
+            </div>
 
-            <CardBody className="grid gap-2 sm:grid-cols-4">
-              <Button variant="secondary" disabled={!isHost} onClick={hostPause}>
-                Pause
+            {/* Host micro-controls (icon-ish compact) */}
+            <div className="flex items-center gap-1.5">
+              <Button variant="secondary" className="h-9 px-3" disabled={!isHost} onClick={hostPause}>
+                ⏸
               </Button>
-              <Button variant="secondary" disabled={!isHost} onClick={hostResume}>
-                Resume
+              <Button variant="secondary" className="h-9 px-3" disabled={!isHost} onClick={hostResume}>
+                ▶
               </Button>
-              <Button variant="secondary" disabled={!isHost} onClick={hostUndo}>
-                Undo
+              <Button variant="secondary" className="h-9 px-3" disabled={!isHost} onClick={hostUndo}>
+                ↩
               </Button>
-              <Button variant="secondary" disabled={!isHost} onClick={() => setForceOpen(true)}>
-                Force Nominate
+              <Button variant="secondary" className="h-9 px-3" disabled={!isHost} onClick={() => setForceOpen(true)}>
+                ⚡
               </Button>
+            </div>
 
-              {/* Style Pack Selector */}
+            <div className="flex items-center gap-2">
+              <Badge tone={connected ? "neutral" : "warning"}>{connected ? "CONNECTED" : "RECONNECTING"}</Badge>
+
               <SelectWrapper
                 value={snap?.auctioneer?.style_pack ?? "classic"}
-                onValueChange={(value) =>
-                  appendDraftAction(draftId!, "set_style_pack", {
-                    style: value,
-                  })
-                }
+                onValueChange={(value) => appendDraftAction(draftId!, "set_style_pack", { style: value })}
                 disabled={!isHost}
-                className="sm:col-span-4"
+                className="w-[160px]"
               >
                 {Object.entries(STYLE_PACKS).map(([id, pack]) => (
                   <SelectItem key={id} value={id}>
@@ -614,86 +615,66 @@ export default function DraftRoomV2() {
                 ))}
               </SelectWrapper>
 
-              {!isHost ? (
-                <div className="sm:col-span-4 text-xs text-fg2">
-                  These controls are disabled because you are not the host device.
-                </div>
-              ) : (
-                <div className="sm:col-span-4 text-xs text-fg2">
-                  Undo reverts one snapshot step (capped stack). Force Nominate bypasses turn order.
-                </div>
-              )}
-            </CardBody>
-          </Card>
+              <Button variant="secondary" className="h-9 px-3" onClick={() => setShowLog((v) => !v)}>
+                {showLog ? "Hide Log" : "Log"}
+              </Button>
+            </div>
+          </div>
         </div>
 
-        {/* RIGHT: TEAMS + LOG (tabs on mobile) */}
-        <div className="space-y-3">
-          <div className="lg:hidden">
-            <Tabs
-              value={sideTab}
-              onChange={(v) => setSideTab(v as any)}
-              tabs={[
-                { value: "teams", label: "Teams", badge: String(snap?.teams?.length ?? 0) },
-                { value: "log", label: "Log", badge: String(snap?.log?.length ?? 0) },
-              ]}
-            />
-          </div>
-
-          {(sideTab === "teams" || (typeof window !== "undefined" && window.innerWidth >= 1024)) && (
-            <Card className="hidden lg:block">
-              <CardHeader className="pb-0">
-                <SectionTitle title="Teams" subtitle="Budgets and quick status." />
-              </CardHeader>
-              <CardBody className="space-y-2">
-                {(snap?.teams?.slice(0, 8) || []).map((t: Team) => (
-                  <TeamRow key={t.teamId} t={t} highlight={t.teamId === myTeamId || t.teamId === snap?.order?.currentNominatorTeamId} />
-                ))}
-                <div className="text-xs text-fg2">
-                  (show all + roster drawer in Step 6/8)
-                </div>
-              </CardBody>
-            </Card>
-          )}
-
-          {(sideTab === "teams" && (
-            <Card className="lg:hidden">
-              <CardHeader className="pb-0">
-                <SectionTitle title="Teams" subtitle="Budgets and quick status." />
-              </CardHeader>
-              <CardBody className="space-y-2">
-                {(snap?.teams?.slice(0, 6) || []).map((t: Team) => (
-                  <TeamRow key={t.teamId} t={t} highlight={t.teamId === myTeamId || t.teamId === snap?.order?.currentNominatorTeamId} />
-                ))}
-                <div className="text-xs text-fg2">
-                  (show all + roster drawer in Step 6/8)
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-
-          {(sideTab === "log" || (typeof window !== "undefined" && window.innerWidth >= 1024)) && (
-            <Card className={cn("lg:block", sideTab !== "log" ? "hidden lg:block" : "")}>
-              <CardHeader className="pb-0">
-                <SectionTitle title="Draft Log" subtitle="History feed (mock)." right={<Badge tone="neutral">{snap?.log?.length ?? 0}</Badge>} />
-              </CardHeader>
-              <CardBody className="space-y-2">
-                <div className="rounded-xl border border-stroke bg-[rgba(255,255,255,0.03)] overflow-hidden">
-                  <div className="divide-y divide-[rgba(255,255,255,0.08)]">
-                    {(snap?.log?.slice().reverse() || []).map((e: any) => (
-                      <DraftLogEntry key={e.id} entry={e} />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="text-xs text-fg2">
-                  In Step 6 this will subscribe to snapshot updates and display true history.
-                </div>
-              </CardBody>
-            </Card>
-          )}
+        {/* tiny second row: phrase banner (sportsbook ticker) */}
+        <div className="border-t border-stroke px-3 py-2">
+          <AuctionPhraseBanner phrase={phrase} />
         </div>
       </div>
+
+      {/* TEAM BOARD (12 columns + slots; seeded in snapshot) */}
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-0">
+          <SectionTitle
+            title="Team Board"
+            subtitle="All teams + roster slots. (No horizontal scroll; columns compress.)"
+            right={<Badge tone="neutral">{snap?.teams?.length ?? 0} teams</Badge>}
+          />
+        </CardHeader>
+        <CardBody>
+          {Array.isArray(snap?.teams) && snap.teams.length > 0 ? (
+            <TeamBoard
+              teams={snap.teams}
+              rosterSlots={rosterSlots as any}
+              currentNominatorTeamId={snap?.order?.currentNominatorTeamId ?? null}
+              myTeamId={myTeamId}
+            />
+          ) : (
+            <div className="rounded-lg border border-stroke bg-[rgba(255,255,255,0.03)] p-4 text-sm text-fg2">
+              No teams loaded yet.
+            </div>
+          )}
+
+          {rosterSlots.length === 0 ? (
+            <div className="mt-3 text-xs text-fg2">Roster slots not loaded yet (draft_config missing).</div>
+          ) : null}
+        </CardBody>
+      </Card>
+
+      {/* Log (optional, not stealing screen real estate) */}
+      {showLog ? (
+        <div className="rounded-xl border border-stroke bg-[rgba(0,0,0,0.12)] p-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-[12px] tracking-wide text-fg2">
+              DRAFT LOG • <span className="text-fg1 font-semibold">{snap?.log?.length ?? 0}</span>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-stroke bg-[rgba(255,255,255,0.03)] overflow-hidden">
+            <div className="divide-y divide-[rgba(255,255,255,0.08)]">
+              {(snap?.log?.slice().reverse() || []).map((e: any) => (
+                <DraftLogEntry key={e.id} entry={e} />
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* FORCE NOMINATE MODAL */}
       <ModalLite open={forceOpen} title="Force Nominate" onClose={() => setForceOpen(false)}>

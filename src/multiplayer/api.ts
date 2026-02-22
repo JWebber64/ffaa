@@ -51,7 +51,11 @@ export async function createDraftRoom(displayName: string, draftConfig: DraftCon
   if (error) throw error;
   if (!draft) throw new Error("Draft not returned from RPC");
 
-  return draft;
+  // PostgREST RPC can return a single object OR an array depending on function shape.
+  // create_draft_room_v2 RETURNS TABLE(...), so Supabase often returns an array.
+  const row = Array.isArray(draft) ? draft[0] : draft;
+  if (!row?.id) throw new Error("Draft RPC returned no id");
+  return row;
 }
 
 export async function joinDraftRoom(code: string, displayName: string) {
@@ -65,7 +69,9 @@ export async function joinDraftRoom(code: string, displayName: string) {
   if (error) throw error;
   if (!draft) throw new Error("Draft not returned from RPC");
 
-  return draft;
+  const row = Array.isArray(draft) ? draft[0] : draft;
+  if (!row?.id) throw new Error("Join draft RPC returned no id");
+  return row;
 }
 
 export async function sendDraftAction(draftId: string, type: string, payload: unknown) {
