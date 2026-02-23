@@ -1,5 +1,4 @@
 import { SlotType } from '../../types/draftConfig';
-import { getPositionRgb } from './positionColors';
 
 interface RosterRowProps {
   slotKey: SlotType;
@@ -20,7 +19,8 @@ export default function RosterRow({
   onRemove,
   availablePositions = [],
 }: RosterRowProps) {
-  const positionRgb = getPositionRgb(slotKey);
+  // Use CSS variables from tokens.css for universal color system
+  const positionColor = `var(--pos-${slotKey.toLowerCase()})`;
 
   const handleIncrement = () => {
     onCountChange(Math.min(count + 1, 20));
@@ -36,12 +36,13 @@ export default function RosterRow({
     <div
       className="relative group"
       style={{
-        '--pos-rgb': positionRgb,
+        '--pos-color': positionColor,
       } as React.CSSProperties}
     >
       <div className="relative h-[72px] px-5 flex items-center justify-between rounded-[28px] bg-white/6 backdrop-blur-xl border border-white/10 transition-all duration-300 ease-out hover:bg-white/8 shadow-[0_10px_30px_rgba(0,0,0,0.45)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.55)] overflow-hidden"
         style={{
-          boxShadow: `0 0 0 1px rgba(${positionRgb},0.20), 0 0 22px rgba(${positionRgb},0.12), 0 10px_30px_rgba(0,0,0,0.45)`,
+          boxShadow: `0 0 0 1px var(--pos-color), 0 0 22px var(--pos-color), 0 10px_30px_rgba(0,0,0,0.45)`,
+          opacity: 0.8,
         }}
       >
         {/* Specular highlight */}
@@ -55,8 +56,9 @@ export default function RosterRow({
           {/* Position Pill - Fixed Size */}
           <div className="relative h-9 px-5 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300"
             style={{
-              background: `rgba(${positionRgb},0.18)`,
-              border: `1px solid rgba(${positionRgb},0.35)`,
+              background: 'var(--pos-color)',
+              opacity: 0.6,
+              border: '1px solid var(--pos-color)',
             }}
           >
             {/* Inner highlight */}
@@ -107,7 +109,7 @@ export default function RosterRow({
           {isFlexSlot && onEligibilityToggle && (
             <div className="flex items-center gap-1 ml-3">
               {availablePositions.map((position) => {
-                  const posRgb = getPositionRgb(position);
+                  const posColor = `var(--pos-${position.toLowerCase()})`;
                   const isActive = eligibility.includes(position);
                   return (
                     <button
@@ -115,9 +117,10 @@ export default function RosterRow({
                       onClick={() => onEligibilityToggle(position)}
                       className="relative h-4.5 px-2 rounded-full text-[9px] font-medium flex items-center backdrop-blur-md border transition-all duration-200 hover:scale-105 active:scale-[0.98]"
                       style={{
-                        background: isActive ? `rgba(${posRgb},0.15)` : 'rgba(255,255,255,0.05)',
-                        borderColor: isActive ? `rgba(${posRgb},0.35)` : 'rgba(255,255,255,0.10)',
+                        background: isActive ? posColor : 'rgba(255,255,255,0.05)',
+                        borderColor: isActive ? posColor : 'rgba(255,255,255,0.10)',
                         color: isActive ? 'white' : 'rgba(255,255,255,0.6)',
+                        opacity: isActive ? 0.6 : 1,
                       }}
                     >
                       {/* Inner highlight */}

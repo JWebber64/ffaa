@@ -1,6 +1,5 @@
 import { cn } from "@/ui/cn";
 import { Badge } from "@/ui/Badge";
-import React from "react";
 
 // Inject custom styles
 if (typeof document !== 'undefined' && !document.getElementById('team-board-styles')) {
@@ -25,7 +24,7 @@ if (typeof document !== 'undefined' && !document.getElementById('team-board-styl
   document.head.appendChild(style);
 }
 
-type RosterSlot = { slot: string; count: number };
+type RosterSlot = { slot: string; count: number; flexEligible?: string[] };
 
 type Team = {
   teamId: string;
@@ -44,40 +43,71 @@ function expandSlots(rosterSlots: RosterSlot[]) {
   return out;
 }
 
-function SlotTile({ slot, assigned }: { slot: string; assigned?: { name?: string; price?: number } | null }) {
+function SlotTile({ slot, assigned, flexEligible }: { slot: string; assigned?: { name?: string; price?: number } | null; flexEligible?: string[] }) {
   const isFilled = !!assigned?.name;
   
+  // Map position slots to CSS variables from tokens.css
   const positionColors = {
-    QB: { bright: 'rgba(30, 64, 175, 0.8)', dark: 'rgba(15, 32, 87, 0.9)', soft: 'rgba(30, 64, 175, 0.3)', accent: 'rgba(30, 64, 175, 0.4)' },
-    RB: { bright: 'rgba(34, 197, 94, 0.8)', dark: 'rgba(17, 98, 47, 0.9)', soft: 'rgba(34, 197, 94, 0.3)', accent: 'rgba(34, 197, 94, 0.4)' },
-    WR: { bright: 'rgba(147, 51, 234, 0.8)', dark: 'rgba(73, 25, 117, 0.9)', soft: 'rgba(147, 51, 234, 0.3)', accent: 'rgba(147, 51, 234, 0.4)' },
-    TE: { bright: 'rgba(245, 158, 11, 0.8)', dark: 'rgba(122, 79, 5, 0.9)', soft: 'rgba(245, 158, 11, 0.3)', accent: 'rgba(245, 158, 11, 0.4)' },
-    FLEX: { bright: 'rgba(148, 163, 184, 0.8)', dark: 'rgba(74, 81, 92, 0.9)', soft: 'rgba(148, 163, 184, 0.3)', accent: 'rgba(148, 163, 184, 0.4)' },
-    K: { bright: 'rgba(220, 38, 127, 0.8)', dark: 'rgba(110, 19, 63, 0.9)', soft: 'rgba(220, 38, 127, 0.3)', accent: 'rgba(220, 38, 127, 0.4)' },
-    DEF: { bright: 'rgba(59, 130, 246, 0.8)', dark: 'rgba(29, 65, 123, 0.9)', soft: 'rgba(59, 130, 246, 0.3)', accent: 'rgba(59, 130, 246, 0.4)' },
+    QB: 'var(--pos-qb)',
+    RB: 'var(--pos-rb)', 
+    WR: 'var(--pos-wr)',
+    TE: 'var(--pos-te)',
+    FLEX: 'var(--pos-flex)',
+    K: 'var(--pos-k)',
+    DST: 'var(--pos-dst)',
   };
 
-  const colors = positionColors[slot as keyof typeof positionColors] || positionColors.FLEX;
+  // For FLEX slots, get the colors of eligible positions
+  let flexSections = null;
+
+  if (slot === 'FLEX' && flexEligible && flexEligible.length > 0) {
+    // Create sections for each eligible position color using CSS variables
+    flexSections = flexEligible.map(pos => positionColors[pos as keyof typeof positionColors] || 'var(--pos-flex)');
+  }
 
   return (
     <div
       className={cn(
-        "rounded-[12px] transition-all duration-300 hover:scale-[1.02] hover:shadow-lg",
+        "rounded-[12px] transition-all duration-300 hover:scale-[1.02] hover:shadow-lg relative overflow-hidden",
         "h-9 flex items-center px-1",
         isFilled 
-          ? "bg-[var(--color-bright)] text-white shadow-[0_0_15px_var(--color-soft)] border border-transparent"
-          : "bg-[var(--color-accent)] text-fg2 backdrop-blur-sm"
+          ? "text-white shadow-[0_0_15px_rgba(0,0,0,0.3)] border border-transparent"
+          : "bg-[rgba(255,255,255,0.05)] text-fg2 backdrop-blur-sm"
       )}
       style={{
-        '--color-bright': colors.bright,
-        '--color-dark': colors.dark,
-        '--color-soft': colors.soft,
-        '--color-accent': colors.accent,
-      } as React.CSSProperties}
+        ...(isFilled ? {
+          backgroundColor: positionColors[slot as keyof typeof positionColors] || 'var(--pos-flex)',
+        } : {}),
+        ...(!isFilled && slot !== 'FLEX' ? {
+          backgroundColor: positionColors[slot as keyof typeof positionColors] || 'var(--pos-flex)',
+          opacity: 0.8,
+        } : {})
+      }}
     >
-      <div className="flex items-center justify-between w-full gap-2">
+      {/* FLEX slot color sections */}
+      {slot === 'FLEX' && flexSections && !isFilled && (
+        <div className="absolute inset-0 flex">
+          {flexSections.map((color, index) => (
+            <div 
+              key={index}
+              className="flex-1"
+              style={{ backgroundColor: color }}
+            />
+          ))}
+        </div>
+      )}
+      
+      {/* Dark overlay for text readability */}
+      {slot === 'FLEX' && flexSections && !isFilled && (
+        <div className="absolute inset-0 bg-black/30" />
+      )}
+      
+      <div className="relative z-10 flex items-center justify-between w-full gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <div className={cn("font-bold text-xs uppercase tracking-wide flex-shrink-0", isFilled ? "text-white" : "text-fg0")}>{slot}</div>
+          <div className={cn(
+            "font-bold text-xs uppercase tracking-wide flex-shrink-0", 
+            isFilled ? "text-white" : slot === 'FLEX' && flexSections ? "text-white" : "text-fg0"
+          )}>{slot}</div>
           {assigned?.name && (
             <div className={cn("text-xs truncate", isFilled ? "text-white/90" : "text-fg1")} title={assigned.name}>
               {assigned.name}
@@ -87,7 +117,7 @@ function SlotTile({ slot, assigned }: { slot: string; assigned?: { name?: string
         {assigned?.price != null ? (
           <div className="font-mono text-xs font-bold text-white/90 flex-shrink-0">${assigned.price}</div>
         ) : (
-          <div className="text-xs text-fg3 flex-shrink-0">—</div>
+          <div className={cn("text-xs flex-shrink-0", slot === 'FLEX' && flexSections && !isFilled ? "text-white/80" : "text-fg3")}>—</div>
         )}
       </div>
     </div>
@@ -99,11 +129,15 @@ function TeamColumn({
   rosterSlots,
   isNominator,
   isMe,
+  isActive,
+  onOpen,
 }: {
   team: Team;
   rosterSlots: RosterSlot[];
   isNominator?: boolean;
   isMe?: boolean;
+  isActive?: boolean;
+  onOpen?: (teamId: string) => void;
 }) {
   const remaining = (team.budget ?? 0) - (team.spent ?? 0);
   const slots = expandSlots(rosterSlots);
@@ -132,9 +166,19 @@ function TeamColumn({
           <div className="px-2 py-1.5 border-b border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)]">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <div className="truncate text-[13px] font-bold text-fg0" title={team.name}>
+                <button
+                  type="button"
+                  className={cn(
+                    "truncate text-[13px] font-bold text-fg0 text-left",
+                    "hover:underline hover:underline-offset-2",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-0",
+                    onOpen ? "cursor-pointer" : "cursor-default"
+                  )}
+                  title={onOpen ? `Open device for ${team.name}` : team.name}
+                  onClick={() => onOpen?.(team.teamId)}
+                >
                   {team.name}
-                </div>
+                </button>
                 {/* Compact budget bar */}
                 <div className="mt-1 flex items-center gap-2 text-[10px]">
                   <span className="text-fg1 font-semibold">${remaining}</span>
@@ -144,15 +188,27 @@ function TeamColumn({
               </div>
               <div className="flex flex-col items-end gap-1">
                 {isNominator ? <Badge tone="accent" className="text-xs">NOM</Badge> : null}
+                {isActive ? <Badge tone="neutral" className="text-[10px]">OPEN</Badge> : null}
               </div>
             </div>
           </div>
 
           {/* Roster slots area */}
           <div className="flex-1 flex flex-col gap-[6px] p-1">
-            {slots.map((slot, idx) => (
-              <SlotTile key={`${team.teamId}:${slot}:${idx}`} slot={slot} assigned={roster[idx] ?? null} />
-            ))}
+            {slots.map((slot, idx) => {
+              // Find the roster slot configuration to get flexEligible positions
+              const rosterSlotConfig = rosterSlots.find(rs => rs.slot === slot);
+              const flexEligible = rosterSlotConfig?.flexEligible;
+              
+              return (
+                <SlotTile 
+                  key={`${team.teamId}:${slot}:${idx}`} 
+                  slot={slot} 
+                  assigned={roster[idx] ?? null}
+                  {...(flexEligible && { flexEligible })}
+                />
+              );
+            })}
           </div>
         </div>
       </div>
@@ -165,11 +221,15 @@ export default function TeamBoard({
   rosterSlots,
   currentNominatorTeamId,
   myTeamId,
+  activeTeamId,
+  onTeamOpen,
 }: {
   teams: Team[];
   rosterSlots: RosterSlot[];
   currentNominatorTeamId?: string | null;
   myTeamId?: string | null;
+  activeTeamId?: string | null;
+  onTeamOpen?: (teamId: string) => void;
 }) {
   return (
     <div className="grid grid-cols-12 gap-0 items-stretch">
@@ -180,6 +240,8 @@ export default function TeamBoard({
             rosterSlots={rosterSlots}
             isNominator={!!currentNominatorTeamId && t.teamId === currentNominatorTeamId}
             isMe={!!myTeamId && t.teamId === myTeamId}
+            isActive={!!activeTeamId && t.teamId === activeTeamId}
+            {...(onTeamOpen && { onOpen: onTeamOpen })}
           />
         </div>
       ))}

@@ -34,6 +34,22 @@ const POSITION_NAMES: Record<Pos, string> = {
 
 const ALL_TABS: readonly TabValue[] = ['ALL', ...POS_ORDER, 'FLEX'] as const;
 
+// Helper function to map positions to correct color schemes
+const getPositionColorForBadge = (pos: string) => {
+  switch (pos) {
+    case 'QB': return 'red';
+    case 'RB': return 'green';
+    case 'WR': return 'blue';
+    case 'TE': return 'orange';
+    case 'K': return 'purple';
+    case 'DEF': return 'gray';
+    case 'FLEX': return 'cyan';
+    case 'BENCH': return 'gray';
+    case 'IR': return 'gray';
+    default: return 'gray';
+  }
+};
+
 export interface PlayerPoolProps {
   onNominate?: (playerId: string, playerName?: string) => void;
   showPositionTabs?: boolean;
@@ -63,7 +79,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({ player, onNominate, nominate, sho
     >
       <HStack spacing={3} flex={1}>
         <Text fontWeight="semibold" isTruncated>{player.name}</Text>
-        {player.pos && <Badge colorScheme="blue" minW="2.5em" textAlign="center">{player.pos}</Badge>}
+        {player.pos && <Badge colorScheme={getPositionColorForBadge(player.pos)} minW="2.5em" textAlign="center">{player.pos}</Badge>}
         {player.nflTeam && <Badge colorScheme="gray" minW="2.5em" textAlign="center">{player.nflTeam}</Badge>}
         {showDebugInfo && (
           <HStack spacing={2} ml="auto" pr={2}>
@@ -229,7 +245,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
   }, [activeTab]);
 
   const tabBg = useColorModeValue('gray.100', 'gray.700');
-  const activeTabBg = useColorModeValue('blue.500', 'blue.600');
+  const activeTabBg = useColorModeValue('green.500', 'green.600');
   const tabHoverBg = useColorModeValue('gray.200', 'gray.600');
   const activeTabColor = 'white';
   const inactiveTabColor = useColorModeValue('gray.800', 'gray.200');
@@ -254,10 +270,10 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
             borderColor="gray.600"
             color="white"
             _placeholder={{ color: 'gray.400' }}
-            _hover={{ borderColor: 'blue.500' }}
+            _hover={{ borderColor: 'green.500' }}
             _focus={{
-              borderColor: 'blue.400',
-              boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)'
+              borderColor: 'green.400',
+              boxShadow: '0 0 0 1px var(--chakra-colors-green-400)'
             }}
             pl={10}
           />
@@ -289,11 +305,11 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
                   onClick={() => setActiveTab(tab)}
                   size="sm"
                   variant={isActive ? 'solid' : 'ghost'}
-                  colorScheme={isActive ? 'blue' : 'gray'}
+                  colorScheme={isActive ? 'green' : 'gray'}
                   bg={isActive ? activeTabBg : tabBg}
                   color={isActive ? activeTabColor : inactiveTabColor}
                   _hover={{
-                    bg: isActive ? 'blue.500' : tabHoverBg,
+                    bg: isActive ? 'green.500' : tabHoverBg,
                   }}
                   px={3}
                   py={1}
@@ -339,7 +355,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
                 {players.length === 0 && (
                   <Button 
                     mt={2} 
-                    colorScheme="blue" 
+                    colorScheme="green" 
                     size="sm"
                     onClick={() => window.location.reload()}
                   >
@@ -395,7 +411,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
                       <Button 
                         size="sm" 
                         variant="ghost" 
-                        colorScheme="blue"
+                        colorScheme="green"
                         onClick={(e) => {
                           e.stopPropagation();
                           handlePositionTabClick(pos);

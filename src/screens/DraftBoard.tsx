@@ -89,21 +89,26 @@ interface SlotBoxProps {
 }
 
 const SlotBox = ({ label, player }: SlotBoxProps) => {
-  const POSITION_COLORS: Record<string, string> = {
-    QB: 'blue',
-    RB: 'red',
-    WR: 'green',
-    TE: 'orange',
-    K: 'yellow',
-    DEF: 'blue',
-    FLEX: 'purple',
-    BENCH: 'gray',
+  // Use universal color system from tokens.css
+  const getPositionColor = (pos: string) => {
+    switch (pos) {
+      case 'QB': return 'red';
+      case 'RB': return 'green';
+      case 'WR': return 'blue';
+      case 'TE': return 'orange';
+      case 'K': return 'purple';
+      case 'DEF': return 'gray';
+      case 'FLEX': return 'cyan';
+      case 'BENCH': return 'gray';
+      case 'IR': return 'gray';
+      default: return 'gray';
+    }
   };
 
-  const positionColor = POSITION_COLORS[label] || 'gray';
-  // Use lighter gray for bench, lighter yellow for kicker, lighter blue for defense
-  const bgColor = label === 'BENCH' ? 'gray.700' : label === 'K' ? 'yellow.600' : label === 'DEF' ? 'blue.500' : `${positionColor}.900`;
-  const borderColor = label === 'BENCH' ? 'gray.500' : label === 'K' ? 'yellow.400' : label === 'DEF' ? 'blue.300' : `${positionColor}.600`;
+  const positionColor = getPositionColor(label);
+  // Use appropriate shades for each position
+  const bgColor = label === 'BENCH' ? 'gray.700' : label === 'IR' ? 'gray.700' : label === 'K' ? 'purple.600' : label === 'DEF' ? 'gray.600' : `${positionColor}.900`;
+  const borderColor = label === 'BENCH' ? 'gray.500' : label === 'IR' ? 'gray.500' : label === 'K' ? 'purple.400' : label === 'DEF' ? 'gray.300' : `${positionColor}.600`;
   
   if (player) {
     return (
@@ -138,11 +143,11 @@ const SlotBox = ({ label, player }: SlotBoxProps) => {
         
         {/* Bottom row: Badges evenly spaced */}
         <HStack justify="space-between" spacing={0.5} mt={0.5}>
-          <Badge colorScheme={POSITION_COLORS[player.pos] || 'gray'} fontSize="0.55rem" px={1} minW="24px" textAlign="center">
+          <Badge colorScheme={getPositionColor(player.pos)} fontSize="0.55rem" px={1} minW="24px" textAlign="center">
             {player.pos}
           </Badge>
           {player.slot && player.slot !== player.pos && (
-            <Badge colorScheme={POSITION_COLORS[player.slot] || 'gray'} fontSize="0.55rem" px={1} minW="24px" textAlign="center">
+            <Badge colorScheme={getPositionColor(player.slot)} fontSize="0.55rem" px={1} minW="24px" textAlign="center">
               {player.slot}
             </Badge>
           )}

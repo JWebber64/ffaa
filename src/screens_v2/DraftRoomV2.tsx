@@ -25,6 +25,8 @@ import { DraftLogEntry } from "../components/DraftLogEntry";
 import { CountdownRing } from "../components/CountdownRing";
 import { DraftConfigV2 } from "../types/draftConfig";
 import TeamBoard from "../components/draft/TeamBoard";
+import { DeviceModal } from "../ui/DeviceModal";
+import { ManagerDeviceView } from "../components/manager/ManagerDeviceView";
 
 type DraftSnapshot = {
   phase?: string;
@@ -102,6 +104,10 @@ export default function DraftRoomV2() {
   const [search, setSearch] = useState("");
   const [forceOpen, setForceOpen] = useState(false);
   const [forceSearch, setForceSearch] = useState("");
+
+  // Device modal state
+  const [deviceModalOpen, setDeviceModalOpen] = useState(false);
+  const [activeTeamId, setActiveTeamId] = useState<string | null>(null);
 
   let engine: any = null;
 
@@ -242,6 +248,17 @@ export default function DraftRoomV2() {
     setForceSearch("");
   }
 
+  // Device modal handler
+  function handleTeamOpen(teamId: string) {
+    setActiveTeamId(teamId);
+    setDeviceModalOpen(true);
+  }
+
+  function handleDeviceModalClose() {
+    setDeviceModalOpen(false);
+    setActiveTeamId(null);
+  }
+
   // --- CONTROL DECK (replaces cramped strip; no overlap) ---
   const bidIncs = (snap as any)?.settings?.bidIncrements ?? [1, 2, 5, 10];
   const currentBid = (snap as any)?.auction?.currentBid ?? 0;
@@ -352,6 +369,8 @@ export default function DraftRoomV2() {
             rosterSlots={rosterSlots as any}
             currentNominatorTeamId={currentNominatorTeamId}
             myTeamId={myTeamId}
+            activeTeamId={activeTeamId}
+            onTeamOpen={handleTeamOpen}
           />
         </CardBody>
       </Card>
@@ -459,6 +478,26 @@ export default function DraftRoomV2() {
           </div>
         </div>
       </ModalLite>
+
+      {/* DEVICE MODAL */}
+      <DeviceModal
+        open={deviceModalOpen}
+        title={activeTeamId ? boardTeams.find(t => t.teamId === activeTeamId)?.name || "Team View" : "Team View"}
+        subtitle={activeTeamId ? "Manager device view" : ""}
+        preset="iphone"
+        zoom={0.85}
+        onClose={handleDeviceModalClose}
+        activeHint="Draft live"
+      >
+        {activeTeamId && (
+          <ManagerDeviceView
+            draftId={draftId || ""}
+            teamId={activeTeamId}
+            snap={snap as any}
+            onRequestClose={handleDeviceModalClose}
+          />
+        )}
+      </DeviceModal>
     </div>
   );
 }

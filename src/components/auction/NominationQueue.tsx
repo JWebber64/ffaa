@@ -25,14 +25,15 @@ export const NominationQueue = ({
 }: NominationQueueProps) => {
   const getPlayerById = (id: string) => players.find(p => p.id === id);
   
-  const getPositionColor = (pos: string) => {
+  // Map positions to Chakra UI color schemes that match our corrected colors
+  const getPositionColorScheme = (pos: string) => {
     switch (pos) {
-      case 'QB': return 'blue';
+      case 'QB': return 'red';
       case 'RB': return 'green';
-      case 'WR': return 'purple';
+      case 'WR': return 'blue';
       case 'TE': return 'orange';
-      case 'K': return 'yellow';
-      case 'DEF': return 'red';
+      case 'K': return 'purple';
+      case 'DEF': return 'gray';
       default: return 'gray';
     }
   };
@@ -49,7 +50,7 @@ export const NominationQueue = ({
     <VStack align="stretch" spacing={4}>
       <Text fontWeight="bold">Nomination Queue ({queue.length})</Text>
       
-      <VStack gap={2} align="stretch">
+      {queue.length === 0 ? (
         <Box p={4} bg="gray.800" borderRadius="md" borderWidth="1px" borderColor="gray.700">
           <Text color="gray.400" textAlign="center">No players in nomination queue</Text>
         </Box>
@@ -74,7 +75,7 @@ export const NominationQueue = ({
                 <Box flex={1}>
                   <HStack gap={2}>
                     <Text fontWeight="medium">{player.name}</Text>
-                    <Badge colorScheme={getPositionColor(player.pos)}>
+                    <Badge colorScheme={getPositionColorScheme(player.pos)}>
                       {formatPositionForDisplay(player.pos as Position)}
                     </Badge>
                     {player.nflTeam && (
@@ -116,7 +117,7 @@ export const NominationQueue = ({
             );
           })}
         </VStack>
-      </VStack>
+      )}
       
       {queue.length > 5 && (
         <Text fontSize="sm" color="gray.500" textAlign="center" mt={2}>

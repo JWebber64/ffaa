@@ -23,22 +23,36 @@
   --glow-a2: rgba(20,184,166,0.30);
   --glow-a3: rgba(96,165,250,0.25);
 
-  /* --- Position colors (jewel tones, broadcast-safe) --- */
-  --pos-qb:   #3B82F6; /* Royal Blue */
-  --pos-rb:   #16A34A; /* Emerald Green */
-  --pos-wr:   #10B981; /* Deep Green */
-  --pos-te:   #D97706; /* Burnt Amber */
-  --pos-flex: #0891B2; /* Deep Cyan */
-  --pos-k:    #BE123C; /* Crimson */
-  --pos-dst:  #C2410C; /* Rust */
-  --pos-bench:#64748B; /* Slate */
+  /* --- Position colors (corrected) --- */
+  --pos-qb:   #DC2626; /* Red */
+  --pos-rb:   #16A34A; /* Green */
+  --pos-wr:   #2563EB; /* Blue */
+  --pos-te:   #EA580C; /* Orange */
+  --pos-flex: #0891B2; /* Mixed/Cyan */
+  --pos-k:    #9333EA; /* Purple */
+  --pos-dst:  #374151; /* Dark Gray */
+  --pos-bench:#6B7280; /* Gray */
 
-  /* IDP / misc */
-  --pos-ir:     #475569; /* Dark slate */
-  --pos-dl:     #B45309; /* Dark amber */
-  --pos-lb:     #15803D; /* Deep green */
-  --pos-db:     #14B8A6; /* Teal */
-  --pos-idpflex:#0E7490; /* Deep cyan */
+  /* IDP / misc - darker shades of base colors */
+  --pos-ir:     #374151; /* Dark slate */
+  --pos-dl:     #991B1B; /* Dark red */
+  --pos-lb:     #14532D; /* Dark green */
+  --pos-db:     #1E3A8A; /* Dark blue */
+  --pos-idpflex:#0891B2; /* Same as FLEX */
+
+  /* --- Force override for problematic positions --- */
+  .pos-bench,
+  .pos-ir,
+  [class*="bench"],
+  [class*="ir"] {
+    background-color: var(--pos-bench) !important;
+    border-color: var(--pos-bench) !important;
+  }
+
+  .pos-bench *,
+  .pos-ir * {
+    color: white !important;
+  }
 
   /* --- Glass (rgba so backdrop blur works) --- */
   --glass-1: rgba(255,255,255,0.06);  /* card */

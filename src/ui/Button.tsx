@@ -51,17 +51,21 @@ const variants: Record<Variant, string> = {
     "shadow-[0_10px_40px_rgba(0,0,0,0.35)]",
 };
 
-export function Button({
-  className,
-  variant = "primary",
-  size = "md",
-  isLoading,
-  disabled,
-  children,
-  ...props
-}: UIButtonProps) {
+export const Button = React.forwardRef<HTMLButtonElement, UIButtonProps>(function Button(
+  {
+    className,
+    variant = "primary",
+    size = "md",
+    isLoading,
+    disabled,
+    children,
+    ...props
+  },
+  ref
+) {
   return (
     <button
+      ref={ref}
       className={cn(base, sizes[size], variants[variant], className)}
       disabled={disabled || isLoading}
       {...props}
@@ -76,4 +80,4 @@ export function Button({
       )}
     </button>
   );
-}
+});

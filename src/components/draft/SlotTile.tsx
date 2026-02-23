@@ -1,5 +1,4 @@
 import { cn } from "@/ui/cn";
-import { getPositionRgb } from "@/components/roster/positionColors";
 
 type AssignedPlayer = {
   name: string;
@@ -16,11 +15,19 @@ export function SlotTile({
   assigned?: AssignedPlayer | null;
   className?: string;
 }) {
-  const rgbString = getPositionRgb(slot);
-  const rgbParts = rgbString.split(',').map(s => parseInt(s.trim()));
-  const rgb = rgbParts.length === 3 ? { r: rgbParts[0], g: rgbParts[1], b: rgbParts[2] } : null;
-  const edge = rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.55)` : "rgba(255,255,255,0.18)";
-  const glow = rgb ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.18)` : "rgba(255,255,255,0.06)";
+  // Use fallback colors that match tokens.css values for universal color system
+  const fallbackColors = {
+    qb: "rgba(59, 130, 246, 0.55)",
+    rb: "rgba(22, 163, 74, 0.55)", 
+    wr: "rgba(16, 185, 129, 0.55)",
+    te: "rgba(217, 119, 6, 0.55)",
+    flex: "rgba(8, 145, 178, 0.55)",
+    k: "rgba(190, 18, 60, 0.55)",
+    dst: "rgba(194, 65, 12, 0.55)"
+  };
+  
+  const edge = fallbackColors[slot.toLowerCase() as keyof typeof fallbackColors] || "rgba(255,255,255,0.18)";
+  const glow = fallbackColors[slot.toLowerCase() as keyof typeof fallbackColors]?.replace('0.55', '0.18') || "rgba(255,255,255,0.06)";
 
   return (
     <div
