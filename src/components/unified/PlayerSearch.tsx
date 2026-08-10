@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import type { ChangeEvent, MouseEvent as ReactMouseEvent } from 'react';
 import {
   Box,
   Button,
@@ -27,10 +28,12 @@ import {
   Spinner,
   VStack,
   Portal,
-} from '@chakra-ui/react';
+} from '@/ui/custom';
 import { FaSearch } from 'react-icons/fa';
 import { useDraftStore } from '../../store/draftStore';
 import type { Player } from '../../store/draftStore';
+import { TeamMark } from '../player/TeamMark';
+import { formatByeWeek } from '../player/teamMarkUtils';
 
 type PlayerSearchProps = {
   /** Array of players to search through. If not provided, will use players from store */
@@ -67,7 +70,8 @@ const POSITION_COLORS: Record<string, string> = {
   K: 'yellow',
   DEF: 'blue',
   FLEX: 'purple',
-  BENCH: 'gray',
+  BENCH: 'var(--pos-bench)',
+  IR: 'var(--pos-ir)',
 };
 
 export const PlayerSearch: React.FC<PlayerSearchProps> = ({
@@ -144,7 +148,8 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
         const name = p.name?.toLowerCase() || '';
         const team = p.nflTeam?.toLowerCase() || '';
         const pos = (p.pos as string)?.toLowerCase() || '';
-        return name.includes(searchTerm) || team.includes(searchTerm) || pos.includes(searchTerm);
+        const bye = formatByeWeek(p.byeWeek).toLowerCase();
+        return name.includes(searchTerm) || team.includes(searchTerm) || pos.includes(searchTerm) || bye.includes(searchTerm);
       });
     }
 
@@ -152,7 +157,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
     return result
       .sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999))
       .slice(0, maxResults);
-  }, [players, topAvailable, query, filterUndrafted]);
+  }, [players, topAvailable, query, filterUndrafted, maxResults]);
 
   // Compute menu position based on input element
   const computeMenuPos = () => {
@@ -275,7 +280,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
         <Input
           ref={inputRef}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
@@ -366,10 +371,31 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                 >
                   <HStack justify="space-between">
                     <Box>
-                      <Text fontWeight="medium" color="white">{player.name}</Text>
+                      <HStack spacing={2}>
+                        <TeamMark team={player.nflTeam} size="xs" />
+                        <Text fontWeight="medium" color="white">{player.name}</Text>
+                      </HStack>
                       <HStack spacing={2} mt={1}>
-                        <Badge colorScheme={POSITION_COLORS[player.pos] || 'gray'}>{player.pos}</Badge>
+                        <Badge 
+                          colorScheme={
+                            player.pos === 'BENCH' || player.pos === 'IR' 
+                              ? undefined 
+                              : POSITION_COLORS[player.pos] || 'gray'
+                          }
+                          style={
+                            player.pos === 'BENCH' || player.pos === 'IR'
+                              ? {
+                                  background: player.pos === 'BENCH' ? 'var(--pos-bench)' : 'var(--pos-ir)',
+                                  color: 'white',
+                                  border: 'none'
+                                }
+                              : undefined
+                          }
+                        >
+                          {player.pos}
+                        </Badge>
                         {player.nflTeam && <Badge variant="outline">{player.nflTeam}</Badge>}
+                        {player.byeWeek && <Badge variant="outline">Bye {player.byeWeek}</Badge>}
                         {player.rank && <Text fontSize="sm" color="whiteAlpha.700">#{player.rank}</Text>}
                       </HStack>
                     </Box>
@@ -377,7 +403,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                       <Button 
                         size="sm" 
                         colorScheme="blue"
-                        onClick={(e) => {
+                        onClick={(e: ReactMouseEvent<HTMLButtonElement>) => {
                           e.stopPropagation();
                           handleSelect(player);
                         }}
@@ -422,7 +448,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                 <Text color="white">Player: {selectedPlayerState.name} ({selectedPlayerState.pos})</Text>
                 <NumberInput
                   value={bidAmount}
-                  onChange={(value) => setBidAmount(Number(value))}
+                  onChange={(value: string) => setBidAmount(Number(value))}
                   min={1}
                   max={1000}
                   width="100%"
@@ -464,3 +490,4 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
 };
 
 export default PlayerSearch;
+

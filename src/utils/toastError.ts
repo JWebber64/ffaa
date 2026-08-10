@@ -1,6 +1,11 @@
-import type { UseToastOptions } from "@chakra-ui/react";
+export type ToastOptions = {
+  title?: string;
+  description?: string;
+  status?: "info" | "success" | "warning" | "error";
+  duration?: number;
+};
 
-export function toastError(title: string, err: unknown): UseToastOptions {
+export function toastError(title: string, err: unknown): ToastOptions {
   const description =
     err instanceof Error
       ? err.message
@@ -13,7 +18,6 @@ export function toastError(title: string, err: unknown): UseToastOptions {
     description,
     status: "error",
     duration: 6000,
-    isClosable: true,
-    position: "top",
   };
 }
+

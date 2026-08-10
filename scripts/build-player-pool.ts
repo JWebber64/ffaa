@@ -6,29 +6,51 @@ import { load as loadHTML } from "cheerio";
 import slugify from "slugify";
 
 // If on Node <18, uncomment the next line and replace global fetch with it.
-// import fetch from "node-fetch";
 
 /** Sources */
 const FP_ADP_PPR = "https://www.fantasypros.com/nfl/adp/ppr-overall.php";             // primary (table)
 const FP_OVERALL_PPR = "https://www.fantasypros.com/nfl/cheatsheets/top-ppr-players.php"; // backup (ordered list)
 const SLEEPER_PLAYERS = "https://api.sleeper.app/v1/players/nfl";
+const FANTASY_SEASON = 2026;
+const ESPN_FALLBACK_JSON = path.resolve(`src/data/players-${FANTASY_SEASON}-espn.json`);
 
 type Pos = "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
 type Row = {
   id: string;
   season: number;
-  source: "FantasyPros ADP" | "FantasyPros ECR";
+  source: "FantasyPros ADP" | "FantasyPros ECR" | "ESPN salary-cap values";
   rank: number;                 // overall/ADP rank when available
   name: string;                 // always a non-empty string
   pos: Pos;
   nflTeam: string;              // use "FA" for free agents
+  byeWeek?: number;
 };
 
-const OUT_JSON = path.resolve("src/data/player-pool-2025.json");
-const VALID_POS = new Set(["QB","RB","WR","TE","K","DST","D/ST","DEF"]);
+const OUT_JSON = path.resolve(`src/data/player-pool-${FANTASY_SEASON}.json`);
 const toSlug = (s: string) => slugify(s, { lower: true, strict: true });
-const normTeam = (t?: string) => (t ?? "").replace(/\s+/g, "").toUpperCase();
+const TEAM_ALIASES: Record<string, string> = {
+  ARZ: "ARI",
+  JAC: "JAX",
+  LA: "LAR",
+  LVR: "LV",
+  NOR: "NO",
+  NWE: "NE",
+  SFO: "SF",
+  TAM: "TB",
+  WSH: "WAS",
+};
+const normTeam = (t?: string) => {
+  const raw = (t ?? "").replace(/\s+/g, "").toUpperCase();
+  return TEAM_ALIASES[raw] ?? raw;
+};
 const normPos = (p: string): Pos => (p === "DST" || p === "D/ST" || p === "DEF") ? "DEF" : (p as Pos);
+const cleanFantasyPos = (p?: string): Pos | null => {
+  const normalized = (p ?? "").toUpperCase();
+  if (normalized === "DST" || normalized === "D/ST" || normalized === "DEF") return "DEF";
+  return (["QB", "RB", "WR", "TE", "K"] as const).includes(normalized as Exclude<Pos, "DEF">)
+    ? (normalized as Pos)
+    : null;
+};
 const SUFFIX_TOKENS = new Set(["JR","SR","II","III","IV","V"]);
 const normalizeName = (name: string) =>
   name
@@ -97,14 +119,28 @@ function parseFpAdpPpr(html: string): Row[] {
     // "CIN (10)" → "CIN"
     const txtUpper = (txt || '').toUpperCase();
     const m = txtUpper.match(/\b([A-Z]{2,3})\b/);
-    if (m && m[1] && NFL_TEAMS.has(m[1])) return m[1];
+    if (m?.[1]) {
+      const team = normTeam(m[1]);
+      if (NFL_TEAMS.has(team)) return team;
+    }
 
     // Sometimes the PLAYER cell contains "... CIN (10)"; try to pull from there.
     if (fallbackFromPlayer) {
       const m2 = fallbackFromPlayer.toUpperCase().match(/\b([A-Z]{2,3})\s*\(\d+\)\s*$/);
-      if (m2 && m2[1] && NFL_TEAMS.has(m2[1])) return m2[1];
+      if (m2?.[1]) {
+        const team = normTeam(m2[1]);
+        if (NFL_TEAMS.has(team)) return team;
+      }
     }
     return "FA";
+  };
+
+  const cleanByeWeek = (txt: string, fallbackFromPlayer: string = '') => {
+    const source = `${txt || ""} ${fallbackFromPlayer || ""}`;
+    const match = source.match(/\((\d{1,2})\)/);
+    if (!match?.[1]) return undefined;
+    const byeWeek = Number(match[1]);
+    return Number.isFinite(byeWeek) && byeWeek > 0 ? byeWeek : undefined;
   };
 
   const cleanPos = (txt: string): Pos | null => {
@@ -140,19 +176,21 @@ function parseFpAdpPpr(html: string): Row[] {
 
     const name = cleanPlayerName(playerTxt);
     const team = cleanTeam(teamTxt, playerTxt);
+    const byeWeek = cleanByeWeek(teamTxt, playerTxt);
 
     // Use suffix-stripped name ONLY for id; display name remains full
     const baseForId = stripSuffixes(name);
-    const id = `2025-${pos}-${toSlug(baseForId)}`;
+    const id = `${FANTASY_SEASON}-${pos}-${toSlug(baseForId)}`;
 
     rows.push({
       id,
-      season: 2025,
+      season: FANTASY_SEASON,
       source: "FantasyPros ADP",
       rank: rank ?? 9999,
       name,
       pos,
-      nflTeam: team
+      nflTeam: team,
+      ...(byeWeek ? { byeWeek } : {})
     });
   });
 
@@ -178,11 +216,11 @@ function parseFpOverallPpr(html: string): Row[] {
     const team = m[4] ? normTeam(m[4]) : 'FA';
 
     const baseForId = stripSuffixes(name);
-    const id = `2025-${pos}-${toSlug(baseForId)}`;
+    const id = `${FANTASY_SEASON}-${pos}-${toSlug(baseForId)}`;
 
     rows.push({
       id,
-      season: 2025,
+      season: FANTASY_SEASON,
       source: "FantasyPros ECR",
       rank,
       name,
@@ -200,20 +238,70 @@ async function fetchSleeperMap() {
   const res = await fetch(SLEEPER_PLAYERS);
   if (!res.ok) throw new Error(`Sleeper ${res.status}`);
   const json = await res.json() as Record<string, any>;
-  const rows: Record<string, { pos?: Pos; team?: string; name: string }> = {};
+  const rows: Record<string, { pos?: Pos; team?: string; name: string; searchRank: number }> = {};
 
   for (const p of Object.values(json) as any[]) {
     if (p?.sport !== "nfl" || !p?.full_name) continue;
     const nameKey = stripSuffixes(p.full_name).toLowerCase();
-    const pos = p?.position ? normPos(String(p.position)) : 'RB';
+    const fantasyPos = Array.isArray(p?.fantasy_positions)
+      ? p.fantasy_positions.map((pos: unknown) => cleanFantasyPos(String(pos))).find(Boolean)
+      : null;
+    const pos = fantasyPos ?? cleanFantasyPos(String(p?.position ?? ""));
+    if (!pos) continue;
+
     const team = normTeam(p?.team) || 'FA';
+    const searchRank = typeof p?.search_rank === "number" ? p.search_rank : Number.POSITIVE_INFINITY;
+    const existing = rows[nameKey];
+    if (existing && existing.searchRank <= searchRank) continue;
+
     rows[nameKey] = {
       name: p.full_name as string,
-      pos: VALID_POS.has(pos) ? (pos as Pos) : 'RB',
-      team
+      pos,
+      team,
+      searchRank
     };
   }
   return rows;
+}
+
+async function loadEspnFallbackPool(): Promise<Row[]> {
+  try {
+    const content = await fs.readFile(ESPN_FALLBACK_JSON, "utf8");
+    const espnRows = JSON.parse(content) as Array<{
+      rank?: number;
+      name?: string;
+      position?: string;
+      team?: string;
+      bye?: number;
+      byeWeek?: number;
+    }>;
+
+    return espnRows.flatMap((row): Row[] => {
+      const name = String(row.name ?? "").trim();
+      const pos = cleanFantasyPos(row.position);
+      const team = normTeam(row.team) || "FA";
+      const rank = typeof row.rank === "number" ? row.rank : 9999;
+      const byeWeek = typeof row.byeWeek === "number" ? row.byeWeek : row.bye;
+      if (!name || !pos || !rank) return [];
+
+      const baseForId = stripSuffixes(name);
+      return [
+        {
+          id: `${FANTASY_SEASON}-${pos}-${toSlug(baseForId)}`,
+          season: FANTASY_SEASON,
+          source: "ESPN salary-cap values",
+          rank,
+          name,
+          pos,
+          nflTeam: team,
+          ...(typeof byeWeek === "number" && byeWeek > 0 ? { byeWeek } : {}),
+        },
+      ];
+    });
+  } catch (error) {
+    console.warn("ESPN fallback pool unavailable:", (error as Error).message);
+    return [];
+  }
 }
 
 async function main() {
@@ -243,6 +331,13 @@ async function main() {
     }
   }
 
+  if (!rows.length) {
+    rows = await loadEspnFallbackPool();
+    if (rows.length) {
+      console.warn(`Using ESPN 2026 salary-cap sheet as player-pool fallback: ${rows.length} rows`);
+    }
+  }
+
   // 3) Augment with Sleeper for missing team/pos
   try {
     const sleeper = await fetchSleeperMap();
@@ -253,7 +348,7 @@ async function main() {
       return {
         ...r,
         pos: hit.pos || r.pos,
-        nflTeam: r.nflTeam === 'FA' ? hit.team || 'FA' : r.nflTeam
+        nflTeam: hit.team && hit.team !== 'FA' ? hit.team : r.nflTeam
       };
     });
   } catch (e) {
@@ -282,6 +377,10 @@ async function main() {
     console.warn(`⚠️ Only ${unique.length} ranked players found (wanted ${TOP_N}).`);
   }
   
+  if (unique.length < Math.min(50, TOP_N)) {
+    throw new Error(`Only ${unique.length} ranked players found; refusing to overwrite ${OUT_JSON}.`);
+  }
+
   console.log(`Parsed ${unique.length} total players`);
   await fs.mkdir(path.dirname(OUT_JSON), { recursive: true });
   await fs.writeFile(OUT_JSON, JSON.stringify(unique, null, 2), "utf8");

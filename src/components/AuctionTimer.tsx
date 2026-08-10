@@ -1,4 +1,4 @@
-import { HStack, Progress, Text, Tooltip } from '@chakra-ui/react';
+import { HStack, Progress, Text, Tooltip } from '@/ui/custom';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDraftStore } from '../hooks/useDraftStore';
 import type { DraftStore } from '../types/draft';
@@ -139,3 +139,4 @@ export default function AuctionTimer() {
     </Tooltip>
   );
 }
+

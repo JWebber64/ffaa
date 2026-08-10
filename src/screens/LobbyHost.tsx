@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Box, Button, Input, Heading, Stack, Text, VStack, HStack, Badge, useToast } from '@chakra-ui/react';
+import type { ChangeEvent } from 'react';
+import { Box, Button, Input, Heading, Stack, Text, VStack, HStack, Badge, useToast } from '@/ui/custom';
 import { useNavigate } from 'react-router-dom';
 import { createDraftRoom } from '@/multiplayer/api';
 import { startHostEngine } from '@/multiplayer/hostEngine';
@@ -12,7 +13,7 @@ export default function LobbyHost() {
   const [displayName, setDisplayName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [roomCode, setRoomCode] = useState<string | null>(null);
-  const [participants, setParticipants] = useState<any[]>([]);
+  const [participants] = useState<any[]>([]);
 
   const handleCreateRoom = async () => {
     if (!displayName.trim()) {
@@ -75,7 +76,7 @@ export default function LobbyHost() {
             <Input
               placeholder="Display Name"
               value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setDisplayName(e.target.value)}
               size="lg"
             />
             <Button
@@ -126,3 +127,4 @@ export default function LobbyHost() {
     </Box>
   );
 }
+

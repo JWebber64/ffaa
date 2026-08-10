@@ -1,5 +1,5 @@
-import { supabase } from "@/lib/supabase";
 import { subscribeHostToActions } from "@/multiplayer/realtime";
+import { updateFirebaseDraftSnapshot } from "@/multiplayer/firebaseBackend";
 import { useDraftStore } from "@/store/draftStore";
 
 export function startHostEngine(draftId: string) {
@@ -12,15 +12,9 @@ export function startHostEngine(draftId: string) {
     // Publish snapshot
     const snapshot = store.exportDraftState();
 
-    const { error } = await supabase
-      .from("drafts")
-      .update({ snapshot })
-      .eq("id", draftId);
-
-    if (error) {
-      // log only; do not crash the host loop
+    await updateFirebaseDraftSnapshot(draftId, snapshot, "live").catch((error: unknown) => {
       console.error("[hostEngine] snapshot update failed", error);
-    }
+    });
   });
 
   return channel;

@@ -11,7 +11,8 @@ import {
   VStack,
   Divider,
   useColorModeValue,
-} from '@chakra-ui/react';
+} from '@/ui/custom';
+import type { ChangeEvent } from 'react';
 import { SnakeSettings } from '../../types/draftConfig';
 
 interface SnakeSettingsFormProps {
@@ -43,7 +44,7 @@ export default function SnakeSettingsForm({ value, onChange }: SnakeSettingsForm
             </Text>
             <NumberInput
               value={value.pickSeconds}
-              onChange={(val) => updateSetting('pickSeconds', parseInt(val) || 60)}
+              onChange={(val: string) => updateSetting('pickSeconds', parseInt(val) || 60)}
               min={10}
               max={300}
               size="sm"
@@ -71,7 +72,7 @@ export default function SnakeSettingsForm({ value, onChange }: SnakeSettingsForm
             </VStack>
             <Switch
               isChecked={value.autopick}
-              onChange={(e) => updateSetting('autopick', e.target.checked)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => updateSetting('autopick', e.target.checked)}
               colorScheme="blue"
             />
           </HStack>
@@ -87,7 +88,7 @@ export default function SnakeSettingsForm({ value, onChange }: SnakeSettingsForm
             </VStack>
             <Switch
               isChecked={value.pauseBetweenRounds}
-              onChange={(e) => updateSetting('pauseBetweenRounds', e.target.checked)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => updateSetting('pauseBetweenRounds', e.target.checked)}
               colorScheme="blue"
             />
           </HStack>
@@ -96,3 +97,4 @@ export default function SnakeSettingsForm({ value, onChange }: SnakeSettingsForm
     </Box>
   );
 }
+

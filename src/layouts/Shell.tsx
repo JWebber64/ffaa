@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { MouseEvent } from "react";
 import {
   Box,
   Button,
@@ -6,7 +7,7 @@ import {
   Text,
   VStack,
   Progress,
-} from "@chakra-ui/react";
+} from "@/ui/custom";
 import { Outlet } from "react-router-dom";
 import TopNav from "../components/TopNav";
 import SideNav from "../components/SideNav";
@@ -15,33 +16,23 @@ interface ShellProps {
   globalLoading?: boolean;
 }
 
-/**
- * App shell:
- * - Top bar (always visible)
- * - Sidebar (visible ≥1024px), Drawer on mobile
- * - Content area with safe max width
- */
 export default function Shell({ globalLoading = false }: ShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
-    <Box minH="100dvh" bg="#181e28" color="white">
-      {/* Top Bar */}
+    <Box minH="100dvh" bg="var(--bg-0)" color="white">
       <TopNav onMenu={() => setDrawerOpen(true)} />
 
-      {/* Global loading indicator */}
       {globalLoading && (
         <Progress size="xs" isIndeterminate colorScheme="blue" />
       )}
 
-      {/* Body */}
       <Box display="grid" gridTemplateColumns={{ base: "1fr", lg: "260px 1fr" }}>
-        {/* Sidebar for desktop */}
         <Box
           display={{ base: "none", lg: "block" }}
           borderRight="1px solid"
           borderColor="gray.700"
-          bg="#1b2330"
+          bg="var(--bg-1)"
           minH="calc(100dvh - 64px)"
           position="sticky"
           top="64px"
@@ -49,13 +40,11 @@ export default function Shell({ globalLoading = false }: ShellProps) {
           <SideNav onNavigate={() => {}} />
         </Box>
 
-        {/* Content */}
         <Box px={{ base: 3, md: 6 }} py={4} opacity={globalLoading ? 0.7 : 1} transition="opacity 0.2s">
           <Outlet />
         </Box>
       </Box>
 
-      {/* Mobile Drawer */}
       {drawerOpen && (
         <Box
           position="fixed"
@@ -63,25 +52,23 @@ export default function Shell({ globalLoading = false }: ShellProps) {
           zIndex={50}
           onClick={() => setDrawerOpen(false)}
         >
-          {/* Backdrop */}
           <Box position="absolute" inset="0" bg="black" opacity={0.5} />
 
-          {/* Panel */}
           <Box
             position="absolute"
             top="0"
             left="0"
             bottom="0"
             width="260px"
-            bg="#1b2330"
-            borderRight="1px solid #334155"
+            bg="var(--bg-1)"
+            borderRight="1px solid var(--line-1)"
             p={3}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event: MouseEvent<HTMLDivElement>) => event.stopPropagation()}
           >
             <HStack justifyContent="space-between" mb={2}>
-              <Text fontWeight="bold">FFA A</Text>
+              <Text fontWeight="bold">FFAA</Text>
               <Button size="sm" variant="outline" onClick={() => setDrawerOpen(false)}>
-                ✕
+                Close
               </Button>
             </HStack>
             <VStack alignItems="stretch" gap={1}>

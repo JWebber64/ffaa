@@ -178,8 +178,10 @@ export function useSpeech(style: AuctioneerStyle): UseSpeechReturn {
         let finalTranscript = '';
         
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript + ' ';
+          const result = event.results[i];
+          const alt = result?.[0];
+          if (result?.isFinal && alt) {
+            finalTranscript += alt.transcript + ' ';
           }
         }
 

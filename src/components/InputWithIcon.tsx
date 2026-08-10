@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ReactNode, forwardRef, isValidElement } from 'react';
+import React, { ChangeEvent, ReactNode, forwardRef } from 'react';
 import { 
   Input, 
   InputGroup, 
@@ -10,8 +10,8 @@ import {
   useColorModeValue,
   InputLeftAddon,
   InputRightAddon
-} from '@chakra-ui/react';
-import { SmallCloseIcon } from '@chakra-ui/icons';
+} from '@/ui/custom';
+import { X } from 'lucide-react';
 
 
 type InputVariant = 'outline' | 'filled' | 'flushed' | 'unstyled';
@@ -45,7 +45,7 @@ type InputWithIconProps = {
 
 /**
  * A customizable input component with icon support, clear button, and addons.
- * Built on top of Chakra UI's Input component with enhanced functionality.
+ * Built on top of the local custom input primitives.
  */
 const InputWithIcon = forwardRef<HTMLInputElement, InputWithIconProps>(({
   value,
@@ -56,7 +56,7 @@ const InputWithIcon = forwardRef<HTMLInputElement, InputWithIconProps>(({
   leftAddon,
   rightAddon,
   showClearButton = true,
-  clearButtonIcon = <SmallCloseIcon /> as React.ReactElement,
+  clearButtonIcon = <X size={14} /> as React.ReactElement,
   onClear,
   variant = 'outline',
   inputProps = {},
@@ -105,7 +105,7 @@ const InputWithIcon = forwardRef<HTMLInputElement, InputWithIconProps>(({
             colorScheme="gray"
             color={clearButtonColor}
             onClick={handleClear}
-            icon={clearButtonIcon || <SmallCloseIcon />}
+            icon={clearButtonIcon}
             _hover={{ color: 'gray.600' }}
           />
         </InputRightElement>
@@ -124,3 +124,4 @@ const InputWithIcon = forwardRef<HTMLInputElement, InputWithIconProps>(({
 InputWithIcon.displayName = 'InputWithIcon';
 
 export default InputWithIcon;
+

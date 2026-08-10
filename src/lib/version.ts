@@ -1,3 +1,5 @@
+import { appUrl } from "./appBasePath";
+
 export interface VersionInfo {
   version: string;
   gitHash?: string;
@@ -19,7 +21,7 @@ export async function getVersionInfo(): Promise<VersionInfo> {
   if (!gitHash && typeof window !== 'undefined') {
     try {
       // In development, try to get git hash from a simple endpoint
-      const response = await fetch('/api/git-hash');
+      const response = await fetch(appUrl('api/git-hash'));
       if (response.ok) {
         gitHash = await response.text();
       }

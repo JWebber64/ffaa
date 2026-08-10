@@ -3,6 +3,7 @@ interface Manager {
   displayName: string;
   isReady: boolean;
   isHost?: boolean;
+  isComputer?: boolean;
 }
 
 interface ManagersGridProps {
@@ -11,59 +12,50 @@ interface ManagersGridProps {
 }
 
 export default function ManagersGrid({ managers, maxManagers = 8 }: ManagersGridProps) {
-  const emptySlots = maxManagers - managers.length;
+  const emptySlots = Math.max(0, maxManagers - managers.length);
   
   return (
-    <div className="bg-[var(--panel)] border border-[var(--border)] rounded-2xl p-6 backdrop-blur-sm hover-lift">
-      <h3 className="text-lg font-semibold text-[var(--fg0)] mb-4">
-        Managers ({managers.length}/{maxManagers})
-      </h3>
+    <div className="managers-panel">
+      <div className="managers-header">
+        <div>
+          <div className="managers-kicker">Managers</div>
+          <h3 className="managers-title">Lobby roster</h3>
+        </div>
+        <div className="managers-count">{managers.length}/{maxManagers}</div>
+      </div>
       
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      <div className="managers-grid">
         {managers.map((manager) => (
           <div
             key={manager.id}
-            className="relative bg-[var(--glass)] border border-[var(--stroke)] rounded-lg p-3 transition-all duration-200 hover:border-[var(--neon-blue)] hover:shadow-md"
+            className={`manager-card ${manager.isReady ? "ready" : ""} ${manager.isComputer ? "computer" : ""}`}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <div
-                className={`h-2 w-2 rounded-full ${
-                  manager.isReady
-                    ? "bg-[var(--success)] shadow-[0_0_6px_var(--success)]"
-                    : "bg-[var(--fg2)]"
-                }`}
-              />
-              {manager.isHost && (
-                <div className="px-1.5 py-0.5 bg-[var(--neon-blue)] rounded text-xs text-white font-medium">
-                  HOST
-                </div>
-              )}
+            <div className="manager-card-top">
+              <span className={`manager-dot ${manager.isReady ? "ready" : ""}`} />
+              <div className="manager-tags">
+                {manager.isHost ? <span>Host</span> : null}
+                {manager.isComputer ? <span>CPU</span> : null}
+              </div>
             </div>
             
-            <div className="text-sm font-medium text-[var(--fg0)] truncate">
-              {manager.displayName}
-            </div>
+            <div className="manager-name">{manager.displayName}</div>
             
-            <div className="text-xs text-[var(--fg2)]">
-              {manager.isReady ? "Ready" : "Not ready"}
-            </div>
+            <div className="manager-status">{manager.isComputer ? "Automated seat" : manager.isReady ? "Ready" : "Not ready"}</div>
           </div>
         ))}
         
         {Array.from({ length: emptySlots }).map((_, index) => (
           <div
             key={`empty-${index}`}
-            className="bg-[var(--glass)] border border-dashed border-[var(--stroke)] rounded-lg p-3 flex items-center justify-center min-h-[60px]"
+            className="manager-card empty"
           >
-            <div className="text-xs text-[var(--fg2)] text-center">
-              Open Slot
-            </div>
+            Open slot
           </div>
         ))}
       </div>
       
       {managers.length === 0 && (
-        <div className="text-center py-8 text-[var(--fg2)]">
+        <div className="managers-empty">
           No managers connected yet
         </div>
       )}

@@ -1,13 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
-import { AdpConfig, adpConfig as defaultConfig, saveAdpConfig } from '../config/adp';
-
-interface ConfigContextType {
-  config: AdpConfig;
-  updateConfig: (updates: Partial<AdpConfig>) => void;
-  resetConfig: () => void;
-}
-
-const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
+import React, { useState, type ReactNode, useCallback, useEffect } from 'react';
+import { type AdpConfig, adpConfig as defaultConfig, saveAdpConfig } from '../config/adp';
+import { ConfigContext } from './configContextState';
 
 export const ConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [config, setConfig] = useState<AdpConfig>(defaultConfig);
@@ -33,12 +26,4 @@ export const ConfigProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       {children}
     </ConfigContext.Provider>
   );
-};
-
-export const useConfig = (): ConfigContextType => {
-  const context = useContext(ConfigContext);
-  if (!context) {
-    throw new Error('useConfig must be used within a ConfigProvider');
-  }
-  return context;
 };

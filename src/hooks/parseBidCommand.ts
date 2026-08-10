@@ -28,7 +28,7 @@ export function parseBidCommand(input: string): ParseResult {
   const digitMatch = s.match(/\b(\d{1,3})\b/);
   
   // If no digits, try to find number words
-  let amount: number | null = digitMatch ? parseInt(digitMatch[1], 10) : null;
+  let amount: number | null = digitMatch?.[1] ? parseInt(digitMatch[1], 10) : null;
   
   if (!amount) {
     // Try to find number words (e.g., "fifty five" -> 55)

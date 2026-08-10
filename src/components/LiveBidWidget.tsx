@@ -1,7 +1,8 @@
-import { Box, Button, Flex, Text, Tooltip } from '@chakra-ui/react';
+import { Box, Button, Flex, Text, Tooltip } from '@/ui/custom';
 import { useMemo } from 'react';
 import { useDraftStore } from '../store/draftStore';
 import type { Player, Team, Position } from '../types/draft';
+import { formatTeamBye } from './player/teamMarkUtils';
 
 export default function LiveBidWidget({ teamId: teamIdProp }: { teamId: number | string }) {
   // Ensure teamId is treated as string for store compatibility
@@ -22,8 +23,6 @@ export default function LiveBidWidget({ teamId: teamIdProp }: { teamId: number |
     hasSlotFor: s.hasSlotFor,
   }));
 
-  if (!bidState.isLive || !bidState.playerId) return null;
-
   const player = useMemo<Player | undefined>(
     () => players.find((p: Player) => p.id === bidState.playerId),
     [players, bidState.playerId]
@@ -32,6 +31,8 @@ export default function LiveBidWidget({ teamId: teamIdProp }: { teamId: number |
     () => teams.find((t: Team) => t.id.toString() === bidState.highBidder?.toString()),
     [teams, bidState.highBidder]
   );
+
+  if (!bidState.isLive || !bidState.playerId) return null;
 
   const teamIdNum = parseInt(teamId, 10);
   const teamMax = computeMaxBid(teamIdNum) ?? 0;
@@ -66,7 +67,9 @@ export default function LiveBidWidget({ teamId: teamIdProp }: { teamId: number |
     >
       <Flex align="center" justify="space-between">
         <Text fontSize="xs" noOfLines={1}>
-          {player?.name ?? 'Player'} — ${bidState.highBid}
+          {player?.name ?? 'Player'}
+          {player ? ` (${[player.pos, formatTeamBye(player.nflTeam, player.byeWeek)].filter(Boolean).join(' | ')})` : ''}
+          {' — $'}{bidState.highBid}
           {leader && (
             <Text as="span" color="gray.600"> by {leader.name}</Text>
           )}
@@ -86,3 +89,4 @@ export default function LiveBidWidget({ teamId: teamIdProp }: { teamId: number |
     </Box>
   );
 }
+

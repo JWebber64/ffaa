@@ -1,10 +1,22 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { lazy } from "react";
+import { BarChart3, Bug, ChartNoAxesCombined, ClipboardList, Home, Radio, Settings2, Trophy, UserPlus, Users, Wrench } from "lucide-react";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
 import { useDebugDrawerState } from "../hooks/useDebugDrawer";
-import DebugDrawer from "../components/DebugDrawer";
-import { useRole } from "../contexts/RoleContext";
-import { useEnsureSupabaseSession } from "../hooks/useEnsureSupabaseSession";
-import { ToastProvider } from "../ui/ToastProvider";
+import { useRole } from "../contexts/roleContextState";
+
+const DebugDrawer = lazy(() => import("../components/DebugDrawer"));
+
+const primaryNav = [
+  { to: "/", label: "Home", icon: Home, match: (path: string) => path === "/" },
+  { to: "/offline-draft", label: "Offline", icon: ClipboardList, match: (path: string) => path.startsWith("/offline-draft") },
+  { to: "/host/setup", label: "Setup", icon: Settings2, match: (path: string) => path.startsWith("/host") },
+  { to: "/stats", label: "Stats", icon: BarChart3, match: (path: string) => path.startsWith("/stats") },
+  { to: "/analytics", label: "Analytics", icon: ChartNoAxesCombined, match: (path: string) => path.startsWith("/analytics") },
+  { to: "/tools", label: "Tools", icon: Wrench, match: (path: string) => path.startsWith("/tools") },
+  { to: "/league", label: "League HQ", icon: Trophy, match: (path: string) => path.startsWith("/league") },
+  { to: "/join", label: "Join", icon: UserPlus, match: (path: string) => path.startsWith("/join") },
+];
 
 export default function AppShellV2() {
   const dbg = useDebugDrawerState();
@@ -12,15 +24,29 @@ export default function AppShellV2() {
   const loc = useLocation();
   const navigate = useNavigate();
 
-  const ensured = useEnsureSupabaseSession();
-
-  const realtimeLabel = "lobby";
   const pathIsHost = loc.pathname.startsWith("/host");
-  const roleLabel = pathIsHost ? "HOST" : role.isAdmin ? "HOST" : "MANAGER";
+  const pathIsOffline = loc.pathname.startsWith("/offline-draft");
+  const pathIsStats = loc.pathname.startsWith("/stats");
+  const pathIsAnalytics = loc.pathname.startsWith("/analytics");
+  const pathIsTools = loc.pathname.startsWith("/tools");
+  const pathIsLeague = loc.pathname.startsWith("/league");
+  const pathIsPublicResearch = pathIsStats || pathIsAnalytics || pathIsTools;
+  const pathIsNoAuth = pathIsPublicResearch || pathIsLeague;
+  const pathIsDraft = loc.pathname.startsWith("/draft") || pathIsOffline;
+  const realtimeLabel = pathIsLeague ? "league data" : pathIsPublicResearch ? "public data" : pathIsOffline ? "offline" : "lobby";
+  const roleLabel = pathIsLeague ? "COMMISH" : pathIsPublicResearch ? "FREE" : pathIsHost ? "HOST" : role.isAdmin ? "HOST" : "MANAGER";
+
+  const authStatus = pathIsLeague ? "Local" : pathIsPublicResearch ? "No login" : pathIsOffline ? "Local" : "Auth";
+  const authTone = "ok";
   
   const getRouteLabel = () => {
     if (loc.pathname === "/") return "Home";
     if (loc.pathname.startsWith("/host")) return "Host";
+    if (loc.pathname.startsWith("/offline-draft")) return "Offline Draft";
+    if (loc.pathname.startsWith("/stats")) return "Stats";
+    if (loc.pathname.startsWith("/analytics")) return "Analytics";
+    if (loc.pathname.startsWith("/tools")) return "Tools";
+    if (loc.pathname.startsWith("/league")) return "League HQ";
     if (loc.pathname.startsWith("/join")) return "Join";
     if (loc.pathname.startsWith("/draft")) return "Draft";
     if (loc.pathname.startsWith("/results")) return "Results";
@@ -28,72 +54,68 @@ export default function AppShellV2() {
   };
 
   return (
-    <ToastProvider>
-      <div className="ffaa-bg min-h-screen">
-      <header className="sticky top-0 z-50 border-b border-[var(--line-0)] bg-[var(--bg-1)]/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate("/")}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-            >
-              <div className="h-6 w-6 rounded bg-gradient-to-br from-[var(--neon-blue)] to-[var(--neon-green)] shadow-md" />
-              <div>
-                <div className="text-xs font-bold text-[var(--text-0)] leading-tight">
-                  FFAA
-                </div>
-                <div className="text-[10px] text-[var(--text-1)] leading-tight">
-                  {getRouteLabel()}
-                </div>
-              </div>
+    <div className="ffaa-bg min-h-screen">
+      <header className={`app-header ${pathIsDraft ? "app-header-draft" : ""}`}>
+        <div className="app-header-inner">
+          <div className="app-header-left">
+            <button onClick={() => navigate("/")} className="app-brand" aria-label="FFAA Home">
+              <span className="app-brand-mark" />
+              <span className="app-brand-text ff-display">FFAA</span>
             </button>
-
-            <div className="flex items-center gap-1">
-              <div className="h-1.5 w-1.5 rounded-full bg-[var(--ok)] shadow-[0_0_4px_var(--ok)]" />
-              <span className="text-[10px] text-[var(--text-1)]">{realtimeLabel}</span>
-            </div>
-
-            {!ensured.isReady ? (
-              <div className="flex items-center gap-1">
-                <div className="h-1.5 w-1.5 rounded-full bg-[var(--warn)] shadow-[0_0_4px_var(--warn)]" />
-                <span className="text-[10px] text-[var(--text-1)]">connecting…</span>
-              </div>
-            ) : ensured.error ? (
-              <div className="flex items-center gap-1">
-                <div className="h-1.5 w-1.5 rounded-full bg-[var(--bad)] shadow-[0_0_4px_var(--bad)]" />
-                <span className="text-[10px] text-[var(--text-1)]">error</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1">
-                <div className="h-1.5 w-1.5 rounded-full bg-[var(--ok)] shadow-[0_0_4px_var(--ok)]" />
-                <span className="text-[10px] text-[var(--text-1)]">auth</span>
-              </div>
-            )}
+            <span className="app-route-pill">{getRouteLabel()}</span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="px-2 py-0.5 rounded-full bg-[var(--bg-2)] border border-[var(--line-0)]">
-              <span className="text-[10px] font-medium text-[var(--text-0)]">
-                {roleLabel}
-              </span>
-            </div>
-            <Button variant="secondary" size="sm" onClick={dbg.toggle}>
-              Debug
-            </Button>
+          <nav className="app-nav" aria-label="Primary navigation">
+            {primaryNav.map((item) => {
+              const Icon = item.icon;
+              const active = item.match(loc.pathname);
+
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={`app-nav-link ${active ? "is-active" : ""}`}
+                >
+                  <Icon size={15} aria-hidden="true" />
+                  <span>{item.label}</span>
+                </NavLink>
+              );
+            })}
+          </nav>
+
+          <div className="app-header-right">
+            <span className="app-status-pill">
+              <Radio size={13} aria-hidden="true" />
+              <span className="app-dot app-dot-ok" />
+              {realtimeLabel}
+            </span>
+            <span className="app-status-pill">
+              <Users size={13} aria-hidden="true" />
+              <span className={`app-dot app-dot-${authTone}`} />
+              {authStatus}
+            </span>
+            <span className="app-role-pill">{roleLabel}</span>
+            {!pathIsNoAuth ? (
+              <Button variant="secondary" size="sm" className="app-debug-btn" onClick={dbg.toggle}>
+                <Bug size={14} aria-hidden="true" />
+                Debug
+              </Button>
+            ) : null}
           </div>
         </div>
       </header>
 
-      <main className="mx-auto w-full px-4 py-2">
+      <main className={`app-main ${pathIsDraft ? "app-main-draft" : ""}`}>
         <Outlet />
       </main>
 
-      <DebugDrawer
-        isOpen={dbg.isOpen}
-        onClose={dbg.close}
-        realtimeLabel={realtimeLabel}
-      />
+      {dbg.isOpen && !pathIsNoAuth ? (
+        <DebugDrawer
+          isOpen={dbg.isOpen}
+          onClose={dbg.close}
+          realtimeLabel={realtimeLabel}
+        />
+      ) : null}
       </div>
-    </ToastProvider>
   );
 }

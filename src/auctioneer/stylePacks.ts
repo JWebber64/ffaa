@@ -1,11 +1,19 @@
 export type StylePackId = "classic" | "rodeo" | "posh" | "comedian";
 
-export const STYLE_PACKS: Record<StylePackId, any> = {
+type StylePack = {
+  label: string;
+  bid: (team: string, amount: number) => string;
+  once: () => string;
+  twice: () => string;
+  sold: (team: string, amount: number) => string;
+};
+
+export const STYLE_PACKS: Record<StylePackId, StylePack> = {
   classic: {
     label: "Classic",
     bid: (team: string, amount: number) => `${team} bids $${amount}.`,
-    once: () => "Going once…",
-    twice: () => "Going twice…",
+    once: () => "Going once.",
+    twice: () => "Going twice.",
     sold: (team: string, amount: number) =>
       `Sold to ${team} for $${amount}.`,
   },
@@ -24,8 +32,8 @@ export const STYLE_PACKS: Record<StylePackId, any> = {
     label: "Posh Art House",
     bid: (team: string, amount: number) =>
       `${team} delicately increases to $${amount}.`,
-    once: () => "A refined pause… once.",
-    twice: () => "Twice… shall we conclude?",
+    once: () => "A refined pause. Once.",
+    twice: () => "Twice. Shall we conclude?",
     sold: (team: string, amount: number) =>
       `Exquisite. ${team} secures it for $${amount}.`,
   },

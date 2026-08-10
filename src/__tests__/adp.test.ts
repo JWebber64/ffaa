@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 // @ts-nocheck
 import { describe, it, expect, vi, beforeEach, afterEach, beforeAll } from 'vitest';
 import { create } from 'zustand';
@@ -24,73 +25,43 @@ type StoreWithSelectors<T> = T & {
 
 // Create a test store that doesn't use React hooks
 const createTestStore = (initialState: Partial<DraftState> = {}) => {
-  const store = create<DraftState>((set, get) => ({
-    // Initial state
+  const adpCache = new Map<string, Player[]>();
+
+  const normalizePlayers = (data: FfcPlayer[]) => {
+    const positionCounts = new Map<string, number>();
+
+    return data.map((player) => {
+      const normalizedPosition = (player.position === 'DST' ? 'DEF' : player.position) as Position;
+      const nextPosRank = (positionCounts.get(normalizedPosition) ?? 0) + 1;
+      positionCounts.set(normalizedPosition, nextPosRank);
+
+      return {
+        id: player.id,
+        name: player.name || 'Unknown Player',
+        pos: normalizedPosition,
+        nflTeam: player.team || 'FA',
+        adp: player.adp || 999,
+        adpSource: 'ffc',
+        rank: player.rank || 999,
+        posRank: nextPosRank,
+        isDrafted: false,
+        isDraftable: true,
+      };
+    });
+  };
+
+  const store = create<DraftState>((set) => ({
     players: [],
     playersLoaded: false,
     teams: [],
     nominationQueue: [],
     currentBidder: undefined,
-    
-    // Mock actions
-    loadAdp: async (opts: { useCache?: boolean } = { useCache: true }) => {
-      const ffcAdp = new FfcAdp();
-      const data = await ffcAdp.load({
-        year: 2023,
-        teams: 12,
-        scoring: 'ppr' as const
-      });
-      
-      set({
-        players: data.map(p => ({
-          id: p.id,
-          name: p.name || 'Unknown Player',
-          pos: p.position as Position,
-          nflTeam: p.team || 'FA',
-          adp: p.adp || 999,
-          adpSource: 'ffc',
-          rank: p.rank || 999,
-          posRank: 1, // Will be calculated
-          bye: 0,
-          isDrafted: false,
-          isKeeper: false,
-          isDraftable: true,
-          isRookie: false,
-          isUndraftedFreeAgent: false,
-          isInjured: false,
-          isSuspended: false,
-          isOnBye: false,
-          isActive: true,
-          isStarter: false,
-          isBench: false,
-          isIR: false,
-          isTaxi: false,
-          isOnBlock: false
-        })),
-        playersLoaded: true
-      });
-      
-      return true;
-    },
-    
-    // Mock other required actions
-    setCurrentBidder: (teamId?: number) => {
-      set({ currentBidder: teamId });
-      return undefined;
-    },
-    
-    // Add other required actions with default implementations
-    addToNominationQueue: (playerId: string, teamId: number) => {},
-    removeFromNominationQueue: (playerId: string) => {},
-    updatePlayer: (playerId: string, updates: Partial<Player>) => {},
-    updateTeam: (teamId: number, updates: Partial<{ name: string; players: string[]; budget: number; roster: Record<string, number> }>) => {},
-    
-    // Initialize with any provided state
+
     ...initialState,
     teamCount: 12,
     baseBudget: 200,
     templateRoster: {
-      QB: 1, RB: 2, WR: 2, TE: 1, K: 1, DEF: 1, FLEX: 1, BENCH: 6
+      QB: 1, RB: 2, WR: 2, TE: 1, K: 1, DEF: 1, FLEX: 1, BENCH: 6, IR: 0
     },
     currentBid: null,
     currentWinningBid: null,
@@ -98,11 +69,14 @@ const createTestStore = (initialState: Partial<DraftState> = {}) => {
     isPaused: false,
     isComplete: false,
     isMockDraft: false,
-    
-    // Mock actions
+
     setPlayers: (players: Player[]) => set({ players }),
     setTeams: (teams: { id: number; name: string; players: string[]; budget: number; roster: Record<string, number> }[]) => set({ teams }),
     setCurrentNominatedId: (id: string | null) => set({ currentNominatedId: id }),
+    setCurrentBidder: (teamId?: number) => {
+      set({ currentBidder: teamId });
+      return undefined;
+    },
     applyAdp: (updates: Record<string, { adp?: number; adpSource?: string }>) => {
       set(state => ({
         players: state.players.map(p => ({
@@ -112,35 +86,47 @@ const createTestStore = (initialState: Partial<DraftState> = {}) => {
       }));
     },
     loadAdp: async (opts: { useCache?: boolean } = { useCache: true }) => {
+      const cacheKey = JSON.stringify({ year: 2023, teams: 12, scoring: 'ppr' });
+
+      if (opts.useCache !== false && adpCache.has(cacheKey)) {
+        set({
+          players: adpCache.get(cacheKey) ?? [],
+          playersLoaded: true
+        });
+        return true;
+      }
+
       const ffc = new FfcAdp();
       const data = await ffc.load({
         year: 2023,
         teams: 12,
-        scoring: 'ppr' as const
+        scoring: 'ppr' as const,
+        useCache: opts.useCache
       });
+
+      const normalizedPlayers = normalizePlayers(data as FfcPlayer[]);
+      if (opts.useCache !== false) {
+        adpCache.set(cacheKey, normalizedPlayers);
+      }
+
       set({
-        players: data.map((p: { id: string; name: string; position: string }) => ({
-          id: p.id,
-          name: p.name,
-          pos: p.position as Position,
-          nflTeam: p.team,
-          rank: p.rank || 999,
-          posRank: 1, // Will be calculated
-          adp: p.adp,
-          adpSource: 'ffc'
-        })),
+        players: normalizedPlayers,
         playersLoaded: true
       });
+
       return true;
     },
-    // Add other required actions with empty implementations
-    setConfig: (config: { teamCount: number; baseBudget: number; templateRoster: Record<string, number> }) => {},
-    setTeamNames: (names: string[]) => {},
-    nominate: (playerId: string, startingBid: number = 1) => {},
-    placeBid: (playerId: string, byTeamId: number, amount: number) => {},
-    assignPlayer: (playerId: string, teamId: number, price: number) => {},
-    computeMaxBid: (teamId: number) => 0,
-    hasSlotFor: (teamId: number, pos: Position) => true,
+    addToNominationQueue: (_playerId: string, _teamId: number) => {},
+    removeFromNominationQueue: (_playerId: string) => {},
+    updatePlayer: (_playerId: string, _updates: Partial<Player>) => {},
+    updateTeam: (_teamId: number, _updates: Partial<{ name: string; players: string[]; budget: number; roster: Record<string, number> }>) => {},
+    setConfig: (_config: { teamCount: number; baseBudget: number; templateRoster: Record<string, number> }) => {},
+    setTeamNames: (_names: string[]) => {},
+    nominate: (_playerId: string, _startingBid: number = 1) => {},
+    placeBid: (_playerId: string, _byTeamId: number, _amount: number) => {},
+    assignPlayer: (_playerId: string, _teamId: number, _price: number) => {},
+    computeMaxBid: (_teamId: number) => 0,
+    hasSlotFor: (_teamId: number, _pos: Position) => true,
     resetDraft: () => {}
   }));
 
@@ -195,17 +181,13 @@ type MockFfcAdp = {
     mockClear: () => void;
     mockImplementation: (fn: (opts: { year?: number; teams?: number; scoring?: string }) => Promise<FfcPlayer[]>) => void;
   };
-  getCacheKey?: (opts: { year?: number; teams?: number; scoring?: string }) => string;
-  loadFromCache?: (key: string) => FfcPlayer[] | null;
-  saveToCache?: (key: string, data: FfcPlayer[]) => void;
-  clearCache?: () => void;
-  baseUrl?: string;
 };
 
 // Mock the FfcAdp module
 vi.mock('../services/FfcAdp', () => {
   return {
-    default: vi.fn().mockImplementation(() => ({
+    default: vi.fn(function MockFfcAdp() {
+      return {
       load: vi.fn().mockResolvedValue([
         {
           id: '1',
@@ -252,7 +234,8 @@ vi.mock('../services/FfcAdp', () => {
           percentDrafted: 100
         }
       ])
-    }))
+      };
+    })
   };
 });
 
@@ -313,24 +296,19 @@ describe('ADP Integration', () => {
           percentDrafted: 100,
           rank: 120
         }
-      ]),
-      getCacheKey: vi.fn().mockImplementation((opts) => `cache-key-${JSON.stringify(opts)}`),
-      loadFromCache: vi.fn(),
-      saveToCache: vi.fn(),
-      clearCache: vi.fn(),
-      baseUrl: 'https://api.example.com'
+      ])
     };
 
     // Mock the FfcAdp constructor
-    vi.mocked(FfcAdp).mockImplementation(() => mockFfc as unknown as FfcAdp);
+    vi.mocked(FfcAdp).mockImplementation(function MockedFfcAdp() {
+      return mockFfc as unknown as FfcAdp;
+    } as unknown as typeof FfcAdp);
   });
 
   beforeEach(() => {
     // Reset the mock implementation before each test
     (mockFfc.load as any).mockClear();
-    if (mockFfc.loadFromCache) (mockFfc.loadFromCache as any).mockClear();
-    if (mockFfc.saveToCache) (mockFfc.saveToCache as any).mockClear();
-    
+
     // Create a new store for each test
     store = createTestStore();
   });
@@ -407,18 +385,7 @@ describe('ADP Integration', () => {
   it('should handle caching', async () => {
     const loadAdp = store.getState().loadAdp;
     if (!loadAdp) throw new Error('loadAdp is not defined');
-    
-    // Mock cache implementation
-    const cache: Record<string, any> = {};
-    if (mockFfc.loadFromCache) {
-      (mockFfc.loadFromCache as jest.Mock).mockImplementation((key: string) => cache[key]);
-    }
-    if (mockFfc.saveToCache) {
-      (mockFfc.saveToCache as jest.Mock).mockImplementation((key: string, data: FfcPlayer[]) => {
-        cache[key] = data;
-      });
-    }
-    
+
     // First call - should call the API
     await loadAdp({ useCache: true });
     expect((mockFfc.load as any).mock.calls.length).toBe(1);

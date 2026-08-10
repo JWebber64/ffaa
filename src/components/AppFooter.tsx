@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Text, HStack, Icon, Tooltip } from '@chakra-ui/react';
+import { Box, Text, HStack, Icon, Tooltip } from '@/ui/custom';
 import { Info } from 'lucide-react';
 import { getVersionInfo, formatVersionShort, formatVersionFull, type VersionInfo } from '../lib/version';
 
@@ -55,3 +55,4 @@ export default function AppFooter() {
     </Box>
   );
 }
+

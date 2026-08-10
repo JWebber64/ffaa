@@ -1,7 +1,7 @@
-import { Box, Button, Container, HStack, VStack, Heading, Stack, Text, useDisclosure, Input, Badge, useToast } from "@chakra-ui/react";
-import { useMemo, useState, KeyboardEvent, ChangeEvent, useEffect } from "react";
+import { Box, Button, Container, HStack, VStack, Heading, Stack, Text, useDisclosure, Input, Badge, useToast } from "@/ui/custom";
+import { useMemo, useState, useEffect } from "react";
+import type { KeyboardEvent, ChangeEvent, MouseEvent } from "react";
 import { useDraftStore } from '../store/draftStore';
-import { shallow } from 'zustand/shallow';
 import PlayerSearch from '../components/unified/PlayerSearch';
 import NominationIndicator from '../components/NominationIndicator';
 import LiveAuctionBar from '../components/LiveAuctionBar';
@@ -11,7 +11,7 @@ import { getValidSlotsForPlayer } from '../store/draftStore';
 import { toastError } from '../utils/toastError';
 import DraftStateIO from '../components/DraftStateIO';
 
-import type { Position, Player as BasePlayer, Team as BaseTeam } from '../types/draft';
+import type { Position, Player as BasePlayer, Team as BaseTeam, DraftStore as DraftStoreType } from '../types/draft';
 
 type RosterPosition = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
 
@@ -107,8 +107,8 @@ const SlotBox = ({ label, player }: SlotBoxProps) => {
 
   const positionColor = getPositionColor(label);
   // Use appropriate shades for each position
-  const bgColor = label === 'BENCH' ? 'gray.700' : label === 'IR' ? 'gray.700' : label === 'K' ? 'purple.600' : label === 'DEF' ? 'gray.600' : `${positionColor}.900`;
-  const borderColor = label === 'BENCH' ? 'gray.500' : label === 'IR' ? 'gray.500' : label === 'K' ? 'purple.400' : label === 'DEF' ? 'gray.300' : `${positionColor}.600`;
+  const bgColor = label === 'BENCH' ? 'var(--pos-bench)' : label === 'IR' ? 'var(--pos-ir)' : label === 'K' ? 'purple.600' : label === 'DEF' ? 'gray.600' : `${positionColor}.900`;
+  const borderColor = label === 'BENCH' ? 'var(--pos-bench)' : label === 'IR' ? 'var(--pos-ir)' : label === 'K' ? 'purple.400' : label === 'DEF' ? 'gray.300' : `${positionColor}.600`;
   
   if (player) {
     return (
@@ -158,6 +158,11 @@ const SlotBox = ({ label, player }: SlotBoxProps) => {
           ) : (
             <Box minW="24px" />
           )}
+          {player.byeWeek ? (
+            <Badge variant="outline" fontSize="0.55rem" px={1} minW="28px" textAlign="center" color="whiteAlpha.900">
+              B{player.byeWeek}
+            </Badge>
+          ) : null}
         </HStack>
       </Box>
     );
@@ -190,13 +195,13 @@ export default function DraftBoard() {
     teams, 
     placeBid,
     bidState
-  } = useDraftStore(s => ({
-    players: s.players,
+  } = useDraftStore((s: DraftStoreType) => ({
+    players: s.players as Player[],
     templateRoster: s.templateRoster,
     teams: s.teams as Team[],
     bidState: s.bidState,
     placeBid: s.placeBid
-  }), shallow);
+  }));
   
   // Get the current user's team (simplified - in a real app, this would come from auth)
   const currentUserTeam = teams[0]; // Assuming first team is the current user for now
@@ -214,7 +219,7 @@ export default function DraftBoard() {
   //   return Math.max(60, Math.min(120, viewportWidth * 0.12));
   // }
   const slotRows = useMemo(() => {
-    const order: Position[] = ["QB", "RB", "WR", "TE", "FLEX", "K", "DEF", "BENCH"];
+    const order: Position[] = ["QB", "RB", "WR", "TE", "FLEX", "K", "DEF", "IR", "BENCH"];
     return order
       .map((key) => ({ 
         key, 
@@ -323,6 +328,7 @@ export default function DraftBoard() {
       BENCH: bench,
       K: k,
       DEF: def,
+      IR: [],
     } as const;
 
     return (
@@ -546,7 +552,7 @@ export default function DraftBoard() {
                   <VStack width="100%" spacing={2}>
                     <Button
                       size="xs"
-                      bg="#10b3a5"
+                      bg="var(--accent-1)"
                       color="white"
                       onClick={() => claimOrEdit(team)}
                       width="100%"
@@ -562,13 +568,13 @@ export default function DraftBoard() {
                           size="xs"
                           value={nameDraft}
                           onChange={handleInputChange}
-                          onKeyDown={(e) => handleKeyDown(e, team)}
-                          onClick={(e) => e.stopPropagation()}
+                          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, team)}
+                          onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
                           autoFocus
                         />
                         <Button
                           size="xs"
-                          onClick={(e) => {
+                          onClick={(e: MouseEvent<HTMLButtonElement>) => {
                             e.stopPropagation();
                             saveName(team);
                           }}
@@ -645,3 +651,4 @@ export default function DraftBoard() {
     </Container>
   );
 }
+

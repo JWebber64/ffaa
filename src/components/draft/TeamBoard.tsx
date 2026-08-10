@@ -1,133 +1,150 @@
+import type { CSSProperties } from "react";
 import { cn } from "@/ui/cn";
-import { Badge } from "@/ui/Badge";
+import { getComputerManagerProfile } from "@/engine/autoManager";
+import {
+  getTeamMaxBid,
+  getTeamRosterAssignments,
+  type RosterPlayer,
+  type RosterSlot,
+  type SlotAssignment,
+  type Team,
+} from "./rosterAssignments";
+import { formatTeamBye, normalizeTeamAbbr, resolveByeWeek } from "@/components/player/teamMarkUtils";
 
-// Inject custom styles
-if (typeof document !== 'undefined' && !document.getElementById('team-board-styles')) {
-  const style = document.createElement('style');
-  style.id = 'team-board-styles';
-  style.textContent = `
-    @keyframes jewel-glow {
-      0%, 100% { box-shadow: 0 0 15px rgba(124, 58, 237, 0.6), inset 0 0 0 1px rgba(124, 58, 237, 0.3); }
-      50% { box-shadow: 0 0 25px rgba(124, 58, 237, 0.8), inset 0 0 0 1px rgba(124, 58, 237, 0.5); }
-    }
-    .glowing-jewel {
-      animation: jewel-glow 2s ease-in-out infinite;
-      background: linear-gradient(145deg, rgba(124, 58, 237, 0.3), rgba(124, 58, 237, 0.1));
-      backdrop-filter: blur(8px);
-    }
-    .glass {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-  `;
-  document.head.appendChild(style);
+export type TeamBoardDensity = "compact" | "readable";
+
+function formatPlayerPrice(price?: number) {
+  if (typeof price !== "number" || !Number.isFinite(price)) return "$--";
+  return `$${price}`;
 }
 
-type RosterSlot = { slot: string; count: number; flexEligible?: string[] };
-
-type Team = {
-  teamId: string;
-  name: string;
-  budget: number;
-  spent: number;
-  roster?: Array<{ name?: string; price?: number }>;
-};
-
-function expandSlots(rosterSlots: RosterSlot[]) {
-  const out: string[] = [];
-  for (const rs of rosterSlots) {
-    const n = Math.max(0, Number(rs.count) || 0);
-    for (let i = 0; i < n; i++) out.push(rs.slot);
-  }
-  return out;
+function formatProjectedValue(player: RosterPlayer | null) {
+  const value = player?.auctionValue ?? player?.projectedValue;
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  return `$${value}`;
 }
 
-function SlotTile({ slot, assigned, flexEligible }: { slot: string; assigned?: { name?: string; price?: number } | null; flexEligible?: string[] }) {
-  const isFilled = !!assigned?.name;
-  
-  // Map position slots to CSS variables from tokens.css
-  const positionColors = {
-    QB: 'var(--pos-qb)',
-    RB: 'var(--pos-rb)', 
-    WR: 'var(--pos-wr)',
-    TE: 'var(--pos-te)',
-    FLEX: 'var(--pos-flex)',
-    K: 'var(--pos-k)',
-    DST: 'var(--pos-dst)',
+function getRosterMeta(player: RosterPlayer | null) {
+  if (!player) return { team: "", byeWeek: undefined, title: "" };
+
+  const team = normalizeTeamAbbr(player.team);
+  const byeWeek = resolveByeWeek(team, player.byeWeek);
+
+  return {
+    team,
+    byeWeek,
+    title: formatTeamBye(team, byeWeek),
   };
+}
 
-  // For FLEX slots, get the colors of eligible positions
-  let flexSections = null;
-
-  if (slot === 'FLEX' && flexEligible && flexEligible.length > 0) {
-    // Create sections for each eligible position color using CSS variables
-    flexSections = flexEligible.map(pos => positionColors[pos as keyof typeof positionColors] || 'var(--pos-flex)');
+function compactTeamName(team: Team) {
+  const raw = team.name?.trim() || team.teamId;
+  const teamMatch = raw.match(/^team\s+(\d+)$/i);
+  if (teamMatch) {
+    return `T${teamMatch[1]}`;
   }
+
+  const cpuMatch = raw.match(/^cpu\s+(\d+)$/i);
+  if (cpuMatch) {
+    return `CPU${cpuMatch[1]}`;
+  }
+
+  if (raw.length <= 10) return raw;
+
+  const initials = raw
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join("");
+
+  return initials || raw;
+}
+
+function getPlayerNameParts(name: string | null | undefined) {
+  return String(name ?? "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .flatMap((part) => {
+      if (!part.includes("-") || part.length < 10) return [part];
+      const segments = part.split("-").filter(Boolean);
+      return segments.map((segment, index) => (index < segments.length - 1 ? `${segment}-` : segment));
+    });
+}
+
+function getPlayerNameSizeClass(parts: string[]) {
+  const longestPart = parts.reduce((longest, part) => Math.max(longest, part.length), 0);
+  const totalLength = parts.join("").length;
+
+  if (longestPart >= 13 || totalLength >= 22) return "name-xs";
+  if (longestPart >= 9 || totalLength >= 18) return "name-sm";
+  if (longestPart >= 8 || totalLength >= 14) return "name-tight";
+  return "";
+}
+
+function SlotLine({
+  slot,
+}: {
+  slot: SlotAssignment;
+}) {
+  const filled = !!slot.assigned?.name;
+  const rosterMeta = getRosterMeta(slot.assigned);
+  const hasRosterMeta = !!(rosterMeta.team || rosterMeta.byeWeek);
+  const nameParts = getPlayerNameParts(slot.assigned?.name);
+  const nameSizeClass = getPlayerNameSizeClass(nameParts);
+  const slotStyle = {
+    "--team-slot-color": slot.color,
+  } as CSSProperties;
 
   return (
     <div
       className={cn(
-        "rounded-[12px] transition-all duration-300 hover:scale-[1.02] hover:shadow-lg relative overflow-hidden",
-        "h-9 flex items-center px-1",
-        isFilled 
-          ? "text-white shadow-[0_0_15px_rgba(0,0,0,0.3)] border border-transparent"
-          : "bg-[rgba(255,255,255,0.05)] text-fg2 backdrop-blur-sm"
+        "team-slot-line",
+        filled ? "is-filled" : "is-open",
+        filled && hasRosterMeta ? "has-meta" : ""
       )}
-      style={{
-        ...(isFilled ? {
-          backgroundColor: positionColors[slot as keyof typeof positionColors] || 'var(--pos-flex)',
-        } : {}),
-        ...(!isFilled && slot !== 'FLEX' ? {
-          backgroundColor: positionColors[slot as keyof typeof positionColors] || 'var(--pos-flex)',
-          opacity: 0.8,
-        } : {})
-      }}
+      style={slotStyle}
+      title={
+        filled
+          ? `${slot.label}: ${slot.assigned?.name} paid ${formatPlayerPrice(slot.assigned?.price)}${
+              formatProjectedValue(slot.assigned) ? `, projected ${formatProjectedValue(slot.assigned)}` : ""
+            }${rosterMeta.title ? `, ${rosterMeta.title}` : ""}`
+          : `${slot.label}: Open`
+      }
     >
-      {/* FLEX slot color sections */}
-      {slot === 'FLEX' && flexSections && !isFilled && (
-        <div className="absolute inset-0 flex">
-          {flexSections.map((color, index) => (
-            <div 
-              key={index}
-              className="flex-1"
-              style={{ backgroundColor: color }}
-            />
-          ))}
-        </div>
-      )}
-      
-      {/* Dark overlay for text readability */}
-      {slot === 'FLEX' && flexSections && !isFilled && (
-        <div className="absolute inset-0 bg-black/30" />
-      )}
-      
-      <div className="relative z-10 flex items-center justify-between w-full gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className={cn(
-            "font-bold text-xs uppercase tracking-wide flex-shrink-0", 
-            isFilled ? "text-white" : slot === 'FLEX' && flexSections ? "text-white" : "text-fg0"
-          )}>{slot}</div>
-          {assigned?.name && (
-            <div className={cn("text-xs truncate", isFilled ? "text-white/90" : "text-fg1")} title={assigned.name}>
-              {assigned.name}
-            </div>
-          )}
-        </div>
-        {assigned?.price != null ? (
-          <div className="font-mono text-xs font-bold text-white/90 flex-shrink-0">${assigned.price}</div>
+      <span className="team-slot-line-side">
+        <span className="team-slot-line-label">{slot.label}</span>
+        {filled ? <span className="team-slot-line-price">{formatPlayerPrice(slot.assigned?.price)}</span> : null}
+      </span>
+      <span className="team-slot-line-detail">
+        {filled ? (
+          <span className={cn("team-slot-line-player descender-safe-text", nameSizeClass)} title={slot.assigned?.name}>
+            {nameParts.map((part, index) => (
+              <span key={`${part}-${index}`} className="team-slot-line-name-part">
+                {part}
+              </span>
+            ))}
+          </span>
         ) : (
-          <div className={cn("text-xs flex-shrink-0", slot === 'FLEX' && flexSections && !isFilled ? "text-white/80" : "text-fg3")}>—</div>
+          <span className="team-slot-line-player team-slot-line-open">Open</span>
         )}
-      </div>
+      </span>
+      {filled && hasRosterMeta ? (
+        <span className="team-slot-line-meta" aria-label={rosterMeta.title || undefined}>
+          {rosterMeta.team ? <span className="team-slot-line-team">{rosterMeta.team}</span> : null}
+          {rosterMeta.byeWeek ? <span className="team-slot-line-bye-label">bye</span> : null}
+          {rosterMeta.byeWeek ? <strong className="team-slot-line-bye-week">{rosterMeta.byeWeek}</strong> : null}
+        </span>
+      ) : null}
     </div>
   );
 }
 
-function TeamColumn({
+function TeamPanel({
   team,
   rosterSlots,
   isNominator,
+  isHighBidder,
   isMe,
   isActive,
   onOpen,
@@ -135,84 +152,112 @@ function TeamColumn({
   team: Team;
   rosterSlots: RosterSlot[];
   isNominator?: boolean;
+  isHighBidder?: boolean;
   isMe?: boolean;
   isActive?: boolean;
   onOpen?: (teamId: string) => void;
 }) {
-  const remaining = (team.budget ?? 0) - (team.spent ?? 0);
-  const slots = expandSlots(rosterSlots);
   const roster = Array.isArray(team.roster) ? team.roster : [];
+  const slotAssignments = getTeamRosterAssignments(rosterSlots, roster);
+  const visibleSlots = slotAssignments;
+  const totalSlots = slotAssignments.length;
+  const filledSlots = slotAssignments.filter((slot) => slot.assigned?.name).length;
+  const remainingBudget = Math.max(0, (team.budget ?? 0) - (team.spent ?? 0));
+  const maxBid = getTeamMaxBid(team, totalSlots);
+  const isBudgetDanger = maxBid <= 5 || remainingBudget <= Math.max(5, totalSlots - filledSlots);
+  const isBudgetWarn = !isBudgetDanger && (maxBid <= 20 || remainingBudget <= 35);
+  const cpuProfile = team.managerType === "computer" ? getComputerManagerProfile(team) : null;
+  const teamTitle = team.name?.trim() || team.teamId;
+  const panelTitle = cpuProfile ? `${teamTitle} - CPU profile: ${cpuProfile.label}` : teamTitle;
+  const hasVisibleFlags = Boolean(isNominator || isActive);
+  const panelStyle = {
+    "--team-slot-rows": String(Math.max(visibleSlots.length, 1)),
+  } as CSSProperties;
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex-1 flex flex-col justify-between">
-        <div
-          className={cn(
-            "rounded-[18px] backdrop-blur-md overflow-hidden",
-            "bg-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))",
-            "shadow-[0_8px_24px_rgba(0,0,0,0.45),inset_0_0_0_1px_rgba(255,255,255,0.06)]",
-            "border border-[rgba(255,255,255,0.12)]",
-            isNominator ? "ring-2 ring-[rgba(34,211,238,0.35)] shadow-[0_0_25px_rgba(34,211,238,0.2)]" : "",
-            isMe ? "ring-2 ring-[rgba(124,58,237,0.4)] shadow-[0_0_20px_rgba(124,58,237,0.3)]" : ""
-          )}
-        >
-          {/* Position-colored top accent strip */}
-          <div className={cn(
-            "h-1 w-full",
-            isNominator ? "bg-[rgba(34,211,238,0.6)]" : "bg-[rgba(255,255,255,0.1)]"
-          )} />
+    <article
+      className={cn(
+        "team-panel",
+        isNominator ? "team-panel-nominator" : "",
+        isHighBidder ? "team-panel-high-bidder" : "",
+        isMe ? "team-panel-me" : "",
+        isActive ? "team-panel-active" : "",
+        isBudgetWarn ? "team-panel-budget-warn" : "",
+        isBudgetDanger ? "team-panel-budget-danger" : ""
+      )}
+      title={panelTitle}
+      style={panelStyle}
+    >
+      <div className="team-panel-head">
+        <div className={cn("team-panel-title-row", hasVisibleFlags ? "" : "team-panel-title-row-solo")}>
+          <button
+            type="button"
+            className={cn("team-panel-name", onOpen ? "team-panel-name-link" : "team-panel-name-static")}
+            onClick={() => onOpen?.(team.teamId)}
+            title={onOpen ? `Open ${panelTitle}` : panelTitle}
+          >
+            {compactTeamName(team)}
+          </button>
 
-          {/* Header */}
-          <div className="px-2 py-1.5 border-b border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)]">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <button
-                  type="button"
-                  className={cn(
-                    "truncate text-[13px] font-bold text-fg0 text-left",
-                    "hover:underline hover:underline-offset-2",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-0",
-                    onOpen ? "cursor-pointer" : "cursor-default"
-                  )}
-                  title={onOpen ? `Open device for ${team.name}` : team.name}
-                  onClick={() => onOpen?.(team.teamId)}
-                >
-                  {team.name}
-                </button>
-                {/* Compact budget bar */}
-                <div className="mt-1 flex items-center gap-2 text-[10px]">
-                  <span className="text-fg1 font-semibold">${remaining}</span>
-                  <span className="text-fg3">•</span>
-                  <span className="text-fg2">MAX ${Math.max(0, remaining)}</span>
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                {isNominator ? <Badge tone="accent" className="text-xs">NOM</Badge> : null}
-                {isActive ? <Badge tone="neutral" className="text-[10px]">OPEN</Badge> : null}
-              </div>
+          {hasVisibleFlags ? (
+            <div className="team-panel-flags">
+              {isNominator ? <span className="team-flag team-flag-otc">OTC</span> : null}
+              {isActive ? <span className="team-flag team-flag-device">DEV</span> : null}
             </div>
-          </div>
-
-          {/* Roster slots area */}
-          <div className="flex-1 flex flex-col gap-[6px] p-1">
-            {slots.map((slot, idx) => {
-              // Find the roster slot configuration to get flexEligible positions
-              const rosterSlotConfig = rosterSlots.find(rs => rs.slot === slot);
-              const flexEligible = rosterSlotConfig?.flexEligible;
-              
-              return (
-                <SlotTile 
-                  key={`${team.teamId}:${slot}:${idx}`} 
-                  slot={slot} 
-                  assigned={roster[idx] ?? null}
-                  {...(flexEligible && { flexEligible })}
-                />
-              );
-            })}
-          </div>
+          ) : null}
         </div>
       </div>
-    </div>
+
+      {isNominator || isHighBidder ? (
+        <div className="team-panel-status-badges">
+          {isNominator ? <div className="team-panel-turn-marker">Nominating</div> : null}
+          {isHighBidder ? <div className="team-panel-high-marker">High bid</div> : null}
+        </div>
+      ) : null}
+
+      <div className="team-panel-meta-row">
+        <div className="team-panel-meta-item" title={`Remaining budget: $${remainingBudget}`}>
+          <span className="team-panel-meta-label">Budget</span>
+          <span
+            className={cn(
+              "team-panel-meta-value",
+              "team-panel-budget-cell",
+              isBudgetDanger ? "is-danger" : "",
+              isBudgetWarn ? "is-warn" : ""
+            )}
+          >
+            <strong>${remainingBudget}</strong>
+          </span>
+        </div>
+        <div className="team-panel-meta-item" title={`Filled roster slots: ${filledSlots}/${totalSlots}`}>
+          <span className="team-panel-meta-label">Roster</span>
+          <span className="team-panel-meta-value">
+            <strong>{filledSlots}/{totalSlots}</strong>
+          </span>
+        </div>
+        <div className="team-panel-meta-item" title={`Maximum bid: $${maxBid}`}>
+          <span className="team-panel-meta-label">Max Bid</span>
+          <span
+            className={cn(
+              "team-panel-meta-value",
+              "team-panel-max-cell",
+              isBudgetDanger ? "is-danger" : "",
+              isBudgetWarn ? "is-warn" : ""
+            )}
+          >
+            <strong>${maxBid}</strong>
+          </span>
+        </div>
+      </div>
+
+      <div className="team-panel-body">
+        <div className="team-slot-list">
+          {visibleSlots.map((slot) => (
+            <SlotLine key={`${team.teamId}-${slot.key}`} slot={slot} />
+          ))}
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -222,6 +267,8 @@ export default function TeamBoard({
   currentNominatorTeamId,
   myTeamId,
   activeTeamId,
+  highBidderTeamId,
+  density = "readable",
   onTeamOpen,
 }: {
   teams: Team[];
@@ -229,22 +276,33 @@ export default function TeamBoard({
   currentNominatorTeamId?: string | null;
   myTeamId?: string | null;
   activeTeamId?: string | null;
+  highBidderTeamId?: string | null;
+  density?: TeamBoardDensity;
   onTeamOpen?: (teamId: string) => void;
 }) {
+  const boardClass =
+    teams.length >= 15 ? "team-board-16" : teams.length >= 11 ? "team-board-12" : "team-board-standard";
+  const boardStyle = {
+    "--team-columns": String(Math.max(teams.length, 1)),
+  } as CSSProperties;
+
   return (
-    <div className="grid grid-cols-12 gap-0 items-stretch">
-      {teams.map((t, idx) => (
-        <div key={t.teamId} className={cn("h-full flex flex-col", idx !== 0 && "border-l border-[rgba(255,255,255,0.08)]")}>
-          <TeamColumn
-            team={t}
-            rosterSlots={rosterSlots}
-            isNominator={!!currentNominatorTeamId && t.teamId === currentNominatorTeamId}
-            isMe={!!myTeamId && t.teamId === myTeamId}
-            isActive={!!activeTeamId && t.teamId === activeTeamId}
-            {...(onTeamOpen && { onOpen: onTeamOpen })}
-          />
-        </div>
-      ))}
+    <div className={cn("team-board", boardClass, `team-board-density-${density}`)} style={boardStyle}>
+      <div className="team-board-track">
+        {teams.map((team) => (
+          <div key={team.teamId} className="team-board-cell">
+            <TeamPanel
+              team={team}
+              rosterSlots={rosterSlots}
+              isNominator={!!currentNominatorTeamId && team.teamId === currentNominatorTeamId}
+              isHighBidder={!!highBidderTeamId && team.teamId === highBidderTeamId}
+              isMe={!!myTeamId && team.teamId === myTeamId}
+              isActive={!!activeTeamId && team.teamId === activeTeamId}
+              {...(onTeamOpen ? { onOpen: onTeamOpen } : {})}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

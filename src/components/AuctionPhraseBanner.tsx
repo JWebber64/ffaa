@@ -4,7 +4,7 @@ export function AuctionPhraseBanner({ phrase }: { phrase: string | null }) {
   if (!phrase) return null;
 
   return (
-    <div className="rounded-xl border border-[rgba(124,58,237,0.35)] bg-[linear-gradient(135deg,rgba(124,58,237,0.18),rgba(34,211,238,0.10))] shadow-s2 p-4 sm:p-5 transition-all duration-300">
+    <div className="rounded-2xl border border-[rgba(16,185,129,0.35)] bg-[linear-gradient(135deg,rgba(16,185,129,0.18),rgba(20,184,166,0.12),rgba(96,165,250,0.08))] shadow-[0_18px_60px_rgba(0,0,0,0.35)] p-4 sm:p-5 transition-all duration-300">
       <div className={cn(
         "text-[20px] sm:text-[24px] font-semibold text-fg0 tracking-wide",
         "animate-[fadeIn_300ms_ease]"

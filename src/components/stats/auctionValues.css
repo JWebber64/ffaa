@@ -1,0 +1,89 @@
+.stats-view-tabs {
+  grid-template-columns: repeat(7, minmax(130px, 1fr));
+}
+
+.stats-auction-import {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(330px, 0.85fr);
+  gap: 12px 20px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.075), rgba(3, 12, 9, 0.88));
+}
+
+.stats-auction-import-copy {
+  display: grid;
+  gap: 5px;
+}
+
+.stats-auction-import-copy strong {
+  color: rgba(240, 253, 250, 0.94);
+  font-size: 0.9rem;
+}
+
+.stats-auction-import-copy span,
+.stats-auction-import-status {
+  color: rgba(203, 213, 225, 0.72);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.stats-auction-import-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.stats-auction-import-form .ui-input-field {
+  height: 36px;
+  border-radius: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-auction-import-status {
+  grid-column: 1 / -1;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.065);
+}
+
+.stats-auction-import-status.is-error {
+  color: rgba(253, 164, 175, 0.94);
+}
+
+.stats-auction-import-status a,
+.stats-auction-attribution a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: rgba(94, 234, 212, 0.94);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.stats-auction-consensus {
+  color: rgba(110, 231, 183, 0.98);
+  font-size: 0.86rem;
+}
+
+.stats-hub-panel[aria-labelledby="stats-view-auction"] .stats-hub-table {
+  min-width: 1900px;
+}
+
+@media (max-width: 1180px) {
+  .stats-view-tabs {
+    grid-template-columns: repeat(7, minmax(142px, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .stats-auction-import {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-auction-import-form {
+    grid-template-columns: 1fr;
+  }
+}

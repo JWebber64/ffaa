@@ -13,8 +13,8 @@ export const DEFAULT_DRAFT_CONFIG: DraftConfig = {
   teamCount: 12,
 };
 
-export type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF' | 'FLEX' | 'BENCH';
-export type BasePosition = Exclude<Position, 'FLEX' | 'BENCH'>;
+export type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF' | 'FLEX' | 'BENCH' | 'IR';
+export type BasePosition = Exclude<Position, 'FLEX' | 'BENCH' | 'IR'>;
 
 export type NominationOrderMode = 'regular' | 'snake' | 'reverse';
 
@@ -88,7 +88,12 @@ export interface Player {
   name: string;
   pos: Position;
   nflTeam?: string;
+  byeWeek?: number;
   draftedBy?: number;
+  /**
+   * Actual auction sale price paid by the winning team.
+   * Keep projected/consensus dollar values in auctionValue.
+   */
   price?: number;
   search_rank?: number;
   search_rank_ppr?: number;
@@ -96,7 +101,40 @@ export interface Player {
   posRank?: number;
   adp?: number;
   adpSource?: string;
+  /**
+   * FFAA fair value, normalized to the active league settings and budget.
+   * This is a guide value, not a predicted winning bid or sale price.
+   */
+  auctionValue?: number;
+  /**
+   * Median of compatible published auction-dollar sources before FFAA's
+   * projection and roster-demand adjustments.
+   */
+  marketValue?: number;
+  marketValueSourceCount?: number;
+  marketValueUpdatedAt?: string;
+  projectedValue?: number;
+  projectedPoints?: number;
+  valueSources?: PlayerValueSource[];
+  valueConfidence?: number;
+  valueUpdatedAt?: string;
   slot?: Position;
+}
+
+export type PlayerValueSourceKind = 'auction' | 'projection' | 'rank-derived' | 'adp-derived';
+
+export interface PlayerValueSource {
+  source: string;
+  sourceId?: string;
+  sourceUrl?: string;
+  kind: PlayerValueSourceKind;
+  value: number;
+  normalizedValue: number;
+  weight: number;
+  includedInConsensus?: boolean;
+  scoring?: 'standard' | 'halfPpr' | 'ppr' | 'twoQb';
+  projectedPoints?: number;
+  updatedAt?: string;
 }
 
 export interface Team {
@@ -195,6 +233,7 @@ export interface DraftActions {
   setTeams: (teams: Team[]) => void;
   setCurrentNominatedId: (id: string | null) => void;
   setCurrentBidder: (teamId?: number) => void;
+  initializeDraft: (firstNominatorTeamId?: number | null) => void;
   
   // Auction actions
   nominate: (playerId: string, startingBid?: number) => void;

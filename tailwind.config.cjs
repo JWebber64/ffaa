@@ -4,8 +4,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        bg0: "var(--bg0)",
-        bg1: "var(--bg1)",
+        // Legacy aliases
+        bg0: "var(--bg-0)",
+        bg1: "var(--bg-1)",
         panel: "var(--panel)",
         glass: "var(--glass)",
         stroke: "var(--stroke)",
@@ -27,6 +28,7 @@ module.exports = {
         "glass-1": "var(--glass-1)",
         "glass-2": "var(--glass-2)",
         "glass-3": "var(--glass-3)",
+        "line-0": "var(--line-0)",
         "line-1": "var(--line-1)",
         "spec-1": "var(--spec-1)",
         "spec-2": "var(--spec-2)",

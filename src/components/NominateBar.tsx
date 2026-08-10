@@ -2,12 +2,12 @@ import {
   Box,
   Button,
   Flex,
-  HStack,
   Input,
   Text,
   useToast,
-} from '@chakra-ui/react';
+} from '@/ui/custom';
 import { useMemo, useState } from 'react';
+import type { ChangeEvent } from 'react';
 import { useDraftStore } from '../store/draftStore';
 import { PlayerSearch } from './unified/PlayerSearch';
 import type { Player } from '../store/draftStore';
@@ -77,7 +77,7 @@ export default function NominateBar() {
             type="number"
             min={1}
             value={startingBid}
-            onChange={(e) => setStartingBid(Number(e.target.value))}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setStartingBid(Number(e.target.value))}
           />
         </Box>
 
@@ -96,3 +96,4 @@ export default function NominateBar() {
     </Box>
   );
 }
+

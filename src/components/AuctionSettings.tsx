@@ -18,7 +18,7 @@ import {
   NumberDecrementStepper,
   useToast,
   Box,
-} from '@chakra-ui/react';
+} from '@/ui/custom';
 import { useDraftStore } from '../store/draftStore';
 import type { Position } from '../types/draft';
 
@@ -111,7 +111,7 @@ const AuctionSettings: React.FC<AuctionSettingsProps> = ({ isOpen, onClose }) =>
                   <Text fontSize="sm" mb={1}>Countdown (seconds)</Text>
                   <NumberInput
                     value={localSettings.countdownSeconds}
-                    onChange={(value) => setLocalSettings(prev => ({
+                    onChange={(value: string) => setLocalSettings(prev => ({
                       ...prev,
                       countdownSeconds: Number(value) || 30
                     }))}
@@ -130,7 +130,7 @@ const AuctionSettings: React.FC<AuctionSettingsProps> = ({ isOpen, onClose }) =>
                   <Text fontSize="sm" mb={1}>Anti-Snipe (seconds)</Text>
                   <NumberInput
                     value={localSettings.antiSnipeSeconds}
-                    onChange={(value) => setLocalSettings(prev => ({
+                    onChange={(value: string) => setLocalSettings(prev => ({
                       ...prev,
                       antiSnipeSeconds: Number(value) || 10
                     }))}
@@ -155,7 +155,7 @@ const AuctionSettings: React.FC<AuctionSettingsProps> = ({ isOpen, onClose }) =>
                   <Text fontSize="sm" mb={1}>Number of Teams</Text>
                   <NumberInput
                     value={localConfig.teamCount}
-                    onChange={(value) => setLocalConfig(prev => ({
+                    onChange={(value: string) => setLocalConfig(prev => ({
                       ...prev,
                       teamCount: Number(value) || 12
                     }))}
@@ -174,7 +174,7 @@ const AuctionSettings: React.FC<AuctionSettingsProps> = ({ isOpen, onClose }) =>
                   <Text fontSize="sm" mb={1}>Budget per Team</Text>
                   <NumberInput
                     value={localConfig.baseBudget}
-                    onChange={(value) => setLocalConfig(prev => ({
+                    onChange={(value: string) => setLocalConfig(prev => ({
                       ...prev,
                       baseBudget: Number(value) || 200
                     }))}
@@ -201,7 +201,7 @@ const AuctionSettings: React.FC<AuctionSettingsProps> = ({ isOpen, onClose }) =>
                     <Text fontSize="sm">{position}</Text>
                     <NumberInput
                       value={localConfig.roster[position] || 0}
-                      onChange={(value) => updateRosterPosition(position, Number(value) || 0)}
+                      onChange={(value: string) => updateRosterPosition(position, Number(value) || 0)}
                       min={0}
                       max={10}
                       size="sm"
@@ -234,3 +234,4 @@ const AuctionSettings: React.FC<AuctionSettingsProps> = ({ isOpen, onClose }) =>
 };
 
 export default AuctionSettings;
+

@@ -1,0 +1,38 @@
+export const VALUE_SOURCE_WEIGHTS = {
+  espnSalaryCap: 0.85,
+  winWithOddsProjection: 0.7,
+  fantasyProsImport: 0.9,
+  draftSharksImport: 0.8,
+  rotoWireImport: 0.85,
+  yahooImport: 0.75,
+  sharpProjection: 0.75,
+  fourForFourAdp: 0.58,
+  fantasyFootballCalculatorAdp: 0.5,
+  rotoBallerImport: 0.65,
+  footballersRankings: 0.6,
+  fantasyNerdsPublicAuction: 0.72,
+  ffToolboxAuction: 0.55,
+  beatAdpMarket: 0.5,
+  rankDerived: 0.2,
+  adpDerived: 0.2,
+  importedAdpDerivedMultiplier: 0.45,
+  importedRankDerivedMultiplier: 0.4,
+} as const;
+
+export const VALUE_CONFIDENCE_WEIGHTS = {
+  singleAuctionSource: 0.4,
+  secondAuctionSource: 0.25,
+  additionalAuctionSource: 0.1,
+  supportingSource: 0.04,
+  maxWithoutAuctionSource: 0.28,
+  maxWithOneAuctionSource: 0.55,
+} as const;
+
+export const PROJECTION_POSITION_MULTIPLIERS = {
+  QB: 0.72,
+  RB: 1,
+  WR: 1,
+  TE: 0.92,
+  K: 0.18,
+  DEF: 0.18,
+} as const;

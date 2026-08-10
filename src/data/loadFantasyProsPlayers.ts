@@ -1,5 +1,5 @@
 import type { Player, Position } from "@/types/draft";
-import rows from "./players-2025-fantasypros.json";
+import rows from "./player-pool-2026.json";
 
 interface Raw {
   id: string;
@@ -19,7 +19,7 @@ interface Raw {
 
 // Type guard to validate player data
 function isValidPosition(pos: string): pos is Position {
-  return ['QB', 'RB', 'WR', 'TE', 'K', 'DEF', 'FLEX', 'BENCH'].includes(pos);
+  return ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'].includes(pos);
 }
 
 function processPlayerData(raw: Raw, index: number): Player | null {

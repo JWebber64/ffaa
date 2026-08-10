@@ -28,6 +28,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "vite.config.ts", "src/__tests__/**/*"],
+  "include": ["src", "shared", "vite.config.ts", "src/__tests__/**/*"],
   "exclude": ["node_modules", "scripts"]
 }

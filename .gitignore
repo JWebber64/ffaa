@@ -10,7 +10,22 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+*.tsbuildinfo
 *.local
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+cloudflare/.dev.vars
+cloudflare/.dev.vars.*
+!cloudflare/.dev.vars.example
+.wrangler
+.vercel
+
+# Generated audit and browser-QA artifacts
+reports/
+codex-*.html
+codex-*.png
+league-desktop.png
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +37,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+.vercel
+.env*
+!.env.example

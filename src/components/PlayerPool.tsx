@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import type { ChangeEvent, MouseEvent } from 'react';
 import {
   Box,
   Button,
@@ -11,15 +12,17 @@ import {
   Tooltip,
   InputGroup,
   InputLeftElement
-} from '@chakra-ui/react';
-import { SearchIcon } from '@chakra-ui/icons';
+} from '@/ui/custom';
+import { Search } from 'lucide-react';
 import type { Position as PositionType } from '../types/draft';
 import { useDraftStore, useDraftSelectors } from '../store/draftStore';
 import { useGlobalPlayers } from '../hooks/useGlobalPlayers';
 import type { Player } from '../types/draft';
 import { formatPositionForDisplay } from '../utils/positionUtils';
+import { TeamMark } from './player/TeamMark';
+import { formatByeWeek } from './player/teamMarkUtils';
 
-type Pos = Exclude<PositionType, 'FLEX' | 'BENCH'>;
+type Pos = Exclude<PositionType, 'FLEX' | 'BENCH' | 'IR'>;
 type TabValue = 'ALL' | Pos | 'FLEX';
 
 const POS_ORDER: readonly Pos[] = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'] as const;
@@ -44,8 +47,8 @@ const getPositionColorForBadge = (pos: string) => {
     case 'K': return 'purple';
     case 'DEF': return 'gray';
     case 'FLEX': return 'cyan';
-    case 'BENCH': return 'gray';
-    case 'IR': return 'gray';
+    case 'BENCH': return 'gray'; // Will be overridden by CSS
+    case 'IR': return 'gray';    // Will be overridden by CSS
     default: return 'gray';
   }
 };
@@ -78,9 +81,38 @@ const PlayerRow: React.FC<PlayerRowProps> = ({ player, onNominate, nominate, sho
       justify="space-between"
     >
       <HStack spacing={3} flex={1}>
-        <Text fontWeight="semibold" isTruncated>{player.name}</Text>
-        {player.pos && <Badge colorScheme={getPositionColorForBadge(player.pos)} minW="2.5em" textAlign="center">{player.pos}</Badge>}
+        <HStack spacing={2} minW={0}>
+          <TeamMark team={player.nflTeam} size="xs" />
+          <Text fontWeight="semibold" isTruncated>{player.name}</Text>
+        </HStack>
+        {player.pos && (
+          player.pos === 'BENCH' || player.pos === 'IR' ? (
+            <Badge 
+              minW="2.5em" 
+              textAlign="center"
+              style={{ 
+                background: player.pos === 'BENCH' ? 'var(--pos-bench)' : 'var(--pos-ir)',
+                color: 'white'
+              }}
+            >
+              {player.pos}
+            </Badge>
+          ) : (
+            <Badge colorScheme={getPositionColorForBadge(player.pos)} minW="2.5em" textAlign="center">{player.pos}</Badge>
+          )
+        )}
         {player.nflTeam && <Badge colorScheme="gray" minW="2.5em" textAlign="center">{player.nflTeam}</Badge>}
+        {player.byeWeek && <Badge colorScheme="gray" minW="3.5em" textAlign="center">Bye {player.byeWeek}</Badge>}
+        {typeof player.auctionValue === 'number' && (
+          <Badge colorScheme="green" title="FFAA fair auction value" minW="3.5em" textAlign="center">
+            ${player.auctionValue}
+          </Badge>
+        )}
+        {typeof player.marketValue === 'number' && (
+          <Badge colorScheme="gray" title="Published-source market median" minW="3.5em" textAlign="center">
+            M ${Math.round(player.marketValue)}
+          </Badge>
+        )}
         {showDebugInfo && (
           <HStack spacing={2} ml="auto" pr={2}>
             {player.rank && <Badge colorScheme="purple" title="Overall Rank">{player.rank}</Badge>}
@@ -101,7 +133,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({ player, onNominate, nominate, sho
             cursor: 'not-allowed'
           }
         }}
-        onClick={(e) => {
+        onClick={(e: MouseEvent<HTMLButtonElement>) => {
           e.preventDefault();
           e.stopPropagation();
           nominate(player.id);
@@ -149,7 +181,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
   // Get players based on active tab and filters
   const getFilteredPlayers = useMemo(() => {
     console.log('[PlayerPool] Getting filtered players for tab:', activeTab);
-    let players: Player[] = [];
+    let players: Player[];
     const searchTerm = search.trim().toLowerCase();
     
     // Get base player list based on tab
@@ -196,7 +228,8 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
         (p) =>
           (p.name?.toLowerCase().includes(searchTerm) ||
           p.pos?.toLowerCase().includes(searchTerm) ||
-          p.nflTeam?.toLowerCase().includes(searchTerm)) &&
+          p.nflTeam?.toLowerCase().includes(searchTerm) ||
+          formatByeWeek(p.byeWeek).toLowerCase().includes(searchTerm)) &&
           (!onlyUndrafted || !p.draftedBy)
       );
       console.log('[PlayerPool] Players after search filter:', players.length);
@@ -258,13 +291,13 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
       {/* Search Bar */}
       <HStack spacing={2} w="100%">
         <InputGroup maxW="400px">
-          <InputLeftElement pointerEvents="none">
-            <SearchIcon color="gray.500" />
+          <InputLeftElement pointerEvents="none" color="gray.500">
+            <Search size={16} />
           </InputLeftElement>
           <Input
             placeholder="Search players..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
             size="md"
             bg="gray.800"
             borderColor="gray.600"
@@ -273,7 +306,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
             _hover={{ borderColor: 'green.500' }}
             _focus={{
               borderColor: 'green.400',
-              boxShadow: '0 0 0 1px var(--chakra-colors-green-400)'
+              boxShadow: '0 0 0 1px var(--success)'
             }}
             pl={10}
           />
@@ -389,7 +422,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
                     <Button 
                       size="xs" 
                       variant="outline"
-                      onClick={(e) => {
+                      onClick={(e: MouseEvent<HTMLButtonElement>) => {
                         e.stopPropagation();
                         handlePositionTabClick(pos);
                       }}
@@ -412,7 +445,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
                         size="sm" 
                         variant="ghost" 
                         colorScheme="green"
-                        onClick={(e) => {
+                        onClick={(e: MouseEvent<HTMLButtonElement>) => {
                           e.stopPropagation();
                           handlePositionTabClick(pos);
                         }}
@@ -433,3 +466,4 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
 };
 
 export default PlayerPool;
+

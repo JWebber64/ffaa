@@ -23,7 +23,8 @@ export function getPositionDisplayName(pos: Position): string {
     K: 'Kicker',
     DEF: 'Defense',
     FLEX: 'Flex',
-    BENCH: 'Bench'
+    BENCH: 'Bench',
+    IR: 'Injured Reserve'
   };
   
   return displayNames[pos] || pos;

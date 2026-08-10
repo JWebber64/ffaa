@@ -33,7 +33,7 @@ function normalizePosition(posRaw?: string): BasePosition | null {
   return null;
 }
 
-function toPlayer(sp: SleeperPlayer & { search_rank?: number; search_rank_ppr?: number }): (Player & { search_rank?: number; search_rank_ppr?: number }) | null {
+function toPlayer(sp: SleeperPlayer & { search_rank?: number; search_rank_ppr?: number }): Player | null {
   const name = sp.full_name || [sp.first_name, sp.last_name].filter(Boolean).join(' ').trim();
   const pos = normalizePosition(sp.position) || normalizePosition(sp.fantasy_positions?.[0]);
   if (!name || !sp.player_id || !pos) return null;
@@ -42,9 +42,9 @@ function toPlayer(sp: SleeperPlayer & { search_rank?: number; search_rank_ppr?: 
     id: sp.player_id,
     name,
     pos,
-    nflTeam: sp.team || undefined,
-    search_rank: sp.search_rank,
-    search_rank_ppr: sp.search_rank_ppr,
+    ...(sp.team ? { nflTeam: sp.team } : {}),
+    ...(sp.search_rank !== undefined ? { search_rank: sp.search_rank } : {}),
+    ...(sp.search_rank_ppr !== undefined ? { search_rank_ppr: sp.search_rank_ppr } : {}),
     // Add required fields with default values
     rank: 0,
     posRank: 0,

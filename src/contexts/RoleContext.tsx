@@ -1,12 +1,5 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-
-type RoleContextValue = {
-  isAdmin: boolean;
-  enableAdminMode: () => void;
-  disableAdminMode: () => void;
-};
-
-const RoleContext = createContext<RoleContextValue | undefined>(undefined);
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { RoleContext } from "./roleContextState";
 
 const STORAGE_KEY = "ffaa_admin_mode"; // local preference only (NOT security)
 
@@ -46,10 +39,4 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   );
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;
-}
-
-export function useRole(): RoleContextValue {
-  const ctx = useContext(RoleContext);
-  if (!ctx) throw new Error("useRole must be used within a RoleProvider");
-  return ctx;
 }

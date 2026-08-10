@@ -1,206 +1,211 @@
-import { supabase } from "@/lib/supabase";
-import { DraftConfigV2 } from "@/types/draftConfig";
+import type { DraftConfigV2 } from "@/types/draftConfig";
+import {
+  appendFirebaseDraftAction,
+  cancelFirebaseDraftRoom,
+  createFirebaseDraftRoom,
+  getFirebaseDraftByCode,
+  getFirebaseDraftConfig,
+  joinFirebaseDraftRoom,
+  leaveFirebaseDraftRoom,
+  listFirebaseParticipants,
+  placeFirebaseBid,
+  setFirebaseReady,
+  updateFirebaseDraftConfig,
+  updateFirebaseTeamNumber,
+} from "@/multiplayer/firebaseBackend";
+import {
+  appendLocalDraftAction,
+  cancelLocalDraftRoom,
+  createLocalDraftRoom,
+  getLocalDraftByCode,
+  getLocalDraftConfig,
+  isLocalMultiplayerMode,
+  joinLocalDraftRoom,
+  leaveLocalDraftRoom,
+  listLocalParticipants,
+  setLocalReady,
+  updateLocalDraftConfig,
+  updateLocalTeamNumber,
+} from "@/multiplayer/localMode";
+import {
+  isAuctionGatewayEnabled,
+  submitCloudflareBid,
+} from "@/multiplayer/cloudflareGateway";
 
-async function requireUserId(): Promise<string> {
-  const { data: s1, error: e1 } = await supabase.auth.getSession();
-  if (e1) throw e1;
+type DraftActionOptions = {
+  actionId?: string;
+  submittedAt?: number;
+};
 
-  if (!s1.session) {
-    const { data: s2, error: e2 } = await supabase.auth.signInAnonymously();
-    if (e2) throw e2;
-    const uid = s2.session?.user?.id;
-    if (!uid) throw new Error("Anonymous session missing user id");
-    return uid;
-  }
+function isDirectBidFallback(error: unknown) {
+  const code = typeof error === "object" && error !== null
+    ? String((error as { code?: unknown }).code ?? "")
+    : "";
 
-  const uid = s1.session.user.id;
-  if (!uid) throw new Error("Session missing user id");
-  return uid;
+  return code === "permission-denied" || code === "unavailable" || code === "failed-precondition";
 }
 
 export async function createDraftRoom(displayName: string, draftConfig: DraftConfigV2) {
-  await requireUserId();
-
-  // normalize budgets (keep your existing normalization)
-  if (draftConfig.draftType === "auction" && draftConfig.auctionSettings) {
-    if (draftConfig.auctionSettings.teamBudgets.length !== draftConfig.teamCount) {
-      draftConfig = {
-        ...draftConfig,
-        auctionSettings: {
-          ...draftConfig.auctionSettings,
-          teamBudgets: Array(draftConfig.teamCount).fill(draftConfig.auctionSettings.defaultBudget),
-        },
-      };
-    }
+  if (isLocalMultiplayerMode()) {
+    return createLocalDraftRoom(displayName, draftConfig);
   }
 
-  const settings = {
-    ...draftConfig,
-    version: 1,
-    locked: true,
-    lockedAt: new Date().toISOString(),
-  };
-
-  const { data: draft, error } = await supabase.rpc("create_draft_room_v2", {
-    p_display_name: displayName,
-    p_settings: settings,
-    p_draft_type: draftConfig.draftType,
-    p_team_count: draftConfig.teamCount,
-  });
-
-  if (error) throw error;
-  if (!draft) throw new Error("Draft not returned from RPC");
-
-  // PostgREST RPC can return a single object OR an array depending on function shape.
-  // create_draft_room_v2 RETURNS TABLE(...), so Supabase often returns an array.
-  const row = Array.isArray(draft) ? draft[0] : draft;
-  if (!row?.id) throw new Error("Draft RPC returned no id");
-  return row;
+  return createFirebaseDraftRoom(displayName, draftConfig);
 }
 
 export async function joinDraftRoom(code: string, displayName: string) {
-  await requireUserId();
+  if (isLocalMultiplayerMode()) {
+    return joinLocalDraftRoom(code, displayName);
+  }
 
-  const { data: draft, error } = await supabase.rpc("join_draft_by_code_v2", {
-    p_code: code,
-    p_display_name: displayName,
-  });
-
-  if (error) throw error;
-  if (!draft) throw new Error("Draft not returned from RPC");
-
-  const row = Array.isArray(draft) ? draft[0] : draft;
-  if (!row?.id) throw new Error("Join draft RPC returned no id");
-  return row;
+  return joinFirebaseDraftRoom(code, displayName);
 }
 
-export async function sendDraftAction(draftId: string, type: string, payload: unknown) {
-  const userId = await requireUserId();
+export async function sendDraftAction(
+  draftId: string,
+  type: string,
+  payload: unknown,
+  options: DraftActionOptions = {}
+) {
+  if (isLocalMultiplayerMode()) {
+    return appendLocalDraftAction(
+      draftId,
+      type,
+      (payload as Record<string, unknown> | null) ?? {},
+      options.actionId
+    );
+  }
 
-  const { error } = await supabase.from("draft_actions").insert({
-    draft_id: draftId,
-    action_id: crypto.randomUUID(),
-    user_id: userId,
+  return appendFirebaseDraftAction(
+    draftId,
     type,
-    payload,
-  });
-
-  if (error) throw error;
+    (payload as Record<string, unknown> | null) ?? {},
+    options.actionId
+  );
 }
 
 export async function getDraftByCode(code: string) {
-  const { data, error } = await supabase
-    .from("drafts")
-    .select("*")
-    .eq("code", code.toUpperCase())
-    .single();
-  if (error) throw error;
-  return data;
+  if (isLocalMultiplayerMode()) {
+    const draft = getLocalDraftByCode(code.toUpperCase());
+    if (!draft) throw new Error("Draft room not found.");
+    return draft;
+  }
+
+  return getFirebaseDraftByCode(code);
 }
 
 export async function getDraftConfig(draftId: string): Promise<DraftConfigV2> {
-  const { data, error } = await supabase
-    .from("drafts")
-    .select("settings")
-    .eq("id", draftId)
-    .single();
-  
-  if (error) throw error;
-  if (!data?.settings) throw new Error("Draft config not found");
-  
-  return data.settings as DraftConfigV2;
+  if (isLocalMultiplayerMode()) {
+    return getLocalDraftConfig(draftId);
+  }
+
+  return getFirebaseDraftConfig(draftId);
+}
+
+export async function updateDraftConfig(draftId: string, draftConfig: DraftConfigV2): Promise<DraftConfigV2> {
+  if (isLocalMultiplayerMode()) {
+    return updateLocalDraftConfig(draftId, draftConfig);
+  }
+
+  return updateFirebaseDraftConfig(draftId, draftConfig);
 }
 
 export async function listParticipants(draftId: string) {
-  const { data, error } = await supabase
-    .from("draft_participants")
-    .select("*")
-    .eq("draft_id", draftId)
-    .order("joined_at", { ascending: true });
+  if (isLocalMultiplayerMode()) {
+    return listLocalParticipants(draftId);
+  }
 
-  if (error) throw error;
-  return data ?? [];
+  return listFirebaseParticipants(draftId);
 }
 
 export async function listParticipantsSafe(draftId: string) {
-  const { data, error } = await supabase
-    .from("draft_participants")
-    .select("*")
-    .eq("draft_id", draftId)
-    .order("joined_at", { ascending: true });
+  if (isLocalMultiplayerMode()) {
+    return listLocalParticipants(draftId);
+  }
 
-  if (error) {
+  try {
+    return await listFirebaseParticipants(draftId);
+  } catch (error) {
     console.error("listParticipants failed", error);
     return [];
   }
-  return data ?? [];
 }
 
 export async function setMyReady(draftId: string, isReady: boolean) {
-  const userId = await requireUserId();
+  if (isLocalMultiplayerMode()) {
+    setLocalReady(draftId, isReady);
+    return;
+  }
 
-  const { error } = await supabase
-    .from("draft_participants")
-    .update({ is_ready: isReady })
-    .eq("draft_id", draftId)
-    .eq("user_id", userId);
-
-  if (error) throw error;
+  await setFirebaseReady(draftId, isReady);
 }
 
 export async function leaveDraftRoom(draftId: string) {
-  const userId = await requireUserId();
-  const { error } = await supabase
-    .from("draft_participants")
-    .delete()
-    .eq("draft_id", draftId)
-    .eq("user_id", userId);
+  if (isLocalMultiplayerMode()) {
+    leaveLocalDraftRoom(draftId);
+    return;
+  }
 
-  if (error) throw error;
+  await leaveFirebaseDraftRoom(draftId);
+}
+
+export async function cancelDraftRoom(draftId: string) {
+  if (isLocalMultiplayerMode()) {
+    cancelLocalDraftRoom(draftId);
+    return;
+  }
+
+  await cancelFirebaseDraftRoom(draftId);
 }
 
 export async function updateTeamNumber(userId: string, teamNumber: number) {
-  // First get the draft to check phase
-  const { data: participant } = await supabase
-    .from("draft_participants")
-    .select("draft_id")
-    .eq("user_id", userId)
-    .single();
-
-  if (!participant?.draft_id) throw new Error("Participant not found");
-
-  const { data: draft } = await supabase
-    .from("drafts")
-    .select("snapshot")
-    .eq("id", participant.draft_id)
-    .single();
-
-  if (draft?.snapshot?.phase !== "lobby") {
-    throw new Error("Cannot change teams after draft starts.");
+  if (isLocalMultiplayerMode()) {
+    updateLocalTeamNumber(userId, teamNumber);
+    return;
   }
 
-  const { error } = await supabase
-    .from("draft_participants")
-    .update({ team_number: teamNumber })
-    .eq("user_id", userId);
-
-  if (error) throw error;
+  await updateFirebaseTeamNumber(userId, teamNumber);
 }
 
 export async function appendDraftAction(
   draftId: string,
   type: string,
-  payload: Record<string, any>
+  payload: Record<string, any>,
+  options: DraftActionOptions = {}
 ) {
-  const userId = await requireUserId();
+  if (isLocalMultiplayerMode()) {
+    return appendLocalDraftAction(draftId, type, payload, options.actionId);
+  }
 
-  const { error } = await supabase.from("draft_actions").insert({
-    draft_id: draftId,
-    action_id: crypto.randomUUID(),
-    user_id: userId,
-    type,
-    payload,
-  });
+  return appendFirebaseDraftAction(draftId, type, payload, options.actionId);
+}
 
-  if (error) throw error;
+export async function submitDraftBid(
+  draftId: string,
+  teamId: string,
+  amount: number,
+  options: DraftActionOptions = {}
+) {
+  const actionId: string = options.actionId ?? crypto.randomUUID();
+  const submittedAt = options.submittedAt ?? Date.now();
+  const payload = { teamId, amount, submittedAt };
+
+  if (isLocalMultiplayerMode()) {
+    return appendLocalDraftAction(draftId, "bid", payload, actionId);
+  }
+
+  if (isAuctionGatewayEnabled()) {
+    return submitCloudflareBid(draftId, teamId, amount, actionId);
+  }
+
+  try {
+    return await placeFirebaseBid(draftId, teamId, amount, actionId, submittedAt);
+  } catch (error) {
+    if (isDirectBidFallback(error)) {
+      console.warn("[multiplayer] direct bid transaction unavailable; falling back to host action queue.", error);
+      return appendFirebaseDraftAction(draftId, "bid", payload, actionId);
+    }
+
+    throw error;
+  }
 }

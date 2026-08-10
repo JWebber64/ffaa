@@ -13,8 +13,9 @@ import {
   ModalOverlay,
   Text,
   useToast,
-} from '@chakra-ui/react';
+} from '@/ui/custom';
 import { useEffect, useMemo, useState } from 'react';
+import type { ChangeEvent } from 'react';
 import { useDraftStore } from '../../store/draftStore';
 
 type BidModalProps = {
@@ -112,7 +113,7 @@ export default function BidModal({ teamId, isOpen, onClose }: BidModalProps) {
                 <Input
                   type="number"
                   value={amount}
-                  onChange={(e) => setAmount(Number(e.target.value))}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setAmount(Number(e.target.value))}
                   min={bidState.highBid + 1}
                   max={teamMax}
                 />
@@ -148,3 +149,4 @@ export default function BidModal({ teamId, isOpen, onClose }: BidModalProps) {
     </Modal>
   );
 }
+

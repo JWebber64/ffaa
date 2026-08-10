@@ -60,7 +60,7 @@ export function normalizeTeamName(teamName: string): string {
   
   // Try partial match for DEF
   if (teamName.includes('DEF')) {
-    const teamPart = teamName.split('DEF')[0].trim();
+    const teamPart = teamName.split('DEF')[0]?.trim() ?? '';
     return TEAM_ALIASES[teamPart] || teamName;
   }
   

@@ -1,4 +1,5 @@
-import playersData from './players-2025-espn.json';
+import { FANTASY_SEASON } from '@/config/fantasySeason';
+import playersData from './players-2026-espn.json';
 
 export interface Player {
   id: string;
@@ -20,7 +21,7 @@ export function loadEspnPlayers(): Player[] {
     rank: player.rank,
     byeWeek: player.bye,
     espnValue: player.value,
-    season: 2025
+    season: FANTASY_SEASON
   }));
 }
 
@@ -28,6 +29,6 @@ export function loadEspnPlayers(): Player[] {
 try {
   const players = loadEspnPlayers();
   console.log(`Successfully loaded ${players.length} players`);
-} catch (error) {
+} catch (_error) {
   console.warn('No player data found. Run `npm run espn:pull` to download the latest data.');
 }

@@ -4,7 +4,6 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
-  Input,
   NumberInput,
   NumberInputField,
   Radio,
@@ -12,7 +11,7 @@ import {
   Stack,
   Text,
   useToast,
-} from '@chakra-ui/react';
+} from '@/ui/custom';
 import { useState } from 'react';
 import { useDraftStore } from '../store/draftStore';
 import type { NominationOrderMode } from '../types/draft';
@@ -29,11 +28,14 @@ export default function AuctionSettingsPanel() {
   const [reverseAt, setReverseAt] = useState<number>(auctionSettings.reverseAtRound ?? 2);
 
   const save = () => {
-    setAuctionSettings({
+    const next: { nominationOrderMode: NominationOrderMode; countdownSeconds: number; reverseAtRound?: number } = {
       nominationOrderMode: mode,
       countdownSeconds: Math.max(5, Math.floor(countdown || 30)),
-      reverseAtRound: mode === 'reverse' ? Math.max(1, Math.floor(reverseAt)) : undefined,
-    });
+    };
+    if (mode === 'reverse') {
+      next.reverseAtRound = Math.max(1, Math.floor(reverseAt));
+    }
+    setAuctionSettings(next);
     
     toast({
       title: 'Settings saved',
@@ -52,7 +54,7 @@ export default function AuctionSettingsPanel() {
         <NumberInput 
           min={5} 
           value={countdown} 
-          onChange={(_, v) => setCountdown(v)}
+          onChange={(_value: string, v: number) => setCountdown(v)}
           mb={2}
         >
           <NumberInputField />
@@ -64,7 +66,7 @@ export default function AuctionSettingsPanel() {
         <FormLabel>Nomination Order</FormLabel>
         <RadioGroup 
           value={mode} 
-          onChange={(v) => setMode(v as NominationOrderMode)}
+          onChange={(v: string) => setMode(v as NominationOrderMode)}
           mb={3}
         >
           <Stack direction="column" spacing={2}>
@@ -81,7 +83,7 @@ export default function AuctionSettingsPanel() {
               min={2} 
               max={20} 
               value={reverseAt} 
-              onChange={(_, v) => setReverseAt(v)}
+              onChange={(_value: string, v: number) => setReverseAt(v)}
               width="100px"
             >
               <NumberInputField />
@@ -105,3 +107,4 @@ export default function AuctionSettingsPanel() {
     </Box>
   );
 }
+

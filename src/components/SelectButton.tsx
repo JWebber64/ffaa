@@ -1,7 +1,7 @@
-import { Button, useDisclosure } from '@chakra-ui/react';
+import { Button, useDisclosure } from '@/ui/custom';
 import { Check } from 'lucide-react';
 import SelectPlayerModal from './modals/SelectPlayerModal';
-import { useRole } from '../contexts/RoleContext';
+import { useRole } from '../contexts/roleContextState';
 
 type SelectButtonProps = {
   teamId: number;
@@ -28,3 +28,4 @@ export default function SelectButton({ teamId }: SelectButtonProps) {
     </>
   );
 }
+

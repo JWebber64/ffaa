@@ -1,4 +1,4 @@
-import { Button, Tooltip, useDisclosure } from '@chakra-ui/react';
+import { Button, Tooltip, useDisclosure } from '@/ui/custom';
 import { GiGavel } from 'react-icons/gi';
 import BidModal from './modals/BidModal';
 import { useDraftStore } from '../store/draftStore';
@@ -38,3 +38,4 @@ export default function BidButton({ teamId }: BidButtonProps) {
     </>
   );
 }
+

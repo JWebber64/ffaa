@@ -1,15 +1,18 @@
 import React from "react";
 import { cn } from "./cn";
 
+type CardVariant = "glass" | "control";
+
 export function Card({
+  variant = "glass",
   className,
   children,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: React.HTMLAttributes<HTMLDivElement> & { variant?: CardVariant }) {
   return (
     <div
       className={cn(
-        "rounded-[20px] border border-[rgba(255,255,255,0.12)] bg-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)) shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[20px]",
+        variant === "control" ? "control-card-surface" : "liquid-card rounded-[20px]",
         className
       )}
       {...props}

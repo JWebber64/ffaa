@@ -1,4 +1,4 @@
-import { Box, Heading, List, ListItem, Text } from '@chakra-ui/react';
+import { Box, Heading, List, ListItem, Text } from '@/ui/custom';
 import { useDraftStore } from '../store/draftStore';
 import type { LogEvent } from '../types/draft';
 
@@ -24,3 +24,4 @@ export default function ActivityLog() {
     </Box>
   );
 }
+

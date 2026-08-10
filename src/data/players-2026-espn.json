@@ -1,0 +1,3012 @@
+[
+  {
+    "rank": 1,
+    "name": "Jahmyr Gibbs",
+    "position": "RB",
+    "team": "DET",
+    "value": 57,
+    "bye": 6,
+    "id": "2026-RB-jahmyr-gibbs",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 81,
+    "name": "Brian Thomas Jr.",
+    "position": "WR",
+    "team": "JAC",
+    "value": 4,
+    "bye": 7,
+    "id": "2026-WR-brian-thomas-jr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 161,
+    "name": "Jalen Nailor",
+    "position": "WR",
+    "team": "LV",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-WR-jalen-nailor",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 241,
+    "name": "LeQuint Allen",
+    "position": "RB",
+    "team": "JAC",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-RB-lequint-allen",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 2,
+    "name": "Bijan Robinson",
+    "position": "RB",
+    "team": "ATL",
+    "value": 56,
+    "bye": 11,
+    "id": "2026-RB-bijan-robinson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 82,
+    "name": "Trevor Lawrence",
+    "position": "QB",
+    "team": "JAC",
+    "value": 4,
+    "bye": 7,
+    "id": "2026-QB-trevor-lawrence",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 162,
+    "name": "Omar Cooper Jr.",
+    "position": "WR",
+    "team": "NYJ",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-WR-omar-cooper-jr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 242,
+    "name": "MarShawn Lloyd",
+    "position": "RB",
+    "team": "GB",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-RB-marshawn-lloyd",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 3,
+    "name": "Puka Nacua",
+    "position": "WR",
+    "team": "LAR",
+    "value": 56,
+    "bye": 11,
+    "id": "2026-WR-puka-nacua",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 83,
+    "name": "Dak Prescott",
+    "position": "QB",
+    "team": "DAL",
+    "value": 4,
+    "bye": 14,
+    "id": "2026-QB-dak-prescott",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 163,
+    "name": "Rashod Bateman",
+    "position": "WR",
+    "team": "BAL",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-WR-rashod-bateman",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 243,
+    "name": "Jaydon Blue",
+    "position": "RB",
+    "team": "DAL",
+    "value": 0,
+    "bye": 14,
+    "id": "2026-RB-jaydon-blue",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 4,
+    "name": "Ja'Marr Chase",
+    "position": "WR",
+    "team": "CIN",
+    "value": 55,
+    "bye": 6,
+    "id": "2026-WR-jamarr-chase",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 84,
+    "name": "Bo Nix",
+    "position": "QB",
+    "team": "DEN",
+    "value": 4,
+    "bye": 10,
+    "id": "2026-QB-bo-nix",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 164,
+    "name": "Jauan Jennings",
+    "position": "WR",
+    "team": "MIN",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-WR-jauan-jennings",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 244,
+    "name": "George Holani",
+    "position": "RB",
+    "team": "SEA",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-RB-george-holani",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 5,
+    "name": "Jaxon Smith-Njigba",
+    "position": "WR",
+    "team": "SEA",
+    "value": 54,
+    "bye": 11,
+    "id": "2026-WR-jaxon-smith-njigba",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 85,
+    "name": "Brock Purdy",
+    "position": "QB",
+    "team": "SF",
+    "value": 4,
+    "bye": 8,
+    "id": "2026-QB-brock-purdy",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 165,
+    "name": "Tank Dell",
+    "position": "WR",
+    "team": "HOU",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-WR-tank-dell",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 245,
+    "name": "Ty Johnson",
+    "position": "RB",
+    "team": "BUF",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-RB-ty-johnson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 6,
+    "name": "Christian McCaffrey",
+    "position": "RB",
+    "team": "SF",
+    "value": 53,
+    "bye": 8,
+    "id": "2026-RB-christian-mccaffrey",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 86,
+    "name": "Matthew Stafford",
+    "position": "QB",
+    "team": "LAR",
+    "value": 4,
+    "bye": 11,
+    "id": "2026-QB-matthew-stafford",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 166,
+    "name": "Tyjae Spears",
+    "position": "RB",
+    "team": "TEN",
+    "value": 0,
+    "bye": 9,
+    "id": "2026-RB-tyjae-spears",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 246,
+    "name": "Emari Demercado",
+    "position": "RB",
+    "team": "KC",
+    "value": 0,
+    "bye": 5,
+    "id": "2026-RB-emari-demercado",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 7,
+    "name": "Jonathan Taylor",
+    "position": "RB",
+    "team": "IND",
+    "value": 52,
+    "bye": 13,
+    "id": "2026-RB-jonathan-taylor",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 87,
+    "name": "Caleb Williams",
+    "position": "QB",
+    "team": "CHI",
+    "value": 3,
+    "bye": 10,
+    "id": "2026-QB-caleb-williams",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 167,
+    "name": "Braelon Allen",
+    "position": "RB",
+    "team": "NYJ",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-RB-braelon-allen",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 247,
+    "name": "Isaiah Davis",
+    "position": "RB",
+    "team": "NYJ",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-RB-isaiah-davis",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 8,
+    "name": "Amon-Ra St. Brown",
+    "position": "WR",
+    "team": "DET",
+    "value": 52,
+    "bye": 6,
+    "id": "2026-WR-amon-ra-st-brown",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 88,
+    "name": "Jakobi Meyers",
+    "position": "WR",
+    "team": "JAC",
+    "value": 3,
+    "bye": 7,
+    "id": "2026-WR-jakobi-meyers",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 168,
+    "name": "Keaton Mitchell",
+    "position": "RB",
+    "team": "LAC",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-RB-keaton-mitchell",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 248,
+    "name": "Emmett Johnson",
+    "position": "RB",
+    "team": "KC",
+    "value": 0,
+    "bye": 5,
+    "id": "2026-RB-emmett-johnson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 9,
+    "name": "CeeDee Lamb",
+    "position": "WR",
+    "team": "DAL",
+    "value": 51,
+    "bye": 14,
+    "id": "2026-WR-ceedee-lamb",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 89,
+    "name": "Wan'Dale Robinson",
+    "position": "WR",
+    "team": "TEN",
+    "value": 3,
+    "bye": 9,
+    "id": "2026-WR-wandale-robinson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 169,
+    "name": "Broncos D/ST",
+    "position": "DEF",
+    "team": "DEN",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-DEF-broncos-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 249,
+    "name": "Chris Brooks",
+    "position": "RB",
+    "team": "GB",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-RB-chris-brooks",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 10,
+    "name": "De'Von Achane",
+    "position": "RB",
+    "team": "MIA",
+    "value": 50,
+    "bye": 6,
+    "id": "2026-RB-devon-achane",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 90,
+    "name": "Makai Lemon",
+    "position": "WR",
+    "team": "PHI",
+    "value": 3,
+    "bye": 10,
+    "id": "2026-WR-makai-lemon",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 170,
+    "name": "Texans D/ST",
+    "position": "DEF",
+    "team": "HOU",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-DEF-texans-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 250,
+    "name": "Sean Tucker",
+    "position": "RB",
+    "team": "TB",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-RB-sean-tucker",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 11,
+    "name": "Justin Jefferson",
+    "position": "WR",
+    "team": "MIN",
+    "value": 48,
+    "bye": 6,
+    "id": "2026-WR-justin-jefferson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 91,
+    "name": "Josh Downs",
+    "position": "WR",
+    "team": "IND",
+    "value": 3,
+    "bye": 13,
+    "id": "2026-WR-josh-downs",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 171,
+    "name": "Steelers D/ST",
+    "position": "DEF",
+    "team": "PIT",
+    "value": 0,
+    "bye": 9,
+    "id": "2026-DEF-steelers-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 251,
+    "name": "DJ Giddens",
+    "position": "RB",
+    "team": "IND",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-RB-dj-giddens",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 12,
+    "name": "James Cook III",
+    "position": "RB",
+    "team": "BUF",
+    "value": 46,
+    "bye": 7,
+    "id": "2026-RB-james-cook-iii",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 92,
+    "name": "Jordan Addison",
+    "position": "WR",
+    "team": "MIN",
+    "value": 3,
+    "bye": 6,
+    "id": "2026-WR-jordan-addison",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 172,
+    "name": "Seahawks D/ST",
+    "position": "DEF",
+    "team": "SEA",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-DEF-seahawks-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 252,
+    "name": "Dontayvion Wicks",
+    "position": "WR",
+    "team": "PHI",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-WR-dontayvion-wicks",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 13,
+    "name": "Jeremiyah Love",
+    "position": "RB",
+    "team": "ARI",
+    "value": 45,
+    "bye": 14,
+    "id": "2026-RB-jeremiyah-love",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 93,
+    "name": "Justin Herbert",
+    "position": "QB",
+    "team": "LAC",
+    "value": 3,
+    "bye": 7,
+    "id": "2026-QB-justin-herbert",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 173,
+    "name": "Rams D/ST",
+    "position": "DEF",
+    "team": "LAR",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-DEF-rams-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 253,
+    "name": "Savion Williams",
+    "position": "WR",
+    "team": "GB",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-WR-savion-williams",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 14,
+    "name": "Drake London",
+    "position": "WR",
+    "team": "ATL",
+    "value": 43,
+    "bye": 11,
+    "id": "2026-WR-drake-london",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 94,
+    "name": "Patrick Mahomes",
+    "position": "QB",
+    "team": "KC",
+    "value": 3,
+    "bye": 5,
+    "id": "2026-QB-patrick-mahomes",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 174,
+    "name": "Ravens D/ST",
+    "position": "DEF",
+    "team": "BAL",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-DEF-ravens-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 254,
+    "name": "Jaguars D/ST",
+    "position": "DEF",
+    "team": "JAC",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-DEF-jaguars-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 15,
+    "name": "Ashton Jeanty",
+    "position": "RB",
+    "team": "LV",
+    "value": 42,
+    "bye": 13,
+    "id": "2026-RB-ashton-jeanty",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 95,
+    "name": "Jaylen Warren",
+    "position": "RB",
+    "team": "PIT",
+    "value": 3,
+    "bye": 9,
+    "id": "2026-RB-jaylen-warren",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 175,
+    "name": "Eagles D/ST",
+    "position": "DEF",
+    "team": "PHI",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-DEF-eagles-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 255,
+    "name": "Colts D/ST",
+    "position": "DEF",
+    "team": "IND",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-DEF-colts-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 16,
+    "name": "Rashee Rice",
+    "position": "WR",
+    "team": "KC",
+    "value": 40,
+    "bye": 5,
+    "id": "2026-WR-rashee-rice",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 96,
+    "name": "Rhamondre Stevenson",
+    "position": "RB",
+    "team": "NE",
+    "value": 2,
+    "bye": 11,
+    "id": "2026-RB-rhamondre-stevenson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 176,
+    "name": "Browns D/ST",
+    "position": "DEF",
+    "team": "CLE",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-DEF-browns-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 256,
+    "name": "Evan McPherson",
+    "position": "K",
+    "team": "CIN",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-K-evan-mcpherson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 17,
+    "name": "Trey McBride",
+    "position": "TE",
+    "team": "ARI",
+    "value": 38,
+    "bye": 14,
+    "id": "2026-TE-trey-mcbride",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 97,
+    "name": "Rico Dowdle",
+    "position": "RB",
+    "team": "PIT",
+    "value": 2,
+    "bye": 9,
+    "id": "2026-RB-rico-dowdle",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 177,
+    "name": "Patriots D/ST",
+    "position": "DEF",
+    "team": "NE",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-DEF-patriots-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 257,
+    "name": "Nick Folk",
+    "position": "K",
+    "team": "ATL",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-K-nick-folk",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 18,
+    "name": "Omarion Hampton",
+    "position": "RB",
+    "team": "LAC",
+    "value": 37,
+    "bye": 7,
+    "id": "2026-RB-omarion-hampton",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 98,
+    "name": "Kenny Gainwell",
+    "position": "RB",
+    "team": "TB",
+    "value": 2,
+    "bye": 10,
+    "id": "2026-RB-kenny-gainwell",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 178,
+    "name": "Lions D/ST",
+    "position": "DEF",
+    "team": "DET",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-DEF-lions-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 258,
+    "name": "Oronde Gadsden",
+    "position": "TE",
+    "team": "LAC",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-TE-oronde-gadsden",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 19,
+    "name": "Saquon Barkley",
+    "position": "RB",
+    "team": "PHI",
+    "value": 36,
+    "bye": 10,
+    "id": "2026-RB-saquon-barkley",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 99,
+    "name": "Chuba Hubbard",
+    "position": "RB",
+    "team": "CAR",
+    "value": 2,
+    "bye": 5,
+    "id": "2026-RB-chuba-hubbard",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 179,
+    "name": "Chiefs D/ST",
+    "position": "DEF",
+    "team": "KC",
+    "value": 0,
+    "bye": 5,
+    "id": "2026-DEF-chiefs-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 259,
+    "name": "Greg Dulcich",
+    "position": "TE",
+    "team": "MIA",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-TE-greg-dulcich",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 20,
+    "name": "Derrick Henry",
+    "position": "RB",
+    "team": "BAL",
+    "value": 35,
+    "bye": 13,
+    "id": "2026-RB-derrick-henry",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 100,
+    "name": "Aaron Jones Sr.",
+    "position": "RB",
+    "team": "MIN",
+    "value": 2,
+    "bye": 6,
+    "id": "2026-RB-aaron-jones-sr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 180,
+    "name": "Chargers D/ST",
+    "position": "DEF",
+    "team": "LAC",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-DEF-chargers-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 260,
+    "name": "Cade Otton",
+    "position": "TE",
+    "team": "TB",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-TE-cade-otton",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 21,
+    "name": "Chase Brown",
+    "position": "RB",
+    "team": "CIN",
+    "value": 34,
+    "bye": 6,
+    "id": "2026-RB-chase-brown",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 101,
+    "name": "George Kittle",
+    "position": "TE",
+    "team": "SF",
+    "value": 2,
+    "bye": 8,
+    "id": "2026-TE-george-kittle",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 181,
+    "name": "Brandon Aubrey",
+    "position": "K",
+    "team": "DAL",
+    "value": 0,
+    "bye": 14,
+    "id": "2026-K-brandon-aubrey",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 261,
+    "name": "Pat Bryant",
+    "position": "WR",
+    "team": "DEN",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-WR-pat-bryant",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 22,
+    "name": "Kenneth Walker III",
+    "position": "RB",
+    "team": "KC",
+    "value": 33,
+    "bye": 5,
+    "id": "2026-RB-kenneth-walker-iii",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 102,
+    "name": "Tucker Kraft",
+    "position": "TE",
+    "team": "GB",
+    "value": 2,
+    "bye": 11,
+    "id": "2026-TE-tucker-kraft",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 182,
+    "name": "Cameron Dicker",
+    "position": "K",
+    "team": "LAC",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-K-cameron-dicker",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 262,
+    "name": "Tory Horton",
+    "position": "WR",
+    "team": "SEA",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-WR-tory-horton",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 23,
+    "name": "Josh Jacobs",
+    "position": "RB",
+    "team": "GB",
+    "value": 32,
+    "bye": 11,
+    "id": "2026-RB-josh-jacobs",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 103,
+    "name": "Dallas Goedert",
+    "position": "TE",
+    "team": "PHI",
+    "value": 2,
+    "bye": 10,
+    "id": "2026-TE-dallas-goedert",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 183,
+    "name": "Jason Myers",
+    "position": "K",
+    "team": "SEA",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-K-jason-myers",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 263,
+    "name": "Elijah Sarratt",
+    "position": "WR",
+    "team": "BAL",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-WR-elijah-sarratt",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 24,
+    "name": "Brock Bowers",
+    "position": "TE",
+    "team": "LV",
+    "value": 32,
+    "bye": 13,
+    "id": "2026-TE-brock-bowers",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 104,
+    "name": "Travis Kelce",
+    "position": "TE",
+    "team": "KC",
+    "value": 2,
+    "bye": 5,
+    "id": "2026-TE-travis-kelce",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 184,
+    "name": "Harrison Mevis",
+    "position": "K",
+    "team": "LAR",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-K-harrison-mevis",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 264,
+    "name": "Dyami Brown",
+    "position": "WR",
+    "team": "WAS",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-WR-dyami-brown",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 25,
+    "name": "Nico Collins",
+    "position": "WR",
+    "team": "HOU",
+    "value": 31,
+    "bye": 8,
+    "id": "2026-WR-nico-collins",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 105,
+    "name": "Rachaad White",
+    "position": "RB",
+    "team": "WAS",
+    "value": 2,
+    "bye": 7,
+    "id": "2026-RB-rachaad-white",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 185,
+    "name": "Ka'imi Fairbairn",
+    "position": "K",
+    "team": "HOU",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-K-kaimi-fairbairn",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 265,
+    "name": "Malik Davis",
+    "position": "RB",
+    "team": "DAL",
+    "value": 0,
+    "bye": 14,
+    "id": "2026-RB-malik-davis",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 26,
+    "name": "Garrett Wilson",
+    "position": "WR",
+    "team": "NYJ",
+    "value": 30,
+    "bye": 13,
+    "id": "2026-WR-garrett-wilson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 106,
+    "name": "Jonathon Brooks",
+    "position": "RB",
+    "team": "CAR",
+    "value": 2,
+    "bye": 5,
+    "id": "2026-RB-jonathon-brooks",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 186,
+    "name": "Eddy Pineiro",
+    "position": "K",
+    "team": "SF",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-K-eddy-pineiro",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 266,
+    "name": "Emanuel Wilson",
+    "position": "RB",
+    "team": "SEA",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-RB-emanuel-wilson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 27,
+    "name": "A.J. Brown",
+    "position": "WR",
+    "team": "NE",
+    "value": 30,
+    "bye": 11,
+    "id": "2026-WR-aj-brown",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 107,
+    "name": "J.K. Dobbins",
+    "position": "RB",
+    "team": "DEN",
+    "value": 2,
+    "bye": 10,
+    "id": "2026-RB-jk-dobbins",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 187,
+    "name": "Harrison Butker",
+    "position": "K",
+    "team": "KC",
+    "value": 0,
+    "bye": 5,
+    "id": "2026-K-harrison-butker",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 267,
+    "name": "Geno Smith",
+    "position": "QB",
+    "team": "NYJ",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-QB-geno-smith",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 28,
+    "name": "Chris Olave",
+    "position": "WR",
+    "team": "NO",
+    "value": 29,
+    "bye": 8,
+    "id": "2026-WR-chris-olave",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 108,
+    "name": "RJ Harvey",
+    "position": "RB",
+    "team": "DEN",
+    "value": 2,
+    "bye": 10,
+    "id": "2026-RB-rj-harvey",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 188,
+    "name": "Cam Little",
+    "position": "K",
+    "team": "JAC",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-K-cam-little",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 268,
+    "name": "Aaron Rodgers",
+    "position": "QB",
+    "team": "PIT",
+    "value": 0,
+    "bye": 9,
+    "id": "2026-QB-aaron-rodgers",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 29,
+    "name": "George Pickens",
+    "position": "WR",
+    "team": "DAL",
+    "value": 28,
+    "bye": 14,
+    "id": "2026-WR-george-pickens",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 109,
+    "name": "Jake Ferguson",
+    "position": "TE",
+    "team": "DAL",
+    "value": 2,
+    "bye": 14,
+    "id": "2026-TE-jake-ferguson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 189,
+    "name": "Jake Bates",
+    "position": "K",
+    "team": "DET",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-K-jake-bates",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 269,
+    "name": "Jacoby Brissett",
+    "position": "QB",
+    "team": "ARI",
+    "value": 0,
+    "bye": 14,
+    "id": "2026-QB-jacoby-brissett",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 30,
+    "name": "Breece Hall",
+    "position": "RB",
+    "team": "NYJ",
+    "value": 27,
+    "bye": 13,
+    "id": "2026-RB-breece-hall",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 110,
+    "name": "Mark Andrews",
+    "position": "TE",
+    "team": "BAL",
+    "value": 2,
+    "bye": 13,
+    "id": "2026-TE-mark-andrews",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 190,
+    "name": "Tyler Loop",
+    "position": "K",
+    "team": "BAL",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-K-tyler-loop",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 270,
+    "name": "Deshaun Watson",
+    "position": "QB",
+    "team": "CLE",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-QB-deshaun-watson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 31,
+    "name": "Javonte Williams",
+    "position": "RB",
+    "team": "DAL",
+    "value": 26,
+    "bye": 14,
+    "id": "2026-RB-javonte-williams",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 111,
+    "name": "T.J. Hockenson",
+    "position": "TE",
+    "team": "MIN",
+    "value": 2,
+    "bye": 6,
+    "id": "2026-TE-tj-hockenson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 191,
+    "name": "Cairo Santos",
+    "position": "K",
+    "team": "CHI",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-K-cairo-santos",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 271,
+    "name": "Darius Slayton",
+    "position": "WR",
+    "team": "NYG",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-WR-darius-slayton",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 32,
+    "name": "Malik Nabers",
+    "position": "WR",
+    "team": "NYG",
+    "value": 25,
+    "bye": 8,
+    "id": "2026-WR-malik-nabers",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 112,
+    "name": "Khalil Shakir",
+    "position": "WR",
+    "team": "BUF",
+    "value": 2,
+    "bye": 7,
+    "id": "2026-WR-khalil-shakir",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 192,
+    "name": "Will Reichard",
+    "position": "K",
+    "team": "MIN",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-K-will-reichard",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 272,
+    "name": "Treylon Burks",
+    "position": "WR",
+    "team": "WAS",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-WR-treylon-burks",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 33,
+    "name": "Tetairoa McMillan",
+    "position": "WR",
+    "team": "CAR",
+    "value": 24,
+    "bye": 5,
+    "id": "2026-WR-tetairoa-mcmillan",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 113,
+    "name": "Jayden Reed",
+    "position": "WR",
+    "team": "GB",
+    "value": 2,
+    "bye": 11,
+    "id": "2026-WR-jayden-reed",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 193,
+    "name": "Jordan James",
+    "position": "RB",
+    "team": "SF",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-RB-jordan-james",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 273,
+    "name": "Tyquan Thornton",
+    "position": "WR",
+    "team": "KC",
+    "value": 0,
+    "bye": 5,
+    "id": "2026-WR-tyquan-thornton",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 34,
+    "name": "Zay Flowers",
+    "position": "WR",
+    "team": "BAL",
+    "value": 23,
+    "bye": 13,
+    "id": "2026-WR-zay-flowers",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 114,
+    "name": "Xavier Worthy",
+    "position": "WR",
+    "team": "KC",
+    "value": 2,
+    "bye": 5,
+    "id": "2026-WR-xavier-worthy",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 194,
+    "name": "Brenton Strange",
+    "position": "TE",
+    "team": "JAC",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-TE-brenton-strange",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 274,
+    "name": "Andrei Iosivas",
+    "position": "WR",
+    "team": "CIN",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-WR-andrei-iosivas",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 35,
+    "name": "DeVonta Smith",
+    "position": "WR",
+    "team": "PHI",
+    "value": 22,
+    "bye": 10,
+    "id": "2026-WR-devonta-smith",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 115,
+    "name": "Kyle Monangai",
+    "position": "RB",
+    "team": "CHI",
+    "value": 2,
+    "bye": 10,
+    "id": "2026-RB-kyle-monangai",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 195,
+    "name": "James Conner",
+    "position": "RB",
+    "team": "ARI",
+    "value": 0,
+    "bye": 14,
+    "id": "2026-RB-james-conner",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 275,
+    "name": "Jahan Dotson",
+    "position": "WR",
+    "team": "ATL",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-WR-jahan-dotson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 36,
+    "name": "Josh Allen",
+    "position": "QB",
+    "team": "BUF",
+    "value": 22,
+    "bye": 7,
+    "id": "2026-QB-josh-allen",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 116,
+    "name": "Kenyon Sadiq",
+    "position": "TE",
+    "team": "NYJ",
+    "value": 2,
+    "bye": 13,
+    "id": "2026-TE-kenyon-sadiq",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 196,
+    "name": "Justice Hill",
+    "position": "RB",
+    "team": "BAL",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-RB-justice-hill",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 276,
+    "name": "Will Shipley",
+    "position": "RB",
+    "team": "PHI",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-RB-will-shipley",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 37,
+    "name": "Kyren Williams",
+    "position": "RB",
+    "team": "LAR",
+    "value": 22,
+    "bye": 11,
+    "id": "2026-RB-kyren-williams",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 117,
+    "name": "Isaiah Likely",
+    "position": "TE",
+    "team": "NYG",
+    "value": 2,
+    "bye": 8,
+    "id": "2026-TE-isaiah-likely",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 197,
+    "name": "Zachariah Branch",
+    "position": "WR",
+    "team": "ATL",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-WR-zachariah-branch",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 277,
+    "name": "Devin Singletary",
+    "position": "RB",
+    "team": "NYG",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-RB-devin-singletary",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 38,
+    "name": "Travis Etienne Jr.",
+    "position": "RB",
+    "team": "NO",
+    "value": 21,
+    "bye": 8,
+    "id": "2026-RB-travis-etienne-jr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 118,
+    "name": "Dalton Kincaid",
+    "position": "TE",
+    "team": "BUF",
+    "value": 2,
+    "bye": 7,
+    "id": "2026-TE-dalton-kincaid",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 198,
+    "name": "Jordan Love",
+    "position": "QB",
+    "team": "GB",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-QB-jordan-love",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 278,
+    "name": "Tyler Badie",
+    "position": "RB",
+    "team": "DEN",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-RB-tyler-badie",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 39,
+    "name": "Cam Skattebo",
+    "position": "RB",
+    "team": "NYG",
+    "value": 21,
+    "bye": 8,
+    "id": "2026-RB-cam-skattebo",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 119,
+    "name": "Hunter Henry",
+    "position": "TE",
+    "team": "NE",
+    "value": 2,
+    "bye": 11,
+    "id": "2026-TE-hunter-henry",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 199,
+    "name": "Cam Ward",
+    "position": "QB",
+    "team": "TEN",
+    "value": 0,
+    "bye": 9,
+    "id": "2026-QB-cam-ward",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 279,
+    "name": "Tahj Brooks",
+    "position": "RB",
+    "team": "CIN",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-RB-tahj-brooks",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 40,
+    "name": "Quinshon Judkins",
+    "position": "RB",
+    "team": "CLE",
+    "value": 20,
+    "bye": 11,
+    "id": "2026-RB-quinshon-judkins",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 120,
+    "name": "Jacory Croskey-Merritt",
+    "position": "RB",
+    "team": "WAS",
+    "value": 2,
+    "bye": 7,
+    "id": "2026-RB-jacory-croskey-merritt",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 200,
+    "name": "C.J. Stroud",
+    "position": "QB",
+    "team": "HOU",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-QB-cj-stroud",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 280,
+    "name": "Trevor Etienne",
+    "position": "RB",
+    "team": "CAR",
+    "value": 0,
+    "bye": 5,
+    "id": "2026-RB-trevor-etienne",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 41,
+    "name": "Bucky Irving",
+    "position": "RB",
+    "team": "TB",
+    "value": 19,
+    "bye": 10,
+    "id": "2026-RB-bucky-irving",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 121,
+    "name": "Blake Corum",
+    "position": "RB",
+    "team": "LAR",
+    "value": 1,
+    "bye": 11,
+    "id": "2026-RB-blake-corum",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 201,
+    "name": "Darnell Mooney",
+    "position": "WR",
+    "team": "NYG",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-WR-darnell-mooney",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 281,
+    "name": "Seth McGowan",
+    "position": "RB",
+    "team": "IND",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-RB-seth-mcgowan",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 42,
+    "name": "Emeka Egbuka",
+    "position": "WR",
+    "team": "TB",
+    "value": 19,
+    "bye": 10,
+    "id": "2026-WR-emeka-egbuka",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 122,
+    "name": "Woody Marks",
+    "position": "RB",
+    "team": "HOU",
+    "value": 1,
+    "bye": 8,
+    "id": "2026-RB-woody-marks",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 202,
+    "name": "Tre Harris",
+    "position": "WR",
+    "team": "LAC",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-WR-tre-harris",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 282,
+    "name": "Kendre Miller",
+    "position": "RB",
+    "team": "NO",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-RB-kendre-miller",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 43,
+    "name": "Davante Adams",
+    "position": "WR",
+    "team": "LAR",
+    "value": 18,
+    "bye": 11,
+    "id": "2026-WR-davante-adams",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 123,
+    "name": "Zach Charbonnet",
+    "position": "RB",
+    "team": "SEA",
+    "value": 1,
+    "bye": 11,
+    "id": "2026-RB-zach-charbonnet",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 203,
+    "name": "Ryan Flournoy",
+    "position": "WR",
+    "team": "DAL",
+    "value": 0,
+    "bye": 14,
+    "id": "2026-WR-ryan-flournoy",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 283,
+    "name": "Jawhar Jordan",
+    "position": "RB",
+    "team": "HOU",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-RB-jawhar-jordan",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 44,
+    "name": "Ladd McConkey",
+    "position": "WR",
+    "team": "LAC",
+    "value": 17,
+    "bye": 7,
+    "id": "2026-WR-ladd-mcconkey",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 124,
+    "name": "Quentin Johnston",
+    "position": "WR",
+    "team": "LAC",
+    "value": 1,
+    "bye": 7,
+    "id": "2026-WR-quentin-johnston",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 204,
+    "name": "Antonio Williams",
+    "position": "WR",
+    "team": "WAS",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-WR-antonio-williams",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 284,
+    "name": "Marvin Mims Jr.",
+    "position": "WR",
+    "team": "DEN",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-WR-marvin-mims-jr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 45,
+    "name": "Terry McLaurin",
+    "position": "WR",
+    "team": "WAS",
+    "value": 17,
+    "bye": 7,
+    "id": "2026-WR-terry-mclaurin",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 125,
+    "name": "KC Concepcion",
+    "position": "WR",
+    "team": "CLE",
+    "value": 1,
+    "bye": 11,
+    "id": "2026-WR-kc-concepcion",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 205,
+    "name": "Jaylin Noel",
+    "position": "WR",
+    "team": "HOU",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-WR-jaylin-noel",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 285,
+    "name": "Bengals D/ST",
+    "position": "DEF",
+    "team": "CIN",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-DEF-bengals-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 46,
+    "name": "Tee Higgins",
+    "position": "WR",
+    "team": "CIN",
+    "value": 15,
+    "bye": 6,
+    "id": "2026-WR-tee-higgins",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 126,
+    "name": "Deebo Samuel Sr.",
+    "position": "WR",
+    "team": "SF",
+    "value": 1,
+    "bye": 8,
+    "id": "2026-WR-deebo-samuel-sr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 206,
+    "name": "Pat Freiermuth",
+    "position": "TE",
+    "team": "PIT",
+    "value": 0,
+    "bye": 9,
+    "id": "2026-TE-pat-freiermuth",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 286,
+    "name": "Bears D/ST",
+    "position": "DEF",
+    "team": "CHI",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-DEF-bears-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 47,
+    "name": "Jaylen Waddle",
+    "position": "WR",
+    "team": "DEN",
+    "value": 15,
+    "bye": 10,
+    "id": "2026-WR-jaylen-waddle",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 127,
+    "name": "Stefon Diggs",
+    "position": "WR",
+    "team": "WAS",
+    "value": 1,
+    "bye": 7,
+    "id": "2026-WR-stefon-diggs",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 207,
+    "name": "Dalton Schultz",
+    "position": "TE",
+    "team": "HOU",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-TE-dalton-schultz",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 287,
+    "name": "Trey Smack",
+    "position": "K",
+    "team": "GB",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-K-trey-smack",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 48,
+    "name": "Jameson Williams",
+    "position": "WR",
+    "team": "DET",
+    "value": 14,
+    "bye": 6,
+    "id": "2026-WR-jameson-williams",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 128,
+    "name": "Chris Godwin Jr.",
+    "position": "WR",
+    "team": "TB",
+    "value": 1,
+    "bye": 10,
+    "id": "2026-WR-chris-godwin-jr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 208,
+    "name": "Xavier Legette",
+    "position": "WR",
+    "team": "CAR",
+    "value": 0,
+    "bye": 5,
+    "id": "2026-WR-xavier-legette",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 288,
+    "name": "Jake Elliott",
+    "position": "K",
+    "team": "PHI",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-K-jake-elliott",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 49,
+    "name": "Colston Loveland",
+    "position": "TE",
+    "team": "CHI",
+    "value": 13,
+    "bye": 10,
+    "id": "2026-TE-colston-loveland",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 129,
+    "name": "Romeo Doubs",
+    "position": "WR",
+    "team": "NE",
+    "value": 1,
+    "bye": 11,
+    "id": "2026-WR-romeo-doubs",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 209,
+    "name": "Jack Bech",
+    "position": "WR",
+    "team": "LV",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-WR-jack-bech",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 289,
+    "name": "Mike Gesicki",
+    "position": "TE",
+    "team": "CIN",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-TE-mike-gesicki",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 50,
+    "name": "Tyler Warren",
+    "position": "TE",
+    "team": "IND",
+    "value": 13,
+    "bye": 13,
+    "id": "2026-TE-tyler-warren",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 130,
+    "name": "Jayden Higgins",
+    "position": "WR",
+    "team": "HOU",
+    "value": 1,
+    "bye": 8,
+    "id": "2026-WR-jayden-higgins",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 210,
+    "name": "Isaac TeSlaa",
+    "position": "WR",
+    "team": "DET",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-WR-isaac-teslaa",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 290,
+    "name": "Evan Engram",
+    "position": "TE",
+    "team": "DEN",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-TE-evan-engram",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 51,
+    "name": "Carnell Tate",
+    "position": "WR",
+    "team": "TEN",
+    "value": 12,
+    "bye": 9,
+    "id": "2026-WR-carnell-tate",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 131,
+    "name": "Jalen Coker",
+    "position": "WR",
+    "team": "CAR",
+    "value": 1,
+    "bye": 5,
+    "id": "2026-WR-jalen-coker",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 211,
+    "name": "Chris Bell",
+    "position": "WR",
+    "team": "MIA",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-WR-chris-bell",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 291,
+    "name": "David Njoku",
+    "position": "TE",
+    "team": "LAC",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-TE-david-njoku",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 52,
+    "name": "Rome Odunze",
+    "position": "WR",
+    "team": "CHI",
+    "value": 11,
+    "bye": 10,
+    "id": "2026-WR-rome-odunze",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 132,
+    "name": "Jerry Jeudy",
+    "position": "WR",
+    "team": "CLE",
+    "value": 1,
+    "bye": 11,
+    "id": "2026-WR-jerry-jeudy",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 212,
+    "name": "Jonah Coleman",
+    "position": "RB",
+    "team": "DEN",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-RB-jonah-coleman",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 292,
+    "name": "Michael Mayer",
+    "position": "TE",
+    "team": "LV",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-TE-michael-mayer",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 53,
+    "name": "Luther Burden III",
+    "position": "WR",
+    "team": "CHI",
+    "value": 11,
+    "bye": 10,
+    "id": "2026-WR-luther-burden-iii",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 133,
+    "name": "Kyler Murray",
+    "position": "QB",
+    "team": "MIN",
+    "value": 1,
+    "bye": 6,
+    "id": "2026-QB-kyler-murray",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 213,
+    "name": "Kaelon Black",
+    "position": "RB",
+    "team": "SF",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-RB-kaelon-black",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 293,
+    "name": "Jake Tonges",
+    "position": "TE",
+    "team": "SF",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-TE-jake-tonges",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 54,
+    "name": "DJ Moore",
+    "position": "WR",
+    "team": "BUF",
+    "value": 10,
+    "bye": 7,
+    "id": "2026-WR-dj-moore",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 134,
+    "name": "Tyler Shough",
+    "position": "QB",
+    "team": "NO",
+    "value": 1,
+    "bye": 8,
+    "id": "2026-QB-tyler-shough",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 214,
+    "name": "Kaytron Allen",
+    "position": "RB",
+    "team": "WAS",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-RB-kaytron-allen",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 294,
+    "name": "KaVontae Turpin",
+    "position": "WR",
+    "team": "DAL",
+    "value": 0,
+    "bye": 14,
+    "id": "2026-WR-kavontae-turpin",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 55,
+    "name": "Jayden Daniels",
+    "position": "QB",
+    "team": "WAS",
+    "value": 10,
+    "bye": 7,
+    "id": "2026-QB-jayden-daniels",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 135,
+    "name": "Jared Goff",
+    "position": "QB",
+    "team": "DET",
+    "value": 1,
+    "bye": 6,
+    "id": "2026-QB-jared-goff",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 215,
+    "name": "Gunnar Helm",
+    "position": "TE",
+    "team": "TEN",
+    "value": 0,
+    "bye": 9,
+    "id": "2026-TE-gunnar-helm",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 295,
+    "name": "Jaylin Lane",
+    "position": "WR",
+    "team": "WAS",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-WR-jaylin-lane",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 56,
+    "name": "Lamar Jackson",
+    "position": "QB",
+    "team": "BAL",
+    "value": 10,
+    "bye": 13,
+    "id": "2026-QB-lamar-jackson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 136,
+    "name": "Daniel Jones",
+    "position": "QB",
+    "team": "IND",
+    "value": 1,
+    "bye": 13,
+    "id": "2026-QB-daniel-jones",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 216,
+    "name": "Chig Okonkwo",
+    "position": "TE",
+    "team": "WAS",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-TE-chig-okonkwo",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 296,
+    "name": "Tua Tagovailoa",
+    "position": "QB",
+    "team": "ATL",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-QB-tua-tagovailoa",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 57,
+    "name": "Drake Maye",
+    "position": "QB",
+    "team": "NE",
+    "value": 10,
+    "bye": 11,
+    "id": "2026-QB-drake-maye",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 137,
+    "name": "Jordan Mason",
+    "position": "RB",
+    "team": "MIN",
+    "value": 1,
+    "bye": 6,
+    "id": "2026-RB-jordan-mason",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 217,
+    "name": "AJ Barner",
+    "position": "TE",
+    "team": "SEA",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-TE-aj-barner",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 297,
+    "name": "49ers D/ST",
+    "position": "DEF",
+    "team": "SF",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-DEF-49ers-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 58,
+    "name": "Jalen Hurts",
+    "position": "QB",
+    "team": "PHI",
+    "value": 9,
+    "bye": 10,
+    "id": "2026-QB-jalen-hurts",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 138,
+    "name": "Alvin Kamara",
+    "position": "RB",
+    "team": "NO",
+    "value": 1,
+    "bye": 8,
+    "id": "2026-RB-alvin-kamara",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 218,
+    "name": "Sam Darnold",
+    "position": "QB",
+    "team": "SEA",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-QB-sam-darnold",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 298,
+    "name": "Jets D/ST",
+    "position": "DEF",
+    "team": "NYJ",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-DEF-jets-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 59,
+    "name": "TreVeyon Henderson",
+    "position": "RB",
+    "team": "NE",
+    "value": 9,
+    "bye": 11,
+    "id": "2026-RB-treveyon-henderson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 139,
+    "name": "Isiah Pacheco",
+    "position": "RB",
+    "team": "DET",
+    "value": 1,
+    "bye": 6,
+    "id": "2026-RB-isiah-pacheco",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 219,
+    "name": "Bryce Young",
+    "position": "QB",
+    "team": "CAR",
+    "value": 0,
+    "bye": 5,
+    "id": "2026-QB-bryce-young",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 299,
+    "name": "Saints D/ST",
+    "position": "DEF",
+    "team": "NO",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-DEF-saints-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 60,
+    "name": "Bhayshul Tuten",
+    "position": "RB",
+    "team": "JAC",
+    "value": 9,
+    "bye": 7,
+    "id": "2026-RB-bhayshul-tuten",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 140,
+    "name": "Chris Rodriguez Jr.",
+    "position": "RB",
+    "team": "JAC",
+    "value": 1,
+    "bye": 7,
+    "id": "2026-RB-chris-rodriguez-jr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 220,
+    "name": "Fernando Mendoza",
+    "position": "QB",
+    "team": "LV",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-QB-fernando-mendoza",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 300,
+    "name": "Panthers D/ST",
+    "position": "DEF",
+    "team": "CAR",
+    "value": 0,
+    "bye": 5,
+    "id": "2026-DEF-panthers-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 61,
+    "name": "D'Andre Swift",
+    "position": "RB",
+    "team": "CHI",
+    "value": 8,
+    "bye": 10,
+    "id": "2026-RB-dandre-swift",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 141,
+    "name": "Brian Robinson Jr.",
+    "position": "RB",
+    "team": "ATL",
+    "value": 1,
+    "bye": 11,
+    "id": "2026-RB-brian-robinson-jr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 221,
+    "name": "Nicholas Singleton",
+    "position": "RB",
+    "team": "TEN",
+    "value": 0,
+    "bye": 9,
+    "id": "2026-RB-nicholas-singleton",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 62,
+    "name": "David Montgomery",
+    "position": "RB",
+    "team": "HOU",
+    "value": 8,
+    "bye": 8,
+    "id": "2026-RB-david-montgomery",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 142,
+    "name": "Tank Bigsby",
+    "position": "RB",
+    "team": "PHI",
+    "value": 1,
+    "bye": 10,
+    "id": "2026-RB-tank-bigsby",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 222,
+    "name": "Demond Claiborne",
+    "position": "RB",
+    "team": "MIN",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-RB-demond-claiborne",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 63,
+    "name": "Jadarian Price",
+    "position": "RB",
+    "team": "SEA",
+    "value": 8,
+    "bye": 11,
+    "id": "2026-RB-jadarian-price",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 143,
+    "name": "Rashid Shaheed",
+    "position": "WR",
+    "team": "SEA",
+    "value": 1,
+    "bye": 11,
+    "id": "2026-WR-rashid-shaheed",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 223,
+    "name": "Kimani Vidal",
+    "position": "RB",
+    "team": "LAC",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-RB-kimani-vidal",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 64,
+    "name": "Tony Pollard",
+    "position": "RB",
+    "team": "TEN",
+    "value": 7,
+    "bye": 9,
+    "id": "2026-RB-tony-pollard",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 144,
+    "name": "Jalen McMillan",
+    "position": "WR",
+    "team": "TB",
+    "value": 1,
+    "bye": 10,
+    "id": "2026-WR-jalen-mcmillan",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 224,
+    "name": "Malik Washington",
+    "position": "WR",
+    "team": "MIA",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-WR-malik-washington",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 65,
+    "name": "Courtland Sutton",
+    "position": "WR",
+    "team": "DEN",
+    "value": 7,
+    "bye": 10,
+    "id": "2026-WR-courtland-sutton",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 145,
+    "name": "Calvin Ridley",
+    "position": "WR",
+    "team": "TEN",
+    "value": 1,
+    "bye": 9,
+    "id": "2026-WR-calvin-ridley",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 225,
+    "name": "Jaylen Wright",
+    "position": "RB",
+    "team": "MIA",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-RB-jaylen-wright",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 66,
+    "name": "Michael Pittman Jr.",
+    "position": "WR",
+    "team": "PIT",
+    "value": 7,
+    "bye": 9,
+    "id": "2026-WR-michael-pittman-jr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 146,
+    "name": "Denzel Boston",
+    "position": "WR",
+    "team": "CLE",
+    "value": 1,
+    "bye": 11,
+    "id": "2026-WR-denzel-boston",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 226,
+    "name": "Ollie Gordon II",
+    "position": "RB",
+    "team": "MIA",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-RB-ollie-gordon-ii",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 67,
+    "name": "Alec Pierce",
+    "position": "WR",
+    "team": "IND",
+    "value": 7,
+    "bye": 13,
+    "id": "2026-WR-alec-pierce",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 147,
+    "name": "Travis Hunter",
+    "position": "WR",
+    "team": "JAC",
+    "value": 1,
+    "bye": 7,
+    "id": "2026-WR-travis-hunter",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 227,
+    "name": "Jalen Tolbert",
+    "position": "WR",
+    "team": "MIA",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-WR-jalen-tolbert",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 68,
+    "name": "Marvin Harrison Jr.",
+    "position": "WR",
+    "team": "ARI",
+    "value": 6,
+    "bye": 14,
+    "id": "2026-WR-marvin-harrison-jr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 148,
+    "name": "Adonai Mitchell",
+    "position": "WR",
+    "team": "NYJ",
+    "value": 1,
+    "bye": 13,
+    "id": "2026-WR-adonai-mitchell",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 228,
+    "name": "Cooper Kupp",
+    "position": "WR",
+    "team": "SEA",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-WR-cooper-kupp",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 69,
+    "name": "DK Metcalf",
+    "position": "WR",
+    "team": "PIT",
+    "value": 6,
+    "bye": 9,
+    "id": "2026-WR-dk-metcalf",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 149,
+    "name": "Baker Mayfield",
+    "position": "QB",
+    "team": "TB",
+    "value": 1,
+    "bye": 10,
+    "id": "2026-QB-baker-mayfield",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 229,
+    "name": "Caleb Douglas",
+    "position": "WR",
+    "team": "MIA",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-WR-caleb-douglas",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 70,
+    "name": "Jordyn Tyson",
+    "position": "WR",
+    "team": "NO",
+    "value": 6,
+    "bye": 8,
+    "id": "2026-WR-jordyn-tyson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 150,
+    "name": "Malik Willis",
+    "position": "QB",
+    "team": "MIA",
+    "value": 1,
+    "bye": 6,
+    "id": "2026-QB-malik-willis",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 230,
+    "name": "Kayshon Boutte",
+    "position": "WR",
+    "team": "NE",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-WR-kayshon-boutte",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 71,
+    "name": "Kyle Pitts Sr.",
+    "position": "TE",
+    "team": "ATL",
+    "value": 6,
+    "bye": 11,
+    "id": "2026-TE-kyle-pitts-sr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 151,
+    "name": "De'Zhaun Stribling",
+    "position": "WR",
+    "team": "SF",
+    "value": 1,
+    "bye": 8,
+    "id": "2026-WR-dezhaun-stribling",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 231,
+    "name": "Brandon Aiyuk",
+    "position": "WR",
+    "team": "SF",
+    "value": 0,
+    "bye": 8,
+    "id": "2026-WR-brandon-aiyuk",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 72,
+    "name": "Harold Fannin Jr.",
+    "position": "TE",
+    "team": "CLE",
+    "value": 6,
+    "bye": 11,
+    "id": "2026-TE-harold-fannin-jr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 152,
+    "name": "Germie Bernard",
+    "position": "WR",
+    "team": "PIT",
+    "value": 1,
+    "bye": 9,
+    "id": "2026-WR-germie-bernard",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 232,
+    "name": "Ja'Kobi Lane",
+    "position": "WR",
+    "team": "BAL",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-WR-jakobi-lane",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 73,
+    "name": "Sam LaPorta",
+    "position": "TE",
+    "team": "DET",
+    "value": 6,
+    "bye": 6,
+    "id": "2026-TE-sam-laporta",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 153,
+    "name": "Tre Tucker",
+    "position": "WR",
+    "team": "LV",
+    "value": 1,
+    "bye": 13,
+    "id": "2026-WR-tre-tucker",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 233,
+    "name": "Ted Hurst",
+    "position": "WR",
+    "team": "TB",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-WR-ted-hurst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 74,
+    "name": "Joe Burrow",
+    "position": "QB",
+    "team": "CIN",
+    "value": 5,
+    "bye": 6,
+    "id": "2026-QB-joe-burrow",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 154,
+    "name": "Ray Davis",
+    "position": "RB",
+    "team": "BUF",
+    "value": 1,
+    "bye": 7,
+    "id": "2026-RB-ray-davis",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 234,
+    "name": "Keon Coleman",
+    "position": "WR",
+    "team": "BUF",
+    "value": 0,
+    "bye": 7,
+    "id": "2026-WR-keon-coleman",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 75,
+    "name": "Jaxson Dart",
+    "position": "QB",
+    "team": "NYG",
+    "value": 5,
+    "bye": 8,
+    "id": "2026-QB-jaxson-dart",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 155,
+    "name": "Tyrone Tracy Jr.",
+    "position": "RB",
+    "team": "NYG",
+    "value": 1,
+    "bye": 8,
+    "id": "2026-RB-tyrone-tracy-jr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 235,
+    "name": "Buccaneers D/ST",
+    "position": "DEF",
+    "team": "TB",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-DEF-buccaneers-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 76,
+    "name": "Mike Evans",
+    "position": "WR",
+    "team": "SF",
+    "value": 5,
+    "bye": 8,
+    "id": "2026-WR-mike-evans",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 156,
+    "name": "Mike Washington Jr.",
+    "position": "RB",
+    "team": "LV",
+    "value": 1,
+    "bye": 13,
+    "id": "2026-RB-mike-washington-jr",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 236,
+    "name": "Packers D/ST",
+    "position": "DEF",
+    "team": "GB",
+    "value": 0,
+    "bye": 11,
+    "id": "2026-DEF-packers-dst",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 77,
+    "name": "Parker Washington",
+    "position": "WR",
+    "team": "JAC",
+    "value": 5,
+    "bye": 7,
+    "id": "2026-WR-parker-washington",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 157,
+    "name": "Tyler Allgeier",
+    "position": "RB",
+    "team": "ARI",
+    "value": 1,
+    "bye": 14,
+    "id": "2026-RB-tyler-allgeier",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 237,
+    "name": "Chris Boswell",
+    "position": "K",
+    "team": "PIT",
+    "value": 0,
+    "bye": 9,
+    "id": "2026-K-chris-boswell",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 78,
+    "name": "Christian Watson",
+    "position": "WR",
+    "team": "GB",
+    "value": 4,
+    "bye": 11,
+    "id": "2026-WR-christian-watson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 158,
+    "name": "Dylan Sampson",
+    "position": "RB",
+    "team": "CLE",
+    "value": 1,
+    "bye": 11,
+    "id": "2026-RB-dylan-sampson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 238,
+    "name": "Chase McLaughlin",
+    "position": "K",
+    "team": "TB",
+    "value": 0,
+    "bye": 10,
+    "id": "2026-K-chase-mclaughlin",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 79,
+    "name": "Matthew Golden",
+    "position": "WR",
+    "team": "GB",
+    "value": 4,
+    "bye": 11,
+    "id": "2026-WR-matthew-golden",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 159,
+    "name": "Terrance Ferguson",
+    "position": "TE",
+    "team": "LAR",
+    "value": 1,
+    "bye": 11,
+    "id": "2026-TE-terrance-ferguson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 239,
+    "name": "Adam Randall",
+    "position": "RB",
+    "team": "BAL",
+    "value": 0,
+    "bye": 13,
+    "id": "2026-RB-adam-randall",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 80,
+    "name": "Michael Wilson",
+    "position": "WR",
+    "team": "ARI",
+    "value": 4,
+    "bye": 14,
+    "id": "2026-WR-michael-wilson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 160,
+    "name": "Juwan Johnson",
+    "position": "TE",
+    "team": "NO",
+    "value": 1,
+    "bye": 8,
+    "id": "2026-TE-juwan-johnson",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 240,
+    "name": "Samaje Perine",
+    "position": "RB",
+    "team": "CIN",
+    "value": 0,
+    "bye": 6,
+    "id": "2026-RB-samaje-perine",
+    "updatedAt": "2026-08-10"
+  },
+  {
+    "rank": 1,
+    "name": "Jahmyr Gibbs",
+    "position": "RB",
+    "team": "DET",
+    "value": 57,
+    "bye": 6,
+    "id": "2026-RB-jahmyr-gibbs",
+    "updatedAt": "2026-08-10"
+  }
+]

@@ -3,7 +3,7 @@ import { cn } from "../ui/cn";
 
 type LogEntry = {
   id: string;
-  type: "bid" | "sold" | "system" | "nominate";
+  type: "bid" | "sold" | "system" | "nominate" | string;
   text: string;
   ts: string;
 };
@@ -53,23 +53,36 @@ function getBadgeTone(type: LogEntry["type"]) {
   }
 }
 
+function formatLogTime(ts: string) {
+  const parsed = new Date(ts);
+  if (Number.isFinite(parsed.getTime())) {
+    return new Intl.DateTimeFormat(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(parsed);
+  }
+
+  return ts.length > 18 ? ts.slice(0, 16) : ts;
+}
+
 export function DraftLogEntry({ entry }: { entry: LogEntry }) {
   return (
     <div className={cn(
-      "p-3 border-l-4 transition-all hover:bg-[rgba(255,255,255,0.02)]",
+      "draft-log-entry",
       getLogColor(entry.type)
     )}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-2 flex-1">
-          <span className="text-lg">{getLogIcon(entry.type)}</span>
-          <div className="flex-1">
-            <div className="text-sm text-fg1">{entry.text}</div>
-            <div className="mt-1">
+      <div className="draft-log-entry-grid">
+        <div className="draft-log-entry-main">
+          <span className="draft-log-entry-icon">{getLogIcon(entry.type)}</span>
+          <div className="draft-log-entry-copy">
+            <div className="draft-log-entry-text">{entry.text}</div>
+            <div className="draft-log-entry-badge">
               <Badge tone={getBadgeTone(entry.type)}>{entry.type}</Badge>
             </div>
           </div>
         </div>
-        <div className="text-xs text-fg2 whitespace-nowrap">{entry.ts}</div>
+        <time className="draft-log-entry-time" title={entry.ts}>{formatLogTime(entry.ts)}</time>
       </div>
     </div>
   );

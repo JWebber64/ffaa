@@ -1,5 +1,5 @@
-import { Button, HStack, Box, Text } from '@chakra-ui/react';
-import { useRole } from '../contexts/RoleContext';
+import { Button, HStack, Box, Text } from '@/ui/custom';
+import { useRole } from '../contexts/roleContextState';
 
 export default function AdminLogin() {
   const { isAdmin, enableAdminMode, disableAdminMode } = useRole();
@@ -34,3 +34,4 @@ export default function AdminLogin() {
     </HStack>
   );
 }
+

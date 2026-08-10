@@ -11,7 +11,6 @@ import type {
   Player,
   Team,
   Position,
-  BasePosition,
   AuctionSettings,
   BidState,
   DraftRuntime,
@@ -84,6 +83,7 @@ const DEFAULT_ROSTER: Record<Position, number> = {
   DEF: 0,
   FLEX: 1,
   BENCH: 4,
+  IR: 0,
 };
 
 const initialRuntime: DraftRuntime = {
@@ -132,7 +132,7 @@ function nextNominatorPointer(draft: Draft<DraftStore>) {
   draft.runtime.currentNominatorTeamId = draft.runtime.nominationOrder[nextIdx] ?? null;
 }
 
-function isFlexEligible(pos: BasePosition, includeTE = true): pos is 'RB' | 'WR' | 'TE' {
+function isFlexEligible(pos: Position, includeTE = true): pos is 'RB' | 'WR' | 'TE' {
   return pos === 'RB' || pos === 'WR' || (includeTE && pos === 'TE');
 }
 
@@ -797,7 +797,6 @@ const creator: Creator = ((set: (partial: DraftStore | Partial<DraftStore> | ((s
 
       if (priceRefund) team.budget += priceRefund;
       if (slot && slot in team.roster) {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         team.roster[slot as keyof typeof team.roster] =
           (team.roster[slot as keyof typeof team.roster] ?? 0) + 1;
       }

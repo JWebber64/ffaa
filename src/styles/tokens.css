@@ -7,8 +7,8 @@
   --bg-2: #0B1910;        /* raised surface */
 
   /* Borders */
-  --line-0: rgba(255,255,255,0.08);
-  --line-1: rgba(255,255,255,0.10);   /* hairline border */
+  --line-0: rgba(255,255,255,0.06);
+  --line-1: rgba(255,255,255,0.08);   /* hairline border */
 
   --text-0: rgba(255,255,255,0.92);
   --text-1: rgba(255,255,255,0.68);
@@ -40,20 +40,6 @@
   --pos-db:     #1E3A8A; /* Dark blue */
   --pos-idpflex:#0891B2; /* Same as FLEX */
 
-  /* --- Force override for problematic positions --- */
-  .pos-bench,
-  .pos-ir,
-  [class*="bench"],
-  [class*="ir"] {
-    background-color: var(--pos-bench) !important;
-    border-color: var(--pos-bench) !important;
-  }
-
-  .pos-bench *,
-  .pos-ir * {
-    color: white !important;
-  }
-
   /* --- Glass (rgba so backdrop blur works) --- */
   --glass-1: rgba(255,255,255,0.06);  /* card */
   --glass-2: rgba(255,255,255,0.08);  /* panel */
@@ -63,15 +49,87 @@
   --spec-1: rgba(255,255,255,0.18);
   --spec-2: rgba(255,255,255,0.06);
 
+  /* Liquid glass tuning */
+  --glass-tint-1: rgba(255,255,255,0.12);
+  --glass-tint-2: rgba(255,255,255,0.05);
+  --glass-tint-3: rgba(255,255,255,0.02);
+  --glass-edge: rgba(255,255,255,0.14);
+  --glass-edge-soft: rgba(255,255,255,0.08);
+  --glass-spec-strong: rgba(255,255,255,0.26);
+  --glass-spec-soft: rgba(255,255,255,0.10);
+  --glass-inner: rgba(255,255,255,0.07);
+
+  /* Control sizing */
+  --control-max: 240px;
+  --control-max-wide: 320px;
+
   /* Blur */
-  --blur-sm: 8px;
-  --blur-md: 14px;
-  --blur-lg: 20px;
+  --blur-sm: 10px;
+  --blur-md: 18px;
+  --blur-lg: 26px;
 
   /* Shadows (soft, diffused) */
-  --shadow-glass-1: 0 12px 40px rgba(0,0,0,0.35);
-  --shadow-glass-2: 0 18px 70px rgba(0,0,0,0.45);
+  --shadow-glass-1: 0 16px 44px rgba(0,0,0,0.35);
+  --shadow-glass-2: 0 24px 70px rgba(0,0,0,0.45);
+  --shadow1: 0 4px 12px rgba(0,0,0,0.15);
+  --shadow2: 0 8px 24px rgba(0,0,0,0.25);
+  --shadow3: 0 16px 48px rgba(0,0,0,0.35);
+
+  /* Border radius */
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
 
   /* Focus ring */
   --focus: rgba(20,184,166,0.35);
+
+  /* --- Legacy variable aliases for compatibility --- */
+  /* Surface aliases */
+  --panel: var(--glass-1);
+  --glass: var(--glass-2);
+  --bg2: var(--bg-2);
+
+  /* Text aliases */
+  --fg0: var(--text-0);
+  --fg1: var(--text-0);
+  --fg2: var(--text-1);
+
+  /* Border aliases */
+  --border: var(--line-0);
+  --stroke: var(--line-1);
+  --stroke2: var(--focus);
+
+  /* Accent aliases */
+  --accent: var(--a2);
+  --accent2: var(--a3);
+  --accent-1: var(--a1);
+  --accent-2: var(--a2);
+
+  /* Status aliases */
+  --ok: var(--a1);
+  --success: var(--a1);
+  --warn: #f59e0b;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --bad: #ef4444;
+
+  /* Neon aliases */
+  --neon-green: var(--a1);
+  --neon-cyan: var(--a2);
+  --neon-blue: var(--a3);
+}
+
+/* --- Force override for problematic positions --- */
+.pos-bench,
+.pos-ir,
+[class*="bench"],
+[class*="ir"] {
+  background-color: var(--pos-bench) !important;
+  border-color: var(--pos-bench) !important;
+}
+
+.pos-bench *,
+.pos-ir * {
+  color: white !important;
 }

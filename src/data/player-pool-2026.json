@@ -1,0 +1,2999 @@
+[
+  {
+    "id": "2026-RB-jahmyr-gibbs",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 1,
+    "name": "Jahmyr Gibbs",
+    "pos": "RB",
+    "nflTeam": "DET",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-RB-bijan-robinson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 2,
+    "name": "Bijan Robinson",
+    "pos": "RB",
+    "nflTeam": "ATL",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-puka-nacua",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 3,
+    "name": "Puka Nacua",
+    "pos": "WR",
+    "nflTeam": "LAR",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-jamarr-chase",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 4,
+    "name": "Ja'Marr Chase",
+    "pos": "WR",
+    "nflTeam": "CIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-WR-jaxon-smith-njigba",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 5,
+    "name": "Jaxon Smith-Njigba",
+    "pos": "WR",
+    "nflTeam": "SEA",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-christian-mccaffrey",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 6,
+    "name": "Christian McCaffrey",
+    "pos": "RB",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-RB-jonathan-taylor",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 7,
+    "name": "Jonathan Taylor",
+    "pos": "RB",
+    "nflTeam": "IND",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-amon-ra-st-brown",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 8,
+    "name": "Amon-Ra St. Brown",
+    "pos": "WR",
+    "nflTeam": "DET",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-WR-ceedee-lamb",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 9,
+    "name": "CeeDee Lamb",
+    "pos": "WR",
+    "nflTeam": "DAL",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-RB-devon-achane",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 10,
+    "name": "De'Von Achane",
+    "pos": "RB",
+    "nflTeam": "MIA",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-WR-justin-jefferson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 11,
+    "name": "Justin Jefferson",
+    "pos": "WR",
+    "nflTeam": "MIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-RB-jeremiyah-love",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 12,
+    "name": "Jeremiyah Love",
+    "pos": "RB",
+    "nflTeam": "ARI",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-WR-drake-london",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 13,
+    "name": "Drake London",
+    "pos": "WR",
+    "nflTeam": "ATL",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-rashee-rice",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 14,
+    "name": "Rashee Rice",
+    "pos": "WR",
+    "nflTeam": "KC",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-RB-james-cook",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 15,
+    "name": "James Cook III",
+    "pos": "RB",
+    "nflTeam": "BUF",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-TE-trey-mcbride",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 16,
+    "name": "Trey McBride",
+    "pos": "TE",
+    "nflTeam": "ARI",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-RB-ashton-jeanty",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 17,
+    "name": "Ashton Jeanty",
+    "pos": "RB",
+    "nflTeam": "LV",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-RB-omarion-hampton",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 18,
+    "name": "Omarion Hampton",
+    "pos": "RB",
+    "nflTeam": "LAC",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-RB-saquon-barkley",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 19,
+    "name": "Saquon Barkley",
+    "pos": "RB",
+    "nflTeam": "PHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-RB-derrick-henry",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 20,
+    "name": "Derrick Henry",
+    "pos": "RB",
+    "nflTeam": "BAL",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-RB-josh-jacobs",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 21,
+    "name": "Josh Jacobs",
+    "pos": "RB",
+    "nflTeam": "GB",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-chase-brown",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 22,
+    "name": "Chase Brown",
+    "pos": "RB",
+    "nflTeam": "CIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-RB-breece-hall",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 23,
+    "name": "Breece Hall",
+    "pos": "RB",
+    "nflTeam": "NYJ",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-TE-brock-bowers",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 24,
+    "name": "Brock Bowers",
+    "pos": "TE",
+    "nflTeam": "LV",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-nico-collins",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 25,
+    "name": "Nico Collins",
+    "pos": "WR",
+    "nflTeam": "HOU",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-garrett-wilson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 26,
+    "name": "Garrett Wilson",
+    "pos": "WR",
+    "nflTeam": "NYJ",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-aj-brown",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 27,
+    "name": "A.J. Brown",
+    "pos": "WR",
+    "nflTeam": "NE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-chris-olave",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 28,
+    "name": "Chris Olave",
+    "pos": "WR",
+    "nflTeam": "NO",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-george-pickens",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 29,
+    "name": "George Pickens",
+    "pos": "WR",
+    "nflTeam": "DAL",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-RB-kenneth-walker",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 30,
+    "name": "Kenneth Walker III",
+    "pos": "RB",
+    "nflTeam": "KC",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-RB-javonte-williams",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 31,
+    "name": "Javonte Williams",
+    "pos": "RB",
+    "nflTeam": "DAL",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-WR-tetairoa-mcmillan",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 32,
+    "name": "Tetairoa McMillan",
+    "pos": "WR",
+    "nflTeam": "CAR",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-WR-malik-nabers",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 33,
+    "name": "Malik Nabers",
+    "pos": "WR",
+    "nflTeam": "NYG",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-zay-flowers",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 34,
+    "name": "Zay Flowers",
+    "pos": "WR",
+    "nflTeam": "BAL",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-devonta-smith",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 35,
+    "name": "DeVonta Smith",
+    "pos": "WR",
+    "nflTeam": "PHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-QB-josh-allen",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 36,
+    "name": "Josh Allen",
+    "pos": "QB",
+    "nflTeam": "BUF",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-RB-kyren-williams",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 37,
+    "name": "Kyren Williams",
+    "pos": "RB",
+    "nflTeam": "LAR",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-travis-etienne",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 38,
+    "name": "Travis Etienne Jr.",
+    "pos": "RB",
+    "nflTeam": "NO",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-RB-cam-skattebo",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 39,
+    "name": "Cam Skattebo",
+    "pos": "RB",
+    "nflTeam": "NYG",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-RB-quinshon-judkins",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 40,
+    "name": "Quinshon Judkins",
+    "pos": "RB",
+    "nflTeam": "CLE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-bucky-irving",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 41,
+    "name": "Bucky Irving",
+    "pos": "RB",
+    "nflTeam": "TB",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-davante-adams",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 42,
+    "name": "Davante Adams",
+    "pos": "WR",
+    "nflTeam": "LAR",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-ladd-mcconkey",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 43,
+    "name": "Ladd McConkey",
+    "pos": "WR",
+    "nflTeam": "LAC",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-WR-emeka-egbuka",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 44,
+    "name": "Emeka Egbuka",
+    "pos": "WR",
+    "nflTeam": "TB",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-terry-mclaurin",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 45,
+    "name": "Terry McLaurin",
+    "pos": "WR",
+    "nflTeam": "WAS",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-WR-tee-higgins",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 46,
+    "name": "Tee Higgins",
+    "pos": "WR",
+    "nflTeam": "CIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-WR-jaylen-waddle",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 47,
+    "name": "Jaylen Waddle",
+    "pos": "WR",
+    "nflTeam": "DEN",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-jameson-williams",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 48,
+    "name": "Jameson Williams",
+    "pos": "WR",
+    "nflTeam": "DET",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-TE-colston-loveland",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 49,
+    "name": "Colston Loveland",
+    "pos": "TE",
+    "nflTeam": "CHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-TE-tyler-warren",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 50,
+    "name": "Tyler Warren",
+    "pos": "TE",
+    "nflTeam": "IND",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-carnell-tate",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 51,
+    "name": "Carnell Tate",
+    "pos": "WR",
+    "nflTeam": "TEN",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-WR-rome-odunze",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 52,
+    "name": "Rome Odunze",
+    "pos": "WR",
+    "nflTeam": "CHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-luther-burden",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 53,
+    "name": "Luther Burden III",
+    "pos": "WR",
+    "nflTeam": "CHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-dj-moore",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 54,
+    "name": "DJ Moore",
+    "pos": "WR",
+    "nflTeam": "BUF",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-QB-jayden-daniels",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 55,
+    "name": "Jayden Daniels",
+    "pos": "QB",
+    "nflTeam": "WAS",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-QB-lamar-jackson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 56,
+    "name": "Lamar Jackson",
+    "pos": "QB",
+    "nflTeam": "BAL",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-QB-drake-maye",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 57,
+    "name": "Drake Maye",
+    "pos": "QB",
+    "nflTeam": "NE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-QB-jalen-hurts",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 58,
+    "name": "Jalen Hurts",
+    "pos": "QB",
+    "nflTeam": "PHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-RB-treveyon-henderson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 59,
+    "name": "TreVeyon Henderson",
+    "pos": "RB",
+    "nflTeam": "NE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-bhayshul-tuten",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 60,
+    "name": "Bhayshul Tuten",
+    "pos": "RB",
+    "nflTeam": "JAX",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-RB-jadarian-price",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 61,
+    "name": "Jadarian Price",
+    "pos": "RB",
+    "nflTeam": "SEA",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-dandre-swift",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 62,
+    "name": "D'Andre Swift",
+    "pos": "RB",
+    "nflTeam": "CHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-RB-david-montgomery",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 63,
+    "name": "David Montgomery",
+    "pos": "RB",
+    "nflTeam": "HOU",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-RB-tony-pollard",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 64,
+    "name": "Tony Pollard",
+    "pos": "RB",
+    "nflTeam": "TEN",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-WR-marvin-harrison",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 65,
+    "name": "Marvin Harrison Jr.",
+    "pos": "WR",
+    "nflTeam": "ARI",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-WR-courtland-sutton",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 66,
+    "name": "Courtland Sutton",
+    "pos": "WR",
+    "nflTeam": "DEN",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-michael-pittman",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 67,
+    "name": "Michael Pittman Jr.",
+    "pos": "WR",
+    "nflTeam": "PIT",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-WR-dk-metcalf",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 68,
+    "name": "DK Metcalf",
+    "pos": "WR",
+    "nflTeam": "PIT",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-WR-alec-pierce",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 69,
+    "name": "Alec Pierce",
+    "pos": "WR",
+    "nflTeam": "IND",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-jordyn-tyson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 70,
+    "name": "Jordyn Tyson",
+    "pos": "WR",
+    "nflTeam": "NO",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-TE-kyle-pitts",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 71,
+    "name": "Kyle Pitts Sr.",
+    "pos": "TE",
+    "nflTeam": "ATL",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-TE-harold-fannin",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 72,
+    "name": "Harold Fannin Jr.",
+    "pos": "TE",
+    "nflTeam": "CLE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-TE-sam-laporta",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 73,
+    "name": "Sam LaPorta",
+    "pos": "TE",
+    "nflTeam": "DET",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-QB-joe-burrow",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 74,
+    "name": "Joe Burrow",
+    "pos": "QB",
+    "nflTeam": "CIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-QB-jaxson-dart",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 75,
+    "name": "Jaxson Dart",
+    "pos": "QB",
+    "nflTeam": "NYG",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-parker-washington",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 76,
+    "name": "Parker Washington",
+    "pos": "WR",
+    "nflTeam": "JAX",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-WR-christian-watson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 77,
+    "name": "Christian Watson",
+    "pos": "WR",
+    "nflTeam": "GB",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-matthew-golden",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 78,
+    "name": "Matthew Golden",
+    "pos": "WR",
+    "nflTeam": "GB",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-mike-evans",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 79,
+    "name": "Mike Evans",
+    "pos": "WR",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-brian-thomas",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 80,
+    "name": "Brian Thomas Jr.",
+    "pos": "WR",
+    "nflTeam": "JAX",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-WR-jakobi-meyers",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 81,
+    "name": "Jakobi Meyers",
+    "pos": "WR",
+    "nflTeam": "JAX",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-QB-trevor-lawrence",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 82,
+    "name": "Trevor Lawrence",
+    "pos": "QB",
+    "nflTeam": "JAX",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-QB-dak-prescott",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 83,
+    "name": "Dak Prescott",
+    "pos": "QB",
+    "nflTeam": "DAL",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-QB-bo-nix",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 84,
+    "name": "Bo Nix",
+    "pos": "QB",
+    "nflTeam": "DEN",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-QB-brock-purdy",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 85,
+    "name": "Brock Purdy",
+    "pos": "QB",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-QB-matthew-stafford",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 86,
+    "name": "Matthew Stafford",
+    "pos": "QB",
+    "nflTeam": "LAR",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-QB-caleb-williams",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 87,
+    "name": "Caleb Williams",
+    "pos": "QB",
+    "nflTeam": "CHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-wandale-robinson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 88,
+    "name": "Wan'Dale Robinson",
+    "pos": "WR",
+    "nflTeam": "TEN",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-WR-makai-lemon",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 89,
+    "name": "Makai Lemon",
+    "pos": "WR",
+    "nflTeam": "PHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-michael-wilson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 90,
+    "name": "Michael Wilson",
+    "pos": "WR",
+    "nflTeam": "ARI",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-WR-ricky-pearsall",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 91,
+    "name": "Ricky Pearsall",
+    "pos": "WR",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-jordan-addison",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 92,
+    "name": "Jordan Addison",
+    "pos": "WR",
+    "nflTeam": "MIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-QB-justin-herbert",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 93,
+    "name": "Justin Herbert",
+    "pos": "QB",
+    "nflTeam": "LAC",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-QB-patrick-mahomes",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 94,
+    "name": "Patrick Mahomes",
+    "pos": "QB",
+    "nflTeam": "KC",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-RB-jaylen-warren",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 95,
+    "name": "Jaylen Warren",
+    "pos": "RB",
+    "nflTeam": "PIT",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-RB-rhamondre-stevenson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 96,
+    "name": "Rhamondre Stevenson",
+    "pos": "RB",
+    "nflTeam": "NE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-rico-dowdle",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 97,
+    "name": "Rico Dowdle",
+    "pos": "RB",
+    "nflTeam": "PIT",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-RB-chuba-hubbard",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 98,
+    "name": "Chuba Hubbard",
+    "pos": "RB",
+    "nflTeam": "CAR",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-RB-aaron-jones",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 99,
+    "name": "Aaron Jones Sr.",
+    "pos": "RB",
+    "nflTeam": "MIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-RB-kenneth-gainwell",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 100,
+    "name": "Kenneth Gainwell",
+    "pos": "RB",
+    "nflTeam": "TB",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-TE-george-kittle",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 101,
+    "name": "George Kittle",
+    "pos": "TE",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-TE-dallas-goedert",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 102,
+    "name": "Dallas Goedert",
+    "pos": "TE",
+    "nflTeam": "PHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-TE-travis-kelce",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 103,
+    "name": "Travis Kelce",
+    "pos": "TE",
+    "nflTeam": "KC",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-TE-jake-ferguson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 104,
+    "name": "Jake Ferguson",
+    "pos": "TE",
+    "nflTeam": "DAL",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-RB-rachaad-white",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 105,
+    "name": "Rachaad White",
+    "pos": "RB",
+    "nflTeam": "WAS",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-RB-jk-dobbins",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 106,
+    "name": "J.K. Dobbins",
+    "pos": "RB",
+    "nflTeam": "DEN",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-RB-rj-harvey",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 107,
+    "name": "RJ Harvey",
+    "pos": "RB",
+    "nflTeam": "DEN",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-RB-kyle-monangai",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 108,
+    "name": "Kyle Monangai",
+    "pos": "RB",
+    "nflTeam": "CHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-TE-mark-andrews",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 109,
+    "name": "Mark Andrews",
+    "pos": "TE",
+    "nflTeam": "BAL",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-TE-tucker-kraft",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 110,
+    "name": "Tucker Kraft",
+    "pos": "TE",
+    "nflTeam": "GB",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-TE-tj-hockenson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 111,
+    "name": "T.J. Hockenson",
+    "pos": "TE",
+    "nflTeam": "MIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-WR-kc-concepcion",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 112,
+    "name": "KC Concepcion",
+    "pos": "WR",
+    "nflTeam": "CLE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-chris-godwin",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 113,
+    "name": "Chris Godwin Jr.",
+    "pos": "WR",
+    "nflTeam": "TB",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-khalil-shakir",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 114,
+    "name": "Khalil Shakir",
+    "pos": "WR",
+    "nflTeam": "BUF",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-RB-jonathon-brooks",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 115,
+    "name": "Jonathon Brooks",
+    "pos": "RB",
+    "nflTeam": "CAR",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-TE-kenyon-sadiq",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 116,
+    "name": "Kenyon Sadiq",
+    "pos": "TE",
+    "nflTeam": "NYJ",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-TE-isaiah-likely",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 117,
+    "name": "Isaiah Likely",
+    "pos": "TE",
+    "nflTeam": "NYG",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-TE-dalton-kincaid",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 118,
+    "name": "Dalton Kincaid",
+    "pos": "TE",
+    "nflTeam": "BUF",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-TE-hunter-henry",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 119,
+    "name": "Hunter Henry",
+    "pos": "TE",
+    "nflTeam": "NE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-jacory-croskey-merritt",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 120,
+    "name": "Jacory Croskey-Merritt",
+    "pos": "RB",
+    "nflTeam": "WAS",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-RB-blake-corum",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 121,
+    "name": "Blake Corum",
+    "pos": "RB",
+    "nflTeam": "LAR",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-woody-marks",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 122,
+    "name": "Woody Marks",
+    "pos": "RB",
+    "nflTeam": "HOU",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-RB-jordan-mason",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 123,
+    "name": "Jordan Mason",
+    "pos": "RB",
+    "nflTeam": "MIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-WR-jayden-reed",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 124,
+    "name": "Jayden Reed",
+    "pos": "WR",
+    "nflTeam": "GB",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-josh-downs",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 125,
+    "name": "Josh Downs",
+    "pos": "WR",
+    "nflTeam": "IND",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-romeo-doubs",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 126,
+    "name": "Romeo Doubs",
+    "pos": "WR",
+    "nflTeam": "NE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-xavier-worthy",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 127,
+    "name": "Xavier Worthy",
+    "pos": "WR",
+    "nflTeam": "KC",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-WR-quentin-johnston",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 128,
+    "name": "Quentin Johnston",
+    "pos": "WR",
+    "nflTeam": "LAC",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-WR-jayden-higgins",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 129,
+    "name": "Jayden Higgins",
+    "pos": "WR",
+    "nflTeam": "HOU",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-jerry-jeudy",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 130,
+    "name": "Jerry Jeudy",
+    "pos": "WR",
+    "nflTeam": "CLE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-jalen-coker",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 131,
+    "name": "Jalen Coker",
+    "pos": "WR",
+    "nflTeam": "CAR",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-WR-rashid-shaheed",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 132,
+    "name": "Rashid Shaheed",
+    "pos": "WR",
+    "nflTeam": "SEA",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-QB-kyler-murray",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 133,
+    "name": "Kyler Murray",
+    "pos": "QB",
+    "nflTeam": "MIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-QB-tyler-shough",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 134,
+    "name": "Tyler Shough",
+    "pos": "QB",
+    "nflTeam": "NO",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-QB-daniel-jones",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 135,
+    "name": "Daniel Jones",
+    "pos": "QB",
+    "nflTeam": "IND",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-QB-jared-goff",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 136,
+    "name": "Jared Goff",
+    "pos": "QB",
+    "nflTeam": "DET",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-RB-zach-charbonnet",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 137,
+    "name": "Zach Charbonnet",
+    "pos": "RB",
+    "nflTeam": "SEA",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-alvin-kamara",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 138,
+    "name": "Alvin Kamara",
+    "pos": "RB",
+    "nflTeam": "NO",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-RB-isiah-pacheco",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 139,
+    "name": "Isiah Pacheco",
+    "pos": "RB",
+    "nflTeam": "DET",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-RB-chris-rodriguez",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 140,
+    "name": "Chris Rodriguez Jr.",
+    "pos": "RB",
+    "nflTeam": "JAX",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-RB-braelon-allen",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 141,
+    "name": "Braelon Allen",
+    "pos": "RB",
+    "nflTeam": "NYJ",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-RB-tank-bigsby",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 142,
+    "name": "Tank Bigsby",
+    "pos": "RB",
+    "nflTeam": "PHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-jalen-mcmillan",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 143,
+    "name": "Jalen McMillan",
+    "pos": "WR",
+    "nflTeam": "TB",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-calvin-ridley",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 144,
+    "name": "Calvin Ridley",
+    "pos": "WR",
+    "nflTeam": "TEN",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-WR-denzel-boston",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 145,
+    "name": "Denzel Boston",
+    "pos": "WR",
+    "nflTeam": "CLE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-travis-hunter",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 146,
+    "name": "Travis Hunter",
+    "pos": "WR",
+    "nflTeam": "JAX",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-WR-germie-bernard",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 147,
+    "name": "Germie Bernard",
+    "pos": "WR",
+    "nflTeam": "PIT",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-WR-antonio-williams",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 148,
+    "name": "Antonio Williams",
+    "pos": "WR",
+    "nflTeam": "WAS",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-QB-baker-mayfield",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 149,
+    "name": "Baker Mayfield",
+    "pos": "QB",
+    "nflTeam": "TB",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-QB-malik-willis",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 150,
+    "name": "Malik Willis",
+    "pos": "QB",
+    "nflTeam": "MIA",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-WR-darnell-mooney",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 151,
+    "name": "Darnell Mooney",
+    "pos": "WR",
+    "nflTeam": "NYG",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-omar-cooper",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 152,
+    "name": "Omar Cooper Jr.",
+    "pos": "WR",
+    "nflTeam": "NYJ",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-adonai-mitchell",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 153,
+    "name": "Adonai Mitchell",
+    "pos": "WR",
+    "nflTeam": "NYJ",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-RB-mike-washington",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 154,
+    "name": "Mike Washington Jr.",
+    "pos": "RB",
+    "nflTeam": "LV",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-RB-ray-davis",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 155,
+    "name": "Ray Davis",
+    "pos": "RB",
+    "nflTeam": "BUF",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-RB-tyrone-tracy",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 156,
+    "name": "Tyrone Tracy Jr.",
+    "pos": "RB",
+    "nflTeam": "NYG",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-RB-brian-robinson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 157,
+    "name": "Brian Robinson Jr.",
+    "pos": "RB",
+    "nflTeam": "ATL",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-tyjae-spears",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 158,
+    "name": "Tyjae Spears",
+    "pos": "RB",
+    "nflTeam": "TEN",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-TE-juwan-johnson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 159,
+    "name": "Juwan Johnson",
+    "pos": "TE",
+    "nflTeam": "NO",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-TE-brenton-strange",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 160,
+    "name": "Brenton Strange",
+    "pos": "TE",
+    "nflTeam": "JAX",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-WR-tre-tucker",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 161,
+    "name": "Tre Tucker",
+    "pos": "WR",
+    "nflTeam": "LV",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-jalen-nailor",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 162,
+    "name": "Jalen Nailor",
+    "pos": "WR",
+    "nflTeam": "LV",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-rashod-bateman",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 163,
+    "name": "Rashod Bateman",
+    "pos": "WR",
+    "nflTeam": "BAL",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-jauan-jennings",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 164,
+    "name": "Jauan Jennings",
+    "pos": "WR",
+    "nflTeam": "MIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-WR-chris-bell",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 165,
+    "name": "Chris Bell",
+    "pos": "WR",
+    "nflTeam": "MIA",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-RB-tyler-allgeier",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 166,
+    "name": "Tyler Allgeier",
+    "pos": "RB",
+    "nflTeam": "ARI",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-RB-james-conner",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 167,
+    "name": "James Conner",
+    "pos": "RB",
+    "nflTeam": "ARI",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-RB-keaton-mitchell",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 168,
+    "name": "Keaton Mitchell",
+    "pos": "RB",
+    "nflTeam": "LAC",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-DEF-broncos-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 169,
+    "name": "Broncos D/ST",
+    "pos": "DEF",
+    "nflTeam": "DEN",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-DEF-texans-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 170,
+    "name": "Texans D/ST",
+    "pos": "DEF",
+    "nflTeam": "HOU",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-DEF-steelers-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 171,
+    "name": "Steelers D/ST",
+    "pos": "DEF",
+    "nflTeam": "PIT",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-DEF-seahawks-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 172,
+    "name": "Seahawks D/ST",
+    "pos": "DEF",
+    "nflTeam": "SEA",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-DEF-rams-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 173,
+    "name": "Rams D/ST",
+    "pos": "DEF",
+    "nflTeam": "LAR",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-DEF-ravens-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 174,
+    "name": "Ravens D/ST",
+    "pos": "DEF",
+    "nflTeam": "BAL",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-DEF-eagles-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 175,
+    "name": "Eagles D/ST",
+    "pos": "DEF",
+    "nflTeam": "PHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-DEF-browns-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 176,
+    "name": "Browns D/ST",
+    "pos": "DEF",
+    "nflTeam": "CLE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-DEF-patriots-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 177,
+    "name": "Patriots D/ST",
+    "pos": "DEF",
+    "nflTeam": "NE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-DEF-lions-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 178,
+    "name": "Lions D/ST",
+    "pos": "DEF",
+    "nflTeam": "DET",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-DEF-chiefs-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 179,
+    "name": "Chiefs D/ST",
+    "pos": "DEF",
+    "nflTeam": "KC",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-DEF-chargers-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 180,
+    "name": "Chargers D/ST",
+    "pos": "DEF",
+    "nflTeam": "LAC",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-K-brandon-aubrey",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 181,
+    "name": "Brandon Aubrey",
+    "pos": "K",
+    "nflTeam": "DAL",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-K-cameron-dicker",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 182,
+    "name": "Cameron Dicker",
+    "pos": "K",
+    "nflTeam": "LAC",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-K-jason-myers",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 183,
+    "name": "Jason Myers",
+    "pos": "K",
+    "nflTeam": "SEA",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-K-harrison-mevis",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 184,
+    "name": "Harrison Mevis",
+    "pos": "K",
+    "nflTeam": "LAR",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-K-kaimi-fairbairn",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 185,
+    "name": "Ka'imi Fairbairn",
+    "pos": "K",
+    "nflTeam": "HOU",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-K-eddy-pineiro",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 186,
+    "name": "Eddy Pineiro",
+    "pos": "K",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-K-harrison-butker",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 187,
+    "name": "Harrison Butker",
+    "pos": "K",
+    "nflTeam": "KC",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-K-cam-little",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 188,
+    "name": "Cam Little",
+    "pos": "K",
+    "nflTeam": "JAX",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-K-jake-bates",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 189,
+    "name": "Jake Bates",
+    "pos": "K",
+    "nflTeam": "DET",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-K-tyler-loop",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 190,
+    "name": "Tyler Loop",
+    "pos": "K",
+    "nflTeam": "BAL",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-K-cairo-santos",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 191,
+    "name": "Cairo Santos",
+    "pos": "K",
+    "nflTeam": "CHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-K-will-reichard",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 192,
+    "name": "Will Reichard",
+    "pos": "K",
+    "nflTeam": "MIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-RB-justice-hill",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 193,
+    "name": "Justice Hill",
+    "pos": "RB",
+    "nflTeam": "BAL",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-TE-pat-freiermuth",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 194,
+    "name": "Pat Freiermuth",
+    "pos": "TE",
+    "nflTeam": "PIT",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-RB-jordan-james",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 195,
+    "name": "Jordan James",
+    "pos": "RB",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-RB-kaelon-black",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 196,
+    "name": "Kaelon Black",
+    "pos": "RB",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-jack-bech",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 197,
+    "name": "Jack Bech",
+    "pos": "WR",
+    "nflTeam": "LV",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-QB-jordan-love",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 198,
+    "name": "Jordan Love",
+    "pos": "QB",
+    "nflTeam": "GB",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-QB-cam-ward",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 199,
+    "name": "Cam Ward",
+    "pos": "QB",
+    "nflTeam": "TEN",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-QB-cj-stroud",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 200,
+    "name": "C.J. Stroud",
+    "pos": "QB",
+    "nflTeam": "HOU",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-tank-dell",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 201,
+    "name": "Tank Dell",
+    "pos": "WR",
+    "nflTeam": "HOU",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-brandon-aiyuk",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 202,
+    "name": "Brandon Aiyuk",
+    "pos": "WR",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-deebo-samuel",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 203,
+    "name": "Deebo Samuel Sr.",
+    "pos": "WR",
+    "nflTeam": "FA"
+  },
+  {
+    "id": "2026-WR-stefon-diggs",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 204,
+    "name": "Stefon Diggs",
+    "pos": "WR",
+    "nflTeam": "FA"
+  },
+  {
+    "id": "2026-WR-tre-harris",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 205,
+    "name": "Tre Harris",
+    "pos": "WR",
+    "nflTeam": "LAC",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-TE-terrance-ferguson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 206,
+    "name": "Terrance Ferguson",
+    "pos": "TE",
+    "nflTeam": "LAR",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-TE-dalton-schultz",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 207,
+    "name": "Dalton Schultz",
+    "pos": "TE",
+    "nflTeam": "HOU",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-isaac-teslaa",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 208,
+    "name": "Isaac TeSlaa",
+    "pos": "WR",
+    "nflTeam": "DET",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-WR-caleb-douglas",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 209,
+    "name": "Caleb Douglas",
+    "pos": "WR",
+    "nflTeam": "MIA",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-WR-cooper-kupp",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 210,
+    "name": "Cooper Kupp",
+    "pos": "WR",
+    "nflTeam": "SEA",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-ryan-flournoy",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 211,
+    "name": "Ryan Flournoy",
+    "pos": "WR",
+    "nflTeam": "DAL",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-RB-kaytron-allen",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 212,
+    "name": "Kaytron Allen",
+    "pos": "RB",
+    "nflTeam": "WAS",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-RB-nicholas-singleton",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 213,
+    "name": "Nicholas Singleton",
+    "pos": "RB",
+    "nflTeam": "TEN",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-RB-demond-claiborne",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 214,
+    "name": "Demond Claiborne",
+    "pos": "RB",
+    "nflTeam": "MIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-TE-gunnar-helm",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 215,
+    "name": "Gunnar Helm",
+    "pos": "TE",
+    "nflTeam": "TEN",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-TE-oronde-gadsden",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 216,
+    "name": "Oronde Gadsden",
+    "pos": "TE",
+    "nflTeam": "LAC",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-TE-chig-okonkwo",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 217,
+    "name": "Chig Okonkwo",
+    "pos": "TE",
+    "nflTeam": "WAS",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-QB-sam-darnold",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 218,
+    "name": "Sam Darnold",
+    "pos": "QB",
+    "nflTeam": "SEA",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-QB-bryce-young",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 219,
+    "name": "Bryce Young",
+    "pos": "QB",
+    "nflTeam": "CAR",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-QB-fernando-mendoza",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 220,
+    "name": "Fernando Mendoza",
+    "pos": "QB",
+    "nflTeam": "LV",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-RB-jonah-coleman",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 221,
+    "name": "Jonah Coleman",
+    "pos": "RB",
+    "nflTeam": "DEN",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-RB-seth-mcgowan",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 222,
+    "name": "Seth McGowan",
+    "pos": "RB",
+    "nflTeam": "IND",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-RB-emmett-johnson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 223,
+    "name": "Emmett Johnson",
+    "pos": "RB",
+    "nflTeam": "KC",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-WR-malik-washington",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 224,
+    "name": "Malik Washington",
+    "pos": "WR",
+    "nflTeam": "MIA",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-RB-dylan-sampson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 225,
+    "name": "Dylan Sampson",
+    "pos": "RB",
+    "nflTeam": "CLE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-samaje-perine",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 226,
+    "name": "Samaje Perine",
+    "pos": "RB",
+    "nflTeam": "CIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-WR-tyreek-hill",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 227,
+    "name": "Tyreek Hill",
+    "pos": "WR",
+    "nflTeam": "FA"
+  },
+  {
+    "id": "2026-WR-dezhaun-stribling",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 228,
+    "name": "De'Zhaun Stribling",
+    "pos": "WR",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-jalen-tolbert",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 229,
+    "name": "Jalen Tolbert",
+    "pos": "WR",
+    "nflTeam": "MIA",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-WR-christian-kirk",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 230,
+    "name": "Christian Kirk",
+    "pos": "WR",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-savion-williams",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 231,
+    "name": "Savion Williams",
+    "pos": "WR",
+    "nflTeam": "GB",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-chris-brazzell",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 232,
+    "name": "Chris Brazzell II",
+    "pos": "WR",
+    "nflTeam": "CAR",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-WR-xavier-legette",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 233,
+    "name": "Xavier Legette",
+    "pos": "WR",
+    "nflTeam": "CAR",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-WR-keon-coleman",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 234,
+    "name": "Keon Coleman",
+    "pos": "WR",
+    "nflTeam": "BUF",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-DEF-buccaneers-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 235,
+    "name": "Buccaneers D/ST",
+    "pos": "DEF",
+    "nflTeam": "TB",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-DEF-packers-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 236,
+    "name": "Packers D/ST",
+    "pos": "DEF",
+    "nflTeam": "GB",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-K-chris-boswell",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 237,
+    "name": "Chris Boswell",
+    "pos": "K",
+    "nflTeam": "PIT",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-K-chase-mclaughlin",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 238,
+    "name": "Chase McLaughlin",
+    "pos": "K",
+    "nflTeam": "TB",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-RB-lequint-allen",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 239,
+    "name": "LeQuint Allen",
+    "pos": "RB",
+    "nflTeam": "JAX",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-RB-jaylen-wright",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 240,
+    "name": "Jaylen Wright",
+    "pos": "RB",
+    "nflTeam": "MIA",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-RB-ollie-gordon",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 241,
+    "name": "Ollie Gordon II",
+    "pos": "RB",
+    "nflTeam": "MIA",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-RB-kimani-vidal",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 242,
+    "name": "Kimani Vidal",
+    "pos": "RB",
+    "nflTeam": "LAC",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-RB-brashard-smith",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 243,
+    "name": "Brashard Smith",
+    "pos": "RB",
+    "nflTeam": "KC",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-RB-adam-randall",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 244,
+    "name": "Adam Randall",
+    "pos": "RB",
+    "nflTeam": "BAL",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-RB-trey-benson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 245,
+    "name": "Trey Benson",
+    "pos": "RB",
+    "nflTeam": "ARI",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-RB-kaleb-johnson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 246,
+    "name": "Kaleb Johnson",
+    "pos": "RB",
+    "nflTeam": "PIT",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-RB-ty-johnson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 247,
+    "name": "Ty Johnson",
+    "pos": "RB",
+    "nflTeam": "BUF",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-RB-marshawn-lloyd",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 248,
+    "name": "MarShawn Lloyd",
+    "pos": "RB",
+    "nflTeam": "GB",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-emari-demercado",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 249,
+    "name": "Emari Demercado",
+    "pos": "RB",
+    "nflTeam": "KC",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-RB-malik-davis",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 250,
+    "name": "Malik Davis",
+    "pos": "RB",
+    "nflTeam": "DAL",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-RB-kyle-juszczyk",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 251,
+    "name": "Kyle Juszczyk",
+    "pos": "RB",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-pat-bryant",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 252,
+    "name": "Pat Bryant",
+    "pos": "WR",
+    "nflTeam": "DEN",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-tory-horton",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 253,
+    "name": "Tory Horton",
+    "pos": "WR",
+    "nflTeam": "SEA",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-DEF-jaguars-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 254,
+    "name": "Jaguars D/ST",
+    "pos": "DEF",
+    "nflTeam": "JAX",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-DEF-colts-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 255,
+    "name": "Colts D/ST",
+    "pos": "DEF",
+    "nflTeam": "IND",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-K-evan-mcpherson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 256,
+    "name": "Evan McPherson",
+    "pos": "K",
+    "nflTeam": "CIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-K-nick-folk",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 257,
+    "name": "Nick Folk",
+    "pos": "K",
+    "nflTeam": "ATL",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-TE-aj-barner",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 258,
+    "name": "AJ Barner",
+    "pos": "TE",
+    "nflTeam": "SEA",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-TE-greg-dulcich",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 259,
+    "name": "Greg Dulcich",
+    "pos": "TE",
+    "nflTeam": "MIA",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-TE-jake-tonges",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 260,
+    "name": "Jake Tonges",
+    "pos": "TE",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-kayshon-boutte",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 261,
+    "name": "Kayshon Boutte",
+    "pos": "WR",
+    "nflTeam": "NE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-WR-jakobi-lane",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 262,
+    "name": "Ja'Kobi Lane",
+    "pos": "WR",
+    "nflTeam": "BAL",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-ted-hurst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 263,
+    "name": "Ted Hurst",
+    "pos": "WR",
+    "nflTeam": "TB",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-elijah-sarratt",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 264,
+    "name": "Elijah Sarratt",
+    "pos": "WR",
+    "nflTeam": "BAL",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-RB-chris-brooks",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 265,
+    "name": "Chris Brooks",
+    "pos": "RB",
+    "nflTeam": "GB",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-george-holani",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 266,
+    "name": "George Holani",
+    "pos": "RB",
+    "nflTeam": "SEA",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-QB-geno-smith",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 267,
+    "name": "Geno Smith",
+    "pos": "QB",
+    "nflTeam": "NYJ",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-QB-aaron-rodgers",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 268,
+    "name": "Aaron Rodgers",
+    "pos": "QB",
+    "nflTeam": "PIT",
+    "byeWeek": 9
+  },
+  {
+    "id": "2026-QB-deshaun-watson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 269,
+    "name": "Deshaun Watson",
+    "pos": "QB",
+    "nflTeam": "CLE",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-QB-jacoby-brissett",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 270,
+    "name": "Jacoby Brissett",
+    "pos": "QB",
+    "nflTeam": "ARI",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-WR-dontayvion-wicks",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 271,
+    "name": "Dontayvion Wicks",
+    "pos": "WR",
+    "nflTeam": "PHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-WR-nick-westbrook-ikhine",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 272,
+    "name": "Nick Westbrook-Ikhine",
+    "pos": "WR",
+    "nflTeam": "IND",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-darius-slayton",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 273,
+    "name": "Darius Slayton",
+    "pos": "WR",
+    "nflTeam": "NYG",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-dyami-brown",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 274,
+    "name": "Dyami Brown",
+    "pos": "WR",
+    "nflTeam": "WAS",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-WR-jahan-dotson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 275,
+    "name": "Jahan Dotson",
+    "pos": "WR",
+    "nflTeam": "ATL",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-isaiah-davis",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 276,
+    "name": "Isaiah Davis",
+    "pos": "RB",
+    "nflTeam": "NYJ",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-RB-dj-giddens",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 277,
+    "name": "DJ Giddens",
+    "pos": "RB",
+    "nflTeam": "IND",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-RB-jaydon-blue",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 278,
+    "name": "Jaydon Blue",
+    "pos": "RB",
+    "nflTeam": "DAL",
+    "byeWeek": 14
+  },
+  {
+    "id": "2026-RB-trevor-etienne",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 279,
+    "name": "Trevor Etienne",
+    "pos": "RB",
+    "nflTeam": "CAR",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-RB-emanuel-wilson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 280,
+    "name": "Emanuel Wilson",
+    "pos": "RB",
+    "nflTeam": "SEA",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-RB-will-shipley",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 281,
+    "name": "Will Shipley",
+    "pos": "RB",
+    "nflTeam": "PHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-RB-tyler-badie",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 282,
+    "name": "Tyler Badie",
+    "pos": "RB",
+    "nflTeam": "DEN",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-RB-devin-singletary",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 283,
+    "name": "Devin Singletary",
+    "pos": "RB",
+    "nflTeam": "NYG",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-WR-andrei-iosivas",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 284,
+    "name": "Andrei Iosivas",
+    "pos": "WR",
+    "nflTeam": "CIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-DEF-bengals-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 285,
+    "name": "Bengals D/ST",
+    "pos": "DEF",
+    "nflTeam": "CIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-DEF-bears-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 286,
+    "name": "Bears D/ST",
+    "pos": "DEF",
+    "nflTeam": "CHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-K-trey-smack",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 287,
+    "name": "Trey Smack",
+    "pos": "K",
+    "nflTeam": "GB",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-K-jake-elliott",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 288,
+    "name": "Jake Elliott",
+    "pos": "K",
+    "nflTeam": "PHI",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-TE-cade-otton",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 289,
+    "name": "Cade Otton",
+    "pos": "TE",
+    "nflTeam": "TB",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-TE-mike-gesicki",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 290,
+    "name": "Mike Gesicki",
+    "pos": "TE",
+    "nflTeam": "CIN",
+    "byeWeek": 6
+  },
+  {
+    "id": "2026-TE-evan-engram",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 291,
+    "name": "Evan Engram",
+    "pos": "TE",
+    "nflTeam": "DEN",
+    "byeWeek": 10
+  },
+  {
+    "id": "2026-TE-david-njoku",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 292,
+    "name": "David Njoku",
+    "pos": "TE",
+    "nflTeam": "LAC",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-TE-michael-mayer",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 293,
+    "name": "Michael Mayer",
+    "pos": "TE",
+    "nflTeam": "LV",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-WR-tyquan-thornton",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 294,
+    "name": "Tyquan Thornton",
+    "pos": "WR",
+    "nflTeam": "KC",
+    "byeWeek": 5
+  },
+  {
+    "id": "2026-WR-van-jefferson",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 295,
+    "name": "Van Jefferson",
+    "pos": "WR",
+    "nflTeam": "WAS",
+    "byeWeek": 7
+  },
+  {
+    "id": "2026-QB-tua-tagovailoa",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 296,
+    "name": "Tua Tagovailoa",
+    "pos": "QB",
+    "nflTeam": "ATL",
+    "byeWeek": 11
+  },
+  {
+    "id": "2026-DEF-49ers-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 297,
+    "name": "49ers D/ST",
+    "pos": "DEF",
+    "nflTeam": "SF",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-DEF-jets-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 298,
+    "name": "Jets D/ST",
+    "pos": "DEF",
+    "nflTeam": "NYJ",
+    "byeWeek": 13
+  },
+  {
+    "id": "2026-DEF-saints-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 299,
+    "name": "Saints D/ST",
+    "pos": "DEF",
+    "nflTeam": "NO",
+    "byeWeek": 8
+  },
+  {
+    "id": "2026-DEF-panthers-dst",
+    "season": 2026,
+    "source": "ESPN salary-cap values",
+    "rank": 300,
+    "name": "Panthers D/ST",
+    "pos": "DEF",
+    "nflTeam": "CAR",
+    "byeWeek": 5
+  }
+]

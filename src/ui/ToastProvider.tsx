@@ -1,26 +1,43 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { useState } from "react";
 import { cn } from "./cn";
+import { ToastContext, type ToastInput } from "./toastContext";
 
 type Toast = {
   id: string;
-  message: string;
+  title: string | undefined;
+  description: string | undefined;
+  status: "info" | "success" | "warning" | "error";
+  duration: number;
 };
-
-const ToastCtx = createContext<any>(null);
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  function push(message: string) {
+  function push(input: ToastInput) {
     const id = crypto.randomUUID();
-    setToasts((t) => [...t, { id, message }]);
+    const normalized =
+      typeof input === "string"
+        ? { title: input, description: undefined, status: "info" as const, duration: 3000 }
+        : {
+            title: input.title,
+            description: input.description,
+            status: input.status ?? "info",
+            duration: input.duration ?? 3000,
+          };
+
+    const toast: Toast = { id, ...normalized };
+    setToasts((t) => [...t, toast]);
     setTimeout(() => {
       setToasts((t) => t.filter((x) => x.id !== id));
-    }, 3000);
+    }, normalized.duration);
+  }
+
+  function closeAll() {
+    setToasts([]);
   }
 
   return (
-    <ToastCtx.Provider value={{ push }}>
+    <ToastContext.Provider value={{ push, closeAll }}>
       {children}
 
       <div className="fixed bottom-6 right-6 space-y-2 z-[100]">
@@ -34,14 +51,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               "animate-[fadeIn_200ms_ease]"
             )}
           >
-            {t.message}
+            <div className="text-xs uppercase tracking-wide opacity-70">{t.status}</div>
+            {t.title ? <div className="font-medium">{t.title}</div> : null}
+            {t.description ? <div className="text-xs opacity-80 mt-1">{t.description}</div> : null}
           </div>
         ))}
       </div>
-    </ToastCtx.Provider>
+    </ToastContext.Provider>
   );
-}
-
-export function useToast() {
-  return useContext(ToastCtx);
 }

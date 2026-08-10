@@ -80,7 +80,7 @@ const createMockStore = (initial: Partial<DraftStateType> = {}) => {
     baseBudget: 200,
     teamCount: 2,
     templateRoster: {
-      QB: 1, RB: 2, WR: 2, TE: 1, FLEX: 1, K: 1, DEF: 1, BENCH: 6,
+      QB: 1, RB: 2, WR: 2, TE: 1, FLEX: 1, K: 1, DEF: 1, BENCH: 6, IR: 0,
     } as Record<Position, number>,
     auctionSettings: DEFAULT_AUCTION_SETTINGS,
     runtime: DEFAULT_RUNTIME,
@@ -97,6 +97,7 @@ const createMockStore = (initial: Partial<DraftStateType> = {}) => {
     updateTeam: vi.fn(),
     setCurrentNominatedId: vi.fn(),
     setCurrentBidder: vi.fn(),
+    initializeDraft: vi.fn(),
     applyAdp: vi.fn(),
     loadAdp: vi.fn(),
     setConfig: vi.fn(),
@@ -107,6 +108,10 @@ const createMockStore = (initial: Partial<DraftStateType> = {}) => {
     clearLogs: vi.fn(),
     resetDraft: vi.fn(),
     setAuctionSettings: vi.fn(),
+    exportDraftState: vi.fn(),
+    importDraftState: vi.fn(),
+    applyIncomingAction: vi.fn(),
+    markActionProcessed: vi.fn(),
     pushLog: vi.fn((event: Omit<LogEvent, 'id' | 'ts'>) => {
       set((s) => ({
         logs: [{ ...event, id: `log_${s.logs.length + 1}`, ts: Date.now() } as LogEvent, ...s.logs],
@@ -242,7 +247,7 @@ const mockTeam = (id: number, budget: number, roster: Partial<Record<Position, n
   name: `Team ${id}`,
   budget,
   roster: {
-    QB: 0, RB: 0, WR: 0, TE: 0, FLEX: 0, K: 0, DEF: 0, BENCH: 0,
+    QB: 0, RB: 0, WR: 0, TE: 0, FLEX: 0, K: 0, DEF: 0, BENCH: 0, IR: 0,
     ...roster,
   },
   players: [],

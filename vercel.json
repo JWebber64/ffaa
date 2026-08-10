@@ -1,0 +1,54 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/ff",
+      "destination": "/ff/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/ff/ffc-api/:path*",
+      "destination": "https://fantasyfootballcalculator.com/api/v1/:path*"
+    },
+    {
+      "source": "/ffc-api/:path*",
+      "destination": "https://fantasyfootballcalculator.com/api/v1/:path*"
+    },
+    {
+      "source": "/ff/assets/:path*",
+      "destination": "/assets/:path*"
+    },
+    {
+      "source": "/ff/sounds/:path*",
+      "destination": "/sounds/:path*"
+    },
+    {
+      "source": "/ff/data/:path*",
+      "destination": "/data/:path*"
+    },
+    {
+      "source": "/ff/teams/:path*",
+      "destination": "/teams/:path*"
+    },
+    {
+      "source": "/ff/vite.svg",
+      "destination": "/vite.svg"
+    },
+    {
+      "source": "/ff/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/ff/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ]
+}

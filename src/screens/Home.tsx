@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Heading, Stack, Text, Alert, AlertIcon, AlertTitle, AlertDescription, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, VStack, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, Divider, Heading, Stack, Text, Alert, AlertIcon, AlertTitle, AlertDescription, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, VStack, useDisclosure, useToast } from "@/ui/custom";
 import { NavLink, useNavigate } from "react-router-dom";
 import { ResetDraftButton } from "../components/auction/ResetDraftButton";
 import { useDraftStore } from "../store";
@@ -7,7 +7,7 @@ export default function Home() {
   const navigate = useNavigate();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { teams, setCurrentBidder } = useDraftStore();
+  const { teams } = useDraftStore();
 
   const handleStartDraft = (mode: 'auction' | 'snake') => {
     if (!teams || teams.length === 0) {
@@ -67,7 +67,7 @@ export default function Home() {
           </Box>
         </Alert>
 
-        <Button bg="#2372b2" width="100%" size="lg" onClick={onOpen}>
+        <Button bg="var(--accent-2)" width="100%" size="lg" onClick={onOpen}>
           🚀 Start Draft
         </Button>
         <NavLink to="/auctioneer" style={{ textDecoration: "none" }}>
@@ -130,3 +130,4 @@ export default function Home() {
     </Box>
   );
 }
+

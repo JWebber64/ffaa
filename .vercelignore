@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+reports
+codex-chrome-*.html
+league-desktop.png
+cloudflare
+supabase
+*.tsbuildinfo

@@ -1,13 +1,14 @@
 import { cn } from "@/ui/cn";
 import { Badge } from "@/ui/Badge";
 import { SlotTile } from "./SlotTile";
+import { normalizeTeamAbbr, resolveByeWeek } from "@/components/player/teamMarkUtils";
 
 type Team = {
   teamId: string;
   name: string;
   budget: number;
   spent: number;
-  roster?: Array<{ name?: string; price?: number }>;
+  roster?: Array<{ name?: string; price?: number; team?: string; byeWeek?: number }>;
 };
 
 type RosterSlot = { slot: string; count: number };
@@ -23,6 +24,16 @@ function expandSlots(rosterSlots: RosterSlot[]) {
     for (let i = 0; i < count; i++) out.push(rs.slot);
   }
   return out;
+}
+
+function formatCompactTeamBye(team?: string, byeWeek?: number) {
+  const normalizedTeam = normalizeTeamAbbr(team);
+  const resolvedByeWeek = resolveByeWeek(normalizedTeam, byeWeek);
+  return [
+    normalizedTeam,
+    resolvedByeWeek ? "bye" : "",
+    resolvedByeWeek ? String(resolvedByeWeek) : "",
+  ].filter(Boolean).join(" | ");
 }
 
 export function TeamColumn({
@@ -79,7 +90,8 @@ export function TeamColumn({
             const rosterPlayer = roster[idx];
             const assigned = rosterPlayer?.name ? { 
               name: rosterPlayer.name, 
-              price: rosterPlayer.price || 0 
+              price: rosterPlayer.price || 0,
+              meta: formatCompactTeamBye(rosterPlayer.team, rosterPlayer.byeWeek),
             } : null;
             return <SlotTile key={`${team.teamId}:${slot}:${idx}`} slot={slot} assigned={assigned} />;
           })

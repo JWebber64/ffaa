@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
+import type { MouseEvent as ReactMouseEvent } from 'react';
 import {
   Badge,
   Box,
@@ -15,20 +16,21 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
-} from '@chakra-ui/react';
+} from '@/ui/custom';
 import { FaClock, FaGavel, FaSync, FaCog } from 'react-icons/fa';
 import { useDraftStore } from '../store';
 import type { Player } from '../types/draft';
-import { useConfig } from '../contexts/ConfigContext';
+import { useConfig } from '../contexts/configContextState';
 import { formatPositionForDisplay } from '../utils/positionUtils';
 import type { Position } from '../types/draft';
 import { PlayerSearch } from '../components/unified/PlayerSearch';
 import { ResetDraftButton } from '../components/auction/ResetDraftButton';
 import AuctionSettings from '../components/AuctionSettings';
 import { useNavigate } from 'react-router-dom';
-import { useDisclosure } from '@chakra-ui/react';
+import { useDisclosure } from '@/ui/custom';
 import { useAuctionSound } from '../hooks/useAuctionSound';
 import { toastError } from '../utils/toastError';
+import { TeamMark } from '../components/player/TeamMark';
 
 const Auctioneer: React.FC = () => {
   const toast = useToast();
@@ -71,6 +73,7 @@ const Auctioneer: React.FC = () => {
   const [time, setTime] = useState<number>(countdownSeconds);
   const timerRef = useRef<number | null>(null);
   const deadlineRef = useRef<number | null>(null);
+  const lastTimerSoundSecondRef = useRef<number | null>(null);
 
   // ---- config ----
   const { config } = useConfig();
@@ -87,6 +90,7 @@ const Auctioneer: React.FC = () => {
     if (timerRef.current !== null) return;
     
     setIsTimerRunning(true);
+    lastTimerSoundSecondRef.current = null;
     const deadline = Date.now() + time * 1000;
     deadlineRef.current = deadline;
     
@@ -95,7 +99,8 @@ const Auctioneer: React.FC = () => {
       setTime(remaining);
       
       // Play timer tick sound every second
-      if (remaining > 0 && remaining <= 5) {
+      if (remaining > 0 && remaining <= 5 && lastTimerSoundSecondRef.current !== remaining) {
+        lastTimerSoundSecondRef.current = remaining;
         playSound('timer');
       }
       
@@ -103,6 +108,7 @@ const Auctioneer: React.FC = () => {
         setIsTimerRunning(false);
         timerRef.current = null;
         deadlineRef.current = null;
+        lastTimerSoundSecondRef.current = null;
         
         // Play winner sound when timer ends
         playSound('winner');
@@ -120,6 +126,7 @@ const Auctioneer: React.FC = () => {
       timerRef.current = null;
       deadlineRef.current = null;
     }
+    lastTimerSoundSecondRef.current = null;
     setIsTimerRunning(false);
   }, []);
 
@@ -185,9 +192,6 @@ const Auctioneer: React.FC = () => {
       setTime(countdownSeconds);
       if (!isTimerRunning) startTimer();
 
-      // Play bid sound
-      playSound('bid');
-
       toast({
         title: 'Bid placed',
         description: `Bid $${bidAmount} on ${currentPlayer.name}`,
@@ -213,8 +217,8 @@ const Auctioneer: React.FC = () => {
     bidAmount,
     computeMaxBid,
     config.includeTeInFlex,
+    countdownSeconds,
     currentBidder,
-    currentNom,
     currentPlayer,
     hasSlotFor,
     isTimerRunning,
@@ -250,7 +254,7 @@ const Auctioneer: React.FC = () => {
       duration: 2000,
       isClosable: true,
     });
-  }, [currentBidder, nominate, isTimerRunning, startTimer, toast, playSound]);
+  }, [countdownSeconds, currentBidder, nominate, isTimerRunning, startTimer, toast, playSound]);
 
   // ---- team buttons block (select team & per-team quick bid) ----
   const teamButtonsBlock = useMemo(() => {
@@ -393,7 +397,7 @@ const Auctioneer: React.FC = () => {
               const isDisabled = !currentPlayer || !hasSlot || maxBid < 1 || isLoading;
               const isOutbid = currentBidder === team.id;
               
-              let tooltipLabel = '';
+              let tooltipLabel: string;
               if (!currentPlayer) {
                 tooltipLabel = 'No player is currently nominated for bidding';
               } else if (!hasSlot) {
@@ -419,7 +423,7 @@ const Auctioneer: React.FC = () => {
                       leftIcon={<FaGavel />}
                       colorScheme={isOutbid ? 'green' : 'blue'}
                       variant={isOutbid ? 'solid' : 'solid'}
-                      onClick={(e) => {
+                      onClick={(e: ReactMouseEvent<HTMLButtonElement>) => {
                         e.stopPropagation();
                         void handleTeamQuickBid(team.id);
                       }}
@@ -469,6 +473,7 @@ const Auctioneer: React.FC = () => {
     bidAmount,
     isLoading,
     config.includeTeInFlex,
+    countdownSeconds,
     computeMaxBid,
   ]);
 
@@ -579,8 +584,11 @@ const Auctioneer: React.FC = () => {
           {currentPlayer ? (
             <VStack spacing={4} align="stretch">
               <HStack justify="space-between" align="center">
-                <Text fontSize="xl" fontWeight="bold" color="white">
-                  {currentPlayer.name}
+                <HStack minW={0} spacing={2}>
+                  <TeamMark team={currentPlayer.nflTeam} size="sm" />
+                  <Text fontSize="xl" fontWeight="bold" color="white">
+                    {currentPlayer.name}
+                  </Text>
                   {currentPlayer.pos && (
                     <Badge ml={2} colorScheme="blue">
                       {formatPositionForDisplay(currentPlayer.pos)}
@@ -591,7 +599,12 @@ const Auctioneer: React.FC = () => {
                       {currentPlayer.nflTeam}
                     </Badge>
                   )}
-                </Text>
+                  {currentPlayer.byeWeek && (
+                    <Badge ml={2} colorScheme="gray" variant="outline">
+                      Bye {currentPlayer.byeWeek}
+                    </Badge>
+                  )}
+                </HStack>
 
                 <HStack>
                   <Button
@@ -782,9 +795,6 @@ const Auctioneer: React.FC = () => {
           <Button size="sm" onClick={() => playSound('nomination')} colorScheme="blue">
             🔊 Test Nomination
           </Button>
-          <Button size="sm" onClick={() => playSound('bid')} colorScheme="green">
-            🔊 Test Bid
-          </Button>
           <Button size="sm" onClick={() => playSound('winner')} colorScheme="orange">
             🔊 Test Winner
           </Button>
@@ -798,3 +808,4 @@ const Auctioneer: React.FC = () => {
 };
 
 export default React.memo(Auctioneer);
+

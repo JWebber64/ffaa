@@ -9,11 +9,11 @@ import {
   ModalOverlay,
   Text,
   useToast,
-} from '@chakra-ui/react';
+} from '@/ui/custom';
 import { useState } from 'react';
 import { PlayerSearch } from '../unified/PlayerSearch';
 import { useDraftStore } from '../../store/draftStore';
-import { useRole } from '../../contexts/RoleContext';
+import { useRole } from '../../contexts/roleContextState';
 import type { Player } from '../../types/draft';
 import { toastError } from '../../utils/toastError';
 
@@ -76,3 +76,4 @@ export default function SelectPlayerModal({ teamId, isOpen, onClose }: SelectPla
     </Modal>
   );
 }
+

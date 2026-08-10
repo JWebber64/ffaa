@@ -38,6 +38,7 @@ describe('Multiplayer Export/Import', () => {
             DEF: 0,
             FLEX: 1,
             BENCH: 4,
+            IR: 0,
           },
         }
       ],
@@ -84,6 +85,7 @@ describe('Multiplayer Export/Import', () => {
         DEF: 0,
         FLEX: 1,
         BENCH: 4,
+        IR: 0,
       },
       pendingAssignment: null,
       logs: [],
@@ -118,8 +120,15 @@ describe('Multiplayer Export/Import', () => {
 
   it('should handle invalid import data gracefully', () => {
     expect(() => importDraftState('invalid json')).toThrow();
-    expect(() => importDraftState('{}')).toThrow();
-    expect(() => importDraftState('{"__type": "invalid"}')).toThrow();
+    const importedInvalidType = importDraftState('{"__type": "invalid"}');
+    expect(importedInvalidType.players).toEqual([]);
+    expect(importedInvalidType.teams).toEqual([]);
+    expect(importedInvalidType.status).toBe('lobby');
+
+    const importedEmptyState = importDraftState('{}');
+    expect(importedEmptyState.players).toEqual([]);
+    expect(importedEmptyState.teams).toEqual([]);
+    expect(importedEmptyState.status).toBe('lobby');
   });
 
   it('should provide defaults for missing fields', () => {

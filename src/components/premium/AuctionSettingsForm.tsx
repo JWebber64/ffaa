@@ -1,4 +1,5 @@
 import React from 'react';
+import type { ChangeEvent } from 'react';
 import {
   Box,
   Button,
@@ -17,8 +18,8 @@ import {
   GridItem,
   IconButton,
   Tooltip,
-} from '@chakra-ui/react';
-import { AddIcon, MinusIcon } from '@chakra-ui/icons';
+} from '@/ui/custom';
+import { Minus, Plus } from 'lucide-react';
 import { AuctionSettingsV2, NominationOrderModeV2, TeamCountV2 } from '../../types/draftConfig';
 
 interface AuctionSettingsFormProps {
@@ -31,9 +32,9 @@ export default function AuctionSettingsForm({ value, onChange, teamCount }: Auct
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
 
-  const updateSetting = <K extends keyof AuctionSettingsV2>(key: K, val: AuctionSettingsV2[K]) => {
+  const updateSetting = React.useCallback(<K extends keyof AuctionSettingsV2>(key: K, val: AuctionSettingsV2[K]) => {
     onChange({ ...value, [key]: val });
-  };
+  }, [onChange, value]);
 
   const updateTeamBudget = (teamIndex: number, budget: number) => {
     const newBudgets = [...value.teamBudgets];
@@ -64,7 +65,7 @@ export default function AuctionSettingsForm({ value, onChange, teamCount }: Auct
       }
       updateSetting('teamBudgets', newBudgets);
     }
-  }, [teamCount, value.teamBudgets.length, value.defaultBudget]);
+  }, [teamCount, updateSetting, value.defaultBudget, value.teamBudgets]);
 
   return (
     <Box bg={bgColor} border="1px" borderColor={borderColor} borderRadius="lg" p={6}>
@@ -83,7 +84,7 @@ export default function AuctionSettingsForm({ value, onChange, teamCount }: Auct
             </Text>
             <NumberInput
               value={value.defaultBudget}
-              onChange={(val) => updateSetting('defaultBudget', parseInt(val) || 0)}
+              onChange={(val: string) => updateSetting('defaultBudget', parseInt(val) || 0)}
               min={0}
               max={10000}
               size="sm"
@@ -106,7 +107,7 @@ export default function AuctionSettingsForm({ value, onChange, teamCount }: Auct
             </Text>
             <NumberInput
               value={value.nominationSeconds}
-              onChange={(val) => updateSetting('nominationSeconds', parseInt(val) || 30)}
+              onChange={(val: string) => updateSetting('nominationSeconds', parseInt(val) || 30)}
               min={5}
               max={300}
               size="sm"
@@ -129,7 +130,7 @@ export default function AuctionSettingsForm({ value, onChange, teamCount }: Auct
             </Text>
             <NumberInput
               value={value.bidResetSeconds}
-              onChange={(val) => updateSetting('bidResetSeconds', parseInt(val) || 10)}
+              onChange={(val: string) => updateSetting('bidResetSeconds', parseInt(val) || 10)}
               min={0}
               max={60}
               size="sm"
@@ -152,7 +153,7 @@ export default function AuctionSettingsForm({ value, onChange, teamCount }: Auct
             </Text>
             <NumberInput
               value={value.minIncrement}
-              onChange={(val) => updateSetting('minIncrement', parseInt(val) || 1)}
+              onChange={(val: string) => updateSetting('minIncrement', parseInt(val) || 1)}
               min={1}
               max={50}
               size="sm"
@@ -175,7 +176,7 @@ export default function AuctionSettingsForm({ value, onChange, teamCount }: Auct
             </Text>
             <Select
               value={value.nominationOrderMode}
-              onChange={(e) => updateSetting('nominationOrderMode', e.target.value as NominationOrderModeV2)}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => updateSetting('nominationOrderMode', e.target.value as NominationOrderModeV2)}
               size="sm"
               flex={1}
             >
@@ -208,7 +209,7 @@ export default function AuctionSettingsForm({ value, onChange, teamCount }: Auct
               <Tooltip label="Add $10 to all teams">
                 <IconButton
                   aria-label="Add $10 to all"
-                  icon={<AddIcon />}
+                  icon={<Plus size={16} />}
                   size="sm"
                   colorScheme="green"
                   variant="outline"
@@ -218,7 +219,7 @@ export default function AuctionSettingsForm({ value, onChange, teamCount }: Auct
               <Tooltip label="Subtract $10 from all teams">
                 <IconButton
                   aria-label="Subtract $10 from all"
-                  icon={<MinusIcon />}
+                  icon={<Minus size={16} />}
                   size="sm"
                   colorScheme="red"
                   variant="outline"
@@ -237,7 +238,7 @@ export default function AuctionSettingsForm({ value, onChange, teamCount }: Auct
                   </Text>
                   <NumberInput
                     value={value.teamBudgets[index] || value.defaultBudget}
-                    onChange={(val) => updateTeamBudget(index, parseInt(val) || 0)}
+                    onChange={(val: string) => updateTeamBudget(index, parseInt(val) || 0)}
                     min={0}
                     max={10000}
                     size="sm"
@@ -263,3 +264,4 @@ export default function AuctionSettingsForm({ value, onChange, teamCount }: Auct
     </Box>
   );
 }
+

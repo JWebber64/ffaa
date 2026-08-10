@@ -1,5 +1,7 @@
 import type { Player, Position } from "@/types/draft";
-import pool from "./player-pool-2025.json";
+import pool from "./player-pool-2026.json";
+import { applyConsensusAuctionValues } from "./playerValues";
+import type { AuctionValueOptions } from "./playerValues";
 
 // Valid NFL team abbreviations
 const VALID_TEAMS = new Set([
@@ -8,6 +10,18 @@ const VALID_TEAMS = new Set([
   'LV', 'LAC', 'LAR', 'MIA', 'MIN', 'NE', 'NO', 'NYG',
   'NYJ', 'PHI', 'PIT', 'SEA', 'SF', 'TB', 'TEN', 'WAS', 'FA'
 ]);
+
+const TEAM_ALIASES: Record<string, string> = {
+  ARZ: 'ARI',
+  JAC: 'JAX',
+  LA: 'LAR',
+  LVR: 'LV',
+  NOR: 'NO',
+  NWE: 'NE',
+  SFO: 'SF',
+  TAM: 'TB',
+  WSH: 'WAS',
+};
 
 // Valid positions
 const VALID_POSITIONS = new Set(['QB', 'RB', 'WR', 'TE', 'K', 'DEF']);
@@ -18,13 +32,29 @@ function cleanNumber(value: unknown): number | undefined {
   return isNaN(num) ? undefined : num;
 }
 
+function cleanByeWeek(value: unknown): number | undefined {
+  const byeWeek = cleanNumber(value);
+  if (byeWeek === undefined || byeWeek <= 0) return undefined;
+  return Math.round(byeWeek);
+}
+
 function cleanString(value: unknown): string | undefined {
   if (!value) return undefined;
   const str = String(value).trim();
   return str || undefined;
 }
 
-export function loadPlayerPool(): Player[] {
+function cleanTeam(value: unknown): string {
+  const rawTeam = cleanString(value)?.toUpperCase();
+  const team = rawTeam ? TEAM_ALIASES[rawTeam] ?? rawTeam : undefined;
+  return team && VALID_TEAMS.has(team) ? team : 'FA';
+}
+
+export type LoadPlayerPoolOptions = AuctionValueOptions & {
+  budget?: number;
+};
+
+export function loadPlayerPool(options: LoadPlayerPoolOptions = {}): Player[] {
   console.log('[loadPlayerPool] Starting to load player pool...');
   
   try {
@@ -53,13 +83,19 @@ export function loadPlayerPool(): Player[] {
         }
         
         // Clean team
-        const team = cleanString(raw.nflTeam)?.toUpperCase();
-        const nflTeam = team && VALID_TEAMS.has(team) ? team : 'FA';
+        const nflTeam = cleanTeam(raw.nflTeam ?? raw.team);
         
         // Clean numbers with fallbacks
         const rank = cleanNumber(raw.rank) || 999;
         const posRank = cleanNumber(raw.posRank);
         const adp = cleanNumber(raw.adp);
+        const byeWeek = cleanByeWeek(raw.byeWeek ?? raw.bye);
+        const rankSource =
+          typeof raw.adpSource === 'string'
+            ? raw.adpSource
+            : typeof raw.source === 'string'
+              ? raw.source
+              : undefined;
         
         const player: Player = {
           id,
@@ -69,7 +105,8 @@ export function loadPlayerPool(): Player[] {
           rank,
           ...(posRank !== undefined && { posRank }),
           ...(adp !== undefined && { adp }),
-          ...(typeof raw.adpSource === 'string' && { adpSource: raw.adpSource }),
+          ...(byeWeek !== undefined && { byeWeek }),
+          ...(rankSource && { adpSource: rankSource }),
           search_rank: rank,
           search_rank_ppr: rank
         };
@@ -92,9 +129,15 @@ export function loadPlayerPool(): Player[] {
       }
     }
     
+    const valuedPlayers = applyConsensusAuctionValues(
+      validPlayers,
+      options.budget ?? 200,
+      options,
+    );
+
     // Sort players by rank
-    const sortedPlayers = [...validPlayers].sort((a, b) => (a.rank ?? 999) - (b.rank ?? 999));
-    
+    const sortedPlayers = [...valuedPlayers].sort((a, b) => (a.rank ?? 999) - (b.rank ?? 999));
+
     console.log(`[loadPlayerPool] Successfully loaded ${sortedPlayers.length} valid players`);
     
     // Log sample data for debugging
@@ -106,9 +149,11 @@ export function loadPlayerPool(): Player[] {
           name: samplePlayer.name,
           pos: samplePlayer.pos,
           nflTeam: samplePlayer.nflTeam,
+          byeWeek: samplePlayer.byeWeek,
           rank: samplePlayer.rank,
           posRank: samplePlayer.posRank,
-          adp: samplePlayer.adp
+          adp: samplePlayer.adp,
+          auctionValue: samplePlayer.auctionValue
         };
         console.log('[loadPlayerPool] Sample player:', sampleData);
       }

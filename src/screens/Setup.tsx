@@ -7,9 +7,10 @@ import {
     Heading,
     HStack,
     Input,
+    Select,
     Stack,
     Text,
-  } from "@chakra-ui/react";
+  } from "@/ui/custom";
   import { useState } from "react";
   import type { ChangeEvent } from "react"; // 👈 type-only
   import { useNavigate } from "react-router-dom";
@@ -94,39 +95,32 @@ import {
           <HStack spacing={4} alignItems="center" flexWrap="wrap">
             <HStack gap={2} alignItems="center">
               <Text>Managers</Text>
-              {/* Use native select to avoid Chakra v3 slot typing */}
-              <select
+              {/* Native control keeps this legacy screen independent from a UI framework. */}
+              <Select
                 value={teams}
                 onChange={updateTeamCount}
-                style={{
-                  background: "#233347",
-                  color: "white",
-                  border: "1px solid #374151",
-                  padding: "8px 10px",
-                  borderRadius: "8px",
-                  width: "140px",
-                }}
+                style={{ width: "140px" }}
               >
                 {TEAM_OPTIONS.map((n) => (
                   <option key={n} value={n}>
                     {n}
                   </option>
                 ))}
-              </select>
+              </Select>
             </HStack>
   
             <HStack gap={2} alignItems="center">
               <Text>Budget ($)</Text>
-              {/* Use native number input to avoid Chakra v3 NumberInput slots */}
+              {/* Native control keeps this legacy screen independent from a UI framework. */}
               <input
                 type="number"
                 value={budget}
                 min={50}
                 onChange={updateBudget}
                 style={{
-                  background: "#233347",
+                  background: "var(--bg-2)",
                   color: "white",
-                  border: "1px solid #374151",
+                  border: "1px solid var(--line-1)",
                   padding: "8px 10px",
                   borderRadius: "8px",
                   width: "140px",
@@ -137,7 +131,7 @@ import {
             <Box
               ml="auto"
               p={3}
-              bg="#233347"
+              bg="var(--bg-2)"
               rounded="md"
               border="1px solid"
               borderColor="gray.700"
@@ -177,9 +171,9 @@ import {
                       value={roster[p]}
                       onChange={updateRoster(p)}
                       style={{
-                        background: "#233347",
+                        background: "var(--bg-2)",
                         color: "white",
-                        border: "1px solid #374151",
+                        border: "1px solid var(--line-1)",
                         padding: "8px 10px",
                         borderRadius: "8px",
                         width: "120px",
@@ -191,7 +185,7 @@ import {
             </Grid>
           </Box>
   
-          <Button bg="#2372b2" onClick={handleStart} size="lg">
+          <Button bg="var(--accent-2)" onClick={handleStart} size="lg">
             Continue to Draft Board
           </Button>
         </Stack>

@@ -1,4 +1,4 @@
-import { beforeAll, afterAll } from '@jest/globals';
+import { afterAll, beforeAll } from 'vitest';
 
 // Mock for window.localStorage
 const localStorageMock = (() => {

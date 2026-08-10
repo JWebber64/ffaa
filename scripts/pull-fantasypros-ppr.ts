@@ -1,12 +1,9 @@
 /* eslint-disable no-console */
-// @ts-ignore - node-fetch types are not needed for ESM
-import fetch from "node-fetch";
 import * as fs from "node:fs/promises";
 import path from "node:path";
 import slugify from "slugify";
 import * as cheerio from "cheerio";
 import { stringify } from "csv-stringify";
-import type { Position as DraftPosition } from "../src/types/draft";
 
 // Local type that includes UNK for internal processing
 type Position = "QB" | "RB" | "WR" | "TE" | "K" | "DEF" | "FLEX" | "BENCH" | "UNK";
@@ -42,6 +39,7 @@ function isKicker(name: string): boolean {
 
 const FP_URL_PRIMARY = "https://www.fantasypros.com/nfl/cheatsheets/top-ppr-players.php"; // Overall PPR
 const FP_URL_BACKUP = "https://www.fantasypros.com/nfl/adp/ppr-overall.php";             // ADP PPR overall
+const FANTASY_SEASON = 2026;
 
 type Pos = Position;
 interface Row {
@@ -54,8 +52,8 @@ interface Row {
   nflTeam: string;
 }
 
-const OUT_JSON = path.resolve("src/data/players-2025-fantasypros.json");
-const OUT_CSV = path.resolve("src/data/players-2025-fantasypros.csv");
+const OUT_JSON = path.resolve(`src/data/players-${FANTASY_SEASON}-fantasypros.json`);
+const OUT_CSV = path.resolve(`src/data/players-${FANTASY_SEASON}-fantasypros.csv`);
 
 function toSlug(s: string) {
   return slugify(s, { lower: true, strict: true });
@@ -112,8 +110,8 @@ function parsePrimary(html: string): Row[] {
     const pos = normPos(m[3] || '');
     const team = normTeam(m[4] || '');
     items.push({
-      id: `2025-${pos}-${toSlug(name)}`,
-      season: 2025,
+      id: `${FANTASY_SEASON}-${pos}-${toSlug(name)}`,
+      season: FANTASY_SEASON,
       source: "FantasyPros ECR",
       rank, name, pos, nflTeam: team
     });
@@ -134,8 +132,8 @@ function parsePrimary(html: string): Row[] {
       const team = normTeam(mt[2] || '');
       const pos = normPos(posTxt);
       items.push({
-        id: `2025-${pos}-${toSlug(name)}`,
-        season: 2025,
+        id: `${FANTASY_SEASON}-${pos}-${toSlug(name)}`,
+        season: FANTASY_SEASON,
         source: "FantasyPros ECR",
         rank, name, pos, nflTeam: team
       });
@@ -295,13 +293,13 @@ function parseBackup(html: string): Row[] {
       // Ensure pos is a valid Position type
       const validPos: Position = pos as Position;
       
-      // Convert to DraftPosition, filtering out UNK
-      const draftPos: DraftPosition | null = validPos === "UNK" ? null : validPos as DraftPosition;
+      // Filter out rows where the position could not be parsed.
+      const draftPos: Pos | null = validPos === "UNK" ? null : validPos as Pos;
       
       if (draftPos) {
         rows.push({
-          id: `2025-${draftPos}-${toSlug(name)}`,
-          season: 2025,
+          id: `${FANTASY_SEASON}-${draftPos}-${toSlug(name)}`,
+          season: FANTASY_SEASON,
           source: "FantasyPros ADP",
           rank,
           name,

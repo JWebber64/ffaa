@@ -1,6 +1,7 @@
 import React from 'react';
-import { Box, Button, FormControl, FormLabel, HStack, NumberInput, NumberInputField, Select, Switch, VStack } from '@chakra-ui/react';
-import { useConfig } from '../../contexts/ConfigContext';
+import type { ChangeEvent } from 'react';
+import { Box, Button, FormControl, FormLabel, HStack, NumberInput, NumberInputField, Select, Switch, VStack } from '@/ui/custom';
+import { useConfig } from '../../contexts/configContextState';
 
 export const AdpConfigPanel: React.FC = () => {
   const { config, updateConfig } = useConfig();
@@ -13,7 +14,7 @@ export const AdpConfigPanel: React.FC = () => {
           <FormLabel>Scoring Format</FormLabel>
           <Select
             value={config.scoring}
-            onChange={(e) => updateConfig({ scoring: e.target.value as any })}
+            onChange={(e: ChangeEvent<HTMLSelectElement>) => updateConfig({ scoring: e.target.value as any })}
           >
             <option value="ppr">PPR</option>
             <option value="half">Half PPR</option>
@@ -27,7 +28,7 @@ export const AdpConfigPanel: React.FC = () => {
             min={4}
             max={20}
             value={config.teams}
-            onChange={(_, value) => updateConfig({ teams: isNaN(value) ? 12 : value })}
+            onChange={(_value: string, value: number) => updateConfig({ teams: isNaN(value) ? 12 : value })}
           >
             <NumberInputField />
           </NumberInput>
@@ -39,7 +40,7 @@ export const AdpConfigPanel: React.FC = () => {
             min={2020}
             max={currentYear + 1}
             value={config.year}
-            onChange={(_, value) => updateConfig({ year: isNaN(value) ? currentYear : value })}
+            onChange={(_value: string, value: number) => updateConfig({ year: isNaN(value) ? currentYear : value })}
           >
             <NumberInputField />
           </NumberInput>
@@ -49,7 +50,7 @@ export const AdpConfigPanel: React.FC = () => {
           <FormLabel mb={0}>Include TE in FLEX</FormLabel>
           <Switch
             isChecked={config.includeTeInFlex}
-            onChange={(e) => updateConfig({ includeTeInFlex: e.target.checked })}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => updateConfig({ includeTeInFlex: e.target.checked })}
             colorScheme="blue"
           />
         </FormControl>
@@ -69,3 +70,4 @@ export const AdpConfigPanel: React.FC = () => {
     </Box>
   );
 };
+

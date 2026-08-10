@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, Box, Flex, HStack, Text } from '@chakra-ui/react';
+import { Alert, AlertIcon, Box, Flex, HStack, Text } from '@/ui/custom';
 import { useDraftStore } from '../store/draftStore';
 
 export default function NominationIndicator() {
@@ -29,3 +29,4 @@ export default function NominationIndicator() {
     </Box>
   );
 }
+

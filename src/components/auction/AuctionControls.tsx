@@ -8,14 +8,16 @@ import {
   Input, 
   InputGroup,
   useToast 
-} from '@chakra-ui/react';
-import { useConfig } from '../../contexts/ConfigContext';
+} from '@/ui/custom';
+import { useConfig } from '../../contexts/configContextState';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 import { Player } from '../../store/draftStore';
 import type { CurrentAuction } from '../../types/draft';
 import { useState } from 'react';
+import type { ChangeEvent, KeyboardEvent } from 'react';
 import { formatPositionForDisplay } from '../../utils/positionUtils';
 import type { Position } from '../../types/draft';
+import { TeamMark } from '../player/TeamMark';
 
 interface AuctionControlsProps {
   currentPlayer: Player | null;
@@ -112,12 +114,18 @@ export const AuctionControls = ({
       <Box w="100%" p={4} bg="gray.800" borderRadius="md" borderWidth="1px" borderColor="gray.700">
         <HStack justify="space-between" mb={2}>
           <Box>
-            <Text fontSize="xl" fontWeight="bold" color="white">{currentPlayer.name}</Text>
+            <HStack gap={2}>
+              <TeamMark team={currentPlayer.nflTeam} size="sm" />
+              <Text fontSize="xl" fontWeight="bold" color="white">{currentPlayer.name}</Text>
+            </HStack>
             <HStack gap={2} alignItems="center">
               <Badge colorScheme={currentPlayer.pos === 'QB' ? 'blue' : currentPlayer.pos === 'RB' ? 'green' : 'purple'}>
                 {currentPlayer.pos}
               </Badge>
               <Text fontSize="sm" color="gray.300">{currentPlayer.nflTeam || 'FA'}</Text>
+              {currentPlayer.byeWeek && (
+                <Badge variant="outline" colorScheme="gray">Bye {currentPlayer.byeWeek}</Badge>
+              )}
             </HStack>
           </Box>
           <Box textAlign="right">
@@ -138,14 +146,14 @@ export const AuctionControls = ({
             placeholder={`Min $${price + 1}`}
             value={customBid}
             pl={8}
-            onChange={(e) => {
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
               const value = e.target.value;
               // Only allow numbers and empty string
               if (value === '' || /^\d+$/.test(value)) {
                 setCustomBid(value);
               }
             }}
-            onKeyDown={(e) => {
+            onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
               if (e.key === 'Enter' && currentBidder !== null && customBid) {
                 handleBid(currentBidder, customBid);
               }
@@ -231,3 +239,4 @@ export const AuctionControls = ({
     </VStack>
   );
 };
+

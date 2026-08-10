@@ -43,11 +43,6 @@ interface ParseBidAmountResult {
   confidence: number;
 }
 
-interface ParseTeamResult {
-  id: number;
-  confidence: number;
-}
-
 /**
  * Parses a bid amount from text with confidence scoring
  */
@@ -64,7 +59,7 @@ export const parseBidAmount = (text: string): ParseBidAmountResult | null => {
   // Try to match amount patterns
   for (const pattern of amountPatterns) {
     const match = text.match(pattern);
-    if (match) {
+    if (match?.[1]) {
       const amount = parseInt(match[1], 10);
       if (!isNaN(amount) && amount > 0) {
         // Higher confidence for dollar sign or specific patterns

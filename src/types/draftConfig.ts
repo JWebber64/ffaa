@@ -1,3 +1,8 @@
+import {
+  normalizeCpuManagerProfileSelections,
+  type CpuManagerProfileSelection,
+} from "./cpuManager";
+
 // League Types
 export const LEAGUE_TYPES = ['redraft', 'keeper', 'dynasty'] as const;
 export type LeagueType = typeof LEAGUE_TYPES[number];
@@ -64,6 +69,8 @@ export interface DraftConfigV2 {
   leagueType: LeagueType;
   draftType: DraftTypeV2;
   teamCount: TeamCountV2;
+  computerManagers?: number;
+  computerManagerProfiles?: CpuManagerProfileSelection[];
   scoring: ScoringType;
   rosterSlots: RosterSlot[];
   auctionSettings?: AuctionSettingsV2;
@@ -75,8 +82,39 @@ export function makeDefaultBudgets(teamCount: TeamCountV2, defaultBudget: number
   return Array(teamCount).fill(defaultBudget);
 }
 
+export function normalizeDraftConfigV2(draftConfig: DraftConfigV2): DraftConfigV2 {
+  const computerManagers = Math.max(
+    0,
+    Math.min(draftConfig.teamCount - 1, Number(draftConfig.computerManagers ?? 0) || 0)
+  );
+  let nextConfig: DraftConfigV2 = {
+    ...draftConfig,
+    computerManagers,
+    computerManagerProfiles: normalizeCpuManagerProfileSelections(
+      draftConfig.computerManagerProfiles,
+      computerManagers
+    ),
+  };
+
+  if (
+    nextConfig.draftType === 'auction' &&
+    nextConfig.auctionSettings &&
+    nextConfig.auctionSettings.teamBudgets.length !== nextConfig.teamCount
+  ) {
+    nextConfig = {
+      ...nextConfig,
+      auctionSettings: {
+        ...nextConfig.auctionSettings,
+        teamBudgets: Array(nextConfig.teamCount).fill(nextConfig.auctionSettings.defaultBudget),
+      },
+    };
+  }
+
+  return nextConfig;
+}
+
 // Default roster slots for standard 12-team auction
-const DEFAULT_ROSTER_SLOTS: RosterSlot[] = [
+export const DEFAULT_ROSTER_SLOTS: RosterSlot[] = [
   { slot: 'QB', count: 1 },
   { slot: 'RB', count: 2 },
   { slot: 'WR', count: 2 },
@@ -86,10 +124,6 @@ const DEFAULT_ROSTER_SLOTS: RosterSlot[] = [
   { slot: 'DST', count: 1 },
   { slot: 'BENCH', count: 6 },
   { slot: 'IR', count: 1 },
-  { slot: 'DL', count: 1 },
-  { slot: 'LB', count: 2 },
-  { slot: 'DB', count: 2 },
-  { slot: 'IDP_FLEX', count: 1, flexEligible: [...IDP_FLEX_ELIGIBLE] },
 ];
 
 // Default Auction Config for 12 teams
@@ -97,6 +131,8 @@ export const DEFAULT_CONFIG_AUCTION_12: DraftConfigV2 = {
   leagueType: 'redraft',
   draftType: 'auction',
   teamCount: 12,
+  computerManagers: 0,
+  computerManagerProfiles: [],
   scoring: 'ppr',
   rosterSlots: DEFAULT_ROSTER_SLOTS,
   auctionSettings: {
@@ -114,6 +150,8 @@ export const DEFAULT_CONFIG_SNAKE_12: DraftConfigV2 = {
   leagueType: 'redraft',
   draftType: 'snake',
   teamCount: 12,
+  computerManagers: 0,
+  computerManagerProfiles: [],
   scoring: 'ppr',
   rosterSlots: DEFAULT_ROSTER_SLOTS,
   snakeSettings: {

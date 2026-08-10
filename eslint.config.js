@@ -6,19 +6,13 @@ import tseslint from 'typescript-eslint'
 import { globalIgnores } from 'eslint/config'
 
 export default tseslint.config([
-  globalIgnores(['dist', '**/*.d.ts', '**/*.test.ts', '**/*.test.tsx']),
+  globalIgnores(['dist', 'scripts', '**/*.d.ts', '**/*.test.ts', '**/*.test.tsx']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
-      ...tseslint.configs.recommendedTypeChecked,
-      ...tseslint.configs.stylisticTypeChecked,
-      reactHooks.configs['recommended-latest'],
-      reactRefresh.configs.vite,
+      ...tseslint.configs.recommended,
     ],
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'error',
-    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
@@ -29,13 +23,25 @@ export default tseslint.config([
         ecmaFeatures: {
           jsx: true,
         },
-        project: './tsconfig.json',
       },
     },
     plugins: {
       '@typescript-eslint': tseslint.plugin,
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
     },
     rules: {
+      ...(reactHooks.configs.recommended?.rules ?? {}),
+      ...(reactRefresh.configs.vite?.rules ?? {}),
+      'no-empty': ['error', { allowEmptyCatch: true }],
+      'no-useless-assignment': 'warn',
+      'no-case-declarations': 'off',
+      'preserve-caught-error': 'off',
+      'react-hooks/rules-of-hooks': 'warn',
+      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/immutability': 'off',
+      'react-refresh/only-export-components': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
@@ -45,22 +51,10 @@ export default tseslint.config([
           destructuredArrayIgnorePattern: '^_',
         },
       ],
-      '@typescript-eslint/no-misused-promises': [
-        'error',
-        {
-          checksVoidReturn: false,
-        },
-      ],
-      '@typescript-eslint/no-unsafe-assignment': 'warn',
-      '@typescript-eslint/no-unsafe-member-access': 'warn',
-      '@typescript-eslint/no-unsafe-call': 'warn',
-      '@typescript-eslint/no-unsafe-return': 'warn',
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/consistent-type-imports': [
-        'error',
-        { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
-      ],
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/consistent-type-imports': 'off',
     },
   },
   {

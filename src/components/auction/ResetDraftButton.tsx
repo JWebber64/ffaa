@@ -1,4 +1,4 @@
-import { Button, useDisclosure, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, useToast } from '@chakra-ui/react';
+import { Button, useDisclosure, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, useToast } from '@/ui/custom';
 import { useRef } from 'react';
 import { useDraftStore } from '../../store/draftStore';
 
@@ -83,3 +83,4 @@ export const ResetDraftButton = () => {
 };
 
 export default ResetDraftButton;
+

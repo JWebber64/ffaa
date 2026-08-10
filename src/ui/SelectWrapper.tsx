@@ -1,14 +1,9 @@
 import React from "react";
 import { cn } from "./cn";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./select";
+import { UniversalSelect } from "./UniversalSelect";
 
 export type UISelectProps = {
+  ariaLabel?: string;
   label?: string;
   hint?: string;
   error?: string;
@@ -19,35 +14,52 @@ export type UISelectProps = {
   disabled?: boolean;
 };
 
-export function SelectWrapper({ 
-  label, 
-  hint, 
-  error, 
-  value, 
-  onValueChange, 
-  children, 
+export function SelectWrapper({
+  ariaLabel,
+  label,
+  hint,
+  error,
+  value,
+  onValueChange,
+  children,
   className,
-  disabled 
+  disabled,
 }: UISelectProps) {
   return (
-    <label className="block">
-      {label ? <div className="mb-2 text-sm text-[var(--text-1)]">{label}</div> : null}
-      <Select value={value ?? ""} onValueChange={onValueChange} disabled={disabled ?? false}>
-        <SelectTrigger className={className}>
-          <SelectValue placeholder="Select an option..." />
-        </SelectTrigger>
-        <SelectContent>
-          {children}
-        </SelectContent>
-      </Select>
+    <div className="ffaa-select-wrap">
+      {label ? <div className="ffaa-select-label">{label}</div> : null}
+      <UniversalSelect
+        aria-label={ariaLabel ?? label}
+        value={value ?? ""}
+        disabled={disabled ?? false}
+        onValueChange={onValueChange}
+        className={cn("select-trigger", className)}
+      >
+        {children}
+      </UniversalSelect>
       {error ? (
         <div className="mt-2 text-sm text-[rgba(251,113,133,0.95)]">{error}</div>
       ) : hint ? (
         <div className="mt-2 text-sm text-[rgba(255,255,255,0.50)]">{hint}</div>
       ) : null}
-    </label>
+    </div>
   );
 }
 
-// Export SelectItem for convenience
-export { SelectItem };
+export function SelectItem({
+  value,
+  children,
+  disabled,
+  position,
+}: {
+  value: string;
+  children: React.ReactNode;
+  disabled?: boolean;
+  position?: string | undefined;
+}) {
+  return (
+    <option value={value} disabled={disabled} data-position={position}>
+      {children}
+    </option>
+  );
+}

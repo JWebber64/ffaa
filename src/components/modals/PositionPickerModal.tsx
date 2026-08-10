@@ -12,7 +12,7 @@ import {
   Stack,
   Text,
   useToast,
-} from '@chakra-ui/react';
+} from '@/ui/custom';
 import { useState } from 'react';
 
 type SlotOption = {
@@ -112,3 +112,4 @@ export default function PositionPickerModal({
     </Modal>
   );
 }
+

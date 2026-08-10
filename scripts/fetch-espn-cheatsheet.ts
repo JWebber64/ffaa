@@ -1,14 +1,14 @@
 import fs from 'fs';
 import path from 'path';
-import fetch from 'node-fetch';
-import pdf from 'pdf-parse';
+import { PDFParse } from 'pdf-parse';
 import { stringify } from 'csv-stringify/sync';
 import slugify from 'slugify';
 
-const ESPN_CHEATSHEET_URL = 'https://g.espncdn.com/s/ffldraftkit/25/NFL25_CS_PPR300.pdf?adddata=2025CS_PPR300';
+const FANTASY_SEASON = 2026;
+const ESPN_CHEATSHEET_URL = 'https://g.espncdn.com/s/ffldraftkit/26/NFL26_CS_PPR300.pdf?adddata=2026CS_PPR300';
 const OUTPUT_DIR = path.join(process.cwd(), 'src', 'data');
-const JSON_OUTPUT = path.join(OUTPUT_DIR, 'players-2025-espn.json');
-const CSV_OUTPUT = path.join(OUTPUT_DIR, 'players-2025-espn.csv');
+const JSON_OUTPUT = path.join(OUTPUT_DIR, `players-${FANTASY_SEASON}-espn.json`);
+const CSV_OUTPUT = path.join(OUTPUT_DIR, `players-${FANTASY_SEASON}-espn.csv`);
 
 interface PlayerRow {
   rank: number;
@@ -18,6 +18,7 @@ interface PlayerRow {
   value: number;
   bye: number;
   id: string;
+  updatedAt: string;
 }
 
 async function downloadPdf(): Promise<Buffer> {
@@ -37,45 +38,53 @@ async function downloadPdf(): Promise<Buffer> {
 }
 
 async function parsePdfBuffer(pdfBuffer: Buffer): Promise<string> {
+  const parser = new PDFParse({ data: pdfBuffer });
   try {
-    const data = await pdf(pdfBuffer);
+    const data = await parser.getText();
     return data.text;
   } catch (error) {
     console.error('PDF parse error:', error);
     throw error;
+  } finally {
+    await parser.destroy();
   }
 }
 
 function parsePdfText(text: string): PlayerRow[] {
   console.log('Parsing PDF content...');
-  const lines = text.split('\n').filter(line => line.trim());
   const players: PlayerRow[] = [];
-  
-  // ESPN PDF format: Rank Name, Pos Team $Value (Bye)
-  const playerRegex = /^(\d+)\s+([A-Za-z'\-\. ]+?)\s+([A-Z/]+?)\s+([A-Z]+)\s+\$([\d,]+)\s+\((\d+)\)/;
-  
-  for (const line of lines) {
-    const match = line.match(playerRegex);
-    if (match) {
-      const [_, rank, name, pos, team, value, bye] = match as [string, string, string, string, string, string, string];
-      const position = pos === 'D/ST' ? 'DEF' : pos;
-      
-      const playerRank = parseInt(rank, 10);
-      const playerName = name ? name.trim() : '';
-      const playerValue = parseInt((value || '0').replace(/,/g, ''), 10);
-      const playerBye = parseInt(bye || '0', 10);
-      
-      if (playerName && position && team) {
-        players.push({
-          rank: playerRank,
-          name: playerName,
-          position,
-          team,
-          value: playerValue,
-          bye: playerBye,
-          id: `2025-${position}-${slugify(playerName.toLowerCase(), { lower: true, strict: true })}`
-        });
-      }
+  const updatedAt = new Date().toISOString().slice(0, 10);
+
+  // ESPN 2026 PDF format: "1. (RB1) Jahmyr Gibbs, DET $57 6"
+  // The text extractor places multiple entries on one line, so parse globally.
+  const playerRegex =
+    /(\d+)\.\s+\((QB|RB|WR|TE|K|DST|D\/ST)(\d+)\)\s+(.+?),\s+([A-Z]{2,3})\s+\$([\d,]+)\s+(\d+)/g;
+
+  for (const match of text.matchAll(playerRegex)) {
+    const rank = match[1];
+    const pos = match[2];
+    const name = match[4];
+    const team = match[5];
+    const value = match[6];
+    const bye = match[7];
+    const position = pos === 'D/ST' || pos === 'DST' ? 'DEF' : pos;
+
+    const playerRank = parseInt(rank ?? '0', 10);
+    const playerName = name?.trim() ?? '';
+    const playerValue = parseInt((value ?? '0').replace(/,/g, ''), 10);
+    const playerBye = parseInt(bye ?? '0', 10);
+
+    if (playerRank && playerName && position && team) {
+      players.push({
+        rank: playerRank,
+        name: playerName,
+        position,
+        team,
+        value: playerValue,
+        bye: playerBye,
+        id: `${FANTASY_SEASON}-${position}-${slugify(playerName.toLowerCase(), { lower: true, strict: true })}`,
+        updatedAt,
+      });
     }
   }
   
@@ -94,7 +103,7 @@ function saveOutput(players: PlayerRow[]) {
   // Save as CSV for manual checking
   const csvData = stringify(players, {
     header: true,
-    columns: ['rank', 'name', 'position', 'team', 'value', 'bye', 'id']
+    columns: ['rank', 'name', 'position', 'team', 'value', 'bye', 'id', 'updatedAt']
   });
   fs.writeFileSync(CSV_OUTPUT, csvData);
   console.log(`Saved CSV to ${CSV_OUTPUT}`);
@@ -109,6 +118,9 @@ async function main() {
     console.log('Parsing PDF content...');
     const pdfText = await parsePdfBuffer(pdfBuffer);
     const players = parsePdfText(pdfText);
+    if (!players.length) {
+      throw new Error('ESPN PDF parser extracted 0 players. Check the current PDF text layout before writing output.');
+    }
     saveOutput(players);
     console.log('Done!');
     console.log(`✅ Successfully processed ${players.length} players.`);

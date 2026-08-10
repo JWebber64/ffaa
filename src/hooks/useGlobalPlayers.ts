@@ -1,41 +1,49 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDraftStore } from './useDraftStore';
-import { loadPlayerPool } from '../data/loadPlayerPool';
+import type { Player } from '../types/draft';
 
-// Track if we've already loaded players to prevent duplicate loads
-let playersLoaded = false;
+let loadInFlight: Promise<Player[]> | null = null;
+
+async function loadPlayersOnDemand() {
+  const { loadPlayerPool } = await import('../data/loadPlayerPool');
+  return loadPlayerPool();
+}
 
 export function useGlobalPlayers() {
   // Get players and setter from the store
   const players = useDraftStore((state) => state.players);
+  const playersLoaded = useDraftStore((state) => state.playersLoaded);
   const setPlayers = useDraftStore((state) => state.setPlayers);
   const [isLoading, setIsLoading] = useState(false);
+  const mountedRef = useRef(true);
   
-  // Get undrafted players using the selector
-  const filteredPlayers = useDraftStore(useCallback(
-    (state) => state.selectors.undraftedPlayers(state),
-    []
-  ));
-
   // Load players only once when the component mounts
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
   useEffect(() => {
     const loadPlayers = async () => {
       // Skip if already loaded or currently loading
-      if (playersLoaded || isLoading) {
+      if (playersLoaded || loadInFlight) {
         console.log(`[useGlobalPlayers] Players already loaded or loading:`, { 
           playersCount: players.length, 
-          playersLoaded, 
-          isLoading 
+          playersLoaded,
         });
         return;
       }
 
+      const request = loadPlayersOnDemand();
       try {
-        setIsLoading(true);
+        loadInFlight = request;
+        if (mountedRef.current) setIsLoading(true);
         console.log('[useGlobalPlayers] Loading player pool...');
         
         // Load and process players
-        const loadedPlayers = await loadPlayerPool();
+        const loadedPlayers = await request;
         console.log(`[useGlobalPlayers] Loaded ${loadedPlayers.length} players from player pool`);
         
         if (loadedPlayers.length > 0) {
@@ -47,6 +55,7 @@ export function useGlobalPlayers() {
               name: firstPlayer.name,
               pos: firstPlayer.pos,
               nflTeam: firstPlayer.nflTeam,
+              byeWeek: firstPlayer.byeWeek,
               rank: firstPlayer.rank
             };
             console.log('[useGlobalPlayers] Sample player:', playerInfo);
@@ -54,7 +63,6 @@ export function useGlobalPlayers() {
           
           // Update the store with the loaded players
           setPlayers(loadedPlayers);
-          playersLoaded = true;
           
           // Verify the players were set in the store
           const storePlayers = useDraftStore.getState().players;
@@ -70,6 +78,7 @@ export function useGlobalPlayers() {
                 name: p.name,
                 pos: p.pos,
                 team: p.nflTeam,
+                byeWeek: p.byeWeek,
                 rank: p.rank
               }))
             );
@@ -80,21 +89,21 @@ export function useGlobalPlayers() {
       } catch (error) {
         console.error('[useGlobalPlayers] Error loading players:', error);
       } finally {
-        setIsLoading(false);
+        if (loadInFlight === request) loadInFlight = null;
+        if (mountedRef.current) setIsLoading(false);
       }
     };
 
     loadPlayers();
-  }, [setPlayers, isLoading, players.length]);
+  }, [playersLoaded, setPlayers, players.length]);
 
   return { 
     players, 
-    filteredPlayers, 
     isLoading,
     refreshPlayers: async () => {
       setIsLoading(true);
       try {
-        const loadedPlayers = await loadPlayerPool();
+        const loadedPlayers = await loadPlayersOnDemand();
         setPlayers(loadedPlayers);
         return loadedPlayers;
       } finally {

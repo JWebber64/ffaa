@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Box, Button, Input, Heading, Stack, Text, VStack, HStack, Badge, useToast } from '@chakra-ui/react';
+import type { ChangeEvent } from 'react';
+import { Box, Button, Input, Heading, Stack, Text, VStack, Badge, useToast } from '@/ui/custom';
 import { useNavigate } from 'react-router-dom';
 import { joinDraftRoom } from '@/multiplayer/api';
 import { useDraftStore } from '@/store/draftStore';
@@ -79,14 +80,14 @@ export default function LobbyJoin() {
             <Input
               placeholder="Room Code"
               value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setRoomCode(e.target.value.toUpperCase())}
               size="lg"
               textTransform="uppercase"
             />
             <Input
               placeholder="Display Name"
               value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setDisplayName(e.target.value)}
               size="lg"
             />
             <Button
@@ -125,3 +126,4 @@ export default function LobbyJoin() {
     </Box>
   );
 }
+

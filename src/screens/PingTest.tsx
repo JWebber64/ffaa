@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Button, Heading, Stack, Text, VStack, useToast } from '@chakra-ui/react';
+import { Box, Button, Heading, Stack, Text, VStack, useToast } from '@/ui/custom';
 import { useDraftStore } from '@/store/draftStore';
 import { sendDraftAction } from '@/multiplayer/api';
 import { useDraftSnapshotSubscription } from '@/multiplayer/useDraftSnapshotSubscription';
@@ -94,3 +94,4 @@ export default function PingTest() {
     </Box>
   );
 }
+

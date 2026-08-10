@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { listParticipants } from "../multiplayer/api";
 import { subscribeToParticipants } from "../multiplayer/realtime";
+import { isLocalMultiplayerMode, subscribeToLocalDraft } from "../multiplayer/localMode";
 
 export type ParticipantRow = {
   id: string;
@@ -35,6 +36,16 @@ export function useLobbyRoom(draftId: string | null) {
   useEffect(() => {
     if (!draftId) return;
     refresh();
+
+    if (isLocalMultiplayerMode()) {
+      const unsubscribe = subscribeToLocalDraft(draftId, () => {
+        refresh();
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    }
 
     const ch = subscribeToParticipants(draftId, () => {
       refresh();

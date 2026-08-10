@@ -3,8 +3,8 @@ import { cn } from "../ui/cn";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { Card, CardBody, CardHeader } from "../ui/Card";
-import { useSupabaseSessionInfo } from "../hooks/useSupabaseSessionInfo";
-import { useRole } from "../contexts/RoleContext";
+import { useFirebaseSessionInfo } from "../hooks/useFirebaseSessionInfo";
+import { useRole } from "../contexts/roleContextState";
 
 type Props = {
   isOpen: boolean;
@@ -15,7 +15,7 @@ type Props = {
 export default function DebugDrawer({ isOpen, onClose, realtimeLabel }: Props) {
   const loc = useLocation();
   const params = useParams();
-  const session = useSupabaseSessionInfo();
+  const session = useFirebaseSessionInfo();
   const role = useRole();
 
   return (
@@ -72,7 +72,7 @@ export default function DebugDrawer({ isOpen, onClose, realtimeLabel }: Props) {
               </div>
 
               <div className="space-y-2">
-                <div className="text-sm font-semibold text-fg1">Supabase session</div>
+                <div className="text-sm font-semibold text-fg1">Firebase session</div>
                 <div className="rounded-md border border-stroke bg-[rgba(255,255,255,0.04)] p-3 text-sm">
                   <div className="text-fg2">hasSession</div>
                   <div className="text-fg0">{String(session.hasSession)}</div>

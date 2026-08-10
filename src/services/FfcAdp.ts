@@ -1,6 +1,10 @@
+import { appUrl } from "../lib/appBasePath";
+
 type FfcScoring = 'ppr' | 'half' | 'standard';
 
-const FFC_API_BASE = (import.meta.env.VITE_FFC_API_BASE as string | undefined) ?? "/ffc-api";
+const FFC_API_BASE = appUrl(
+  (import.meta.env.VITE_FFC_API_BASE as string | undefined) ?? "ffc-api",
+);
 
 interface FfcAdpOptions {
   year: number;
