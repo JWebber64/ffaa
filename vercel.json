@@ -4,6 +4,11 @@
   "outputDirectory": "dist",
   "redirects": [
     {
+      "source": "/",
+      "destination": "/ff/",
+      "permanent": false
+    },
+    {
       "source": "/ff",
       "destination": "/ff/",
       "permanent": true
