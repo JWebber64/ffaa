@@ -3,6 +3,7 @@ import {
   createStarterLeagueHQ,
   getDraftCountdown,
   getLeagueLeaders,
+  migrateLegacyProductBranding,
   parseLeagueHQData,
   syncLeagueTeams,
 } from "../features/league-hq/leagueHQData";
@@ -30,7 +31,7 @@ describe("League HQ data model", () => {
     expect(data.rivalries).toEqual([]);
   });
 
-  it("preserves manager history while syncing the current FFAA team list", () => {
+  it("preserves manager history while syncing the current GameHQ team list", () => {
     const original = createStarterLeagueHQ(starterInput);
     original.managers[0] = { ...original.managers[0]!, titles: 3, wins: 40 };
 
@@ -60,7 +61,22 @@ describe("League HQ data model", () => {
   it("validates imported commissioner JSON before accepting it", () => {
     const valid = createStarterLeagueHQ(starterInput);
     expect(parseLeagueHQData(JSON.stringify(valid)).error).toBe("");
-    expect(parseLeagueHQData('{"identity":{"name":"FFAA"}}').error).toContain("currentSeason");
+    expect(parseLeagueHQData('{"identity":{"name":"Fantasy Football"}}').error).toContain("currentSeason");
+  });
+
+  it("migrates the placeholder brand in saved league data", () => {
+    const legacy = createStarterLeagueHQ(starterInput);
+    legacy.identity.name = "FFAA League HQ";
+    legacy.identity.shortName = "FFAA";
+    legacy.identity.tagline = "FFAA history with the FFAA model.";
+    legacy.futures[0] = { ...legacy.futures[0]!, source: "ffaa-model" };
+
+    const migrated = migrateLegacyProductBranding(legacy);
+
+    expect(migrated.identity.name).toBe("Fantasy Football League HQ");
+    expect(migrated.identity.shortName).toBe("Fantasy Football");
+    expect(migrated.identity.tagline).toBe("Fantasy Football history with the GameHQ model.");
+    expect(migrated.futures[0]?.source).toBe("gamehq-model");
   });
 
   it("returns a stable draft countdown", () => {

@@ -41,7 +41,10 @@ export default function TopNav({ onMenu }: Props) {
             <Menu size={16} />
           </Button>
 
-          <Text fontWeight="bold">FFAA</Text>
+          <Box>
+            <Text fontWeight="bold">Fantasy Football</Text>
+            <Text fontSize="xs" color="var(--text-1)">Presented by GameHQ</Text>
+          </Box>
 
           <HStack spacing={2} display={{ base: "none", md: "flex" }}>
             <NavLink to="/legacy" style={linkStyle}>Home</NavLink>

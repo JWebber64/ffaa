@@ -500,7 +500,7 @@ function playerColumns(view: StatsView): StatsTableColumn<HubPlayerRow>[] {
         description: source.id === "sleeper-paid"
           ? "Actual winning bid from the completed Sleeper auction draft you import, normalized to a $200 budget when needed."
           : source.id === "leaguelogs-ppr-rank"
-            ? "FFAA dollar conversion of the public LeagueLogs PPR market index."
+            ? "GameHQ dollar conversion of the public LeagueLogs PPR market index."
             : `${source.label} auction value normalized to a $200 budget. Blank means the source is not currently licensed or imported.`,
         sortValue: (row) => row.auctionSourceValues?.[source.id] ?? null,
         render: (row) => formatMoney(row.auctionSourceValues?.[source.id] ?? null),
@@ -511,15 +511,15 @@ function playerColumns(view: StatsView): StatsTableColumn<HubPlayerRow>[] {
       playerColumn,
       {
         id: "auctionValue",
-        label: "FFAA Fair",
-        description: "FFAA fair value for the selected scoring, league size, roster demand, and budget.",
+        label: "GameHQ Fair",
+        description: "GameHQ fair value for the selected scoring, league size, roster demand, and budget.",
         sortValue: (row) => row.auctionValue,
         render: (row) => <strong className="stats-auction-consensus">{formatMoney(row.auctionValue)}</strong>,
       },
       {
         id: "marketValue",
         label: "Market Median",
-        description: "Median of compatible imported published auction-dollar sources before FFAA projection and roster-demand adjustments.",
+        description: "Median of compatible imported published auction-dollar sources before GameHQ projection and roster-demand adjustments.",
         sortValue: (row) => row.marketValue,
         render: (row) => formatMoney(row.marketValue),
       },
@@ -607,7 +607,7 @@ function playerColumns(view: StatsView): StatsTableColumn<HubPlayerRow>[] {
       {
         id: "auctionValue",
         label: "Fair Value",
-        description: "FFAA fair value recalculated for the selected scoring and league size.",
+        description: "GameHQ fair value recalculated for the selected scoring and league size.",
         sortValue: (row) => row.auctionValue,
         render: (row) => formatMoney(row.auctionValue),
       },
@@ -1176,7 +1176,7 @@ function playerDetail(
       ),
     ];
     sources.push({
-      name: "FFAA auction value model",
+      name: "GameHQ auction value model",
       detail: `${teamCount}-team, $200-budget consensus with 15 drafted players per team${auctionSourceNames.length ? ` using ${auctionSourceNames.join(", ")}` : ""}. The full league pool is calibrated to spend exactly ${teamCount * 200} dollars.`,
       ...(row.projection?.player.valueUpdatedAt
         ? { updatedAt: String(row.projection.player.valueUpdatedAt) }
@@ -1184,7 +1184,7 @@ function playerDetail(
     });
   }
   if (!sources.length) {
-    sources.push({ name: "FFAA player pool", detail: "Local player identity and draft metadata." });
+    sources.push({ name: "GameHQ player pool", detail: "Local player identity and draft metadata." });
   }
 
   const weeks: StatsPlayerWeek[] = (row.summary?.weeklyRows ?? [])
@@ -1757,7 +1757,7 @@ export default function StatsExplorer() {
       ).length;
       return [
         {
-          label: "Top FFAA value",
+          label: "Top GameHQ value",
           value: topValue ? formatMoney(topValue.auctionValue) : "—",
           helper: topValue?.name ?? "No value",
         },
@@ -1849,7 +1849,7 @@ export default function StatsExplorer() {
   function exportCurrentView() {
     if (view === "matchups") {
       downloadCsv(
-        `ffaa-${season}-defense-vs-position.csv`,
+        `gamehq-${season}-defense-vs-position.csv`,
         ["Defense", "Games", "All FPG", "QB", "RB", "WR", "TE", "K", "Difficulty Rank"],
         filteredDefenseRows.map((row) => [row.team, row.games, row.overall, row.qb, row.rb, row.wr, row.te, row.k, row.difficultyRank]),
       );
@@ -1857,12 +1857,12 @@ export default function StatsExplorer() {
     }
     if (view === "auction") {
       downloadCsv(
-        `ffaa-${DRAFT_SEASON}-auction-values-${teamCount}-team-${scoring}.csv`,
+        `gamehq-${DRAFT_SEASON}-auction-values-${teamCount}-team-${scoring}.csv`,
         [
           "Player",
           "Position",
           "Team",
-          "FFAA Fair Value",
+          "GameHQ Fair Value",
           "Market Median",
           ...AUCTION_VALUE_SOURCE_COLUMNS.map((source) => source.label),
           "Source Average",
@@ -1893,15 +1893,15 @@ export default function StatsExplorer() {
     }
     if (view === "teams") {
       downloadCsv(
-        `ffaa-${season}-team-stats.csv`,
+        `gamehq-${season}-team-stats.csv`,
         ["Team", "Games", "Offensive FPG", "Pass Yards/G", "Rush Yards/G", "Receiving Yards/G", "TD/G", "Top Scorer", "Opponent FPG Allowed"],
         filteredTeamRows.map((row) => [row.team, row.games, row.fantasyPointsPerGame, row.passingYardsPerGame, row.rushingYardsPerGame, row.receivingYardsPerGame, row.touchdownsPerGame, row.topScorer, row.opponentFantasyPointsAllowed]),
       );
       return;
     }
     downloadCsv(
-      `ffaa-${view}-${view === "draft" ? DRAFT_SEASON : season}.csv`,
-      ["Player", "Position", "Team", "Games", "Fantasy Points", "FPG", "Last 3", "Last 5", "Floor", "Ceiling", "Opportunities/G", "Target Share", "ADP", "ADP High", "ADP Low", "Times Drafted", "Projected Points", "FFAA Fair Value", "Market Median", "Bye"],
+      `gamehq-${view}-${view === "draft" ? DRAFT_SEASON : season}.csv`,
+      ["Player", "Position", "Team", "Games", "Fantasy Points", "FPG", "Last 3", "Last 5", "Floor", "Ceiling", "Opportunities/G", "Target Share", "ADP", "ADP High", "ADP Low", "Times Drafted", "Projected Points", "GameHQ Fair Value", "Market Median", "Bye"],
       filteredPlayerRows.map((row) => [row.name, row.position, row.team, row.games, row.fantasyPoints, row.fantasyPointsPerGame, row.last3FantasyPointsPerGame, row.last5FantasyPointsPerGame, row.floorFantasyPoints, row.ceilingFantasyPoints, row.opportunitiesPerGame, row.targetShare ?? "", row.adp ?? "", row.adpHigh ?? "", row.adpLow ?? "", row.timesDrafted ?? "", row.projectedFantasyPoints ?? "", row.auctionValue ?? "", row.marketValue ?? "", row.bye ?? ""]),
     );
   }
@@ -2105,7 +2105,7 @@ export default function StatsExplorer() {
           <div className="stats-auction-import-copy">
             <strong>Add actual Sleeper auction prices</strong>
             <span>
-              Paste the numeric ID from a completed Sleeper draft URL. FFAA reads documented draft picks and their actual winning bids; it never uses Sleeper's undocumented suggested-price feed.
+              Paste the numeric ID from a completed Sleeper draft URL. GameHQ reads documented draft picks and their actual winning bids; it never uses Sleeper's undocumented suggested-price feed.
             </span>
           </div>
           <form className="stats-auction-import-form" onSubmit={importSleeperAuction}>
@@ -2153,13 +2153,13 @@ export default function StatsExplorer() {
           <div className="stats-hub-note stats-auction-attribution">
             <Database size={17} aria-hidden="true" />
             <span>
-              LeagueLogs is a market-index signal converted into FFAA dollars, not a published auction price. <a href="https://developer.leaguelogs.com/" target="_blank" rel="noreferrer">Powered by LeagueLogs API <ExternalLink size={12} aria-hidden="true" /></a>
+              LeagueLogs is a market-index signal converted into GameHQ dollars, not a published auction price. <a href="https://developer.leaguelogs.com/" target="_blank" rel="noreferrer">Powered by LeagueLogs API <ExternalLink size={12} aria-hidden="true" /></a>
             </span>
           </div>
           <div className="stats-hub-note">
             <Info size={17} aria-hidden="true" />
             <span>
-              Restricted publisher columns remain blank until FFAA has a display license or you provide an authorized import. The source average, range, spread, and count use only visible numeric source columns; an imported Sleeper winning bid is included there but does not become a universal market recommendation.
+              Restricted publisher columns remain blank until GameHQ has a display license or you provide an authorized import. The source average, range, spread, and count use only visible numeric source columns; an imported Sleeper winning bid is included there but does not become a universal market recommendation.
             </span>
           </div>
         </>

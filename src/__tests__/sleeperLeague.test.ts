@@ -142,7 +142,7 @@ describe("Sleeper League HQ import", () => {
       upsetAgainstManagerId: "sleeper-user-user-a",
     });
     expect(result.data.futures).toHaveLength(2);
-    expect(result.data.futures.every((future) => future.source === "ffaa-model")).toBe(true);
+    expect(result.data.futures.every((future) => future.source === "gamehq-model")).toBe(true);
     expect(result.data.futures.reduce((sum, future) => sum + (future.fairProbability ?? 0), 0)).toBeCloseTo(1, 2);
     expect(result.data.storylines?.map((story) => story.id)).toContain("power-favorite");
     expect(result.data.sleeper?.syncedAt).toBe("2026-08-10T00:00:00.000Z");

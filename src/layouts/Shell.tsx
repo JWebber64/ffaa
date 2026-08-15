@@ -66,7 +66,10 @@ export default function Shell({ globalLoading = false }: ShellProps) {
             onClick={(event: MouseEvent<HTMLDivElement>) => event.stopPropagation()}
           >
             <HStack justifyContent="space-between" mb={2}>
-              <Text fontWeight="bold">FFAA</Text>
+              <Box>
+                <Text fontWeight="bold">Fantasy Football</Text>
+                <Text fontSize="xs" color="var(--text-1)">Presented by GameHQ</Text>
+              </Box>
               <Button size="sm" variant="outline" onClick={() => setDrawerOpen(false)}>
                 Close
               </Button>

@@ -75,7 +75,7 @@ function App() {
             <Suspense
               fallback={
                 <AppStateScreen
-                  title="Loading FFAA"
+                  title="Loading Fantasy Football"
                   message="Opening the requested fantasy football workspace."
                 />
               }

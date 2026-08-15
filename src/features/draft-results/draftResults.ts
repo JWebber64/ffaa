@@ -324,7 +324,7 @@ function csvCell(value: unknown) {
 export function createDraftResultsCsv(report: DraftResultsReport) {
   const header = [
     "Rank", "Team", "Grade", "Score", "Player", "Position", "NFL Team", "Lineup Slot",
-    "Price", "FFAA Fair Value", "Surplus", "Projected Points",
+    "Price", "GameHQ Fair Value", "Surplus", "Projected Points",
   ];
   const rows = report.teams.flatMap((team) => team.players.map((player) => [
     team.rank,

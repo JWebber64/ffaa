@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import { cn } from "@/ui/cn";
 import { appUrl } from "@/lib/appBasePath";
+import { getNflTeamCssVars } from "@/data/nflTeamBrand";
 import { normalizeTeamAbbr } from "./teamMarkUtils";
 
 const missingAssetKeys = new Set<string>();
@@ -26,6 +28,10 @@ export function TeamMark({
   title?: string;
 }) {
   const normalizedTeam = useMemo(() => normalizeTeamAbbr(team), [team]);
+  const teamStyle = useMemo(
+    () => getNflTeamCssVars(normalizedTeam) as CSSProperties,
+    [normalizedTeam],
+  );
   const [assetSrc, setAssetSrc] = useState<string | null>(() => getInitialAssetSrc(normalizedTeam));
 
   useEffect(() => {
@@ -39,6 +45,8 @@ export function TeamMark({
   return (
     <span
       className={cn("team-mark", `team-mark-${size}`, className)}
+      data-team={normalizedTeam || "FA"}
+      style={teamStyle}
       title={label}
       aria-label={label}
     >

@@ -105,7 +105,7 @@ export function ToolsHub() {
 
       <section className="tools-principles" aria-labelledby="tools-principles-title">
         <div>
-          <span>FFAA standard</span>
+          <span>GameHQ standard</span>
           <h2 id="tools-principles-title">Useful without pretending certainty</h2>
         </div>
         <ul>

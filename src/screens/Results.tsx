@@ -126,7 +126,7 @@ export default function Results({ teams }: ResultsProps) {
       "Team Name",
       "Team #",
       "Price",
-      "FFAA Fair Value",
+      "GameHQ Fair Value",
       "Value Delta",
     ];
     const data = rows.map((r) => [
@@ -163,7 +163,7 @@ export default function Results({ teams }: ResultsProps) {
             <option value="nfl">NFL Team</option>
             <option value="bye">Bye Week</option>
             <option value="price">Price</option>
-            <option value="value">FFAA Fair Value</option>
+            <option value="value">GameHQ Fair Value</option>
             <option value="delta">Value Delta</option>
           </Select>
 

@@ -154,7 +154,7 @@ export function CommissionerStudio({
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = "ffaa-league-hq.json";
+    anchor.download = "gamehq-fantasy-football-league-hq.json";
     anchor.click();
     URL.revokeObjectURL(url);
   };
@@ -280,7 +280,7 @@ export function CommissionerStudio({
                         Commissioner profile
                         <textarea rows={4} value={manager.bio} onChange={(event) => updateManager(manager.id, { bio: event.target.value })} />
                       </label>
-                      {manager.outlook ? <p className="studio-source-note"><strong>FFAA outlook:</strong> {manager.outlook}</p> : null}
+                      {manager.outlook ? <p className="studio-source-note"><strong>GameHQ outlook:</strong> {manager.outlook}</p> : null}
                     </details>
                   ))}
                 </div>
@@ -315,7 +315,7 @@ export function CommissionerStudio({
               <div className="studio-section">
                 <div className="studio-section-heading">
                   <span>Prediction desk</span>
-                  <h3>Use the FFAA model or set commissioner lines</h3>
+                  <h3>Use the GameHQ model or set commissioner lines</h3>
                   <p>Editing a line marks it as commissioner-owned so Sleeper refreshes will not replace it.</p>
                 </div>
                 <div className="studio-futures-list">
@@ -326,7 +326,7 @@ export function CommissionerStudio({
                         <header>
                           <div><strong>{manager?.managerName}</strong><small>{manager?.teamName}</small></div>
                           <span className={future.source === "commissioner" ? "is-commissioner" : ""}>
-                            {future.source === "commissioner" ? "Commissioner line" : "FFAA model"}
+                            {future.source === "commissioner" ? "Commissioner line" : "GameHQ model"}
                           </span>
                         </header>
                         <div>
@@ -352,7 +352,7 @@ export function CommissionerStudio({
                 <textarea id="league-json" className="league-json studio-json" spellCheck={false} value={raw} onChange={(event) => { setRaw(event.target.value); setMessage(""); }} />
                 <div className="studio-advanced-actions">
                   <Button variant="ghost" size="sm" onClick={() => { const next = cloneData(starter); setRaw(JSON.stringify(next, null, 2)); setWorking(next); setMessage("Empty starter loaded into the working copy."); }}>Load empty starter</Button>
-                  <Button variant="secondary" size="sm" onClick={() => { const parsed = parseLeagueHQData(raw); if (!parsed.data) { setMessage(parsed.error); return; } const next = syncLeagueTeams(parsed.data, teams); setWorking(next); setRaw(JSON.stringify(next, null, 2)); setMessage("Current FFAA draft teams synced into the working copy."); }}><Upload size={15} aria-hidden="true" /> Sync draft teams</Button>
+                  <Button variant="secondary" size="sm" onClick={() => { const parsed = parseLeagueHQData(raw); if (!parsed.data) { setMessage(parsed.error); return; } const next = syncLeagueTeams(parsed.data, teams); setWorking(next); setRaw(JSON.stringify(next, null, 2)); setMessage("Current GameHQ draft teams synced into the working copy."); }}><Upload size={15} aria-hidden="true" /> Sync draft teams</Button>
                   <Button variant="secondary" size="sm" onClick={download}><Download size={15} aria-hidden="true" /> Export JSON</Button>
                   <Button variant="secondary" size="sm" onClick={applyAdvancedJson}><Code2 size={15} aria-hidden="true" /> Apply JSON</Button>
                 </div>

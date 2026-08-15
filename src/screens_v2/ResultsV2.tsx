@@ -19,6 +19,7 @@ import {
 import { getFirebaseDraftById } from "../multiplayer/firebaseBackend";
 import { getLocalDraftById, isLocalMultiplayerMode } from "../multiplayer/localMode";
 import { GlassCard, GlassPanel, GlassPill } from "../components/premium";
+import { TeamMark } from "../components/player/TeamMark";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 
@@ -190,7 +191,7 @@ export default function ResultsV2() {
     if (!report || !hasTeams) return;
     const winner = report.teams[0];
     if (!winner) return;
-    const title = `${report.roomCode || "FFAA"} draft results`;
+    const title = `${report.roomCode || "Fantasy Football presented by GameHQ"} draft results`;
     const text = `${winner.name} leads the draft grades with ${winner.letterGrade} (${winner.score.toFixed(1)}).`;
 
     setShareStatus("");
@@ -252,7 +253,7 @@ export default function ResultsV2() {
                 </h2>
                 <p className="results-card-copy">
                   {isComplete
-                    ? "Teams are ranked by FFAA roster grade, then projected points. Open any team for the complete player-by-player result."
+                    ? "Teams are ranked by GameHQ roster grade, then projected points. Open any team for the complete player-by-player result."
                     : "These grades use the roster data saved so far and will update when the draft snapshot changes."}
                 </p>
               </div>
@@ -339,7 +340,15 @@ export default function ResultsV2() {
                           <tbody>
                             {team.players.map((player) => (
                               <tr key={player.playerId}>
-                                <td><strong>{player.name}</strong><span>{player.nflTeam}</span></td>
+                                <td>
+                                  <span className="results-player-identity">
+                                    <TeamMark team={player.nflTeam} size="xs" />
+                                    <span className="results-player-copy">
+                                      <strong>{player.name}</strong>
+                                      <span>{player.nflTeam}</span>
+                                    </span>
+                                  </span>
+                                </td>
                                 <td>{player.position}</td>
                                 <td>{player.lineupSlot}</td>
                                 {report.draftType === "auction" ? <td>${formatNumber(player.price)}</td> : null}
@@ -408,7 +417,7 @@ export default function ResultsV2() {
               </div>
             ) : null}
             <p className="results-method-note">
-              Grades use the projections stored in the draft snapshot where available, then current FFAA data for matching and replacement-level context.
+              Grades use the projections stored in the draft snapshot where available, then current GameHQ data for matching and replacement-level context.
             </p>
             <Button variant="secondary" onClick={() => navigate(-1)} className="results-back-btn">
               <ArrowLeft size={16} aria-hidden="true" />

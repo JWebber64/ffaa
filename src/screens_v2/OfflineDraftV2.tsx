@@ -3,6 +3,7 @@ import { ArrowRight, ChevronsUpDown, Plus, RotateCcw, Save, Search, Trash2, Undo
 import { loadPlayerPool } from "../data/loadPlayerPool";
 import { draftedRosterSize, normalizeAuctionValueScoring } from "../data/auctionValueSettings";
 import TeamBoard from "../components/draft/TeamBoard";
+import { TeamMark } from "../components/player/TeamMark";
 import type {
   RosterPlayer,
   RosterSlot as BoardRosterSlot,
@@ -995,7 +996,10 @@ export default function OfflineDraftV2() {
                   onClick={() => selectPlayer(player)}
                 >
                   <span className="offline-player-main">
-                    <strong>{player.name}</strong>
+                    <span className="offline-player-title">
+                      <TeamMark team={player.nflTeam} size="xs" />
+                      <strong>{player.name}</strong>
+                    </span>
                     <span>{playerMeta(player)}</span>
                   </span>
                   <span className="offline-player-value">{money(suggestedPrice(player))}</span>

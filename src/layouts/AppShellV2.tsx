@@ -1,9 +1,10 @@
-import { lazy } from "react";
-import { BarChart3, Bug, ChartNoAxesCombined, ClipboardList, Home, Radio, Settings2, Trophy, UserPlus, Users, Wrench } from "lucide-react";
+import { lazy, type CSSProperties } from "react";
+import { BarChart3, Bug, ChartNoAxesCombined, ClipboardList, Home, Settings2, Trophy, UserPlus, Wrench } from "lucide-react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
 import { useDebugDrawerState } from "../hooks/useDebugDrawer";
 import { useRole } from "../contexts/roleContextState";
+import { appUrl } from "../lib/appBasePath";
 
 const DebugDrawer = lazy(() => import("../components/DebugDrawer"));
 
@@ -37,7 +38,10 @@ export default function AppShellV2() {
   const roleLabel = pathIsLeague ? "COMMISH" : pathIsPublicResearch ? "FREE" : pathIsHost ? "HOST" : role.isAdmin ? "HOST" : "MANAGER";
 
   const authStatus = pathIsLeague ? "Local" : pathIsPublicResearch ? "No login" : pathIsOffline ? "Local" : "Auth";
-  const authTone = "ok";
+  const visualAssets = {
+    "--football-hero-image": `url("${appUrl("images/football-night-hero.png")}")`,
+    "--football-banner-image": `url("${appUrl("images/football-playbook-banner.png")}")`,
+  } as CSSProperties;
   
   const getRouteLabel = () => {
     if (loc.pathname === "/") return "Home";
@@ -50,19 +54,21 @@ export default function AppShellV2() {
     if (loc.pathname.startsWith("/join")) return "Join";
     if (loc.pathname.startsWith("/draft")) return "Draft";
     if (loc.pathname.startsWith("/results")) return "Results";
-    return "FFAA";
+    return "Fantasy Football";
   };
 
   return (
-    <div className="ffaa-bg min-h-screen">
+    <div className="ffaa-bg min-h-screen" style={visualAssets}>
       <header className={`app-header ${pathIsDraft ? "app-header-draft" : ""}`}>
         <div className="app-header-inner">
           <div className="app-header-left">
-            <button onClick={() => navigate("/")} className="app-brand" aria-label="FFAA Home">
-              <span className="app-brand-mark" />
-              <span className="app-brand-text ff-display">FFAA</span>
+            <button onClick={() => navigate("/")} className="app-brand" aria-label="Fantasy Football presented by GameHQ home">
+              <span className="app-brand-text">
+                <span className="app-brand-title ff-display">Fantasy Football</span>
+                <span className="app-brand-presenter">Presented by GameHQ</span>
+              </span>
             </button>
-            <span className="app-route-pill">{getRouteLabel()}</span>
+            <span className="app-route-label">{getRouteLabel()}</span>
           </div>
 
           <nav className="app-nav" aria-label="Primary navigation">
@@ -83,18 +89,10 @@ export default function AppShellV2() {
             })}
           </nav>
 
-          <div className="app-header-right">
-            <span className="app-status-pill">
-              <Radio size={13} aria-hidden="true" />
-              <span className="app-dot app-dot-ok" />
-              {realtimeLabel}
-            </span>
-            <span className="app-status-pill">
-              <Users size={13} aria-hidden="true" />
-              <span className={`app-dot app-dot-${authTone}`} />
-              {authStatus}
-            </span>
-            <span className="app-role-pill">{roleLabel}</span>
+          <div className="app-header-right app-header-meta">
+            <span className="app-status-label">{realtimeLabel}</span>
+            <span className="app-status-label">{authStatus}</span>
+            <span className="app-role-label">{roleLabel}</span>
             {!pathIsNoAuth ? (
               <Button variant="secondary" size="sm" className="app-debug-btn" onClick={dbg.toggle}>
                 <Bug size={14} aria-hidden="true" />

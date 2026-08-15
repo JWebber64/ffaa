@@ -748,10 +748,10 @@ const CORE_COLUMNS: PlayerStatColumn[] = [
   }),
   liveColumn({
     id: "auctionValue",
-    label: "FFAA Fair Value",
+    label: "GameHQ Fair Value",
     shortLabel: "Fair",
     group: "Draft Market",
-    description: "FFAA fair value normalized to the configured league settings and budget.",
+    description: "GameHQ fair value normalized to the configured league settings and budget.",
     source: "Consensus value engine",
     format: "money",
     getValue: (row) => numberValue(row.player.auctionValue ?? row.player.projectedValue),

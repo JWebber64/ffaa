@@ -104,7 +104,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({ player, onNominate, nominate, sho
         {player.nflTeam && <Badge colorScheme="gray" minW="2.5em" textAlign="center">{player.nflTeam}</Badge>}
         {player.byeWeek && <Badge colorScheme="gray" minW="3.5em" textAlign="center">Bye {player.byeWeek}</Badge>}
         {typeof player.auctionValue === 'number' && (
-          <Badge colorScheme="green" title="FFAA fair auction value" minW="3.5em" textAlign="center">
+          <Badge colorScheme="green" title="GameHQ fair auction value" minW="3.5em" textAlign="center">
             ${player.auctionValue}
           </Badge>
         )}

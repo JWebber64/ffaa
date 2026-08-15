@@ -23,8 +23,8 @@ export default function DraftStateIO() {
       // change this to pick only the relevant keys.
       const state = useDraftStore.getState();
       const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-      downloadJson(`ffaa-draft-${stamp}.json`, {
-        __type: "ffaa_draft_export",
+      downloadJson(`gamehq-fantasy-football-draft-${stamp}.json`, {
+        __type: "gamehq_fantasy_football_draft_export",
         __version: 1,
         state,
       });

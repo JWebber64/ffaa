@@ -2,6 +2,7 @@ import { Minus, Plus, RotateCcw, Search, Trash2, UserPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { ToolDataStatus } from "@/components/tools/ToolDataStatus";
+import { TeamMark } from "@/components/player/TeamMark";
 import { ToolLayout } from "@/components/tools/ToolLayout";
 import { ToolMetricBar } from "@/components/tools/ToolMetricBar";
 import { ToolPlayerPicker } from "@/components/tools/ToolPlayerPicker";
@@ -276,7 +277,10 @@ export function TeamRater() {
             <ul>
               {roster.map((player) => (
                 <li key={player.id}>
-                  <span className={`tool-position-tag is-${player.position.toLowerCase()}`}>{player.position}</span>
+                  <span className="tool-player-badges">
+                    <TeamMark team={player.team} size="xs" />
+                    <span className={`tool-position-tag is-${player.position.toLowerCase()}`}>{player.position}</span>
+                  </span>
                   <div><strong>{player.name}</strong><small>{player.team || "FA"} · Proj {formatNumber(player.projectedPoints)}</small></div>
                   <button type="button" aria-label={`Remove ${player.name}`} onClick={() => setRosterIds((current) => current.filter((id) => id !== player.id))}>
                     <Trash2 size={15} aria-hidden="true" />

@@ -1249,8 +1249,12 @@ export function normalizeImportedDraftState(input: unknown): unknown {
   if (!input || typeof input !== "object") return null;
   const obj = input as Record<string, unknown>;
 
-  // Preferred export format
-  if (obj.__type === "ffaa_draft_export" && typeof obj.state === "object" && obj.state) {
+  // Current exports plus the legacy placeholder-brand format.
+  if (
+    (obj.__type === "gamehq_fantasy_football_draft_export" || obj.__type === "ffaa_draft_export")
+    && typeof obj.state === "object"
+    && obj.state
+  ) {
     return obj.state;
   }
 
@@ -1263,7 +1267,7 @@ export function normalizeImportedDraftState(input: unknown): unknown {
 /* Multiplayer serialization functions */
 export function exportDraftState(state: DraftState): string {
   const exportData = {
-    __type: "ffaa_draft_export",
+    __type: "gamehq_fantasy_football_draft_export",
     version: "1.0.0",
     exportedAt: Date.now(),
     state: {

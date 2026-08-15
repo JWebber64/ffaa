@@ -494,7 +494,7 @@ export default function LeagueHQ() {
 
             <div className="league-overview-grid">
               <section className="league-panel league-standings-panel">
-                <SectionHeading eyebrow={`${data.identity.currentSeason} season`} title="Standings & FFAA Power Index" detail="Independent 0-100 model using recent form, scoring, career results, and playoff performance." />
+                <SectionHeading eyebrow={`${data.identity.currentSeason} season`} title="Standings & GameHQ Power Index" detail="Independent 0-100 model using recent form, scoring, career results, and playoff performance." />
                 <div className="league-table-wrap">
                   <table className="league-table">
                     <thead><tr><th>Power</th><th>Manager</th><th>Record</th><th>PF</th><th>Index</th></tr></thead>
@@ -685,7 +685,7 @@ export default function LeagueHQ() {
 
         {activeView === "draft" ? (
           <section>
-            <SectionHeading eyebrow="Draft Central" title="Order, countdown & live room" detail="Set the date or visible order in Commissioner Studio, then launch FFAA's draft tools." />
+            <SectionHeading eyebrow="Draft Central" title="Order, countdown & live room" detail="Set the date or visible order in Commissioner Studio, then launch GameHQ draft tools." />
             <div className="league-draft-hero"><CalendarClock aria-hidden="true" /><span>Draft countdown</span><strong>{countdown.label}</strong><p>{countdown.detail}</p><div><Link className="league-link-button" to="/host/setup">Configure live draft</Link><Link className="league-link-button is-secondary" to="/offline-draft">Open offline draft</Link></div></div>
             <div className="league-draft-order">
               <header><div><span>Commissioner board</span><h3>Draft order</h3></div><Button variant="secondary" size="sm" onClick={() => setWorkspaceOpen(true)}>Edit date & order</Button></header>
@@ -697,10 +697,10 @@ export default function LeagueHQ() {
 
         {activeView === "futures" ? (
           <section>
-            <SectionHeading eyebrow="Prediction desk" title="Futures odds & season ballot" detail="FFAA model probabilities and win totals meet each manager's preseason picks." />
+            <SectionHeading eyebrow="Prediction desk" title="Futures odds & season ballot" detail="GameHQ model probabilities and win totals meet each manager's preseason picks." />
             <div className="league-model-note">
               <Sparkles aria-hidden="true" />
-              <div><strong>How the FFAA model works</strong><p>Title probabilities are derived from the Power Index and normalized across all current teams. Win totals translate the same rating onto the regular-season schedule. These are league entertainment, not sportsbook advice.</p></div>
+              <div><strong>How the GameHQ model works</strong><p>Title probabilities are derived from the Power Index and normalized across all current teams. Win totals translate the same rating onto the regular-season schedule. These are league entertainment, not sportsbook advice.</p></div>
             </div>
             <div className="league-futures-grid">
               {data.futures.map((future) => (
@@ -708,7 +708,7 @@ export default function LeagueHQ() {
                   <span>{managerLabel(future.managerId)}</span>
                   <strong>{formatAmericanOdds(future.championshipOdds)}</strong>
                   <small>Title odds{future.fairProbability != null ? ` / ${(future.fairProbability * 100).toFixed(1)}%` : ""}</small>
-                  <em className={future.source === "commissioner" ? "is-commissioner" : ""}>{future.source === "commissioner" ? "Commissioner line" : "FFAA model"}</em>
+                  <em className={future.source === "commissioner" ? "is-commissioner" : ""}>{future.source === "commissioner" ? "Commissioner line" : "GameHQ model"}</em>
                   <p>{future.caseFor}</p>
                   <div><b>Win total {future.winTotal || "-"}</b><button className={ballot.overUnder[future.managerId] === "over" ? "is-active" : ""} onClick={() => setBallot((current) => ({ ...current, overUnder: { ...current.overUnder, [future.managerId]: "over" } }))}>Over</button><button className={ballot.overUnder[future.managerId] === "under" ? "is-active" : ""} onClick={() => setBallot((current) => ({ ...current, overUnder: { ...current.overUnder, [future.managerId]: "under" } }))}>Under</button></div>
                 </article>

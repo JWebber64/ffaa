@@ -153,7 +153,7 @@ export interface LeagueFuture {
   winTotal: number;
   caseFor: string;
   fairProbability?: number;
-  source?: "ffaa-model" | "commissioner";
+  source?: "gamehq-model" | "ffaa-model" | "commissioner";
 }
 
 export interface LeagueStoryline {
@@ -268,8 +268,8 @@ export function createStarterLeagueHQ(input: StarterLeagueInput): LeagueHQData {
 
   return {
     identity: {
-      name: "FFAA League HQ",
-      shortName: "FFAA",
+      name: "Fantasy Football League HQ",
+      shortName: "Fantasy Football",
       tagline: "Draft night is the start. League memory lives here.",
       currentSeason: FANTASY_SEASON,
       foundedYear: FANTASY_SEASON,
@@ -283,7 +283,7 @@ export function createStarterLeagueHQ(input: StarterLeagueInput): LeagueHQData {
         id: "teams",
         label: "League size",
         value: `${configuredTeams.length || finite(input.teamCount)} teams`,
-        detail: "Synced from the current FFAA draft configuration.",
+        detail: "Synced from the current GameHQ draft configuration.",
       },
       {
         id: "draft",
@@ -469,6 +469,28 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
+export function migrateLegacyProductBranding(data: LeagueHQData): LeagueHQData {
+  const migrateValue = (value: unknown): unknown => {
+    if (typeof value === "string") {
+      if (value === "ffaa-model") return "gamehq-model";
+      return value
+        .replace(/FFAA Fair Value/g, "GameHQ Fair Value")
+        .replace(/FFAA Power Index/g, "GameHQ Power Index")
+        .replace(/FFAA model/g, "GameHQ model")
+        .replace(/\bFFAA\b/g, "Fantasy Football");
+    }
+    if (Array.isArray(value)) return value.map(migrateValue);
+    if (isObject(value)) {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, entry]) => [key, migrateValue(entry)]),
+      );
+    }
+    return value;
+  };
+
+  return migrateValue(data) as LeagueHQData;
+}
+
 export function parseLeagueHQData(raw: string): { data: LeagueHQData | null; error: string } {
   try {
     const candidate: unknown = JSON.parse(raw);
@@ -505,7 +527,7 @@ export function parseLeagueHQData(raw: string): { data: LeagueHQData | null; err
     ) {
       return { data: null, error: "Every manager needs string id, managerName, and teamName values." };
     }
-    return { data: candidate as unknown as LeagueHQData, error: "" };
+    return { data: migrateLegacyProductBranding(candidate as unknown as LeagueHQData), error: "" };
   } catch (error) {
     return {
       data: null,

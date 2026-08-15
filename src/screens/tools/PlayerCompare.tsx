@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { StatsSparkline } from "@/components/stats/StatsSparkline";
+import { TeamMark } from "@/components/player/TeamMark";
 import { ToolDataStatus } from "@/components/tools/ToolDataStatus";
 import { ToolLayout } from "@/components/tools/ToolLayout";
 import { ToolPlayerPicker } from "@/components/tools/ToolPlayerPicker";
@@ -37,7 +38,7 @@ interface ComparisonMetric {
 const COMPARISON_METRICS: ComparisonMetric[] = [
   { label: "2026 projection", detail: "Selected scoring", value: (player) => formatNumber(player.projectedPoints) },
   { label: "Projected per game", detail: "17-game denominator when games are unavailable", value: (player) => formatNumber(player.projectedPointsPerGame) },
-  { label: "FFAA fair value", detail: "12-team, $200 baseline for selected scoring", value: (player) => formatMoney(player.auctionValue) },
+  { label: "GameHQ fair value", detail: "12-team, $200 baseline for selected scoring", value: (player) => formatMoney(player.auctionValue) },
   { label: "Market median", detail: "Compatible imported auction-dollar sources", value: (player) => formatMoney(player.marketValue) },
   { label: "ADP", detail: "Current player-pool market input", value: (player) => formatNumber(player.adp) },
   { label: "2025 points per game", detail: "Regular-season actuals", value: (player) => formatNumber(player.historicalPointsPerGame) },
@@ -87,7 +88,7 @@ export function PlayerCompare() {
       description="Compare projections, actual production, opportunity, consistency, and auction sources without losing the context behind each number."
       methodology={
         <p>
-          Projections use ESPN Mike Clay stat lines with the selected reception scoring and fall back to other disclosed projections. Floor and ceiling are empirical 2025 game quartiles—not guaranteed future outcomes.
+          Projections use ESPN Mike Clay stat lines with the selected reception scoring and fall back to other disclosed projections. Floor and ceiling are empirical 2025 game quartiles, not guaranteed future outcomes.
         </p>
       }
     >
@@ -142,7 +143,10 @@ export function PlayerCompare() {
       <div className="compare-player-grid" style={{ "--compare-columns": comparedPlayers.length } as CSSProperties}>
         {comparedPlayers.map((player) => (
           <article className="compare-player-card" key={player.id}>
-            <span>{player.position} · {player.team || "FA"}</span>
+            <span className="compare-player-kicker">
+              <TeamMark team={player.team} size="sm" />
+              <span>{player.position} · {player.team || "FA"}</span>
+            </span>
             <h2>{player.name}</h2>
             <p>{player.injuryStatus || player.status || "No active injury designation"}</p>
             <div className="compare-player-primary">

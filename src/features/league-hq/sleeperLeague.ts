@@ -498,10 +498,10 @@ function modelFutures(
       championshipOdds: americanOdds(probability),
       winTotal: projectedWins,
       fairProbability: Number(probability.toFixed(3)),
-      source: "ffaa-model",
+      source: "gamehq-model",
       caseFor: latest
         ? `${latest.rank <= 3 ? "Top-three recent finish" : `Finished #${latest.rank} last season`}; ${manager.titles} career title${manager.titles === 1 ? "" : "s"} and ${(managerWinRate(manager) * 100).toFixed(1)}% career win rate.`
-        : `First imported FFAA season; the opening line uses available career and postseason data.`,
+        : `First imported fantasy season; the opening line uses available career and postseason data.`,
     };
   });
 }
@@ -532,7 +532,7 @@ function buildStorylines(
     const manager = managers.find((entry) => entry.id === topPower.managerId);
     stories.push({
       id: "power-favorite",
-      label: "FFAA Power Index",
+      label: "GameHQ Power Index",
       title: `${manager?.teamName || "Power leader"} starts #1`,
       detail: `${topPower.powerScore?.toFixed(1) ?? "50.0"} model score from recent form, scoring, career record, and playoff results.`,
       managerIds: [topPower.managerId],
@@ -1037,7 +1037,7 @@ export async function loadSleeperLeagueHQ(
     manager.badges = badges;
     manager.outlook = latest
       ? `${manager.managerName} enters ${current.league.season} after a ${latest.wins}-${latest.losses}${latest.ties ? `-${latest.ties}` : ""} season and #${latest.rank} regular-season finish. Career win rate: ${(managerWinRate(manager) * 100).toFixed(1)}%.`
-      : `${manager.managerName} begins a first imported FFAA season with no completed Sleeper history yet.`;
+      : `${manager.managerName} begins a first imported fantasy season with no completed Sleeper history yet.`;
   }
 
   const currentRosterMap = rosterMaps.get(current.league.league_id) ?? new Map<number, string>();
@@ -1097,8 +1097,8 @@ export async function loadSleeperLeagueHQ(
     },
     identity: {
       name: current.league.name,
-      shortName: "FFAA",
-      tagline: "Sleeper results, FFAA history, one permanent league home.",
+      shortName: "Fantasy Football",
+      tagline: "Sleeper results and league history, presented by GameHQ.",
       currentSeason: numberValue(current.league.season),
       foundedYear: Math.min(...bundles.map((bundle) => numberValue(bundle.league.season))),
       format: `${current.league.total_rosters}-team ${draftType.toLowerCase()} league`,

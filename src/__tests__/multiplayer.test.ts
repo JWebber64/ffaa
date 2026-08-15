@@ -98,7 +98,7 @@ describe('Multiplayer Export/Import', () => {
 
     // Parse and verify export format
     const parsed = JSON.parse(exported);
-    expect(parsed.__type).toBe('ffaa_draft_export');
+    expect(parsed.__type).toBe('gamehq_fantasy_football_draft_export');
     expect(parsed.version).toBe('1.0.0');
     expect(parsed.state).toBeDefined();
     expect(parsed.state.draftId).toBe('TEST123');
