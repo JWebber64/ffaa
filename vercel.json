@@ -28,6 +28,10 @@
       "destination": "/assets/:path*"
     },
     {
+      "source": "/ff/images/:path*",
+      "destination": "/images/:path*"
+    },
+    {
       "source": "/ff/sounds/:path*",
       "destination": "/sounds/:path*"
     },

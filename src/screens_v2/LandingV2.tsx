@@ -7,6 +7,7 @@ import {
   Users,
   WalletCards,
 } from "lucide-react";
+import { appUrl } from "../lib/appBasePath";
 import { Button } from "../ui/Button";
 
 const CAPABILITIES = [
@@ -89,19 +90,28 @@ export default function LandingV2() {
           </div>
         </div>
 
-        <aside className="home-brief" aria-labelledby="home-brief-title">
-          <div className="home-brief-status">
-            <span aria-hidden="true" />
-            Draft room operating model
-          </div>
-          <h2 id="home-brief-title">Every decision, on one field</h2>
-          <dl>
-            <div><dt>Draft modes</dt><dd>Auction and snake</dd></div>
-            <div><dt>Room roles</dt><dd>Host and manager</dd></div>
-            <div><dt>Practice</dt><dd>CPU-managed seats</dd></div>
-            <div><dt>Fallback</dt><dd>Complete offline draft</dd></div>
-          </dl>
-        </aside>
+        <div className="home-hero-media">
+          <figure className="home-hero-photo">
+            <img
+              src={appUrl("images/football-night-hero.png")}
+              alt="A football on the field beneath bright stadium lights at night."
+            />
+          </figure>
+
+          <aside className="home-brief" aria-labelledby="home-brief-title">
+            <div className="home-brief-status">
+              <span aria-hidden="true" />
+              Draft room operating model
+            </div>
+            <h2 id="home-brief-title">Every decision, on one field</h2>
+            <dl>
+              <div><dt>Draft modes</dt><dd>Auction and snake</dd></div>
+              <div><dt>Room roles</dt><dd>Host and manager</dd></div>
+              <div><dt>Practice</dt><dd>CPU-managed seats</dd></div>
+              <div><dt>Fallback</dt><dd>Complete offline draft</dd></div>
+            </dl>
+          </aside>
+        </div>
       </section>
 
       <section className="home-section" aria-labelledby="capabilities-title">
@@ -139,6 +149,17 @@ export default function LandingV2() {
           ))}
         </ol>
       </section>
+
+      <figure className="home-playbook-photo">
+        <img
+          src={appUrl("images/football-playbook-banner.png")}
+          alt="A football resting on dark turf beside a drawn play route."
+        />
+        <figcaption>
+          <span>Draft preparation</span>
+          <strong>Build the board before the room opens.</strong>
+        </figcaption>
+      </figure>
 
       <section className="home-section" aria-labelledby="comparison-title">
         <header className="home-section-header">
