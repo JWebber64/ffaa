@@ -3,6 +3,11 @@ import { cn } from "@/ui/cn";
 import { getNflTeamCssVars } from "@/data/nflTeamBrand";
 import { normalizeTeamAbbr } from "./teamMarkUtils";
 
+function getHelmetSrc(team: string) {
+  const assetTeam = team === "JAX" ? "JAC" : team;
+  return `https://www.fantasynerds.com/images/nfl/helmets/${assetTeam}.png`;
+}
+
 export function TeamMark({
   team,
   size = "sm",
@@ -22,6 +27,7 @@ export function TeamMark({
 
   const label = title ?? `${normalizedTeam} team`;
   const teamStyle = getNflTeamCssVars(normalizedTeam) as CSSProperties;
+  const helmetSrc = getHelmetSrc(normalizedTeam);
 
   return (
     <span
@@ -32,7 +38,19 @@ export function TeamMark({
       aria-label={label}
     >
       <span className="team-mark-frame" aria-hidden="true">
-        <span className="team-mark-code">{normalizedTeam}</span>
+        <img
+          className="team-mark-image"
+          src={helmetSrc}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={(event) => {
+            event.currentTarget.hidden = true;
+            event.currentTarget.nextElementSibling?.removeAttribute("hidden");
+          }}
+        />
+        <span className="team-mark-code" hidden>{normalizedTeam}</span>
       </span>
       {showLabel ? <span className="team-mark-label">{normalizedTeam}</span> : null}
     </span>

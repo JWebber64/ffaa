@@ -3053,22 +3053,18 @@ dd,
 .tools-card:nth-child(3n + 1) .tools-card-icon { color: var(--football-leather-light); border-color: rgba(196, 103, 45, 0.25); background: rgba(196, 103, 45, 0.1); }
 .tools-card:nth-child(3n + 2) .tools-card-icon { color: var(--football-broadcast); border-color: rgba(120, 168, 196, 0.25); background: rgba(120, 168, 196, 0.1); }
 
-/* Team identity marks: flat two-color scorebugs used beside every player. */
+/* Team identity marks: full team helmets, with no badge box. */
 .team-mark {
   filter: none;
 }
 
-.team-mark-xs { --team-mark-size: 22px; }
-.team-mark-sm { --team-mark-size: 28px; }
-.team-mark-md { --team-mark-size: 36px; }
+.team-mark-xs { --team-mark-size: 34px; }
+.team-mark-sm { --team-mark-size: 40px; }
+.team-mark-md { --team-mark-size: 48px; }
 
 .team-mark-frame {
-  position: relative;
-  width: calc(var(--team-mark-size) + 4px);
-  min-width: calc(var(--team-mark-size) + 4px);
-  border-radius: 6px;
-  border-color: color-mix(in srgb, var(--team-secondary) 72%, rgba(255, 255, 255, 0.18));
-  background: var(--team-primary);
+  width: var(--team-mark-size);
+  min-width: var(--team-mark-size);
   box-shadow: none;
 }
 
