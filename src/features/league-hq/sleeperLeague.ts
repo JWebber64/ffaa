@@ -11,7 +11,6 @@ import type {
   LeagueWeekRecap,
 } from "./leagueHQData";
 
-export const DEFAULT_SLEEPER_LEAGUE_ID = "1385319428408774656";
 const SLEEPER_API = "https://api.sleeper.app/v1";
 const MAX_HISTORY_SEASONS = 10;
 

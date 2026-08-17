@@ -16,6 +16,7 @@ const AnalyticsLab = lazy(() =>
 );
 const Tools = lazy(() => import("./screens/Tools"));
 const LeagueHQ = lazy(() => import("./screens/LeagueHQ"));
+const LeagueHistoryApp = lazy(() => import("./features/league-history/ui/LeagueHistoryApp"));
 const OfflineDraftV2 = lazy(() => import("./screens_v2/OfflineDraftV2"));
 const AuthenticatedApp = lazy(() => import("./routes/AuthenticatedApp"));
 
@@ -43,6 +44,7 @@ function AppRoutes() {
           <Route path="/analytics" element={<AnalyticsLab />} />
           <Route path="/tools/*" element={<Tools />} />
           <Route path="/league" element={<LeagueHQ />} />
+          <Route path="/league/:leagueId/*" element={<LeagueHistoryApp />} />
         </Route>
         <Route
           path="*"

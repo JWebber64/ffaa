@@ -47,7 +47,6 @@ import {
   type SleeperLeagueConnectionSummary,
 } from "../features/league-hq/sleeperConnections";
 import {
-  DEFAULT_SLEEPER_LEAGUE_ID,
   findSleeperLeagues,
   loadSleeperLeagueHQ,
   mergeSleeperLeagueHQ,
@@ -130,7 +129,7 @@ export default function LeagueHQ() {
   const requestedLeagueId = searchParams.get("league")?.trim() ?? "";
   const activeLeagueId = /^\d{10,}$/.test(requestedLeagueId)
     ? requestedLeagueId
-    : connections[0]?.leagueId ?? DEFAULT_SLEEPER_LEAGUE_ID;
+    : connections[0]?.leagueId ?? "";
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [recordSort, setRecordSort] = useState<RecordSort>("titles");
   const [sleeperSync, setSleeperSync] = useState<SleeperSyncState>({ status: "idle", message: "" });
@@ -156,7 +155,7 @@ export default function LeagueHQ() {
       }),
     [teams, teamCount, baseBudget, roster, nominationSeconds, antiSnipeSeconds]
   );
-  const { data, setData, ballot, setBallot } = useLeagueHQ(starter, activeLeagueId);
+  const { data, setData, ballot, setBallot } = useLeagueHQ(starter, activeLeagueId || "local");
   const activeView = isLeagueView(searchParams.get("view")) ? searchParams.get("view") : "overview";
   const managerById = useMemo(() => new Map(data.managers.map((manager) => [manager.id, manager])), [data.managers]);
   const managerLabel = (id: string) => managerById.get(id)?.managerName || "Not recorded";
@@ -209,6 +208,10 @@ export default function LeagueHQ() {
   }, [rememberConnection]);
 
   const syncSleeper = useCallback(async (signal?: AbortSignal) => {
+    if (!/^\d{10,}$/.test(activeLeagueId)) {
+      setSleeperSync({ status: "error", message: "Connect a Sleeper league before refreshing." });
+      return;
+    }
     setSleeperSync({ status: "loading", message: "Reading league history from Sleeper..." });
     try {
       const imported = await loadSleeperLeagueHQ(
@@ -237,6 +240,7 @@ export default function LeagueHQ() {
   }, [activeLeagueId, rememberImportedLeague, setData]);
 
   useEffect(() => {
+    if (!/^\d{10,}$/.test(activeLeagueId)) return;
     const lastSync = data.sleeper?.syncedAt ? Date.parse(data.sleeper.syncedAt) : 0;
     const isFresh =
       data.sleeper?.leagueId === activeLeagueId &&
@@ -319,6 +323,11 @@ export default function LeagueHQ() {
           <Button onClick={() => setWorkspaceOpen(true)}>
             <PencilLine size={16} aria-hidden="true" /> Commissioner Studio
           </Button>
+          {data.sleeper ? (
+            <Link to={`/league/${data.sleeper.leagueId}`}>
+              <Button variant="secondary"><History size={16} aria-hidden="true" /> Permanent history</Button>
+            </Link>
+          ) : null}
           <span>{data.sleeper ? "Live Sleeper results + commissioner context" : "Local commissioner file"}</span>
         </div>
       </section>
@@ -345,17 +354,18 @@ export default function LeagueHQ() {
         </div>
         <div className="league-sync-copy">
           <span>Sleeper connection</span>
-          <strong>{data.sleeper ? `Connected to ${data.sleeper.leagueName}` : `Connecting league ${activeLeagueId}`}</strong>
+          <strong>{data.sleeper ? `Connected to ${data.sleeper.leagueName}` : activeLeagueId ? `Connecting league ${activeLeagueId}` : "No Sleeper league connected"}</strong>
           <small>
             {sleeperSync.message || (data.sleeper
               ? `${data.sleeper.seasonsImported} seasons imported / last synced ${new Date(data.sleeper.syncedAt).toLocaleString()}`
-              : `League ${activeLeagueId}`)}
+              : activeLeagueId ? `League ${activeLeagueId}` : "Connect any public Sleeper league to begin." )}
           </small>
         </div>
         <label className="league-sync-switch">
           <span>Saved league</span>
           <select value={activeLeagueId} onChange={(event) => chooseLeague(event.target.value)}>
-            {!connections.some((connection) => connection.leagueId === activeLeagueId) ? (
+            {!activeLeagueId ? <option value="">Choose a league</option> : null}
+            {activeLeagueId && !connections.some((connection) => connection.leagueId === activeLeagueId) ? (
               <option value={activeLeagueId}>Current league</option>
             ) : null}
             {connections.map((connection) => (
@@ -372,6 +382,7 @@ export default function LeagueHQ() {
           variant="secondary"
           size="sm"
           isLoading={sleeperSync.status === "loading"}
+          disabled={!activeLeagueId}
           onClick={() => void syncSleeper()}
         >
           <RefreshCw size={15} aria-hidden="true" /> Refresh Sleeper
@@ -442,7 +453,15 @@ export default function LeagueHQ() {
                     className="league-saved-remove"
                     onClick={() => {
                       forgetConnection(connection.leagueId);
-                      if (connection.leagueId === activeLeagueId) chooseLeague(DEFAULT_SLEEPER_LEAGUE_ID);
+                      if (connection.leagueId === activeLeagueId) {
+                        const fallback = connections.find((saved) => saved.leagueId !== connection.leagueId);
+                        if (fallback) chooseLeague(fallback.leagueId);
+                        else {
+                          const next = new URLSearchParams(searchParams);
+                          next.delete("league");
+                          setSearchParams(next);
+                        }
+                      }
                     }}
                     aria-label={`Forget ${connection.leagueName}`}
                   >
