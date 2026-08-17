@@ -3,10 +3,63 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { UniversalSelect } from "../../../../ui/UniversalSelect";
+import type { HistoricalTransactionAsset, Manager, SeasonFranchise } from "../../domain/types";
 import { useLeagueHistorySnapshot } from "../historyContext";
 import { formatNumber } from "../format";
+import { groupTransactionAssetsByRecipient } from "../transactionPresentation";
 
 const TRANSACTION_PAGE_SIZE = 100;
+
+function transactionAssetLabel(asset: HistoricalTransactionAsset) {
+  if (asset.assetType === "faab") return `$${formatNumber(asset.faabAmount, 0)} FAAB`;
+  if (asset.assetType === "draft_pick") return asset.playerName || `${asset.draftSeason} round ${asset.draftRound} pick`;
+  return asset.playerName || asset.providerPlayerId || "Unknown player";
+}
+
+function franchiseDisplayName(
+  franchiseId: string | null,
+  franchiseById: ReadonlyMap<string, SeasonFranchise>,
+  managerById: ReadonlyMap<string, Manager>,
+  fallback: string,
+) {
+  if (!franchiseId) return fallback;
+  const franchise = franchiseById.get(franchiseId);
+  if (!franchise) return fallback;
+  return (franchise.managerId ? managerById.get(franchise.managerId)?.displayName : "") || franchise.teamName || fallback;
+}
+
+function TradeAssetFlow({
+  assets,
+  franchiseById,
+  managerById,
+}: {
+  assets: HistoricalTransactionAsset[];
+  franchiseById: ReadonlyMap<string, SeasonFranchise>;
+  managerById: ReadonlyMap<string, Manager>;
+}) {
+  const recipientGroups = groupTransactionAssetsByRecipient(assets);
+  if (!recipientGroups.length) return <div className="history-transaction-assets"><span>Trade details unavailable</span></div>;
+  return (
+    <div className="history-trade-flow" aria-label="Assets received by each manager">
+      {recipientGroups.map((group) => {
+        const recipient = franchiseDisplayName(group.recipientFranchiseId, franchiseById, managerById, "Unknown recipient");
+        return (
+          <section className="history-trade-receipt" aria-label={`${recipient} receives`} key={group.recipientFranchiseId ?? "unassigned"}>
+            <div className="history-trade-recipient"><strong>{recipient}</strong><span>receives</span></div>
+            <div className="history-trade-assets">
+              {group.assets.map((asset) => (
+                <div className="history-trade-asset" key={asset.id}>
+                  <strong>{transactionAssetLabel(asset)}</strong>
+                  <small>from {franchiseDisplayName(asset.fromFranchiseId, franchiseById, managerById, "League pool")}</small>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
 
 export function DraftHistoryPage() {
   const snapshot = useLeagueHistorySnapshot();
@@ -43,7 +96,7 @@ export function TransactionHistoryPage({ defaultType = "all" }: { defaultType?: 
   const franchiseById = new Map(snapshot.franchises.map((franchise) => [franchise.id, franchise]));
   const managerById = new Map(snapshot.managers.map((manager) => [manager.id, manager]));
   const assetsByTransaction = useMemo(() => {
-    const map = new Map<string, typeof snapshot.transactionAssets>();
+    const map = new Map<string, HistoricalTransactionAsset[]>();
     for (const asset of snapshot.transactionAssets) map.set(asset.transactionId, [...(map.get(asset.transactionId) ?? []), asset]);
     return map;
   }, [snapshot.transactionAssets]);
@@ -71,12 +124,16 @@ export function TransactionHistoryPage({ defaultType = "all" }: { defaultType?: 
       </section>
       <section className="history-transaction-list">{visibleRows.map((transaction) => {
         const assets = assetsByTransaction.get(transaction.id) ?? [];
-        const franchiseIds = new Set(assets.flatMap((asset) => [asset.fromFranchiseId, asset.toFranchiseId].filter((id): id is string => Boolean(id))));
-        const managers = [...franchiseIds].map((id) => franchiseById.get(id)).flatMap((franchise) => franchise?.managerId ? [managerById.get(franchise.managerId)?.displayName ?? franchise.teamName] : franchise ? [franchise.teamName] : []);
         const season = seasonById.get(transaction.leagueSeasonId);
+        const isTrade = transaction.transactionType === "trade";
+        const franchiseIds = isTrade ? [] : [...new Set(assets.flatMap((asset) => [asset.fromFranchiseId, asset.toFranchiseId].filter((id): id is string => Boolean(id))))];
+        const managers = franchiseIds.map((id) => franchiseDisplayName(id, franchiseById, managerById, "Unknown manager"));
         return <article key={transaction.id}>
-          <div className="history-transaction-type">{transaction.transactionType === "trade" ? <Activity /> : <CircleDollarSign />}<span>{transaction.transactionType.replace(/_/g, " ")}</span><small>{season?.season} · Week {transaction.week ?? "—"}</small></div>
-          <div className="history-transaction-body"><strong>{[...new Set(managers)].join(" · ") || "League transaction"}</strong><div>{assets.map((asset) => <span key={asset.id}>{asset.assetType === "faab" ? `$${formatNumber(asset.faabAmount, 0)} FAAB` : asset.playerName || `${asset.draftSeason} R${asset.draftRound}`}</span>)}</div></div>
+          <div className="history-transaction-type">{isTrade ? <Activity /> : <CircleDollarSign />}<span>{transaction.transactionType.replace(/_/g, " ")}</span><small>{season?.season} · Week {transaction.week ?? "—"}</small></div>
+          <div className="history-transaction-body">{isTrade
+            ? <TradeAssetFlow assets={assets} franchiseById={franchiseById} managerById={managerById} />
+            : <><strong>{[...new Set(managers)].join(" · ") || "League transaction"}</strong><div className="history-transaction-assets">{assets.map((asset) => <span key={asset.id}>{transactionAssetLabel(asset)}</span>)}</div></>}
+          </div>
           <div className="history-transaction-meta"><span>{transaction.status}</span>{transaction.faabBid == null ? null : <strong>${formatNumber(transaction.faabBid, 0)} bid</strong>}<small>{transaction.occurredAt ? new Date(transaction.occurredAt).toLocaleDateString() : "Date unavailable"}</small></div>
         </article>;
       })}</section>

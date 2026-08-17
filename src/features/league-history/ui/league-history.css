@@ -396,8 +396,17 @@
 .history-transaction-meta small { color: var(--text-1); font-size: 0.6rem; }
 .history-transaction-body { min-width: 0; }
 .history-transaction-body > strong { display: block; overflow: hidden; font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
-.history-transaction-body > div { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
-.history-transaction-body > div span { padding: 4px 6px; border-radius: 5px; background: var(--bg-2); color: var(--text-1); font-size: 0.6rem; }
+.history-transaction-assets { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.history-transaction-assets > span { padding: 4px 6px; border-radius: 5px; background: var(--bg-2); color: var(--text-1); font-size: 0.6rem; }
+.history-trade-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 8px; }
+.history-trade-receipt { min-width: 0; padding: 9px; border: 1px solid var(--line-0); border-radius: 8px; background: color-mix(in srgb, var(--bg-2) 72%, transparent); }
+.history-trade-recipient { display: flex; align-items: baseline; flex-wrap: wrap; gap: 7px; margin-bottom: 7px; }
+.history-trade-recipient span { color: var(--a1); font-size: 0.52rem; font-weight: 850; letter-spacing: 0.08em; text-transform: uppercase; }
+.history-trade-recipient strong { overflow-wrap: anywhere; font-size: 0.72rem; }
+.history-trade-assets { display: grid; gap: 4px; }
+.history-trade-asset { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 6px 7px; border-radius: 6px; background: var(--bg-1); }
+.history-trade-asset strong { min-width: 0; overflow-wrap: anywhere; font-size: 0.64rem; }
+.history-trade-asset small { flex: 0 1 45%; color: var(--text-1); font-size: 0.56rem; overflow-wrap: anywhere; text-align: right; }
 .history-transaction-meta { display: grid; justify-items: end; gap: 3px; font-size: 0.64rem; text-transform: capitalize; }
 .history-transaction-meta strong { color: var(--a1); }
 .history-load-more { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px; color: var(--text-1); font-size: 0.68rem; }
@@ -469,6 +478,7 @@
   .history-champion-grid > article > a { grid-column: 1 / -1; }
   .history-timeline > article { grid-template-columns: 60px 24px 1fr; }
   .history-draft-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .history-trade-flow { grid-template-columns: 1fr; }
   .history-goat-formula { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .history-rivalry-hero strong { font-size: 2.4rem; }
   .history-rivalry-hero span { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

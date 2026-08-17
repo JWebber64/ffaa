@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { calculateGoatRankings, calculateHeadToHead, calculateManagerCareer } from "../features/league-history/analytics";
-import type { LeagueHistorySnapshot } from "../features/league-history/domain/types";
+import type { HistoricalTransactionAsset, LeagueHistorySnapshot } from "../features/league-history/domain/types";
 import { mapSleeperHistory } from "../features/league-history/provider/sleeperMapper";
 import type { SleeperHistoryBundle, SleeperSeasonBundle } from "../features/league-history/provider/sleeperTypes";
 import { leagueHistoryPath, recoverLeagueHistoryPath } from "../features/league-history/ui/leagueRoutes";
+import { groupTransactionAssetsByRecipient } from "../features/league-history/ui/transactionPresentation";
 
 const snapshot: LeagueHistorySnapshot = {
   league: { id: "league", provider: "sleeper", currentExternalLeagueId: "current", name: "Test", sport: "nfl", format: "2-team", settings: {}, createdAt: "", updatedAt: "" },
@@ -60,6 +61,14 @@ function sleeperSeason(season: number, leagueId: string, previousLeagueId: strin
   };
 }
 
+function transactionAsset(id: string, fromFranchiseId: string, toFranchiseId: string, assetType: HistoricalTransactionAsset["assetType"] = "player"): HistoricalTransactionAsset {
+  return {
+    id, transactionId: "trade", providerAssetKey: id, assetType, providerPlayerId: id,
+    playerName: id, fromFranchiseId, toFranchiseId, faabAmount: assetType === "faab" ? 20 : null,
+    draftSeason: null, draftRound: null, metadata: {},
+  };
+}
+
 describe("normalized league history analytics", () => {
   it("anchors every league-history section to the league root", () => {
     expect(leagueHistoryPath("league 123", "h2h")).toBe("/league/league%20123/h2h");
@@ -74,6 +83,21 @@ describe("normalized league history analytics", () => {
     ["/ff/league/123/unknown", "/league/123"],
   ])("recovers malformed nested league path %s", (pathname, expected) => {
     expect(recoverLeagueHistoryPath("123", pathname)).toBe(expected);
+  });
+
+  it("groups every trade asset under its recipient without losing sender direction", () => {
+    const groups = groupTransactionAssetsByRecipient([
+      transactionAsset("Pittman", "big-love", "big-freaky"),
+      transactionAsset("Achane", "big-freaky", "big-love"),
+      transactionAsset("FAAB", "big-love", "big-freaky", "faab"),
+    ]);
+    expect(groups.map((group) => ({
+      recipient: group.recipientFranchiseId,
+      assets: group.assets.map((asset) => ({ id: asset.id, from: asset.fromFranchiseId })),
+    }))).toEqual([
+      { recipient: "big-freaky", assets: [{ id: "Pittman", from: "big-love" }, { id: "FAAB", from: "big-love" }] },
+      { recipient: "big-love", assets: [{ id: "Achane", from: "big-freaky" }] },
+    ]);
   });
 
   it("keeps career and rivalry history attached to permanent manager IDs", () => {
