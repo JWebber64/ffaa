@@ -69,7 +69,7 @@ export function DraftHistoryPage() {
     (seasonById.get(right.leagueSeasonId)?.season ?? 0) - (seasonById.get(left.leagueSeasonId)?.season ?? 0));
   return (
     <main className="history-content">
-      <section className="history-page-heading"><span>Draft foundation</span><h2>Historical drafts</h2><p>Snake and auction picks share one normalized draft ledger; auction price appears only when Sleeper supplied it.</p></section>
+      <section className="history-page-heading"><span>Draft foundation</span><h2>Historical drafts</h2><p>Draft results share one normalized ledger; winning prices appear only when Sleeper supplied them.</p></section>
       <section className="history-draft-list">{drafts.map((draft) => {
         const season = seasonById.get(draft.leagueSeasonId);
         const picks = snapshot.draftPicks.filter((pick) => pick.draftId === draft.id).sort((a, b) => a.pickNumber - b.pickNumber);

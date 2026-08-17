@@ -1,4 +1,5 @@
 import type { JsonValue } from "../domain/types";
+import { getSleeperLeagueDraftTypeOverride } from "../../../config/sleeperLeagueOverrides";
 import type {
   SleeperBracketMatch,
   SleeperHistoryBundle,
@@ -325,7 +326,11 @@ function mapTransaction(
   };
 }
 
-function mapSeason(bundle: SleeperSeasonBundle, players: ReadonlyMap<string, PlayerReference>): SeasonImportPayload {
+function mapSeason(
+  bundle: SleeperSeasonBundle,
+  players: ReadonlyMap<string, PlayerReference>,
+  draftTypeOverride: string | null,
+): SeasonImportPayload {
   const league = bundle.league;
   const playoffStart = nullableNumber(league.settings.playoff_week_start);
   const regularRanks = new Map(rankedRosters(bundle.rosters).map((roster, index) => [roster.roster_id, index + 1]));
@@ -408,7 +413,7 @@ function mapSeason(bundle: SleeperSeasonBundle, players: ReadonlyMap<string, Pla
   }
   const drafts = bundle.drafts.map(({ draft, picks, tradedPicks }): DraftImportPayload => ({
     providerDraftId: draft.draft_id,
-    draftType: draft.type,
+    draftType: draftTypeOverride ?? draft.type,
     status: draft.status,
     budget: nullableNumber(draft.settings?.budget),
     rounds: nullableNumber(draft.settings?.rounds),
@@ -476,6 +481,10 @@ export function mapSleeperHistory(
   const current = bundle.seasons[0]?.league;
   if (!current) throw new Error("Cannot map an empty Sleeper league history.");
   const currentDraft = bundle.seasons[0]?.drafts[0]?.draft;
+  const draftTypeOverride = getSleeperLeagueDraftTypeOverride(
+    bundle.seasons.map((season) => season.league.league_id),
+  );
+  const leagueDraftType = draftTypeOverride ?? currentDraft?.type ?? "fantasy";
   return {
     provider: "sleeper",
     requestedExternalLeagueId: bundle.requestedLeagueId,
@@ -484,12 +493,13 @@ export function mapSleeperHistory(
       currentExternalLeagueId: current.league_id,
       name: current.name,
       sport: current.sport || "nfl",
-      format: `${current.total_rosters}-team ${currentDraft?.type ?? "fantasy"}`,
+      format: `${current.total_rosters}-team ${leagueDraftType}`,
       settings: {
         avatar: current.avatar ?? null,
         seasonType: current.season_type ?? "regular",
+        draftTypeOverride,
       },
     },
-    seasons: bundle.seasons.map((season) => mapSeason(season, players)),
+    seasons: bundle.seasons.map((season) => mapSeason(season, players, draftTypeOverride)),
   };
 }

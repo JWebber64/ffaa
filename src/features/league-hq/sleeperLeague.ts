@@ -1,3 +1,4 @@
+import { getSleeperLeagueDraftTypeOverride } from "../../config/sleeperLeagueOverrides";
 import type {
   LeagueAward,
   LeagueFuture,
@@ -1064,7 +1065,12 @@ export async function loadSleeperLeagueHQ(
     .sort((a, b) => b.year - a.year);
   const reserveSlots = numberValue(current.league.settings.reserve_slots);
   const draftBudget = numberValue(currentDraft?.settings.budget);
-  const draftType = currentDraft?.type ? `${currentDraft.type[0]?.toUpperCase()}${currentDraft.type.slice(1)}` : "Sleeper";
+  const providerDraftType = getSleeperLeagueDraftTypeOverride(
+    bundles.map((bundle) => bundle.league.league_id),
+  ) ?? currentDraft?.type;
+  const draftType = providerDraftType
+    ? `${providerDraftType[0]?.toUpperCase()}${providerDraftType.slice(1)}`
+    : "Sleeper";
   const faab = numberValue(current.league.settings.waiver_budget);
   const tradeDeadline = numberValue(current.league.settings.trade_deadline);
   const standings = buildPowerStandings(current, currentRosterMap, managerById);
