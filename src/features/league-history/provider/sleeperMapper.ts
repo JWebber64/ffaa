@@ -1,5 +1,8 @@
 import type { JsonValue } from "../domain/types";
-import { getSleeperLeagueDraftTypeOverride } from "../../../config/sleeperLeagueOverrides";
+import {
+  getSleeperLeagueDraftTypeOverride,
+  isIgnoredSleeperDraft,
+} from "../../../config/sleeperLeagueOverrides";
 import type {
   SleeperBracketMatch,
   SleeperHistoryBundle,
@@ -411,45 +414,47 @@ function mapSeason(
       });
     }
   }
-  const drafts = bundle.drafts.map(({ draft, picks, tradedPicks }): DraftImportPayload => ({
-    providerDraftId: draft.draft_id,
-    draftType: draftTypeOverride ?? draft.type,
-    status: draft.status,
-    budget: nullableNumber(draft.settings?.budget),
-    rounds: nullableNumber(draft.settings?.rounds),
-    startedAt: dateValue(draft.start_time ?? draft.created),
-    completedAt: dateValue(draft.last_picked),
-    settings: draft.settings ?? {},
-    raw: draft as unknown as Record<string, JsonValue>,
-    picks: picks.map((pick) => {
-      const playerId = pick.player_id ?? stringValue(pick.metadata?.player_id);
-      const player = playerReference(playerId, players);
-      const firstName = stringValue(pick.metadata?.first_name);
-      const lastName = stringValue(pick.metadata?.last_name);
-      return {
-        providerPickId: String(pick.pick_no),
-        providerRosterId: nullableNumber(pick.roster_id),
-        providerPlayerId: playerId,
-        playerName: `${firstName} ${lastName}`.trim() || player.name,
-        position: stringValue(pick.metadata?.position) || player.position,
-        nflTeam: stringValue(pick.metadata?.team) || player.team,
-        pickNumber: pick.pick_no,
+  const drafts = bundle.drafts
+    .filter(({ draft }) => !isIgnoredSleeperDraft(draft.draft_id))
+    .map(({ draft, picks, tradedPicks }): DraftImportPayload => ({
+      providerDraftId: draft.draft_id,
+      draftType: draftTypeOverride ?? draft.type,
+      status: draft.status,
+      budget: nullableNumber(draft.settings?.budget),
+      rounds: nullableNumber(draft.settings?.rounds),
+      startedAt: dateValue(draft.start_time ?? draft.created),
+      completedAt: dateValue(draft.last_picked),
+      settings: draft.settings ?? {},
+      raw: draft as unknown as Record<string, JsonValue>,
+      picks: picks.map((pick) => {
+        const playerId = pick.player_id ?? stringValue(pick.metadata?.player_id);
+        const player = playerReference(playerId, players);
+        const firstName = stringValue(pick.metadata?.first_name);
+        const lastName = stringValue(pick.metadata?.last_name);
+        return {
+          providerPickId: String(pick.pick_no),
+          providerRosterId: nullableNumber(pick.roster_id),
+          providerPlayerId: playerId,
+          playerName: `${firstName} ${lastName}`.trim() || player.name,
+          position: stringValue(pick.metadata?.position) || player.position,
+          nflTeam: stringValue(pick.metadata?.team) || player.team,
+          pickNumber: pick.pick_no,
+          round: pick.round,
+          draftSlot: pick.draft_slot,
+          auctionPrice: nullableNumber(pick.metadata?.amount ?? pick.metadata?.cost),
+          isKeeper: Boolean(pick.is_keeper),
+          metadata: pick.metadata ?? {},
+        };
+      }),
+      tradedPicks: tradedPicks.map((pick, index) => ({
+        providerAssetKey: `${pick.season}:${pick.round}:${pick.roster_id}:${index}`,
+        season: numberValue(pick.season),
         round: pick.round,
-        draftSlot: pick.draft_slot,
-        auctionPrice: nullableNumber(pick.metadata?.amount ?? pick.metadata?.cost),
-        isKeeper: Boolean(pick.is_keeper),
-        metadata: pick.metadata ?? {},
-      };
-    }),
-    tradedPicks: tradedPicks.map((pick, index) => ({
-      providerAssetKey: `${pick.season}:${pick.round}:${pick.roster_id}:${index}`,
-      season: numberValue(pick.season),
-      round: pick.round,
-      originalRosterId: pick.roster_id,
-      previousOwnerRosterId: pick.previous_owner_id,
-      ownerRosterId: pick.owner_id,
-    })),
-  }));
+        originalRosterId: pick.roster_id,
+        previousOwnerRosterId: pick.previous_owner_id,
+        ownerRosterId: pick.owner_id,
+      })),
+    }));
   return {
     externalLeagueId: league.league_id,
     previousExternalLeagueId: league.previous_league_id ?? null,
@@ -480,7 +485,9 @@ export function mapSleeperHistory(
 ): LeagueHistoryImportPayload {
   const current = bundle.seasons[0]?.league;
   if (!current) throw new Error("Cannot map an empty Sleeper league history.");
-  const currentDraft = bundle.seasons[0]?.drafts[0]?.draft;
+  const currentDraft = bundle.seasons[0]?.drafts.find(
+    ({ draft }) => !isIgnoredSleeperDraft(draft.draft_id),
+  )?.draft;
   const draftTypeOverride = getSleeperLeagueDraftTypeOverride(
     bundle.seasons.map((season) => season.league.league_id),
   );

@@ -180,6 +180,37 @@ describe("normalized league history analytics", () => {
     expect(payload.seasons[0]?.drafts[0]?.raw.type).toBe("snake");
   });
 
+  it("excludes the known G.O.A.T. League CPU mock draft from imported history", () => {
+    const season = sleeperSeason(2026, "1385319428408774656", null, "Auction Team");
+    season.drafts = [{
+      draft: {
+        draft_id: "1385319428417142784",
+        league_id: season.league.league_id,
+        type: "snake",
+        status: "complete",
+        settings: { rounds: 12, pick_timer: 10, cpu_autopick: 1 },
+      },
+      picks: [{
+        draft_id: "1385319428417142784",
+        player_id: "player-1",
+        roster_id: 1,
+        round: 1,
+        draft_slot: 1,
+        pick_no: 1,
+      }],
+      tradedPicks: [],
+    }];
+
+    const payload = mapSleeperHistory({
+      requestedLeagueId: season.league.league_id,
+      state: { week: 1 },
+      fetchedAt: "2026-08-18T00:00:00.000Z",
+      seasons: [season],
+    });
+
+    expect(payload.seasons[0]?.drafts).toEqual([]);
+  });
+
   it("never promotes the consolation-bracket winner to league champion", () => {
     const season = sleeperSeason(2025, "league-2025", null, "New Name");
     season.winnersBracket = [];

@@ -1,4 +1,7 @@
-import { getSleeperLeagueDraftTypeOverride } from "../../config/sleeperLeagueOverrides";
+import {
+  getSleeperLeagueDraftTypeOverride,
+  isIgnoredSleeperDraft,
+} from "../../config/sleeperLeagueOverrides";
 import type {
   LeagueAward,
   LeagueFuture,
@@ -1041,7 +1044,7 @@ export async function loadSleeperLeagueHQ(
   }
 
   const currentRosterMap = rosterMaps.get(current.league.league_id) ?? new Map<number, string>();
-  const currentDraft = current.drafts[0];
+  const currentDraft = current.drafts.find((draft) => !isIgnoredSleeperDraft(draft.draft_id));
   const slotByRoster = new Map<number, number>();
   for (const [slot, rosterId] of Object.entries(currentDraft?.slot_to_roster_id ?? {})) {
     slotByRoster.set(numberValue(rosterId), numberValue(slot));

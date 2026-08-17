@@ -7,6 +7,12 @@ const GOAT_LEAGUE_IDS = new Set([
   "1385319428408774656",
 ]);
 
+const IGNORED_SLEEPER_DRAFT_IDS = new Set([
+  // Sleeper exposes this six-minute CPU mock board as a completed 2026 draft,
+  // but its 144 picks do not match the league's current rosters.
+  "1385319428417142784",
+]);
+
 /**
  * Sleeper identifies several G.O.A.T. League draft records as snake drafts even
  * though the league has always used an auction. Keep the raw provider payload
@@ -19,4 +25,8 @@ export function getSleeperLeagueDraftTypeOverride(
     if (GOAT_LEAGUE_IDS.has(leagueId)) return "auction";
   }
   return null;
+}
+
+export function isIgnoredSleeperDraft(draftId: string): boolean {
+  return IGNORED_SLEEPER_DRAFT_IDS.has(draftId);
 }
