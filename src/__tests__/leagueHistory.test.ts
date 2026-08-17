@@ -4,6 +4,7 @@ import { calculateGoatRankings, calculateHeadToHead, calculateManagerCareer } fr
 import type { LeagueHistorySnapshot } from "../features/league-history/domain/types";
 import { mapSleeperHistory } from "../features/league-history/provider/sleeperMapper";
 import type { SleeperHistoryBundle, SleeperSeasonBundle } from "../features/league-history/provider/sleeperTypes";
+import { leagueHistoryPath, recoverLeagueHistoryPath } from "../features/league-history/ui/leagueRoutes";
 
 const snapshot: LeagueHistorySnapshot = {
   league: { id: "league", provider: "sleeper", currentExternalLeagueId: "current", name: "Test", sport: "nfl", format: "2-team", settings: {}, createdAt: "", updatedAt: "" },
@@ -60,6 +61,21 @@ function sleeperSeason(season: number, leagueId: string, previousLeagueId: strin
 }
 
 describe("normalized league history analytics", () => {
+  it("anchors every league-history section to the league root", () => {
+    expect(leagueHistoryPath("league 123", "h2h")).toBe("/league/league%20123/h2h");
+    expect(leagueHistoryPath("league 123", "/history/champions/")).toBe("/league/league%20123/history/champions");
+    expect(leagueHistoryPath("league 123")).toBe("/league/league%20123");
+  });
+
+  it.each([
+    ["/ff/league/123/leaderboards/h2h", "/league/123/h2h"],
+    ["/ff/league/123/managers/history/champions", "/league/123/history/champions"],
+    ["/ff/league/123/h2h/leaderboards", "/league/123/leaderboards"],
+    ["/ff/league/123/unknown", "/league/123"],
+  ])("recovers malformed nested league path %s", (pathname, expected) => {
+    expect(recoverLeagueHistoryPath("123", pathname)).toBe(expected);
+  });
+
   it("keeps career and rivalry history attached to permanent manager IDs", () => {
     const career = calculateManagerCareer(snapshot, "a");
     const rivalry = calculateHeadToHead(snapshot, "a", "b");

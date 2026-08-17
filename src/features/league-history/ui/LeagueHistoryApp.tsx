@@ -12,7 +12,7 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
-import { Link, NavLink, Outlet, Route, Routes, useParams } from "react-router-dom";
+import { Link, Navigate, NavLink, Outlet, Route, Routes, useLocation, useParams } from "react-router-dom";
 
 import { Button } from "../../../ui/Button";
 import { useLeagueHistory } from "../useLeagueHistory";
@@ -24,6 +24,7 @@ import { RecordsPage } from "./pages/RecordsPage";
 import { SeasonArchivePage, SeasonsPage } from "./pages/SeasonsPage";
 import { LeaderboardsPage } from "./pages/LeaderboardsPage";
 import { DraftHistoryPage, TransactionHistoryPage } from "./pages/ActivityPage";
+import { leagueHistoryPath, recoverLeagueHistoryPath } from "./leagueRoutes";
 import "./league-history.css";
 
 const HISTORY_NAV = [
@@ -83,7 +84,7 @@ function LeagueHistoryLayout() {
       </header>
       <nav className="history-nav" aria-label="League history navigation">
         {HISTORY_NAV.map(({ to, label, icon: Icon, ...item }) => (
-          <NavLink key={to || "home"} to={to} end={"end" in item ? item.end : false}>
+          <NavLink key={to || "home"} to={leagueHistoryPath(leagueId, to)} end={"end" in item ? item.end : false}>
             <Icon size={15} aria-hidden="true" /><span>{label}</span>
           </NavLink>
         ))}
@@ -91,6 +92,12 @@ function LeagueHistoryLayout() {
       <Outlet context={snapshot} />
     </div>
   );
+}
+
+function LeagueHistoryRouteFallback() {
+  const { leagueId = "" } = useParams();
+  const { pathname } = useLocation();
+  return <Navigate replace to={recoverLeagueHistoryPath(leagueId, pathname)} />;
 }
 
 export default function LeagueHistoryApp() {
@@ -113,6 +120,7 @@ export default function LeagueHistoryApp() {
         <Route path="trades" element={<TransactionHistoryPage defaultType="trade" />} />
         <Route path="waivers" element={<TransactionHistoryPage defaultType="waiver" />} />
       </Route>
+      <Route path="*" element={<LeagueHistoryRouteFallback />} />
     </Routes>
   );
 }
