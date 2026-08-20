@@ -590,7 +590,7 @@
 .auction-card-group { display: grid; gap: 5px; }
 .auction-group-label { display: flex; justify-content: space-between; color: var(--text-2); font-size: .66rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .auction-group-label small { color: var(--text-3); font-size: .6rem; letter-spacing: 0; }
-.auction-drafted-player { display: grid; grid-template-columns: auto minmax(0,1fr) auto auto; align-items: center; gap: 8px; min-height: 42px; padding: 7px 8px; border-left: 2px solid var(--tools-green); border-radius: 7px; background: rgba(255,255,255,.04); }
+.auction-drafted-player { display: grid; grid-template-columns: auto minmax(0,1fr) auto auto; align-items: center; gap: 8px; min-height: 42px; padding: 7px 8px; border: 1px solid color-mix(in srgb, var(--tools-green) 46%, rgba(255,255,255,.08)); border-radius: 7px; background: rgba(255,255,255,.04); }
 .auction-drafted-player div { min-width: 0; }
 .auction-drafted-player strong, .auction-drafted-player small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .auction-drafted-player strong { font-size: .76rem; }

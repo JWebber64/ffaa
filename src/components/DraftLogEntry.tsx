@@ -26,15 +26,15 @@ function getLogIcon(type: LogEntry["type"]) {
 function getLogColor(type: LogEntry["type"]) {
   switch (type) {
     case "bid":
-      return "border-l-[rgba(34,211,238,0.6)] bg-[rgba(34,211,238,0.05)]";
+      return "bg-[rgba(34,211,238,0.05)]";
     case "sold":
-      return "border-l-[rgba(251,191,36,0.6)] bg-[rgba(251,191,36,0.05)]";
+      return "bg-[rgba(251,191,36,0.05)]";
     case "system":
-      return "border-l-[rgba(124,58,237,0.6)] bg-[rgba(124,58,237,0.05)]";
+      return "bg-[rgba(124,58,237,0.05)]";
     case "nominate":
-      return "border-l-[rgba(74,222,128,0.6)] bg-[rgba(74,222,128,0.05)]";
+      return "bg-[rgba(74,222,128,0.05)]";
     default:
-      return "border-l-[rgba(148,163,184,0.6)] bg-[rgba(148,163,184,0.05)]";
+      return "bg-[rgba(148,163,184,0.05)]";
   }
 }
 

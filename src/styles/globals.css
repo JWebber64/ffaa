@@ -815,7 +815,7 @@ html, body, #root {
   justify-content: space-between;
   gap: 10px;
   padding: 8px 10px;
-  border: 0;
+  border: 1px solid transparent;
   border-radius: 11px;
   background: transparent;
   color: rgba(236,253,245,0.78);
@@ -825,7 +825,7 @@ html, body, #root {
   text-align: left;
   cursor: pointer;
   outline: none;
-  transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
 }
 
 .ffaa-custom-select-option-label {
@@ -852,18 +852,15 @@ html, body, #root {
 
 .ffaa-custom-select-option:hover:not(:disabled),
 .ffaa-custom-select-option:focus-visible {
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--select-position-color) 24%, transparent), rgba(255,255,255,0.055));
+  border-color: color-mix(in srgb, var(--select-position-color) 30%, transparent);
+  background: color-mix(in srgb, var(--select-position-color) 10%, rgba(255,255,255,0.045));
   color: rgba(255,255,255,0.98);
 }
 
 .ffaa-custom-select-option.is-selected {
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--select-position-color) 34%, transparent), color-mix(in srgb, var(--select-position-color) 10%, transparent));
+  border-color: color-mix(in srgb, var(--select-position-color) 58%, rgba(255,255,255,0.12));
+  background: color-mix(in srgb, var(--select-position-color) 18%, rgba(4,18,13,0.94));
   color: white;
-  box-shadow:
-    inset 3px 0 0 var(--select-position-color),
-    inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
 .ffaa-custom-select-option.is-disabled {
@@ -4191,12 +4188,8 @@ html, body, #root {
 }
 
 .draft-player-row.is-selected {
-  background:
-    linear-gradient(90deg, rgba(45,212,191,0.14), rgba(255,255,255,0.026)),
-    rgba(255,255,255,0.012);
-  box-shadow:
-    inset 3px 0 0 rgba(45,212,191,0.78),
-    inset 0 1px 0 rgba(255,255,255,0.05);
+  background: rgba(45,212,191,0.1);
+  box-shadow: inset 0 0 0 1px rgba(45,212,191,0.56);
 }
 
 .draft-player-row.is-locked .draft-player-select-button {
@@ -4475,10 +4468,8 @@ html, body, #root {
 }
 
 .draft-queue-row.is-selected {
-  background:
-    linear-gradient(90deg, rgba(45,212,191,0.18), rgba(255,255,255,0.03)),
-    rgba(45,212,191,0.035);
-  box-shadow: inset 3px 0 0 rgba(45,212,191,0.72);
+  background: rgba(45,212,191,0.1);
+  box-shadow: inset 0 0 0 1px rgba(45,212,191,0.52);
 }
 
 .draft-queue-row.is-drafted {
@@ -4641,8 +4632,6 @@ html, body, #root {
 .draft-log-entry {
   min-width: 0;
   padding: 9px 10px;
-  border-left-width: 3px;
-  border-left-style: solid;
   border-top: 1px solid rgba(255,255,255,0.055);
   background: rgba(255,255,255,0.02);
   transition: background 160ms ease;
@@ -5056,8 +5045,8 @@ html, body, #root {
   min-height: 0;
   padding: 4px 4px 4px 6px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.03);
+  border: 1px solid color-mix(in srgb, var(--team-slot-color) 62%, rgba(255,255,255,0.1));
+  background: color-mix(in srgb, var(--team-slot-color) 7%, rgba(255,255,255,0.025));
   overflow: hidden;
 }
 
@@ -5073,21 +5062,8 @@ html, body, #root {
   gap: 2px;
 }
 
-.team-slot-line::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--team-slot-color);
-}
-
 .team-slot-line.is-filled {
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--team-slot-color) 18%, rgba(255,255,255,0.02)), rgba(255,255,255,0.03)),
-    rgba(255,255,255,0.03);
-  border-color: color-mix(in srgb, var(--team-slot-color) 34%, rgba(255,255,255,0.10));
+  background: color-mix(in srgb, var(--team-slot-color) 12%, rgba(255,255,255,0.025));
 }
 
 .team-slot-line-label {
@@ -7625,12 +7601,8 @@ html, body, #root {
 
 .offline-player-result:hover,
 .offline-player-result.is-selected {
-  background:
-    linear-gradient(90deg, rgba(45,212,191,0.14), rgba(255,255,255,0.026)),
-    rgba(255,255,255,0.012);
-  box-shadow:
-    inset 3px 0 0 rgba(45,212,191,0.78),
-    inset 0 1px 0 rgba(255,255,255,0.05);
+  background: rgba(45,212,191,0.1);
+  box-shadow: inset 0 0 0 1px rgba(45,212,191,0.56);
 }
 
 .offline-player-main {

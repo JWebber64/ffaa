@@ -1102,7 +1102,6 @@ dd,
 
 .auction-drafted-player {
   border: 1px solid var(--line-0);
-  border-left-color: var(--line-0);
   background: transparent;
 }
 
@@ -1224,7 +1223,6 @@ dd,
 .league-draft-note,
 .studio-source-note {
   border: 1px solid var(--ffaa-rule);
-  border-left-color: var(--ffaa-rule);
   background: transparent;
 }
 
@@ -3175,7 +3173,7 @@ dd,
 
 .auction-drafted-player {
   grid-template-columns: auto minmax(0, 1fr) auto auto;
-  border-color: rgba(217, 235, 226, 0.12);
+  border-color: color-mix(in srgb, var(--football-broadcast) 46%, var(--line-0));
 }
 
 .offline-setup-panel > .offline-console-head {
@@ -3318,7 +3316,7 @@ dd,
   }
 }
 
-/* One clean position-colored edge around every roster slot. */
+/* One clean position-colored perimeter around every roster slot. */
 .offline-board-wrap .team-panel {
   overflow: hidden;
 }
@@ -3334,6 +3332,24 @@ dd,
   background: color-mix(in srgb, var(--team-slot-color) 12%, var(--ffaa-surface-raised));
 }
 
-.offline-board-wrap .team-slot-line::before {
-  display: none;
+/* Compound controls own their complete surface; nested inputs remain transparent. */
+.auction-budget-input {
+  overflow: hidden;
+  border-color: rgba(225, 241, 232, 0.14);
+  background: #08130d;
+}
+
+.auction-budget-input:focus-within {
+  border-color: rgba(47, 201, 148, 0.6);
+  box-shadow: 0 0 0 2px rgba(47, 201, 148, 0.15);
+}
+
+.tool-field .auction-budget-input input {
+  height: auto;
+  padding: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
 }
