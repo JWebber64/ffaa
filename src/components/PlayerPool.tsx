@@ -8,12 +8,12 @@ import {
   Text,
   Badge,
   Input,
-  useColorModeValue,
   Tooltip,
   InputGroup,
   InputLeftElement
 } from '@/ui/custom';
 import { Search } from 'lucide-react';
+import { PositionToggle } from '../ui/PositionToggle';
 import type { Position as PositionType } from '../types/draft';
 import { useDraftStore, useDraftSelectors } from '../store/draftStore';
 import { useGlobalPlayers } from '../hooks/useGlobalPlayers';
@@ -36,6 +36,11 @@ const POSITION_NAMES: Record<Pos, string> = {
 };
 
 const ALL_TABS: readonly TabValue[] = ['ALL', ...POS_ORDER, 'FLEX'] as const;
+const PLAYER_POOL_POSITION_OPTIONS = ALL_TABS.map((value) => ({
+  value,
+  label: value === 'ALL' ? 'All' : value,
+  ...(value === 'ALL' ? {} : { position: value }),
+}));
 
 // Helper function to map positions to correct color schemes
 const getPositionColorForBadge = (pos: string) => {
@@ -277,12 +282,6 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
     }
   }, [activeTab]);
 
-  const tabBg = useColorModeValue('gray.100', 'gray.700');
-  const activeTabBg = useColorModeValue('green.500', 'green.600');
-  const tabHoverBg = useColorModeValue('gray.200', 'gray.600');
-  const activeTabColor = 'white';
-  const inactiveTabColor = useColorModeValue('gray.800', 'gray.200');
-
   // Force re-render when tab changes or when forceUpdate changes
   const tabKey = `tab-${activeTab}-${forceUpdate}`;
 
@@ -326,34 +325,13 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
 
       {showPositionTabs && (
         <Box>
-          <HStack as="div" role="tablist" flexWrap="wrap" gap={1} mb={4}>
-            {ALL_TABS.map((tab) => {
-              const isActive = activeTab === tab;
-              return (
-                <Button
-                  key={tab}
-                  as="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => setActiveTab(tab)}
-                  size="sm"
-                  variant={isActive ? 'solid' : 'ghost'}
-                  colorScheme={isActive ? 'green' : 'gray'}
-                  bg={isActive ? activeTabBg : tabBg}
-                  color={isActive ? activeTabColor : inactiveTabColor}
-                  _hover={{
-                    bg: isActive ? 'green.500' : tabHoverBg,
-                  }}
-                  px={3}
-                  py={1}
-                  borderRadius="md"
-                  fontSize="sm"
-                >
-                  {tab === 'ALL' ? 'All' : tab === 'FLEX' ? 'FLEX' : tab}
-                </Button>
-              );
-            })}
-          </HStack>
+          <PositionToggle<TabValue>
+            ariaLabel="Filter player pool by position"
+            className="player-pool-position-toggle"
+            options={PLAYER_POOL_POSITION_OPTIONS}
+            value={activeTab}
+            onChange={handlePositionTabClick}
+          />
         </Box>
       )}
 

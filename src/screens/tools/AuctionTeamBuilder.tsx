@@ -8,7 +8,9 @@ import { ToolLayout } from "@/components/tools/ToolLayout";
 import type { ToolPlayer, ToolPosition, ToolScoring } from "@/data/toolPlayerData";
 import { buildTeamRaterNavigationState } from "@/screens/tools/teamRaterNavigation";
 import { useToolData } from "@/screens/tools/useToolData";
+import { PositionToggle } from "@/ui/PositionToggle";
 import { UniversalSelect } from "@/ui/UniversalSelect";
+import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 
 type SortKey = "value" | "rank" | "name" | "position" | "projection";
 type DraftPick = { playerId: string; bid: number };
@@ -17,8 +19,6 @@ type SlotKey = ToolPosition | "FLEX" | "BENCH";
 const SLOT_ORDER: SlotKey[] = ["QB", "RB", "WR", "TE", "FLEX", "K", "DEF", "BENCH"];
 const SLOT_LABELS: Record<SlotKey, string> = { QB: "QB", RB: "RB", WR: "WR", TE: "TE", FLEX: "FLEX", K: "K", DEF: "D/ST", BENCH: "BENCH" };
 const DEFAULT_SLOTS: Record<SlotKey, number> = { QB: 1, RB: 2, WR: 2, TE: 1, FLEX: 1, K: 1, DEF: 1, BENCH: 6 };
-const POSITIONS: Array<ToolPosition | "ALL"> = ["ALL", "QB", "RB", "WR", "TE", "K", "DEF"];
-
 function money(value: number) { return `$${Math.max(0, Math.round(value))}`; }
 function clamp(value: number, min: number, max: number) { return Math.max(min, Math.min(max, value)); }
 
@@ -155,7 +155,19 @@ export function AuctionTeamBuilder() {
 
         <section className="auction-board" aria-labelledby="auction-board-title">
           <div className="auction-board-head"><div><span>Public market</span><h2 id="auction-board-title">Player board</h2></div><strong>{board.length} available</strong></div>
-          <div className="auction-board-controls"><label className="tool-field"><span>Search</span><span className="tool-input-with-icon"><Search size={14} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Player or team" /></span></label><div className="auction-position-filter">{POSITIONS.map((item) => <button className={position === item ? "is-active" : ""} type="button" key={item} onClick={() => setPosition(item)}>{item === "ALL" ? "All" : item}</button>)}</div></div>
+          <div className="auction-board-controls">
+            <label className="tool-field">
+              <span>Search</span>
+              <span className="tool-input-with-icon"><Search size={14} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Player or team" /></span>
+            </label>
+            <PositionToggle<ToolPosition | "ALL">
+              ariaLabel="Filter auction player board by position"
+              className="auction-position-toggle"
+              options={DEFAULT_POSITION_TOGGLE_OPTIONS}
+              value={position}
+              onChange={setPosition}
+            />
+          </div>
           <div className="auction-selected-ticket">{selected ? <><div><span>Selected player</span><strong>{selected.name}</strong><small>{selected.position} · fair {money(selected.auctionValue ?? 0)} · market {selected.marketValue === null ? "—" : money(selected.marketValue)} · recommended {money(recommendedBid)}</small></div><label>Bid <span><b>$</b><input type="number" min="1" max={Math.max(1, maxBid)} value={bid} onChange={(event) => setBid(Number(event.target.value))} /></span></label><button type="button" className="tool-button is-primary" onClick={draftSelected} disabled={!maxBid}><Gavel size={15} /> Draft</button></> : <span>Select a player to add them to your card.</span>}</div>
           <div className="auction-table-wrap"><table className="auction-table"><thead><tr><th>Pos</th>{(["name", "rank", "projection", "value"] as SortKey[]).map((key) => <th key={key}><button type="button" onClick={() => changeSort(key)}>{key === "name" ? "Player" : key === "rank" ? "Rank" : key === "projection" ? "Proj" : "Fair"} {sortIcon(key)}</button></th>)}<th>Market</th><th aria-label="Draft action" /></tr></thead><tbody>{board.map((player) => <tr className={selectedId === player.id ? "is-selected" : ""} key={player.id} onClick={() => selectPlayer(player)}><td><span className={`tool-position-tag is-${player.position.toLowerCase()}`}>{player.position}</span></td><th><span className="auction-player-identity"><TeamMark team={player.team} size="xs" /><span>{player.name}<small>{player.team || "FA"}</small></span></span></th><td>{player.rank ?? "—"}</td><td>{player.projectedPoints?.toFixed(1) ?? "—"}</td><td><strong>{money(player.auctionValue ?? 0)}</strong></td><td>{player.marketValue === null ? "—" : money(player.marketValue)}</td><td><button type="button" className="auction-row-draft" onClick={(event) => { event.stopPropagation(); draftPlayer(player); }}>Draft</button></td></tr>)}</tbody></table></div>
         </section>

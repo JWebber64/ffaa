@@ -4093,6 +4093,11 @@ html, body, #root {
   opacity: 0.52;
 }
 
+.player-pool-position-toggle,
+.position-picker-toggle {
+  margin-bottom: 16px;
+}
+
 .draft-player-list,
 .draft-log-list {
   min-width: 0;
@@ -5960,6 +5965,23 @@ html, body, #root {
   flex: 0 0 auto;
   min-width: 44px;
   height: 30px;
+}
+
+@media (max-width: 480px) {
+  .player-pool-position-toggle {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .player-pool-position-toggle::-webkit-scrollbar {
+    display: none;
+  }
+
+  .player-pool-position-toggle .ffaa-position-button {
+    flex: 0 0 auto;
+    min-width: 44px;
+  }
 }
 
 .mobile-position-chips button.is-active {

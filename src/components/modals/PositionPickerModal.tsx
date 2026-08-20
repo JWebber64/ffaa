@@ -7,13 +7,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Radio,
-  RadioGroup,
-  Stack,
   Text,
   useToast,
 } from '@/ui/custom';
 import { useState } from 'react';
+import { PositionToggle } from '@/ui/PositionToggle';
 
 type SlotOption = {
   id: string;
@@ -76,19 +74,17 @@ export default function PositionPickerModal({
             Select a position for {player.name} on {team.name}:
           </Text>
           
-          <RadioGroup 
-            onChange={handleSlotChange} 
+          <PositionToggle
+            ariaLabel={`Position slot for ${player.name}`}
+            className="position-picker-toggle"
+            options={validSlots.map((slot) => ({
+              value: slot.id,
+              label: slot.label ?? slot.position,
+              position: slot.position,
+            }))}
             value={selectedSlotId}
-            mb={4}
-          >
-            <Stack spacing={3}>
-              {validSlots.map((slot) => (
-                <Radio key={slot.id} value={slot.id} size="lg" colorScheme="blue">
-                  <Text fontSize="lg">{slot.label ?? slot.position}</Text>
-                </Radio>
-              ))}
-            </Stack>
-          </RadioGroup>
+            onChange={handleSlotChange}
+          />
         </ModalBody>
         
         <ModalFooter>
