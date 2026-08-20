@@ -466,7 +466,7 @@
   background: linear-gradient(145deg, rgba(11,27,21,0.92), rgba(4,14,11,0.94));
 }
 
-.compare-player-card h2 { overflow: hidden; margin: 0; font-size: 1.12rem; text-overflow: ellipsis; white-space: nowrap; }
+.compare-player-card h2 { overflow: hidden; margin: 0; font-size: 1.12rem; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .compare-player-card > p { min-height: 18px; margin: 0; color: var(--text-2); font-size: 0.72rem; }
 .compare-player-primary { display: grid; gap: 2px; margin-top: 8px; }
 .compare-player-primary strong { color: var(--tools-cyan); font-size: 1.8rem; line-height: 1; }
@@ -495,7 +495,7 @@
 .compare-source-grid article > p { color: var(--text-3); font-size: 0.75rem; }
 .compare-source-grid dl { display: grid; gap: 7px; margin: 0; }
 .compare-source-grid dl > div { display: flex; justify-content: space-between; gap: 12px; }
-.compare-source-grid dt { overflow: hidden; color: var(--text-2); font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+.compare-source-grid dt { overflow: hidden; color: var(--text-2); font-size: 0.72rem; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .compare-source-grid dd { margin: 0; color: var(--tools-green); font-weight: 800; }
 
 /* Team rater */
@@ -514,7 +514,7 @@
 .team-slot-control[data-position="te"] { --slot-color: var(--pos-te); }
 .team-slot-control[data-position="k"] { --slot-color: var(--pos-k); }
 .team-slot-control[data-position="dst"] { --slot-color: var(--pos-dst); }
-.team-slot-control > span { overflow: hidden; color: color-mix(in srgb, var(--slot-color) 50%, white); font-size: 0.67rem; font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
+.team-slot-control > span { overflow: hidden; color: color-mix(in srgb, var(--slot-color) 50%, white); font-size: 0.67rem; font-weight: 850; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .team-slot-stepper { width: 100%; }
 .team-slot-stepper input { width: 100%; height: 40px; padding-left: 10px; border: 0; border-radius: 9px; color: var(--text-0); background: rgba(0,0,0,0.22); font: inherit; font-size: 0.78rem; font-weight: 850; }
 .team-player-search .ffaa-position-toggle { width: 100%; }
@@ -527,7 +527,7 @@
 .team-rater-roster li { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 10px; padding: 9px; border-radius: 9px; background: rgba(255,255,255,0.035); }
 .team-rater-roster li div { min-width: 0; }
 .team-rater-roster li strong,
-.team-rater-roster li small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.team-rater-roster li small { display: block; overflow: hidden; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .team-rater-roster li strong { font-size: 0.8rem; }
 .team-rater-roster li small { margin-top: 2px; color: var(--text-3); font-size: 0.68rem; }
 .team-rater-roster li button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 8px; color: var(--text-3); background: transparent; cursor: pointer; }
@@ -561,7 +561,7 @@
 .auction-budget-input input, .auction-selected-ticket label input { width: 100%; border: 0; outline: 0; color: var(--text-0); background: transparent; font: inherit; font-weight: 800; }
 .auction-wallet-summary { display: grid; grid-template-columns: minmax(0,1fr) auto auto; align-items: center; gap: 8px 14px; padding: 7px 10px 7px 12px; border: 1px solid rgba(34,211,238,.18); border-radius: 10px; background: rgba(34,211,238,.045); }
 .auction-wallet-copy { display: grid; gap: 2px; min-width: 0; }
-.auction-wallet-copy span, .auction-wallet-copy small { overflow: hidden; color: var(--text-3); font-size: .66rem; text-overflow: ellipsis; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
+.auction-wallet-copy span, .auction-wallet-copy small { overflow: hidden; color: var(--text-3); font-size: .66rem; line-height: 1.22; text-overflow: ellipsis; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
 .auction-wallet-summary > strong { color: var(--tools-cyan); font-size: 1.55rem; }
 .auction-wallet-summary .tool-button { min-width: 148px; white-space: nowrap; }
 .auction-builder-settings { display: grid; gap: 14px; padding: 18px; border: 1px solid rgba(255,255,255,.08); border-radius: 14px; background: rgba(7,18,14,.78); }
@@ -588,7 +588,7 @@
 .auction-group-label small { color: var(--text-3); font-size: .6rem; letter-spacing: 0; }
 .auction-drafted-player { display: grid; grid-template-columns: auto minmax(0,1fr) auto auto; align-items: center; gap: 8px; min-height: 42px; padding: 7px 8px; border: 1px solid color-mix(in srgb, var(--tools-green) 46%, rgba(255,255,255,.08)); border-radius: 7px; background: rgba(255,255,255,.04); }
 .auction-drafted-player div { min-width: 0; }
-.auction-drafted-player strong, .auction-drafted-player small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auction-drafted-player strong, .auction-drafted-player small { display: block; overflow: hidden; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .auction-drafted-player strong { font-size: .76rem; }
 .auction-drafted-player small { margin-top: 2px; color: var(--text-3); font-size: .62rem; }
 .auction-drafted-player > b { color: var(--tools-amber); font-size: .78rem; }
@@ -601,7 +601,7 @@
 .auction-position-toggle .ffaa-position-button { height: 32px; }
 .auction-selected-ticket { display: flex; align-items: center; gap: 12px; min-height: 58px; padding: 10px 12px; border: 1px solid rgba(34,211,238,.2); border-radius: 9px; background: rgba(34,211,238,.055); }
 .auction-selected-ticket > div { min-width: 0; flex: 1; }
-.auction-selected-ticket strong, .auction-selected-ticket small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.auction-selected-ticket strong, .auction-selected-ticket small { display: block; overflow: hidden; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .auction-selected-ticket strong { margin-top: 3px; font-size: .82rem; }
 .auction-selected-ticket small { margin-top: 2px; color: var(--text-3); font-size: .64rem; }
 .auction-selected-ticket > span { color: var(--text-3); font-size: .72rem; }
@@ -627,7 +627,7 @@
 .rated-lineup-list { display: grid; gap: 5px; }
 .rated-lineup-list > div { display: grid; grid-template-columns: 55px minmax(0,1fr) auto; align-items: center; gap: 8px; min-height: 38px; padding: 7px 9px; border-radius: 8px; background: rgba(255,255,255,0.03); }
 .rated-lineup-list > div > span { color: var(--tools-cyan); font-size: 0.66rem; font-weight: 850; }
-.rated-lineup-list > div > strong { overflow: hidden; font-size: 0.76rem; text-overflow: ellipsis; white-space: nowrap; }
+.rated-lineup-list > div > strong { overflow: hidden; font-size: 0.76rem; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .rated-lineup-list > div > small { color: var(--text-3); font-size: 0.66rem; }
 .rated-lineup-list > div.is-missing { border: 1px dashed rgba(251,191,36,0.2); }
 .team-recommendations { display: grid; gap: 11px; margin: 0; padding-left: 22px; }

@@ -30,7 +30,7 @@
   right: 2%;
   bottom: -35%;
   color: rgba(255, 255, 255, 0.025);
-  font: 900 clamp(110px, 19vw, 260px)/1 var(--font-display, system-ui);
+  font: 900 clamp(110px, 19vw, 260px)/1.1 var(--font-display, system-ui);
   pointer-events: none;
 }
 
@@ -53,7 +53,7 @@
 .league-hero h1 {
   max-width: 760px;
   margin: 14px 0 8px;
-  font: 800 clamp(2.3rem, 5vw, 5.1rem)/0.96 var(--font-display, system-ui);
+  font: 800 clamp(2.3rem, 5vw, 5.1rem)/1.1 var(--font-display, system-ui);
   letter-spacing: -0.055em;
 }
 
@@ -130,7 +130,7 @@
 .league-sync-bar.is-error .league-sync-icon { background: rgba(251, 113, 133, 0.11); color: #fda4af; }
 .league-sync-copy { display: grid; gap: 2px; min-width: 0; }
 .league-sync-copy > span { color: var(--league-teal); font-size: 0.62rem; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase; }
-.league-sync-copy > strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.league-sync-copy > strong { overflow: hidden; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .league-sync-copy > small { color: var(--text-2, #94a3b8); }
 .league-sync-bar > a { color: #a7f3d0; font-size: 0.75rem; font-weight: 750; text-decoration: none; }
 .league-sync-bar > a:hover { text-decoration: underline; }
@@ -244,7 +244,7 @@
 .league-connect-choices span,
 .league-connect-choices strong,
 .league-connect-choices small { display: block; min-width: 0; }
-.league-connect-choices strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.league-connect-choices strong { overflow: hidden; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .league-connect-choices small { margin-top: 3px; color: var(--text-2, #94a3b8); font-size: 0.7rem; text-transform: capitalize; }
 .league-connect-choices > button > svg:last-child { width: 17px; color: var(--league-teal); }
 .league-saved-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; padding-top: 4px; }
@@ -252,7 +252,7 @@
 .league-saved-list > div { display: grid; grid-template-columns: minmax(0, 1fr) 38px; border: 1px solid rgba(148, 163, 184, 0.13); border-radius: 11px; overflow: hidden; }
 .league-saved-list button { border: 0; background: rgba(255, 255, 255, 0.025); color: inherit; cursor: pointer; }
 .league-saved-list > div > button:first-child { display: grid; gap: 3px; min-width: 0; padding: 10px 12px; text-align: left; }
-.league-saved-list strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.league-saved-list strong { overflow: hidden; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .league-saved-list small { color: var(--text-2, #94a3b8); }
 .league-saved-remove { display: grid; place-items: center; border-left: 1px solid rgba(148, 163, 184, 0.12) !important; color: #fda4af !important; }
 .league-saved-list button:hover,
@@ -262,7 +262,7 @@
 .league-content > section { animation: league-enter 260ms ease both; }
 @keyframes league-enter { from { opacity: 0; transform: translateY(5px); } }
 .league-section-heading { margin: 0 0 22px; }
-.league-section-heading h2 { margin: 7px 0 0; font: 760 clamp(1.55rem, 3vw, 2.45rem)/1.08 var(--font-display, system-ui); letter-spacing: -0.035em; }
+.league-section-heading h2 { margin: 7px 0 0; font: 760 clamp(1.55rem, 3vw, 2.45rem)/1.1 var(--font-display, system-ui); letter-spacing: -0.035em; }
 .league-section-heading p { max-width: 700px; margin: 8px 0 0; color: var(--text-2, #94a3b8); }
 .league-rivalry-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
 .league-rivalry-heading .league-section-heading { margin-bottom: 0; }
@@ -286,7 +286,7 @@
 .league-pulse { display: grid; grid-template-columns: minmax(180px, 0.36fr) 1.64fr; gap: 16px; margin-bottom: 42px; padding: 16px; border: 1px solid rgba(45, 212, 191, 0.2); border-radius: 22px; background: rgba(7, 20, 30, 0.72); }
 .league-pulse-heading { display: flex; flex-direction: column; justify-content: center; padding: 14px; }
 .league-pulse-heading > span { color: var(--league-teal); font-size: 0.63rem; font-weight: 850; letter-spacing: 0.12em; text-transform: uppercase; }
-.league-pulse-heading h2 { margin: 6px 0 3px; font: 800 1.5rem/1 var(--font-display, system-ui); }
+.league-pulse-heading h2 { margin: 6px 0 3px; font: 800 1.5rem/1.1 var(--font-display, system-ui); }
 .league-pulse-heading p { margin: 0; color: var(--text-2, #94a3b8); font-size: 0.75rem; }
 .league-pulse-track { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
 .league-pulse-track article { min-height: 138px; padding: 16px; border: 1px solid var(--league-line); border-radius: 12px; background: rgba(255, 255, 255, 0.035); }
@@ -440,7 +440,7 @@
 .league-draft-hero { display: grid; min-height: 350px; place-items: center; align-content: center; padding: 34px; border: 1px solid rgba(52, 211, 153, 0.21); border-radius: 24px; background: radial-gradient(circle at 50% 10%, rgba(16, 185, 129, 0.14), transparent 60%), rgba(2, 6, 23, 0.45); text-align: center; }
 .league-draft-hero > svg { width: 54px; height: 54px; color: var(--league-emerald); }
 .league-draft-hero > span { margin-top: 18px; color: var(--text-2, #94a3b8); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; }
-.league-draft-hero > strong { margin-top: 2px; font: 850 clamp(2.6rem, 7vw, 5.2rem)/1 var(--font-display, system-ui); letter-spacing: -0.05em; }
+.league-draft-hero > strong { margin-top: 2px; font: 850 clamp(2.6rem, 7vw, 5.2rem)/1.1 var(--font-display, system-ui); letter-spacing: -0.05em; }
 .league-draft-hero p { color: var(--text-2, #94a3b8); }
 .league-draft-hero > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; }
 .league-link-button { display: inline-flex; min-height: 42px; align-items: center; padding: 0 18px; border: 1px solid rgba(52, 211, 153, 0.26); border-radius: 11px; background: linear-gradient(135deg, #10b981, #14b8a6); color: white; font-size: 0.82rem; font-weight: 800; text-decoration: none; }
@@ -489,7 +489,7 @@
 .commissioner-studio { display: flex; width: min(1180px, 100%); height: min(820px, calc(100vh - 40px)); flex-direction: column; overflow: hidden; border: 1px solid rgba(52, 211, 153, 0.24); border-radius: 22px; background: #07121d; box-shadow: 0 40px 120px rgba(0, 0, 0, 0.68); }
 .studio-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 21px 24px 18px; border-bottom: 1px solid var(--league-line); background: rgba(2, 8, 16, 0.68); }
 .studio-header > div > span, .studio-section-heading > span { color: var(--league-emerald); font-size: 0.63rem; font-weight: 850; letter-spacing: 0.12em; text-transform: uppercase; }
-.studio-header h2 { margin: 5px 0 3px; font: 800 1.65rem/1 var(--font-display, system-ui); letter-spacing: -0.03em; }
+.studio-header h2 { margin: 5px 0 3px; font: 800 1.65rem/1.1 var(--font-display, system-ui); letter-spacing: -0.03em; }
 .studio-header p { margin: 0; color: var(--text-2, #94a3b8); font-size: 0.78rem; }
 .studio-layout { display: grid; min-height: 0; flex: 1; grid-template-columns: 190px minmax(0, 1fr); }
 .studio-nav { display: flex; flex-direction: column; gap: 4px; padding: 14px 10px; border-right: 1px solid var(--league-line); background: rgba(2, 8, 16, 0.34); }
@@ -510,7 +510,7 @@
 .studio-form-grid small, .studio-futures-list label small { color: var(--text-2, #94a3b8); font-weight: 450; }
 .studio-order-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 14px; }
 .studio-order-list label { display: grid; grid-template-columns: minmax(0, 1fr) 58px; align-items: center; gap: 10px; padding: 8px 10px; border-bottom: 1px solid rgba(148, 163, 184, 0.09); color: var(--text-1, #cbd5e1); font-size: 0.72rem; }
-.studio-order-list label > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.studio-order-list label > span { overflow: hidden; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .studio-order-list input { text-align: center; }
 .studio-manager-list { display: grid; gap: 8px; }
 .studio-manager-list details { border: 1px solid var(--league-line); border-radius: 12px; background: rgba(15, 23, 42, 0.36); }
@@ -539,7 +539,7 @@
 .studio-json { width: 100%; min-height: 390px; }
 .studio-footer { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 13px 18px; border-top: 1px solid var(--league-line); background: rgba(2, 8, 16, 0.7); }
 .studio-footer > div { display: flex; min-width: 0; align-items: center; gap: 8px; margin-right: auto; color: #fbbf24; font-size: 0.71rem; }
-.studio-footer > div span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.studio-footer > div span { overflow: hidden; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 
 @media (max-width: 1080px) {
   .league-sync-bar { grid-template-columns: auto minmax(220px, 1fr) minmax(180px, 0.65fr) auto; }

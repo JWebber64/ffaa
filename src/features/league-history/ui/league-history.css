@@ -57,7 +57,7 @@
   margin: 5px 0 6px;
   font-family: var(--font-display, inherit);
   font-size: clamp(2rem, 4vw, 3.7rem);
-  line-height: 0.98;
+  line-height: 1.1;
   letter-spacing: -0.04em;
 }
 
@@ -143,7 +143,7 @@
 .history-scoreboard > article > span,
 .history-stat-grid > article > span { color: var(--text-1); font-size: 0.73rem; font-weight: 740; }
 .history-scoreboard > article > strong,
-.history-stat-grid > article > strong { display: block; margin-top: 9px; font-size: clamp(1.45rem, 2.5vw, 2.15rem); line-height: 1; letter-spacing: -0.04em; }
+.history-stat-grid > article > strong { display: block; margin-top: 9px; font-size: clamp(1.45rem, 2.5vw, 2.15rem); line-height: 1.22; letter-spacing: -0.04em; }
 .history-scoreboard > article > small,
 .history-stat-grid > article > small { display: block; margin-top: 7px; color: var(--text-1); font-size: 0.68rem; }
 .history-scoreboard .history-feature-card { grid-column: span 2; background: linear-gradient(130deg, color-mix(in srgb, var(--a1) 13%, var(--bg-1)), var(--bg-1)); }
@@ -168,7 +168,7 @@
 .history-leader-strip svg { color: var(--a1); }
 .history-leader-strip span,
 .history-leader-strip small { display: block; color: var(--text-1); font-size: 0.67rem; }
-.history-leader-strip strong { display: block; overflow: hidden; margin: 6px 0 3px; text-overflow: ellipsis; white-space: nowrap; }
+.history-leader-strip strong { display: block; overflow: hidden; margin: 6px 0 3px; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 
 .history-season-rail { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
 .history-season-rail > a { padding: 14px; border: 1px solid var(--line-0); border-radius: 9px; background: var(--bg-2); color: var(--text-0); text-decoration: none; }
@@ -192,7 +192,7 @@
 .history-manager-card small,
 .history-manager-card p { color: var(--text-1); font-size: 0.68rem; }
 .history-manager-card h3 { margin: 2px 0; font-size: 1.04rem; }
-.history-manager-card p { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.history-manager-card p { margin: 0; overflow: hidden; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .history-manager-card dl,
 .history-archive-card dl { display: grid; grid-column: 1 / -1; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0; padding-top: 12px; border-top: 1px solid var(--line-0); }
 .history-manager-card dl div,
@@ -338,10 +338,10 @@
 .history-record-card ol { margin: 0; padding: 0; list-style: none; }
 .history-record-card li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 9px; padding: 9px 12px; border-bottom: 1px solid var(--line-0); font-size: 0.7rem; }
 .history-record-card li:last-child { border-bottom: 0; }
-.history-record-card li a { overflow: hidden; color: var(--text-0); font-weight: 700; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+.history-record-card li a { overflow: hidden; color: var(--text-0); font-weight: 700; text-decoration: none; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .history-record-card li > strong { color: var(--a1); font-variant-numeric: tabular-nums; }
 .history-record-source { display: inline-flex; align-items: center; gap: 3px; color: var(--a2) !important; font-size: 0.6rem; }
-.history-record-card li > small { max-width: 90px; overflow: hidden; color: var(--text-1); font-size: 0.58rem; text-overflow: ellipsis; white-space: nowrap; }
+.history-record-card li > small { max-width: 90px; overflow: hidden; color: var(--text-1); font-size: 0.58rem; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 
 .history-archive-card > div:first-child { display: flex; justify-content: space-between; align-items: baseline; }
 .history-archive-card > div:first-child span { color: var(--text-1); font-size: 0.63rem; text-transform: capitalize; }
@@ -386,7 +386,7 @@
 .history-season-sections button:hover { border-color: var(--line-0); color: var(--text-0); background: var(--bg-2); }
 .history-season-sections button.is-active { border-color: color-mix(in srgb, var(--a1) 30%, var(--line-0)); color: var(--a1); background: color-mix(in srgb, var(--a1) 12%, var(--bg-2)); }
 .history-season-highlights > article { min-height: 126px; }
-.history-season-highlights > article > strong { overflow: hidden; font-size: clamp(1.15rem, 2vw, 1.65rem); text-overflow: ellipsis; white-space: nowrap; }
+.history-season-highlights > article > strong { overflow: hidden; font-size: clamp(1.15rem, 2vw, 1.65rem); line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .history-overview-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .history-overview-actions button {
   display: grid;
@@ -405,7 +405,7 @@
 }
 .history-overview-actions button:hover { border-color: color-mix(in srgb, var(--a2) 45%, var(--line-0)); background: var(--bg-2); }
 .history-overview-actions svg { grid-row: 1 / 3; color: var(--a2); }
-.history-overview-actions span { overflow: hidden; font-size: 0.75rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.history-overview-actions span { overflow: hidden; font-size: 0.75rem; font-weight: 800; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .history-overview-actions small { color: var(--text-1); font-size: 0.62rem; }
 .history-section-header { flex-wrap: wrap; }
 .history-week-list { display: grid; gap: 26px; }
@@ -423,7 +423,7 @@
 .history-matchup-grid p { display: flex; justify-content: space-between; gap: 8px; margin: 5px 0; color: var(--text-1); font-size: 0.71rem; }
 .history-matchup-grid p.is-winner { color: var(--text-0); font-weight: 780; }
 .history-matchup-grid p.is-winner strong { color: var(--a1); }
-.history-matchup-grid p span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.history-matchup-grid p span { overflow: hidden; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .history-table tr.is-champion-row td { background: color-mix(in srgb, var(--a1) 6%, transparent); }
 .history-table tr.is-champion-row td:first-child { color: var(--a1); font-weight: 850; }
 .history-season-draft-panel { overflow: hidden; }
@@ -513,7 +513,7 @@
 .history-transaction-type small,
 .history-transaction-meta small { color: var(--text-1); font-size: 0.6rem; }
 .history-transaction-body { min-width: 0; }
-.history-transaction-body > strong { display: block; overflow: hidden; font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+.history-transaction-body > strong { display: block; overflow: hidden; font-size: 0.72rem; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .history-transaction-assets { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
 .history-transaction-assets > span { padding: 4px 6px; border-radius: 5px; background: var(--bg-2); color: var(--text-1); font-size: 0.6rem; }
 .history-trade-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 8px; }
@@ -614,7 +614,7 @@
   .history-trade-flow { grid-template-columns: 1fr; }
   .history-goat-formula { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .history-rivalry-hero strong { font-size: 2.4rem; }
-  .history-rivalry-hero span { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .history-rivalry-hero span { max-width: 110px; overflow: hidden; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 }
 
 @media (prefers-reduced-motion: reduce) {
