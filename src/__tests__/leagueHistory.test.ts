@@ -4,7 +4,12 @@ import { calculateGoatRankings, calculateHeadToHead, calculateManagerCareer } fr
 import type { HistoricalTransactionAsset, LeagueHistorySnapshot } from "../features/league-history/domain/types";
 import { mapSleeperHistory } from "../features/league-history/provider/sleeperMapper";
 import type { SleeperHistoryBundle, SleeperSeasonBundle } from "../features/league-history/provider/sleeperTypes";
-import { leagueHistoryPath, recoverLeagueHistoryPath } from "../features/league-history/ui/leagueRoutes";
+import {
+  leagueHistoryPath,
+  leagueRivalryPath,
+  recoverLeagueHistoryPath,
+  resolveLeagueHistoryManagerId,
+} from "../features/league-history/ui/leagueRoutes";
 import { groupTransactionAssetsByRecipient } from "../features/league-history/ui/transactionPresentation";
 
 const snapshot: LeagueHistorySnapshot = {
@@ -74,6 +79,14 @@ describe("normalized league history analytics", () => {
     expect(leagueHistoryPath("league 123", "h2h")).toBe("/league/league%20123/h2h");
     expect(leagueHistoryPath("league 123", "/history/champions/")).toBe("/league/league%20123/history/champions");
     expect(leagueHistoryPath("league 123")).toBe("/league/league%20123");
+  });
+
+  it("opens normalized rivalry history from legacy Sleeper manager IDs", () => {
+    expect(leagueRivalryPath("league 123", "sleeper-user-user-a", "sleeper-user-user-b"))
+      .toBe("/league/league%20123/rivalries/sleeper-user-user-a/sleeper-user-user-b");
+    expect(resolveLeagueHistoryManagerId(snapshot.managers, "sleeper-user-user-a")).toBe("a");
+    expect(resolveLeagueHistoryManagerId(snapshot.managers, "user-b")).toBe("b");
+    expect(resolveLeagueHistoryManagerId(snapshot.managers, "a")).toBe("a");
   });
 
   it.each([

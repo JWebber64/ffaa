@@ -264,6 +264,9 @@
 .league-section-heading { margin: 0 0 22px; }
 .league-section-heading h2 { margin: 7px 0 0; font: 760 clamp(1.55rem, 3vw, 2.45rem)/1.08 var(--font-display, system-ui); letter-spacing: -0.035em; }
 .league-section-heading p { max-width: 700px; margin: 8px 0 0; color: var(--text-2, #94a3b8); }
+.league-rivalry-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
+.league-rivalry-heading .league-section-heading { margin-bottom: 0; }
+.league-rivalry-heading > .league-link-button { flex: 0 0 auto; gap: 7px; }
 
 .league-empty {
   display: grid;
@@ -425,6 +428,8 @@
 .league-series-meter span { display: block; height: 100%; background: var(--league-emerald); }
 .league-rivalry footer { display: flex; justify-content: space-between; gap: 14px; }
 .league-rivalry footer span { color: var(--league-teal); text-align: right; }
+.league-rivalry-detail { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 13px; padding: 10px 12px; border: 1px solid rgba(45, 212, 191, 0.18); border-radius: 9px; background: rgba(45, 212, 191, 0.055); color: var(--league-teal); font-size: 0.74rem; font-weight: 800; text-decoration: none; }
+.league-rivalry-detail:hover { border-color: rgba(45, 212, 191, 0.38); background: rgba(45, 212, 191, 0.1); color: #99f6e4; }
 .league-subsection { margin-top: 52px; }
 .league-quote-grid blockquote { position: relative; min-height: 190px; margin: 0; padding: 24px; }
 .league-quote-grid blockquote > svg { color: rgba(52, 211, 153, 0.25); }
@@ -560,6 +565,7 @@
   .league-connect-form { grid-template-columns: minmax(0, 1fr) minmax(120px, 0.32fr); }
   .league-connect-form > button { grid-column: 1 / -1; justify-self: start; }
   .league-overview-grid, .league-rule-grid { grid-template-columns: 1fr; }
+  .league-rivalry-heading { align-items: flex-start; flex-direction: column; gap: 14px; }
   .league-pulse-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; }
   .league-pulse-track article { min-width: min(78vw, 280px); scroll-snap-align: start; }
   .league-standings-panel { grid-row: auto; }

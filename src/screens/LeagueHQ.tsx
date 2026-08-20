@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import {
+  ArrowRight,
   Award,
   BookOpen,
   CalendarClock,
@@ -52,6 +53,7 @@ import {
   mergeSleeperLeagueHQ,
   type SleeperLeagueChoice,
 } from "../features/league-hq/sleeperLeague";
+import { leagueHistoryPath, leagueRivalryPath } from "../features/league-history/ui/leagueRoutes";
 import { FANTASY_SEASON } from "../config/fantasySeason";
 import "./league-hq.css";
 
@@ -679,7 +681,14 @@ export default function LeagueHQ() {
 
         {activeView === "rivalries" ? (
           <section>
-            <SectionHeading eyebrow="League lore" title="Rivalries & head-to-head history" detail="The most-played matchups, live series records, and the next chapter on the schedule." />
+            <div className="league-rivalry-heading">
+              <SectionHeading eyebrow="League lore" title="Rivalries & head-to-head history" detail="Series summaries appear below. Open the all-time matrix or any series to see every recorded score." />
+              {data.sleeper ? (
+                <Link className="league-link-button is-secondary" to={leagueHistoryPath(data.sleeper.leagueId, "h2h")}>
+                  View all H2H results <ArrowRight size={15} aria-hidden="true" />
+                </Link>
+              ) : null}
+            </div>
             {data.rivalries.length ? (
               <div className="league-rivalry-grid">
                 {data.rivalries.map((rivalry) => {
@@ -694,6 +703,15 @@ export default function LeagueHQ() {
                         <span style={{ width: `${totalGames ? (rivalry.winsA / totalGames) * 100 : 50}%` }} />
                       </div>
                       <footer><strong>{totalGames} meetings</strong><span>{rivalry.nextMeeting || "Next meeting not scheduled"}</span></footer>
+                      {data.sleeper ? (
+                        <Link
+                          className="league-rivalry-detail"
+                          to={leagueRivalryPath(data.sleeper.leagueId, rivalry.managerAId, rivalry.managerBId)}
+                          aria-label={`View every result in ${rivalry.name}`}
+                        >
+                          View every result <ArrowRight size={15} aria-hidden="true" />
+                        </Link>
+                      ) : null}
                     </article>
                   );
                 })}

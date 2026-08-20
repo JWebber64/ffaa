@@ -7,6 +7,7 @@ import { calculateHeadToHead } from "../../analytics";
 import type { HeadToHeadStats, LeagueHistorySnapshot } from "../../domain/types";
 import { useLeagueHistorySnapshot } from "../historyContext";
 import { formatNumber } from "../format";
+import { leagueRivalryPath, resolveLeagueHistoryManagerId } from "../leagueRoutes";
 
 type H2HScope = "all" | "regular" | "playoffs";
 
@@ -57,7 +58,7 @@ export function HeadToHeadMatrixPage() {
               const sorted = [rowManager.id, columnManager.id].sort();
               const stats = calculateHeadToHead(filtered, sorted[0]!, sorted[1]!);
               const perspectiveA = rowManager.id === sorted[0];
-              return <td key={columnManager.id}><Link title={`${rowManager.displayName} vs ${columnManager.displayName}: ${stats?.meetings.length ?? 0} meetings`} to={`../rivalries/${rowManager.id}/${columnManager.id}`}>{matrixRecord(stats, perspectiveA)}<small>{stats?.meetings.length ?? 0}</small></Link></td>;
+              return <td key={columnManager.id}><Link title={`${rowManager.displayName} vs ${columnManager.displayName}: ${stats?.meetings.length ?? 0} meetings`} to={leagueRivalryPath(snapshot.league.currentExternalLeagueId, rowManager.id, columnManager.id)}>{matrixRecord(stats, perspectiveA)}<small>{stats?.meetings.length ?? 0}</small></Link></td>;
             })}
           </tr>)}</tbody>
         </table></div>
@@ -89,7 +90,9 @@ function rivalryLabels(snapshot: LeagueHistorySnapshot, managerAId: string, mana
 
 export function RivalryPage() {
   const snapshot = useLeagueHistorySnapshot();
-  const { managerAId = "", managerBId = "" } = useParams();
+  const { managerAId: managerARouteId = "", managerBId: managerBRouteId = "" } = useParams();
+  const managerAId = resolveLeagueHistoryManagerId(snapshot.managers, managerARouteId);
+  const managerBId = resolveLeagueHistoryManagerId(snapshot.managers, managerBRouteId);
   const stats = calculateHeadToHead(snapshot, managerAId, managerBId);
   if (!stats) return <main className="history-content"><div className="history-empty">Rivalry not found.</div></main>;
   const labels = rivalryLabels(snapshot, managerAId, managerBId);
