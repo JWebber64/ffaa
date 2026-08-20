@@ -1448,8 +1448,8 @@ dd,
 }
 
 .team-mark-frame {
-  border-color: var(--ffaa-rule);
-  background: var(--ffaa-surface-raised);
+  border: 0;
+  background: transparent;
   background-image: none;
   box-shadow: none;
 }
@@ -3065,6 +3065,8 @@ dd,
 .team-mark-frame {
   width: var(--team-mark-size);
   min-width: var(--team-mark-size);
+  border: 0;
+  background: transparent;
   box-shadow: none;
 }
 
