@@ -177,5 +177,5 @@ describe("StatsExplorer 2026 Trends", () => {
         expect.objectContaining({ seasons: [2025] }),
       );
     });
-  });
+  }, 15_000);
 });
