@@ -1,10 +1,12 @@
-import { ArrowDownAZ, ArrowUpAZ, Gavel, Minus, Plus, RotateCcw, Search, Trash2 } from "lucide-react";
+import { ArrowDownAZ, ArrowUpAZ, Gauge, Gavel, Minus, Plus, RotateCcw, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { ToolDataStatus } from "@/components/tools/ToolDataStatus";
 import { TeamMark } from "@/components/player/TeamMark";
 import { ToolLayout } from "@/components/tools/ToolLayout";
 import type { ToolPlayer, ToolPosition, ToolScoring } from "@/data/toolPlayerData";
+import { buildTeamRaterNavigationState } from "@/screens/tools/teamRaterNavigation";
 import { useToolData } from "@/screens/tools/useToolData";
 import { UniversalSelect } from "@/ui/UniversalSelect";
 
@@ -32,6 +34,7 @@ function sortPlayers(players: ToolPlayer[], key: SortKey, direction: "asc" | "de
 }
 
 export function AuctionTeamBuilder() {
+  const navigate = useNavigate();
   const [scoring, setScoring] = useState<ToolScoring>("ppr");
   const [teamCount, setTeamCount] = useState(12);
   const [budget, setBudget] = useState(200);
@@ -105,6 +108,17 @@ export function AuctionTeamBuilder() {
     if (sortKey === next) setDirection((current) => current === "desc" ? "asc" : "desc");
     else { setSortKey(next); setDirection(next === "name" ? "asc" : "desc"); }
   }
+  function rateTeam() {
+    if (!picks.length) return;
+    navigate("/tools/team-rater", {
+      state: buildTeamRaterNavigationState({
+        rosterIds: picks.map((pick) => pick.playerId),
+        teamCount,
+        scoring,
+        slots,
+      }),
+    });
+  }
   function sortIcon(key: SortKey) { return sortKey === key ? (direction === "asc" ? <ArrowUpAZ size={13} /> : <ArrowDownAZ size={13} />) : null; }
 
   return (
@@ -113,7 +127,16 @@ export function AuctionTeamBuilder() {
         <label className="tool-field"><span>Budget</span><span className="auction-budget-input"><b>$</b><input aria-label="Auction budget" type="number" min="1" max="1000" value={budget} onChange={(event) => setBudget(clamp(Number(event.target.value) || 1, 1, 1000))} /></span></label>
         <label className="tool-field"><span>League size</span><UniversalSelect value={teamCount} onValueChange={(value) => setTeamCount(Number(value))}>{[8, 10, 12, 14, 16].map((size) => <option key={size} value={size}>{size} teams</option>)}</UniversalSelect></label>
         <label className="tool-field"><span>Scoring</span><UniversalSelect value={scoring} onValueChange={(value) => setScoring(value as ToolScoring)}><option value="ppr">PPR</option><option value="halfPpr">Half PPR</option><option value="standard">Standard</option></UniversalSelect></label>
-        <div className="auction-wallet-summary"><span>Wallet</span><strong>{money(remaining)}</strong><small>{spent ? `${money(spent)} spent` : "Ready to draft"} · {openSpots} open spots</small></div>
+        <div className="auction-wallet-summary">
+          <div className="auction-wallet-copy">
+            <span>Wallet</span>
+            <small id="auction-rate-team-status">{spent ? `${money(spent)} spent` : "Ready to draft"} · {openSpots} open spots</small>
+          </div>
+          <strong>{money(remaining)}</strong>
+          <button type="button" className="tool-button is-primary" aria-describedby="auction-rate-team-status" disabled={!picks.length} onClick={rateTeam}>
+            <Gauge size={16} aria-hidden="true" /> Rate My Team
+          </button>
+        </div>
       </div>
 
       <section className="auction-builder-settings" aria-labelledby="auction-settings-title">

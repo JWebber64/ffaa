@@ -117,4 +117,62 @@ describe("rateFantasyTeam", () => {
     expect(result.lineup.find((entry) => entry.slot === "SUPERFLEX")?.player.id).toBe("QB-1");
     expect(result.isComplete).toBe(true);
   });
+
+  it("treats a replacement-level starter as viable instead of zero-value", () => {
+    const replacementQuarterback = pool.find((candidate) => candidate.id === "QB-11")!;
+    const result = rateFantasyTeam([replacementQuarterback], pool, {
+      teamCount: 12,
+      scoring: "ppr",
+      slots: [
+        { position: "QB", count: 1 },
+        { position: "BENCH", count: 0 },
+      ],
+    });
+
+    expect(result.components.find((component) => component.id === "vor")?.score).toBe(70);
+  });
+
+  it("makes bench and bye scores tie-breakers instead of primary grade drivers", () => {
+    const result = rateFantasyTeam([
+      pool.find((candidate) => candidate.id === "QB-0")!,
+      pool.find((candidate) => candidate.id === "K-0")!,
+      pool.find((candidate) => candidate.id === "DEF-0")!,
+    ], pool, {
+      teamCount: 12,
+      scoring: "ppr",
+      slots: [
+        { position: "QB", count: 1 },
+        { position: "BENCH", count: 2 },
+      ],
+    });
+
+    expect(Object.fromEntries(result.components.map((component) => [component.id, component.weight]))).toEqual({
+      starters: 0.7,
+      vor: 0.2,
+      depth: 0.05,
+      byes: 0.02,
+      availability: 0.03,
+    });
+    expect(result.components.find((component) => component.id === "depth")?.score).toBe(0);
+  });
+
+  it("assigns the letter grade from the same rounded score shown in the UI", () => {
+    const quarterback = {
+      ...pool.find((candidate) => candidate.id === "QB-4")!,
+      injuryStatus: "Questionable",
+    };
+    const result = rateFantasyTeam([quarterback], pool, {
+      teamCount: 12,
+      scoring: "ppr",
+      slots: [
+        { position: "QB", count: 1 },
+        { position: "BENCH", count: 0 },
+      ],
+    });
+
+    expect(result.score).toBeGreaterThanOrEqual(82.5);
+    expect(result.score).toBeLessThan(83);
+    expect(Math.round(result.score)).toBe(83);
+    expect(result.letterGrade).toBe("B+");
+  });
 });

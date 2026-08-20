@@ -1,5 +1,6 @@
-import { Minus, Plus, RotateCcw, Search, Trash2, UserPlus } from "lucide-react";
+import { BadgeCheck, Minus, Plus, RotateCcw, Search, Trash2, UserPlus } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import { ToolDataStatus } from "@/components/tools/ToolDataStatus";
 import { TeamMark } from "@/components/player/TeamMark";
@@ -13,6 +14,7 @@ import {
   type TeamRaterSlot,
   type TeamRaterSlotPosition,
 } from "@/data/teamRater";
+import { readTeamRaterNavigationState } from "@/screens/tools/teamRaterNavigation";
 import { useToolData } from "@/screens/tools/useToolData";
 import { PositionToggle } from "@/ui/PositionToggle";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
@@ -102,14 +104,16 @@ function sortPlayers(players: ToolPlayer[], sort: PlayerSort) {
 }
 
 export function TeamRater() {
-  const [scoring, setScoring] = useState<ToolScoring>("ppr");
-  const [teamCount, setTeamCount] = useState(12);
-  const [slots, setSlots] = useState<TeamRaterSlot[]>(cloneDefaultSlots);
+  const { state } = useLocation();
+  const importedTeam = useMemo(() => readTeamRaterNavigationState(state), [state]);
+  const [scoring, setScoring] = useState<ToolScoring>(() => importedTeam?.scoring ?? "ppr");
+  const [teamCount, setTeamCount] = useState(() => importedTeam?.teamCount ?? 12);
+  const [slots, setSlots] = useState<TeamRaterSlot[]>(() => importedTeam?.slots.map((slot) => ({ ...slot })) ?? cloneDefaultSlots());
   const [playerQuery, setPlayerQuery] = useState("");
   const [playerPosition, setPlayerPosition] = useState<PlayerPositionFilter>("ALL");
   const [playerSort, setPlayerSort] = useState<PlayerSort>("rank");
   const [candidateId, setCandidateId] = useState("");
-  const [rosterIds, setRosterIds] = useState<string[]>([]);
+  const [rosterIds, setRosterIds] = useState<string[]>(() => importedTeam?.rosterIds ?? []);
   const { players, loading, error } = useToolData(scoring);
 
   const roster = useMemo(
@@ -159,7 +163,7 @@ export function TeamRater() {
       description="Enter your league setup, build a roster, and see exactly how its grade is calculated starter by starter."
       methodology={
         <p>
-          The grade is 50% starter projection percentile, 25% value over a league-size and lineup-adjusted replacement baseline, 15% bench depth, 5% bye resilience, and 5% current availability. Flex and superflex demand are included in replacement levels.
+          The grade is 70% starter projection percentile, 20% league-adjusted value over replacement, 5% position-aware bench depth, 2% bye resilience, and 3% current availability. Replacement-level starters remain viable, while flex and superflex demand still shape replacement levels.
         </p>
       }
     >
@@ -184,6 +188,13 @@ export function TeamRater() {
           <small>{rating.totalStarterSlots} starters · {Math.max(0, rosterLimit - rating.totalStarterSlots)} bench</small>
         </div>
       </div>
+
+      {importedTeam ? (
+        <div className="team-rater-import-notice" role="status">
+          <BadgeCheck size={18} aria-hidden="true" />
+          <span><strong>Roster imported from Build a Team</strong>{importedTeam.rosterIds.length} drafted player{importedTeam.rosterIds.length === 1 ? "" : "s"} loaded with the same league settings.</span>
+        </div>
+      ) : null}
 
       <section className="team-rater-settings" aria-labelledby="team-rater-settings-title">
         <div className="tool-subsection-head is-compact">

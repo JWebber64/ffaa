@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { buildOffensiveLineEnvironments } from "../data/offensiveLineEnvironment";
+import {
+  buildOffensiveLineProjection2026,
+  OFFENSIVE_LINE_PROJECTION_AS_OF,
+  OFFENSIVE_LINE_PROJECTION_SOURCES,
+} from "../data/offensiveLineProjection2026";
 import type { WeeklyPlayerStatRow } from "../data/weeklyPlayerStats";
 
 function row(team: string, playerId: string, stats: Record<string, number>): WeeklyPlayerStatRow {
@@ -45,5 +50,41 @@ describe("buildOffensiveLineEnvironments", () => {
   it("returns null rates instead of dividing by zero", () => {
     const [environment] = buildOffensiveLineEnvironments([row("BUF", "qb-a", {})]);
     expect(environment).toMatchObject({ sackRate: null, rushEpaPerCarry: null });
+  });
+});
+
+describe("buildOffensiveLineProjection2026", () => {
+  it("builds an all-team consensus from four source-dated public rankings", () => {
+    const projection = buildOffensiveLineProjection2026();
+
+    expect(projection).toHaveLength(32);
+    expect(OFFENSIVE_LINE_PROJECTION_SOURCES).toHaveLength(4);
+    expect(OFFENSIVE_LINE_PROJECTION_AS_OF).toBe("2026-07-31");
+    expect(projection.map((row) => row.team)).toEqual(expect.arrayContaining(["ARI", "WAS"]));
+  });
+
+  it("keeps the published source ranks and derives consensus agreement", () => {
+    const projection = buildOffensiveLineProjection2026();
+    const denver = projection[0]!;
+    const sanFrancisco = projection.find((row) => row.team === "SF")!;
+
+    expect(denver).toMatchObject({
+      team: "DEN",
+      consensusRank: 1,
+      averageRank: 1,
+      bestSourceRank: 1,
+      worstSourceRank: 1,
+      sourceAgreement: "Strong",
+      sourceAgreementScore: 100,
+    });
+    expect(Object.values(denver.sourceRanks)).toEqual([1, 1, 1, 1]);
+    expect(sanFrancisco).toMatchObject({
+      consensusRank: 11,
+      bestSourceRank: 5,
+      worstSourceRank: 25,
+      rankSpread: 20,
+      sourceAgreement: "Low",
+    });
+    expect(projection.at(-1)?.team).toBe("CLE");
   });
 });

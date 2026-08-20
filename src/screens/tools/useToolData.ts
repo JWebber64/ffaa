@@ -17,6 +17,7 @@ interface ToolDataState {
 export function useToolData(
   scoring: ToolScoring,
   valueOptions: Omit<LoadPlayerPoolOptions, "scoring"> = {},
+  enabled = true,
 ): ToolDataState {
   const { budget, rosterSize, teamCount } = valueOptions;
   const resolvedValueOptions = useMemo<Omit<LoadPlayerPoolOptions, "scoring">>(
@@ -40,8 +41,10 @@ export function useToolData(
     const controller = new AbortController();
     setPlayers(draftPlayers);
     setWeeklyData(null);
-    setLoading(true);
+    setLoading(enabled);
     setError(null);
+
+    if (!enabled) return () => controller.abort();
 
     const sleeperDirectory = loadSleeperPlayerDirectory().catch(() => []);
 
@@ -72,7 +75,7 @@ export function useToolData(
       });
 
     return () => controller.abort();
-  }, [draftPlayers, resolvedValueOptions, scoring]);
+  }, [draftPlayers, enabled, resolvedValueOptions, scoring]);
 
   return { players, weeklyData, loading, error };
 }

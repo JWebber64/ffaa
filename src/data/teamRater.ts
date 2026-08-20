@@ -63,6 +63,8 @@ export const DEFAULT_TEAM_RATER_SLOTS: TeamRaterSlot[] = [
 const FIXED_POSITIONS: ToolPosition[] = ["QB", "RB", "WR", "TE", "K", "DEF"];
 const FLEX_POSITIONS = new Set<ToolPosition>(["RB", "WR", "TE"]);
 const SUPERFLEX_POSITIONS = new Set<ToolPosition>(["QB", "RB", "WR", "TE"]);
+const BENCH_DEPTH_POSITIONS = new Set<ToolPosition>(["QB", "RB", "WR", "TE"]);
+const REPLACEMENT_LEVEL_SCORE = 70;
 const FLEX_DEMAND: Readonly<Record<ToolPosition, number>> = {
   QB: 0,
   RB: 0.4,
@@ -140,15 +142,16 @@ function injuryScore(player: ToolPlayer) {
 }
 
 function letterGrade(score: number) {
-  if (score >= 93) return "A";
-  if (score >= 88) return "A-";
-  if (score >= 83) return "B+";
-  if (score >= 78) return "B";
-  if (score >= 73) return "B-";
-  if (score >= 68) return "C+";
-  if (score >= 62) return "C";
-  if (score >= 55) return "C-";
-  if (score >= 48) return "D";
+  const displayedScore = Math.round(score);
+  if (displayedScore >= 93) return "A";
+  if (displayedScore >= 88) return "A-";
+  if (displayedScore >= 83) return "B+";
+  if (displayedScore >= 78) return "B";
+  if (displayedScore >= 73) return "B-";
+  if (displayedScore >= 68) return "C+";
+  if (displayedScore >= 62) return "C";
+  if (displayedScore >= 55) return "C-";
+  if (displayedScore >= 48) return "D";
   return "F";
 }
 
@@ -248,21 +251,50 @@ export function rateFantasyTeam(
   const vorScores = lineup.flatMap((entry): number[] => {
     if (entry.valueOverReplacement === null || entry.player.projectedPoints === null) return [];
     const baseline = entry.player.projectedPoints - entry.valueOverReplacement;
+    if (entry.valueOverReplacement < 0) {
+      return [clampScore(
+        baseline > 0
+          ? REPLACEMENT_LEVEL_SCORE * (entry.player.projectedPoints / baseline)
+          : 0,
+      )];
+    }
     const ceiling = Math.max(
       ...pool
         .filter((player) => player.position === entry.player.position)
         .map((player) => projected(player) - baseline),
       1,
     );
-    return [clampScore((entry.valueOverReplacement / ceiling) * 100)];
+    return [clampScore(
+      REPLACEMENT_LEVEL_SCORE
+        + (entry.valueOverReplacement / ceiling) * (100 - REPLACEMENT_LEVEL_SCORE),
+    )];
   });
   const vorScore = average(vorScores);
 
   const expectedBench = slotCount(settings, "BENCH");
-  const depthPlayers = sortByProjection(bench).slice(0, Math.max(1, expectedBench));
+  const lineupDepthDemand = new Map<ToolPosition, number>();
+  for (const { player } of lineup) {
+    if (!BENCH_DEPTH_POSITIONS.has(player.position)) continue;
+    lineupDepthDemand.set(player.position, (lineupDepthDemand.get(player.position) ?? 0) + 1);
+  }
+  const eligibleBench = bench.filter((player) => lineupDepthDemand.has(player.position));
+  const depthPlayers = [...eligibleBench]
+    .sort((left, right) =>
+      projectionPercentile(right, pool) - projectionPercentile(left, pool)
+      || projected(right) - projected(left)
+    )
+    .slice(0, expectedBench);
   const depthQuality = average(depthPlayers.map((player) => projectionPercentile(player, pool)));
-  const depthFill = expectedBench > 0 ? Math.min(1, bench.length / expectedBench) : 1;
-  const depthScore = depthQuality * depthFill;
+  const totalDepthDemand = [...lineupDepthDemand.values()].reduce((total, count) => total + count, 0);
+  const coveredDepthDemand = [...lineupDepthDemand.entries()].reduce(
+    (total, [position, count]) => total + (eligibleBench.some((player) => player.position === position) ? count : 0),
+    0,
+  );
+  const depthCoverage = totalDepthDemand > 0 ? (coveredDepthDemand / totalDepthDemand) * 100 : 100;
+  const depthFill = expectedBench > 0 ? Math.min(1, eligibleBench.length / expectedBench) : 1;
+  const depthScore = expectedBench > 0
+    ? (depthQuality * 0.8 + depthCoverage * 0.2) * depthFill
+    : 100;
 
   const byeCounts = new Map<number, number>();
   for (const { player } of lineup) {
@@ -283,35 +315,35 @@ export function rateFantasyTeam(
       id: "starters",
       label: "Starter strength",
       score: clampScore(starterScore),
-      weight: 0.5,
+      weight: 0.7,
       detail: "Projection percentile among players at the same position.",
     },
     {
       id: "vor",
       label: "Value over replacement",
       score: clampScore(vorScore),
-      weight: 0.25,
-      detail: "Projected points above a league-size and roster-adjusted replacement baseline.",
+      weight: 0.2,
+      detail: "League-adjusted value, calibrated so a replacement-level starter remains viable.",
     },
     {
       id: "depth",
       label: "Bench depth",
       score: clampScore(depthScore),
-      weight: 0.15,
-      detail: "Quality and fill rate of projected bench players.",
+      weight: 0.05,
+      detail: "Offensive backup quality, lineup coverage, and fill rate.",
     },
     {
       id: "byes",
       label: "Bye resilience",
       score: byeScore,
-      weight: 0.05,
+      weight: 0.02,
       detail: "Penalizes concentrated starter bye weeks.",
     },
     {
       id: "availability",
       label: "Availability",
       score: clampScore(availabilityScore),
-      weight: 0.05,
+      weight: 0.03,
       detail: "Current Sleeper status and injury designation.",
     },
   ];
