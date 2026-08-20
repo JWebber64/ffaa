@@ -39,9 +39,21 @@ describe("player value consensus", () => {
     expect(player?.auctionValue).toBeGreaterThan(1);
     expect(player?.projectedValue).toBe(player?.auctionValue);
     expect(player?.valueConfidence).toBeGreaterThan(0);
-    expect(player?.valueConfidence).toBeLessThanOrEqual(0.55);
+    expect(player?.valueConfidence).toBeGreaterThan(0.55);
+    expect(player?.valueConfidence).toBeLessThanOrEqual(0.98);
     expect(player?.marketValue).toBeGreaterThan(1);
-    expect(player?.marketValueSourceCount).toBe(1);
+    expect(player?.marketValueSourceCount).toBeGreaterThanOrEqual(7);
+    expect(
+      player?.valueSources?.find((source) => source.sourceId === "sleeper-suggested")
+        ?.normalizedValue,
+    ).toBe(65);
+    expect(
+      player?.valueSources?.find((source) => source.sourceId === "sleeper-suggested")?.weight,
+    ).toBe(VALUE_SOURCE_WEIGHTS.sleeperSuggested);
+    expect(
+      player?.valueSources?.find((source) => source.sourceId === "sportsbrackets")
+        ?.includedInConsensus,
+    ).toBe(false);
     expect(player?.valueSources?.some((source) => source.source.includes("ESPN"))).toBe(true);
     expect(player?.valueSources?.some((source) => source.source.includes("WinWithOdds"))).toBe(true);
     expect(
@@ -122,7 +134,7 @@ describe("player value consensus", () => {
     expect(valued.reduce((sum, player) => sum + (player.auctionValue ?? 0), 0)).toBe(1200);
   });
 
-  it("does not present PPR dollar boards as a standard-scoring market price", () => {
+  it("uses standard-compatible boards without blending PPR-only values", () => {
     const [player] = applyConsensusAuctionValues([
       makePlayer({
         id: "2026-WR-jamarr-chase-standard",
@@ -133,8 +145,21 @@ describe("player value consensus", () => {
       }),
     ], 200, { scoring: "standard", calibrate: false });
 
-    expect(player?.marketValue).toBeUndefined();
-    expect(player?.marketValueSourceCount).toBe(0);
-    expect(player?.valueConfidence).toBeLessThanOrEqual(0.28);
+    expect(player?.marketValue).toBeGreaterThan(1);
+    expect(player?.marketValueSourceCount).toBe(2);
+    expect(
+      player?.valueSources?.find(
+        (source) => source.sourceId === "fftoday" && source.includedInConsensus !== false,
+      )
+        ?.includedInConsensus,
+    ).toBe(true);
+    expect(
+      player?.valueSources?.find((source) => source.sourceId === "sports-illustrated")
+        ?.includedInConsensus,
+    ).toBe(false);
+    expect(
+      player?.valueSources?.find((source) => source.sourceId === "sleeper-suggested")
+        ?.includedInConsensus,
+    ).toBe(false);
   });
 });

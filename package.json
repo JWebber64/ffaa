@@ -16,6 +16,7 @@
     "espn:pull": "tsx scripts/fetch-espn-cheatsheet.ts",
     "vegas:pull": "tsx scripts/fetch-winwithodds-projections.ts",
     "values:import": "tsx scripts/import-player-values.ts",
+    "values:public:pull": "tsx scripts/fetch-public-auction-values.ts",
     "values:pulse": "tsx scripts/check-value-sources.ts",
     "public-data:pull": "tsx scripts/fetch-public-fantasy-data.ts --season=2026",
     "analytics-data:pull": "tsx scripts/pull-analytics-data.ts",

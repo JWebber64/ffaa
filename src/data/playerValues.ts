@@ -6,9 +6,11 @@ import {
 } from "@/config/valueSourceWeights";
 import { FANTASY_SEASON_VALUE_UPDATED_AT } from "@/config/fantasySeason";
 import espnRows from "./players-2026-espn.json";
+import sleeperSuggestedRows from "./players-2026-sleeper-values.json";
+import publicAuctionRows from "./players-2026-public-auction-values.json";
+import { PUBLIC_AUCTION_VALUE_SOURCES } from "./publicAuctionValueSources";
 import winWithOddsRows from "./players-2026-winwithodds.json";
 import fantasyProsValueRows from "./players-2026-fantasypros-values.json";
-import draftSharksRows from "./players-2026-draftsharks.json";
 import rotoWireRows from "./players-2026-rotowire.json";
 import yahooRows from "./players-2026-yahoo-values.json";
 import sharpRows from "./players-2026-sharp.json";
@@ -16,7 +18,6 @@ import fourForFourRows from "./players-2026-4for4.json";
 import fantasyFootballCalculatorRows from "./players-2026-fantasyfootballcalculator.json";
 import rotoBallerRows from "./players-2026-rotoballer.json";
 import footballersRows from "./players-2026-footballers.json";
-import fantasyNerdsRows from "./players-2026-fantasynerds.json";
 import ffToolboxRows from "./players-2026-fftoolbox.json";
 import beatAdpRows from "./players-2026-beatadp.json";
 import leagueLogsRows from "./players-2026-leaguelogs.json";
@@ -37,12 +38,19 @@ export type AuctionValueOptions = {
 
 export const AUCTION_VALUE_SOURCE_COLUMNS = [
   { id: "sleeper-paid", label: "Sleeper Paid", shortLabel: "SL Paid" },
+  { id: "sleeper-suggested", label: "Sleeper Suggested", shortLabel: "Sleeper" },
   { id: "espn", label: "ESPN", shortLabel: "ESPN" },
+  { id: "fftoday", label: "FFToday", shortLabel: "FFToday" },
+  { id: "sports-illustrated", label: "Sports Illustrated", shortLabel: "SI" },
+  { id: "rtsports-aav", label: "RT Sports AAV", shortLabel: "RT AAV" },
+  { id: "yafsb-aav", label: "YAFSB Half-PPR AAV", shortLabel: "YAFSB .5" },
   { id: "fantasypros", label: "FantasyPros", shortLabel: "FPros" },
   { id: "yahoo", label: "Yahoo", shortLabel: "Yahoo" },
   { id: "rotowire", label: "RotoWire", shortLabel: "RWire" },
   { id: "draftsharks", label: "DraftSharks", shortLabel: "DSharks" },
+  { id: "footballguys", label: "Footballguys", shortLabel: "FBGuys" },
   { id: "fantasynerds", label: "FantasyNerds", shortLabel: "FNerds" },
+  { id: "sportsbrackets", label: "SportsBrackets", shortLabel: "SBrkt" },
   { id: "fftoolbox", label: "FFToolbox", shortLabel: "FFTool" },
   { id: "leaguelogs-ppr-rank", label: "LL PPR Market $", shortLabel: "LL PPR" },
   { id: "leaguelogs-half-ppr-rank", label: "LL Half Market $", shortLabel: "LL Half" },
@@ -157,6 +165,16 @@ const DEFENSE_NAME_ALIASES: Record<string, string> = {
 
 const SOURCE_DEFINITIONS: SourceDefinition[] = [
   {
+    sourceId: "sleeper-suggested",
+    source: "Sleeper suggested auction values",
+    rows: sleeperSuggestedRows,
+    kind: "auction",
+    weight: VALUE_SOURCE_WEIGHTS.sleeperSuggested,
+    sourceBudget: 200,
+    consensusScoring: "ppr",
+    valueFields: ["auctionValue", "value"],
+  },
+  {
     sourceId: "espn",
     source: "ESPN salary-cap values",
     sourceUrl: "https://g.espncdn.com/s/ffldraftkit/26/NFL26_CS_PPR300.pdf?adddata=2026CS_PPR300",
@@ -167,6 +185,29 @@ const SOURCE_DEFINITIONS: SourceDefinition[] = [
     consensusScoring: "ppr",
     valueFields: ["value", "auctionValue", "projectedValue"],
   },
+  ...PUBLIC_AUCTION_VALUE_SOURCES
+    .filter((source) => [
+      "fftoday",
+      "sports-illustrated",
+      "rtsports-aav",
+      "yafsb-aav",
+      "draftsharks",
+      "footballguys",
+      "fantasynerds",
+      "sportsbrackets",
+    ].includes(source.id))
+    .map((source): SourceDefinition => ({
+      sourceId: source.id,
+      source: source.label,
+      sourceUrl: source.url,
+      rows: publicAuctionRows.filter((row) => row.sourceId === source.id),
+      kind: "auction",
+      weight: source.weight,
+      sourceBudget: source.budget ?? 200,
+      valueFields: ["auctionValue", "value"],
+      ...(source.scoring ? { consensusScoring: source.scoring } : {}),
+      displayOnly: !source.includedInConsensus,
+    })),
   {
     sourceId: "leaguelogs-ppr",
     source: "LeagueLogs PPR Market Index",
@@ -206,17 +247,6 @@ const SOURCE_DEFINITIONS: SourceDefinition[] = [
     valueFields: ["auctionValue", "value", "salaryCapValue", "avgSalary", "averageSalary"],
     projectionFields: ["projectedPoints", "projection", "points", "fantasyPoints"],
     adpFields: ["adp", "averagePick"],
-    consensusScoring: "ppr",
-  },
-  {
-    sourceId: "draftsharks",
-    source: "Draft Sharks values",
-    sourceUrl: "https://www.draftsharks.com/auction-values",
-    rows: draftSharksRows,
-    kind: "mixed",
-    weight: VALUE_SOURCE_WEIGHTS.draftSharksImport,
-    valueFields: ["auctionValue", "value", "salaryCapValue"],
-    projectionFields: ["projectedPoints", "projection", "points", "fantasyPoints"],
     consensusScoring: "ppr",
   },
   {
@@ -277,17 +307,6 @@ const SOURCE_DEFINITIONS: SourceDefinition[] = [
     kind: "mixed",
     weight: VALUE_SOURCE_WEIGHTS.footballersRankings,
     rankFields: ["rank"],
-  },
-  {
-    sourceId: "fantasynerds",
-    source: "FantasyNerds public auction values",
-    sourceUrl: "https://www.fantasynerds.com/nfl/auction",
-    rows: fantasyNerdsRows,
-    kind: "auction",
-    weight: VALUE_SOURCE_WEIGHTS.fantasyNerdsPublicAuction,
-    sourceBudget: 200,
-    consensusScoring: "ppr",
-    valueFields: ["auctionValue", "value", "avgSalary", "averageSalary"],
   },
   {
     sourceId: "fftoolbox",

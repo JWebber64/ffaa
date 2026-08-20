@@ -33,6 +33,7 @@ import { StatsViewTabs } from "@/components/stats/StatsViewTabs";
 import type { StatsView } from "@/components/stats/statsViewOptions";
 import "@/components/stats/auctionValues.css";
 import { loadPlayerPool } from "@/data/loadPlayerPool";
+import { FANTASY_SEASON } from "@/config/fantasySeason";
 import { buildPlayerStatRows } from "@/data/playerStatCategories";
 import type { PlayerStatRow } from "@/data/playerStatCategories";
 import type { SleeperPlayerRow } from "@/data/playerStatCategories";
@@ -195,8 +196,14 @@ interface SummaryCard {
   helper: string;
 }
 
-const ACTUAL_SEASONS = [2025, 2024, 2023, 2022] as const;
-const DRAFT_SEASON = 2026;
+const DRAFT_SEASON = FANTASY_SEASON;
+const TREND_BASELINE_SEASON = DRAFT_SEASON - 1;
+const ACTUAL_SEASONS = [
+  TREND_BASELINE_SEASON,
+  TREND_BASELINE_SEASON - 1,
+  TREND_BASELINE_SEASON - 2,
+  TREND_BASELINE_SEASON - 3,
+] as const;
 const WEEK_OPTIONS = Array.from({ length: 22 }, (_, index) => index + 1);
 const TEAM_COUNT_OPTIONS = [8, 10, 12, 14] as const;
 const ROW_LIMIT_OPTIONS = [25, 50, 100, 250, 1000] as const;
@@ -227,7 +234,7 @@ const VIEW_COPY: Record<StatsView, { title: string; description: string }> = {
   },
   trends: {
     title: "Trends",
-    description: "Recent scoring changes, volatility, and public Sleeper add/drop activity.",
+    description: "Live 2026 Sleeper add/drop activity across the current player pool, with clearly labeled 2025 form context.",
   },
   matchups: {
     title: "Defense vs position",
@@ -244,7 +251,7 @@ const DEFAULT_SORTS: Record<StatsView, StatsSortState> = {
   draft: { columnId: "adp", direction: "asc" },
   auction: { columnId: "auctionValue", direction: "desc" },
   opportunity: { columnId: "opportunitiesPerGame", direction: "desc" },
-  trends: { columnId: "recentChange", direction: "desc" },
+  trends: { columnId: "netTrending", direction: "desc" },
   matchups: { columnId: "overall", direction: "asc" },
   teams: { columnId: "fantasyPointsPerGame", direction: "desc" },
 };
@@ -307,11 +314,14 @@ function auctionMetrics(
 ) {
   const sourceValues: Record<string, number | null> = {};
   for (const sourceColumn of AUCTION_VALUE_SOURCE_COLUMNS) {
+    const sourceValue =
+      valueSources.find(
+        (source) =>
+          source.sourceId === sourceColumn.id && source.includedInConsensus !== false,
+      ) ?? valueSources.find((source) => source.sourceId === sourceColumn.id);
     sourceValues[sourceColumn.id] = sourceColumn.id === "sleeper-paid"
       ? sleeperPaid
-      : numberValue(
-          valueSources.find((source) => source.sourceId === sourceColumn.id)?.normalizedValue,
-        );
+      : numberValue(sourceValue?.normalizedValue);
   }
 
   const comparableSourceIds = new Set(
@@ -698,49 +708,6 @@ function playerColumns(view: StatsView): StatsTableColumn<HubPlayerRow>[] {
     return [
       playerColumn,
       {
-        id: "fantasyPointsPerGame",
-        label: "FPG",
-        sortValue: (row) => row.fantasyPointsPerGame,
-        render: (row) => formatNumber(row.fantasyPointsPerGame),
-      },
-      {
-        id: "last3FantasyPointsPerGame",
-        label: "Last 3",
-        sortValue: (row) => row.last3FantasyPointsPerGame,
-        render: (row) => formatNumber(row.last3FantasyPointsPerGame),
-      },
-      {
-        id: "recentChange",
-        label: "Form Δ",
-        sortValue: (row) => row.last3FantasyPointsPerGame - row.fantasyPointsPerGame,
-        render: (row) => {
-          const delta = row.last3FantasyPointsPerGame - row.fantasyPointsPerGame;
-          return (
-            <span className={`stats-hub-delta ${deltaClass(delta)}`}>
-              {delta > 0 ? "+" : ""}{delta.toFixed(1)}
-            </span>
-          );
-        },
-      },
-      {
-        id: "standardDeviation",
-        label: "Volatility",
-        sortValue: (row) => row.standardDeviation,
-        render: (row) => formatNumber(row.standardDeviation),
-      },
-      {
-        id: "floorFantasyPoints",
-        label: "Floor",
-        sortValue: (row) => row.floorFantasyPoints,
-        render: (row) => formatNumber(row.floorFantasyPoints),
-      },
-      {
-        id: "ceilingFantasyPoints",
-        label: "Ceiling",
-        sortValue: (row) => row.ceilingFantasyPoints,
-        render: (row) => formatNumber(row.ceilingFantasyPoints),
-      },
-      {
         id: "trendingAdds",
         label: "Adds 24h",
         sortValue: (row) => row.trendingAdds,
@@ -750,18 +717,66 @@ function playerColumns(view: StatsView): StatsTableColumn<HubPlayerRow>[] {
         id: "trendingDrops",
         label: "Drops 24h",
         sortValue: (row) => row.trendingDrops,
-        render: (row) => row.trendingDrops ? `−${row.trendingDrops.toLocaleString()}` : "—",
+        render: (row) => row.trendingDrops ? `-${row.trendingDrops.toLocaleString()}` : "—",
+      },
+      {
+        id: "netTrending",
+        label: "Net 24h",
+        sortValue: (row) => row.trendingAdds - row.trendingDrops,
+        render: (row) => {
+          const delta = row.trendingAdds - row.trendingDrops;
+          if (delta === 0) return "—";
+          return (
+            <span className={`stats-hub-delta ${deltaClass(delta)}`}>
+              {delta > 0 ? "+" : ""}{delta.toLocaleString()}
+            </span>
+          );
+        },
+      },
+      {
+        id: "projectedFantasyPointsPerGame",
+        label: `${DRAFT_SEASON} Proj/G`,
+        sortValue: (row) => row.projectedFantasyPointsPerGame,
+        render: (row) => formatNumber(row.projectedFantasyPointsPerGame),
+      },
+      {
+        id: "fantasyPointsPerGame",
+        label: `${TREND_BASELINE_SEASON} FPG`,
+        sortValue: (row) => row.games > 0 ? row.fantasyPointsPerGame : null,
+        render: (row) => row.games > 0 ? formatNumber(row.fantasyPointsPerGame) : "—",
+      },
+      {
+        id: "last3FantasyPointsPerGame",
+        label: `${TREND_BASELINE_SEASON} Last 3`,
+        sortValue: (row) => row.games > 0 ? row.last3FantasyPointsPerGame : null,
+        render: (row) => row.games > 0 ? formatNumber(row.last3FantasyPointsPerGame) : "—",
+      },
+      {
+        id: "recentChange",
+        label: `${TREND_BASELINE_SEASON} Form Δ`,
+        sortValue: (row) => row.games > 0
+          ? row.last3FantasyPointsPerGame - row.fantasyPointsPerGame
+          : null,
+        render: (row) => {
+          if (row.games === 0) return "—";
+          const delta = row.last3FantasyPointsPerGame - row.fantasyPointsPerGame;
+          return (
+            <span className={`stats-hub-delta ${deltaClass(delta)}`}>
+              {delta > 0 ? "+" : ""}{delta.toFixed(1)}
+            </span>
+          );
+        },
       },
       {
         id: "weeklyTrend",
-        label: "Recent",
-        sortValue: (row) => row.last3FantasyPointsPerGame,
-        render: (row) => (
+        label: `${TREND_BASELINE_SEASON} Recent`,
+        sortValue: (row) => row.games > 0 ? row.last3FantasyPointsPerGame : null,
+        render: (row) => row.games > 0 ? (
           <StatsSparkline
             values={row.weeklyPoints.slice(-8)}
-            label={`${row.name} fantasy points over the last ${Math.min(row.weeklyPoints.length, 8)} games`}
+            label={`${row.name} ${TREND_BASELINE_SEASON} fantasy points over the last ${Math.min(row.weeklyPoints.length, 8)} games`}
           />
-        ),
+        ) : "—",
       },
     ];
   }
@@ -1274,7 +1289,13 @@ export default function StatsExplorer() {
   const view = parseView(searchParams.get("view"));
   const scoring = parseScoring(searchParams.get("scoring"));
   const seasonType = parseSeasonType(searchParams.get("games"));
-  const season = boundedNumber(searchParams.get("season"), 2025, 2022, 2025);
+  const season = boundedNumber(
+    searchParams.get("season"),
+    ACTUAL_SEASONS[0],
+    ACTUAL_SEASONS[ACTUAL_SEASONS.length - 1]!,
+    ACTUAL_SEASONS[0],
+  );
+  const weeklySeason = view === "trends" ? TREND_BASELINE_SEASON : season;
   const weekStart = boundedNumber(searchParams.get("from"), 1, 1, 22);
   const weekEnd = boundedNumber(searchParams.get("to"), 18, 1, 22);
   const teamCount = listedNumber(searchParams.get("teams"), 12, TEAM_COUNT_OPTIONS);
@@ -1294,6 +1315,7 @@ export default function StatsExplorer() {
   const [adpLoading, setAdpLoading] = useState(true);
   const [adpError, setAdpError] = useState<string | null>(null);
   const [sleeperSignals, setSleeperSignals] = useState<SleeperTrendingSignal[]>([]);
+  const [sleeperLoading, setSleeperLoading] = useState(true);
   const [sleeperError, setSleeperError] = useState<string | null>(null);
   const [sleeperDraftId, setSleeperDraftId] = useState("");
   const [sleeperAuction, setSleeperAuction] = useState<SleeperAuctionDraftResult | null>(null);
@@ -1370,7 +1392,7 @@ export default function StatsExplorer() {
     setWeeklyError(null);
     setWeeklyData(null);
     loadWeeklyPlayerStats({
-      seasons: [season],
+      seasons: [weeklySeason],
       seasonType,
       scoring,
       weekStart,
@@ -1379,8 +1401,8 @@ export default function StatsExplorer() {
     })
       .then((result) => {
         setWeeklyData(result);
-        if (result.unavailableSeasons.includes(season)) {
-          setWeeklyError(`Weekly stats for ${season} are temporarily unavailable.`);
+        if (result.unavailableSeasons.includes(weeklySeason)) {
+          setWeeklyError(`Weekly stats for ${weeklySeason} are temporarily unavailable.`);
         }
       })
       .catch((error: unknown) => {
@@ -1392,7 +1414,7 @@ export default function StatsExplorer() {
         if (!controller.signal.aborted) setWeeklyLoading(false);
       });
     return () => controller.abort();
-  }, [scoring, season, seasonType, weekEnd, weekStart]);
+  }, [scoring, seasonType, weekEnd, weekStart, weeklySeason]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1420,6 +1442,7 @@ export default function StatsExplorer() {
 
   useEffect(() => {
     const controller = new AbortController();
+    setSleeperLoading(true);
     setSleeperError(null);
     Promise.all([
       loadSleeperTrending({ type: "add", lookbackHours: 24, limit: 100, signal: controller.signal }),
@@ -1430,6 +1453,9 @@ export default function StatsExplorer() {
         if (controller.signal.aborted) return;
         setSleeperSignals([]);
         setSleeperError(error instanceof Error ? error.message : String(error));
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setSleeperLoading(false);
       });
     return () => controller.abort();
   }, []);
@@ -1688,7 +1714,9 @@ export default function StatsExplorer() {
     ? draftPlayerRows
     : view === "auction"
       ? auctionPlayerRows
-      : actualPlayerRows;
+      : view === "trends"
+        ? draftPlayerRows
+        : actualPlayerRows;
   const teams = useMemo(
     () => ["ALL", ...new Set(playerRows.map((row) => row.team).filter(Boolean))].sort(),
     [playerRows],
@@ -1778,6 +1806,42 @@ export default function StatsExplorer() {
         },
       ];
     }
+    if (view === "trends") {
+      const mostAdded = [...filteredPlayerRows].sort(
+        (left, right) => right.trendingAdds - left.trendingAdds,
+      )[0];
+      const mostDropped = [...filteredPlayerRows].sort(
+        (left, right) => right.trendingDrops - left.trendingDrops,
+      )[0];
+      const netRiser = [...filteredPlayerRows].sort(
+        (left, right) =>
+          (right.trendingAdds - right.trendingDrops) -
+          (left.trendingAdds - left.trendingDrops),
+      )[0];
+      const netRiserValue = netRiser ? netRiser.trendingAdds - netRiser.trendingDrops : 0;
+      return [
+        {
+          label: `${DRAFT_SEASON} players`,
+          value: filteredPlayerRows.length.toLocaleString(),
+          helper: "Current projection and roster pool",
+        },
+        {
+          label: "Most added",
+          value: mostAdded?.trendingAdds ? mostAdded.name : "—",
+          helper: mostAdded?.trendingAdds ? `+${mostAdded.trendingAdds.toLocaleString()} in 24h` : "No live adds",
+        },
+        {
+          label: "Most dropped",
+          value: mostDropped?.trendingDrops ? mostDropped.name : "—",
+          helper: mostDropped?.trendingDrops ? `-${mostDropped.trendingDrops.toLocaleString()} in 24h` : "No live drops",
+        },
+        {
+          label: "Top net riser",
+          value: netRiserValue > 0 ? netRiser?.name ?? "—" : "—",
+          helper: netRiserValue > 0 ? `+${netRiserValue.toLocaleString()} net in 24h` : "No positive net movement",
+        },
+      ];
+    }
     if (view === "draft") {
       const topProjection = [...filteredPlayerRows].sort(
         (left, right) => (right.projectedFantasyPoints ?? 0) - (left.projectedFantasyPoints ?? 0),
@@ -1834,8 +1898,8 @@ export default function StatsExplorer() {
   const selectedPlayer = useMemo(() => {
     if (!selectedPlayerId) return null;
     const row = playerRows.find((candidate) => candidate.id === selectedPlayerId);
-    return row ? playerDetail(row, scoring, season, teamCount) : null;
-  }, [playerRows, scoring, season, selectedPlayerId, teamCount]);
+    return row ? playerDetail(row, scoring, weeklySeason, teamCount) : null;
+  }, [playerRows, scoring, selectedPlayerId, teamCount, weeklySeason]);
   const closePlayer = useCallback(() => setSelectedPlayerId(null), [setSelectedPlayerId]);
 
   const viewResultCount =
@@ -1844,7 +1908,13 @@ export default function StatsExplorer() {
       : view === "teams"
         ? filteredTeamRows.length
         : filteredPlayerRows.length;
-  const viewIsLoading = view === "draft" ? adpLoading : view === "auction" ? false : weeklyLoading;
+  const viewIsLoading = view === "draft"
+    ? adpLoading
+    : view === "auction"
+      ? false
+      : view === "trends"
+        ? sleeperLoading
+        : weeklyLoading;
 
   function exportCurrentView() {
     if (view === "matchups") {
@@ -1852,6 +1922,38 @@ export default function StatsExplorer() {
         `gamehq-${season}-defense-vs-position.csv`,
         ["Defense", "Games", "All FPG", "QB", "RB", "WR", "TE", "K", "Difficulty Rank"],
         filteredDefenseRows.map((row) => [row.team, row.games, row.overall, row.qb, row.rb, row.wr, row.te, row.k, row.difficultyRank]),
+      );
+      return;
+    }
+    if (view === "trends") {
+      downloadCsv(
+        `ffaa-${DRAFT_SEASON}-live-trends.csv`,
+        [
+          "Player",
+          "Position",
+          `${DRAFT_SEASON} Team`,
+          "Adds 24h",
+          "Drops 24h",
+          "Net 24h",
+          `${DRAFT_SEASON} Projected FPG`,
+          `${TREND_BASELINE_SEASON} Games`,
+          `${TREND_BASELINE_SEASON} FPG`,
+          `${TREND_BASELINE_SEASON} Last 3 FPG`,
+          `${TREND_BASELINE_SEASON} Form Delta`,
+        ],
+        filteredPlayerRows.map((row) => [
+          row.name,
+          row.position,
+          row.team,
+          row.trendingAdds,
+          row.trendingDrops,
+          row.trendingAdds - row.trendingDrops,
+          row.projectedFantasyPointsPerGame ?? "",
+          row.games,
+          row.games > 0 ? row.fantasyPointsPerGame : "",
+          row.games > 0 ? row.last3FantasyPointsPerGame : "",
+          row.games > 0 ? row.last3FantasyPointsPerGame - row.fantasyPointsPerGame : "",
+        ]),
       );
       return;
     }
@@ -1906,7 +2008,7 @@ export default function StatsExplorer() {
     );
   }
 
-  const actualViews = view !== "draft" && view !== "auction";
+  const actualViews = ["leaders", "opportunity", "matchups", "teams"].includes(view);
   const playerView = !["matchups", "teams"].includes(view);
   const viewCopy = VIEW_COPY[view];
 
@@ -1920,7 +2022,7 @@ export default function StatsExplorer() {
             Draft prep, weekly leaders, opportunity, trends, matchups, and team context in one public place—no subscription required.
           </p>
           <div className="stats-meta-line">
-            <span>{actualViews ? `${season} actuals` : `${DRAFT_SEASON} draft data`}</span>
+            <span>{view === "trends" ? `${DRAFT_SEASON} live trends` : actualViews ? `${season} actuals` : `${DRAFT_SEASON} draft data`}</span>
             <span>{scoring === "halfPpr" ? "Half PPR" : scoring.toUpperCase()}</span>
             <span>{viewResultCount} results</span>
           </div>
@@ -1937,7 +2039,18 @@ export default function StatsExplorer() {
       <div className="stats-hub-source-strip" aria-label="Active data sources">
         <div className="stats-hub-source">
           <Database size={18} aria-hidden="true" />
-          <div><strong>nflverse</strong><span>{weeklyData ? `${weeklyData.rows.length.toLocaleString()} weekly rows` : "Weekly actuals and usage"}</span></div>
+          <div>
+            <strong>nflverse</strong>
+            <span>
+              {view === "trends"
+                ? weeklyData
+                  ? `${weeklyData.rows.length.toLocaleString()} ${TREND_BASELINE_SEASON} baseline rows`
+                  : `${TREND_BASELINE_SEASON} form baseline`
+                : weeklyData
+                  ? `${weeklyData.rows.length.toLocaleString()} weekly rows`
+                  : "Weekly actuals and usage"}
+            </span>
+          </div>
           <span className={`stats-hub-source-status ${weeklyLoading ? "is-loading" : weeklyError ? "is-warning" : ""}`}>
             {weeklyLoading ? "Loading" : weeklyError ? "Issue" : "Ready"}
           </span>
@@ -1952,8 +2065,8 @@ export default function StatsExplorer() {
         <div className="stats-hub-source">
           <TrendingUp size={18} aria-hidden="true" />
           <div><strong>Sleeper</strong><span>{sleeperSignals.length ? `${sleeperSignals.length} public trend signals` : "24-hour adds and drops"}</span></div>
-          <span className={`stats-hub-source-status ${sleeperError ? "is-warning" : ""}`}>
-            {sleeperError ? "Issue" : "Ready"}
+          <span className={`stats-hub-source-status ${sleeperLoading ? "is-loading" : sleeperError ? "is-warning" : ""}`}>
+            {sleeperLoading ? "Loading" : sleeperError ? "Issue" : "Ready"}
           </span>
         </div>
         <div className="stats-hub-source">
@@ -1990,13 +2103,13 @@ export default function StatsExplorer() {
 
         {actualViews ? (
           <div className="stats-select-shell">
-            <SelectWrapper label="Season" value={String(season)} onValueChange={(value) => updateQuery({ season: value === "2025" ? null : value })} className="stats-select-trigger">
+            <SelectWrapper label="Season" value={String(season)} onValueChange={(value) => updateQuery({ season: value === String(ACTUAL_SEASONS[0]) ? null : value })} className="stats-select-trigger">
               {ACTUAL_SEASONS.map((option) => <SelectItem key={option} value={String(option)}>{option}</SelectItem>)}
             </SelectWrapper>
           </div>
         ) : (
           <div className="stats-select-shell">
-            <SelectWrapper label="Draft year" value={String(DRAFT_SEASON)} onValueChange={() => undefined} className="stats-select-trigger" disabled>
+            <SelectWrapper label={view === "trends" ? "Trend year" : "Draft year"} value={String(DRAFT_SEASON)} onValueChange={() => undefined} className="stats-select-trigger" disabled>
               <SelectItem value={String(DRAFT_SEASON)}>{DRAFT_SEASON}</SelectItem>
             </SelectWrapper>
           </div>
@@ -2018,13 +2131,13 @@ export default function StatsExplorer() {
               <SelectItem value="ALL">All games</SelectItem>
             </SelectWrapper>
           </div>
-        ) : (
+        ) : view !== "trends" ? (
           <div className="stats-select-shell">
             <SelectWrapper label="League size" value={String(teamCount)} onValueChange={(value) => updateQuery({ teams: value === "12" ? null : value })} className="stats-select-trigger">
               {TEAM_COUNT_OPTIONS.map((option) => <SelectItem key={option} value={String(option)}>{option} teams</SelectItem>)}
             </SelectWrapper>
           </div>
-        )}
+        ) : null}
 
         {playerView ? (
           <div className="stats-select-shell">
@@ -2146,6 +2259,26 @@ export default function StatsExplorer() {
       ) : null}
 
       {actualViews && weeklyError ? <div className="stats-hub-note is-error"><Info size={17} aria-hidden="true" /><span>{weeklyError}</span></div> : null}
+      {view === "trends" ? (
+        <div className="stats-hub-note">
+          <TrendingUp size={17} aria-hidden="true" />
+          <span>
+            The player list, teams, projections, and default ranking are 2026. Net 24h equals Sleeper adds minus drops. Columns labeled {TREND_BASELINE_SEASON} are historical game-form context only; auction values are not part of the trend calculation.
+          </span>
+        </div>
+      ) : null}
+      {view === "trends" && sleeperError ? (
+        <div className="stats-hub-note is-error" role="alert">
+          <Info size={17} aria-hidden="true" />
+          <span>Live Sleeper add/drop activity is temporarily unavailable. {sleeperError}</span>
+        </div>
+      ) : null}
+      {view === "trends" && weeklyError ? (
+        <div className="stats-hub-note">
+          <Info size={17} aria-hidden="true" />
+          <span>{TREND_BASELINE_SEASON} form context is unavailable; the 2026 player pool and live activity remain usable.</span>
+        </div>
+      ) : null}
       {view === "draft" && adpError ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>Live ADP is temporarily unavailable. Projection and auction data remain usable. {adpError}</span></div> : null}
       {view === "draft" ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>Fair Value is recalculated for the selected scoring and league size using 15-player rosters. Market Median contains only compatible imported auction-dollar boards. Neither is the actual sale price.</span></div> : null}
       {view === "auction" ? (
@@ -2193,8 +2326,14 @@ export default function StatsExplorer() {
             sort={sort}
             onSortChange={setSort}
             onRowSelect={(row) => setSelectedPlayerId(row.id)}
-            emptyMessage={weeklyLoading && view !== "draft" && view !== "auction" ? "Loading weekly player stats…" : "No players match these filters."}
-            caption={`${viewCopy.title} player table`}
+            emptyMessage={view === "trends" && sleeperLoading
+              ? `Loading ${DRAFT_SEASON} player trends…`
+              : weeklyLoading && view !== "draft" && view !== "auction" && view !== "trends"
+                ? "Loading weekly player stats…"
+                : "No players match these filters."}
+            caption={view === "trends"
+              ? `${DRAFT_SEASON} live Sleeper player trends with ${TREND_BASELINE_SEASON} form context`
+              : `${viewCopy.title} player table`}
           />
         )}
       </div>

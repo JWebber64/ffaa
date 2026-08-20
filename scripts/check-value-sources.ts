@@ -72,6 +72,41 @@ const HTTP_SOURCES = [
     expect: "sleeperPlayerId",
   },
   {
+    id: "fftoday_auction",
+    label: "FFToday 2026 PPR auction values",
+    kind: "public-page" as const,
+    url: "https://www.fftoday.com/rankings/26-av-ppr.html",
+    expect: "Max Bid",
+  },
+  {
+    id: "sports_illustrated_auction",
+    label: "Sports Illustrated 2026 auction values",
+    kind: "public-page" as const,
+    url: "https://www.si.com/fantasy/2026-football-running-back-rankings-seasonal-leagues",
+    expect: "Auction",
+  },
+  {
+    id: "yafsb_auction_aav",
+    label: "YAFSB actual Sleeper auction values",
+    kind: "public-page" as const,
+    url: "https://yafsb.com/fantasy-football/auction-draft-values/?scoring_type=half_ppr&league_size=12&is_superflex=False&is_dynasty=False&is_rookies=False",
+    expect: "Sleeper auction drafts",
+  },
+  {
+    id: "footballguys_auction",
+    label: "Footballguys public auction preview",
+    kind: "public-page" as const,
+    url: "https://www.footballguys.com/salary-cap-auction-values?pos=all",
+    expect: "Jahmyr Gibbs",
+  },
+  {
+    id: "sportsbrackets_auction",
+    label: "SportsBrackets public auction board",
+    kind: "public-page" as const,
+    url: "https://sportsbrackets.net/2026/07/24/2026-fantasy-football-auction-values-printable/",
+    expect: "$200",
+  },
+  {
     id: "fantasypros_auction",
     label: "FantasyPros auction values page",
     kind: "public-page" as const,
@@ -183,6 +218,16 @@ const LOCAL_IMPORTS = [
     file: "src/data/players-2026-espn.json",
   },
   {
+    id: "public_auction_values_local",
+    label: "Public 2026 auction-value caches",
+    file: "src/data/players-2026-public-auction-values.json",
+  },
+  {
+    id: "sleeper_suggested_values_import",
+    label: "Sleeper imported suggested auction values",
+    file: "src/data/players-2026-sleeper-values.json",
+  },
+  {
     id: "winwithodds_local",
     label: "WinWithOdds 2026 projection cache",
     file: "src/data/players-2026-winwithodds.json",
@@ -191,11 +236,6 @@ const LOCAL_IMPORTS = [
     id: "fantasypros_import",
     label: "FantasyPros imported values",
     file: "src/data/players-2026-fantasypros-values.json",
-  },
-  {
-    id: "draftsharks_import",
-    label: "Draft Sharks imported values",
-    file: "src/data/players-2026-draftsharks.json",
   },
   {
     id: "rotowire_import",
@@ -231,11 +271,6 @@ const LOCAL_IMPORTS = [
     id: "footballers_import",
     label: "Fantasy Footballers imported rankings",
     file: "src/data/players-2026-footballers.json",
-  },
-  {
-    id: "fantasynerds_import",
-    label: "FantasyNerds imported public auction values",
-    file: "src/data/players-2026-fantasynerds.json",
   },
   {
     id: "fftoolbox_import",
