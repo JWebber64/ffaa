@@ -353,14 +353,92 @@
 .history-season-hero { justify-content: space-between; }
 .history-season-hero > div:last-child { display: grid; justify-items: end; gap: 3px; }
 .history-season-hero > div:last-child svg { color: var(--a1); }
-.history-matchup-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.history-matchup-grid article { padding: 11px; border: 1px solid var(--line-0); border-radius: 9px; background: var(--bg-2); }
+.history-season-sections {
+  position: sticky;
+  top: 75px;
+  z-index: 18;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 6px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-1) 93%, transparent);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(18px);
+  scrollbar-width: none;
+}
+.history-season-sections::-webkit-scrollbar { display: none; }
+.history-season-sections button {
+  flex: 1 0 auto;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-1);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 780;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+.history-season-sections button:hover { border-color: var(--line-0); color: var(--text-0); background: var(--bg-2); }
+.history-season-sections button.is-active { border-color: color-mix(in srgb, var(--a1) 30%, var(--line-0)); color: var(--a1); background: color-mix(in srgb, var(--a1) 12%, var(--bg-2)); }
+.history-season-highlights > article { min-height: 126px; }
+.history-season-highlights > article > strong { overflow: hidden; font-size: clamp(1.15rem, 2vw, 1.65rem); text-overflow: ellipsis; white-space: nowrap; }
+.history-overview-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.history-overview-actions button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 9px;
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--line-0);
+  border-radius: 10px;
+  background: var(--bg-1);
+  color: var(--text-0);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.history-overview-actions button:hover { border-color: color-mix(in srgb, var(--a2) 45%, var(--line-0)); background: var(--bg-2); }
+.history-overview-actions svg { grid-row: 1 / 3; color: var(--a2); }
+.history-overview-actions span { overflow: hidden; font-size: 0.75rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.history-overview-actions small { color: var(--text-1); font-size: 0.62rem; }
+.history-section-header { flex-wrap: wrap; }
+.history-week-list { display: grid; gap: 26px; }
+.history-week-group { content-visibility: auto; contain-intrinsic-size: auto 230px; }
+.history-week-group > header { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 10px; padding: 0 2px 9px; border-bottom: 1px solid var(--line-0); }
+.history-week-group > header span { display: block; color: var(--a2); font-size: 0.58rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.history-week-group > header h3 { margin: 3px 0 0; font-size: 1rem; }
+.history-week-group > header small { color: var(--text-1); font-size: 0.63rem; }
+.history-matchup-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.history-matchup-grid article { min-width: 0; padding: 13px; border: 1px solid var(--line-0); border-radius: 9px; background: var(--bg-2); }
 .history-matchup-grid article.is-playoff { border-color: color-mix(in srgb, var(--a3) 35%, var(--line-0)); }
 .history-matchup-grid article.is-title { border-color: color-mix(in srgb, var(--a1) 50%, var(--line-0)); background: color-mix(in srgb, var(--a1) 7%, var(--bg-2)); }
 .history-matchup-grid article > div { display: flex; justify-content: space-between; gap: 7px; margin-bottom: 8px; color: var(--text-1); font-size: 0.6rem; }
 .history-matchup-grid article > div small { color: var(--a1); }
-.history-matchup-grid p { display: flex; justify-content: space-between; gap: 8px; margin: 5px 0; font-size: 0.69rem; }
+.history-matchup-grid p { display: flex; justify-content: space-between; gap: 8px; margin: 5px 0; color: var(--text-1); font-size: 0.71rem; }
+.history-matchup-grid p.is-winner { color: var(--text-0); font-weight: 780; }
+.history-matchup-grid p.is-winner strong { color: var(--a1); }
 .history-matchup-grid p span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.history-table tr.is-champion-row td { background: color-mix(in srgb, var(--a1) 6%, transparent); }
+.history-table tr.is-champion-row td:first-child { color: var(--a1); font-weight: 850; }
+.history-season-draft-panel { overflow: hidden; }
+.history-season-draft-toolbar { flex-wrap: wrap; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line-0); }
+.history-season-draft-toolbar > label { min-width: 135px; }
+.history-season-draft-toolbar > .history-draft-search { flex: 1 1 280px; }
+.history-season-draft-table-wrap { max-height: min(68vh, 780px); overflow: auto; }
+.history-season-draft-table-wrap .history-draft-table thead th { position: sticky; top: 0; z-index: 2; background: var(--bg-1); }
+.history-season-draft-table-wrap .history-draft-table thead th:first-child { z-index: 3; }
+.history-activity-cta { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px; }
+.history-activity-cta > svg { color: var(--a1); }
+.history-activity-cta > div > span { color: var(--a2); font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.history-activity-cta h2 { margin: 4px 0; font-size: 1rem; }
+.history-activity-cta p { margin: 0; color: var(--text-1); font-size: 0.68rem; }
+.history-activity-cta .history-text-link { margin: 0; white-space: nowrap; }
 .history-transaction-mini { display: grid; gap: 1px; overflow: hidden; border: 1px solid var(--line-0); border-radius: 8px; background: var(--line-0); }
 .history-transaction-mini > div { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; padding: 9px 10px; background: var(--bg-2); font-size: 0.65rem; }
 .history-transaction-mini span,
@@ -476,9 +554,14 @@
   .history-masthead { align-items: flex-start; padding: 20px; }
   .history-provider-mark small { display: none; }
   .history-nav { margin: 0 -1px; }
+  .history-season-sections { top: 64px; }
   .history-page-heading-row { display: grid; align-items: start; }
   .history-filter-bar { flex-wrap: wrap; }
   .history-draft-toolbar { width: 100%; justify-content: flex-start; }
+  .history-overview-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .history-season-draft-toolbar > .history-draft-search { flex-basis: 100%; }
+  .history-activity-cta { grid-template-columns: auto minmax(0, 1fr); }
+  .history-activity-cta .history-text-link { grid-column: 2; }
   .history-scoreboard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .history-scoreboard .history-feature-card { grid-column: 1 / -1; }
   .history-section-grid { grid-template-columns: 1fr; }
@@ -500,6 +583,9 @@
   .history-provider-mark { display: none; }
   .history-nav a { padding: 8px; }
   .history-nav a span { display: none; }
+  .history-season-hero { align-items: flex-start; }
+  .history-season-hero > div:last-child { justify-items: start; text-align: left; }
+  .history-season-sections button { min-height: 36px; padding: 0 12px; }
   .history-content { gap: 12px; padding-top: 15px; }
   .history-scoreboard,
   .history-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -507,6 +593,9 @@
   .history-archive-grid,
   .history-record-grid,
   .history-leaderboard-grid { grid-template-columns: 1fr; }
+  .history-overview-actions { grid-template-columns: 1fr; }
+  .history-week-list { gap: 20px; }
+  .history-week-group > header { align-items: center; }
   .history-leader-strip { grid-template-columns: 1fr; }
   .history-panel { padding: 15px; }
   .history-profile-hero { align-items: flex-start; flex-wrap: wrap; padding: 18px; }
