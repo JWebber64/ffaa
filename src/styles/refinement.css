@@ -3298,3 +3298,42 @@ dd,
     background-position: 16% center;
   }
 }
+
+/* Offline draft board: keep the team grid as the full first viewport. */
+@media (min-width: 1121px) {
+  .offline-board-wrap {
+    display: grid;
+    min-height: max(620px, calc(100dvh - 72px));
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .offline-board-wrap .team-board {
+    min-height: 0;
+    padding: 0;
+    background: transparent;
+  }
+}
+
+/* One clean position-colored edge around every roster slot. */
+.offline-board-wrap .team-panel {
+  overflow: hidden;
+}
+
+.offline-board-wrap .team-slot-line,
+.offline-board-wrap .team-slot-line.is-filled {
+  border-color: color-mix(in srgb, var(--team-slot-color) 68%, rgba(225, 241, 232, 0.14));
+  background: color-mix(in srgb, var(--team-slot-color) 7%, var(--ffaa-surface-raised));
+  background-image: none;
+}
+
+.offline-board-wrap .team-slot-line.is-filled {
+  background: color-mix(in srgb, var(--team-slot-color) 12%, var(--ffaa-surface-raised));
+}
+
+.offline-board-wrap .team-slot-line::before {
+  display: none;
+}
