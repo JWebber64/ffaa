@@ -14,6 +14,7 @@ import {
 import type { LeagueFuture, LeagueHQData, LeagueManager, LeagueRivalry } from "./leagueHQData";
 import { parseLeagueHQData, syncLeagueTeams } from "./leagueHQData";
 import { Button } from "../../ui/Button";
+import { NumericInput } from "../../ui/NumericInput";
 
 type StudioView = "essentials" | "managers" | "rivalries" | "futures" | "advanced";
 
@@ -210,8 +211,8 @@ export function CommissionerStudio({
                   </label>
                   <label>
                     Founded year
-                    <input
-                      type="number"
+                    <NumericInput
+                      aria-label="League founded year"
                       min="1900"
                       max={working.identity.currentSeason}
                       value={working.identity.foundedYear}
@@ -245,8 +246,7 @@ export function CommissionerStudio({
                   {currentManagers.map((manager) => (
                     <label key={manager.id}>
                       <span>{managerLabel(manager)}</span>
-                      <input
-                        type="number"
+                      <NumericInput
                         min="1"
                         max={currentManagers.length}
                         aria-label={`Draft slot for ${manager.managerName}`}
@@ -330,8 +330,8 @@ export function CommissionerStudio({
                           </span>
                         </header>
                         <div>
-                          <label>Title odds<input type="number" step="10" value={future.championshipOdds} onChange={(event) => updateFuture(future.managerId, { championshipOdds: Number(event.target.value) })} /><small>{oddsLabel(future.championshipOdds)}</small></label>
-                          <label>Win total<input type="number" min="0" step="0.5" value={future.winTotal} onChange={(event) => updateFuture(future.managerId, { winTotal: Number(event.target.value) })} /></label>
+                          <label>Title odds<NumericInput aria-label={`${manager?.managerName ?? "Manager"} title odds`} step="10" value={future.championshipOdds} onChange={(event) => updateFuture(future.managerId, { championshipOdds: Number(event.target.value) })} /><small>{oddsLabel(future.championshipOdds)}</small></label>
+                          <label>Win total<NumericInput aria-label={`${manager?.managerName ?? "Manager"} win total`} min="0" step="0.5" value={future.winTotal} onChange={(event) => updateFuture(future.managerId, { winTotal: Number(event.target.value) })} /></label>
                         </div>
                         <label>Case for this team<textarea rows={3} value={future.caseFor} onChange={(event) => updateFuture(future.managerId, { caseFor: event.target.value })} /></label>
                       </article>

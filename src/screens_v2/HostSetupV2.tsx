@@ -19,6 +19,7 @@ import { SelectWrapper, SelectItem } from "../ui/SelectWrapper";
 import { GlassPanel, GlassCard } from "../components/premium";
 import RosterBuilder from "../components/premium/RosterBuilder";
 import { Input } from "../ui/Input";
+import { NumericInput } from "../ui/NumericInput";
 
 const HOST_LOBBY_SESSION_KEY = "hostLobbyV2";
 
@@ -393,8 +394,8 @@ export default function HostSetupV2() {
                         {auctionSettings.teamBudgets.map((budget, index) => (
                           <label key={index} className="setup-budget-item">
                             <span>Team {index + 1}</span>
-                            <input
-                              type="number"
+                            <NumericInput
+                              aria-label={`Team ${index + 1} budget`}
                               min="0"
                               max="10000"
                               value={budget}

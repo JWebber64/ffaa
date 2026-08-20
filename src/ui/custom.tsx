@@ -3,6 +3,7 @@ import React, { createContext, useContext, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useToast as useToastInternal } from "./toastContext";
 import { UniversalSelect } from "./UniversalSelect";
+import { NumericInput } from "./NumericInput";
 
 type AnyRecord = Record<string, any>;
 type CustomProps = Omit<React.HTMLAttributes<HTMLElement>, "color"> & {
@@ -513,14 +514,32 @@ type InputCompatProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"
 export const Input = React.forwardRef<HTMLInputElement, InputCompatProps>(
   ({ isDisabled, isReadOnly, disabled, readOnly, className, variant, size: _size, ...rest }, ref) => {
     const extracted = extractProps(rest);
+    const inputProps = extracted.domProps as React.InputHTMLAttributes<HTMLInputElement>;
+    const resolvedDisabled = isDisabled ?? disabled;
+    const resolvedReadOnly = isReadOnly ?? readOnly;
+    const resolvedClassName = cx("cui-input", variant ? `cui-input-${variant}` : undefined, extracted.className, className);
+
+    if (inputProps.type === "number") {
+      return (
+        <NumericInput
+          ref={ref}
+          className={resolvedClassName}
+          disabled={resolvedDisabled}
+          readOnly={resolvedReadOnly}
+          style={extracted.style}
+          {...inputProps}
+        />
+      );
+    }
+
     return (
       <input
         ref={ref}
-        className={cx("cui-input", variant ? `cui-input-${variant}` : undefined, extracted.className, className)}
-        disabled={isDisabled ?? disabled}
-        readOnly={isReadOnly ?? readOnly}
+        className={resolvedClassName}
+        disabled={resolvedDisabled}
+        readOnly={resolvedReadOnly}
         style={extracted.style}
-        {...(extracted.domProps as React.InputHTMLAttributes<HTMLInputElement>)}
+        {...inputProps}
       />
     );
   }
@@ -894,7 +913,7 @@ export function NumberInputField(props: InputCompatProps) {
   );
 }
 
-export const NumberInputStepper = ({ children }: { children?: React.ReactNode }) => <Box>{children}</Box>;
+export const NumberInputStepper = (_props: { children?: React.ReactNode }) => null;
 export const NumberIncrementStepper = (_props: CustomProps) => null;
 export const NumberDecrementStepper = (_props: CustomProps) => null;
 

@@ -9,6 +9,7 @@ import type { ToolPlayer, ToolPosition, ToolScoring } from "@/data/toolPlayerDat
 import { buildTeamRaterNavigationState } from "@/screens/tools/teamRaterNavigation";
 import { useToolData } from "@/screens/tools/useToolData";
 import { PositionToggle } from "@/ui/PositionToggle";
+import { NumericInput } from "@/ui/NumericInput";
 import { UniversalSelect } from "@/ui/UniversalSelect";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 
@@ -124,7 +125,7 @@ export function AuctionTeamBuilder() {
   return (
     <ToolLayout eyebrow="Auction room" title="Build a Team" description="Set your wallet and roster demand, then draft a team against a sortable fair-value and market board." methodology={<p>Fair values are recalculated directly for your budget, league size, scoring, and roster depth. Market is the median of compatible imported auction-dollar sources. Your actual bid is the number you enter; the recommendation is a starting point, not a prediction.</p>}>
       <div className="tools-control-panel auction-builder-controls">
-        <label className="tool-field"><span>Budget</span><span className="auction-budget-input"><b>$</b><input aria-label="Auction budget" type="number" min="1" max="1000" value={budget} onChange={(event) => setBudget(clamp(Number(event.target.value) || 1, 1, 1000))} /></span></label>
+        <label className="tool-field"><span>Budget</span><span className="auction-budget-input"><b>$</b><NumericInput aria-label="Auction budget" min="1" max="1000" value={budget} onChange={(event) => setBudget(clamp(Number(event.target.value) || 1, 1, 1000))} /></span></label>
         <label className="tool-field"><span>League size</span><UniversalSelect value={teamCount} onValueChange={(value) => setTeamCount(Number(value))}>{[8, 10, 12, 14, 16].map((size) => <option key={size} value={size}>{size} teams</option>)}</UniversalSelect></label>
         <label className="tool-field"><span>Scoring</span><UniversalSelect value={scoring} onValueChange={(value) => setScoring(value as ToolScoring)}><option value="ppr">PPR</option><option value="halfPpr">Half PPR</option><option value="standard">Standard</option></UniversalSelect></label>
         <div className="auction-wallet-summary">
@@ -168,7 +169,7 @@ export function AuctionTeamBuilder() {
               onChange={setPosition}
             />
           </div>
-          <div className="auction-selected-ticket">{selected ? <><div><span>Selected player</span><strong>{selected.name}</strong><small>{selected.position} · fair {money(selected.auctionValue ?? 0)} · market {selected.marketValue === null ? "—" : money(selected.marketValue)} · recommended {money(recommendedBid)}</small></div><label>Bid <span><b>$</b><input type="number" min="1" max={Math.max(1, maxBid)} value={bid} onChange={(event) => setBid(Number(event.target.value))} /></span></label><button type="button" className="tool-button is-primary" onClick={draftSelected} disabled={!maxBid}><Gavel size={15} /> Draft</button></> : <span>Select a player to add them to your card.</span>}</div>
+          <div className="auction-selected-ticket">{selected ? <><div><span>Selected player</span><strong>{selected.name}</strong><small>{selected.position} · fair {money(selected.auctionValue ?? 0)} · market {selected.marketValue === null ? "—" : money(selected.marketValue)} · recommended {money(recommendedBid)}</small></div><label>Bid <span><b>$</b><NumericInput aria-label="Player bid" min="1" max={Math.max(1, maxBid)} value={bid} onChange={(event) => setBid(Number(event.target.value))} /></span></label><button type="button" className="tool-button is-primary" onClick={draftSelected} disabled={!maxBid}><Gavel size={15} /> Draft</button></> : <span>Select a player to add them to your card.</span>}</div>
           <div className="auction-table-wrap"><table className="auction-table"><thead><tr><th>Pos</th>{(["name", "rank", "projection", "value"] as SortKey[]).map((key) => <th key={key}><button type="button" onClick={() => changeSort(key)}>{key === "name" ? "Player" : key === "rank" ? "Rank" : key === "projection" ? "Proj" : "Fair"} {sortIcon(key)}</button></th>)}<th>Market</th><th aria-label="Draft action" /></tr></thead><tbody>{board.map((player) => <tr className={selectedId === player.id ? "is-selected" : ""} key={player.id} onClick={() => selectPlayer(player)}><td><span className={`tool-position-tag is-${player.position.toLowerCase()}`}>{player.position}</span></td><th><span className="auction-player-identity"><TeamMark team={player.team} size="xs" /><span>{player.name}<small>{player.team || "FA"}</small></span></span></th><td>{player.rank ?? "—"}</td><td>{player.projectedPoints?.toFixed(1) ?? "—"}</td><td><strong>{money(player.auctionValue ?? 0)}</strong></td><td>{player.marketValue === null ? "—" : money(player.marketValue)}</td><td><button type="button" className="auction-row-draft" onClick={(event) => { event.stopPropagation(); draftPlayer(player); }}>Draft</button></td></tr>)}</tbody></table></div>
         </section>
       </div>

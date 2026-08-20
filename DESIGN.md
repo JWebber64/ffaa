@@ -14,9 +14,13 @@ Selected, active, warning, and position states must style the whole owning conta
 
 Compound fields must read as one control. Prefixes, suffixes, and values share one border and one clipped surface; nested inputs stay transparent when the parent owns the field shell.
 
+Editable numeric fields use one shared stepper: a compact teal up/down chevron control inset at the right edge of the field, with separate accessible increment and decrement hit regions.
+
 ## Do's and Don'ts
 
 - Do use a full perimeter border when color identifies a position or state.
 - Do keep every field fill, border, and focus treatment clipped to one control shell.
+- Do use the shared numeric stepper for every editable number field.
 - Do not use decorative left-edge stripes, left-only borders, inset left bars, or left-edge pseudo-elements to indicate selection, activity, status, position, or emphasis.
 - Do not give a nested input its own fill when the parent already owns the field surface.
+- Do not expose browser-native number arrows or omit the shared stepper from an editable number field.

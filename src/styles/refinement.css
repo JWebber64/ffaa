@@ -3344,9 +3344,15 @@ dd,
   box-shadow: 0 0 0 2px rgba(47, 201, 148, 0.15);
 }
 
+.auction-budget-input > .ffaa-number-field,
+.auction-selected-ticket label > span > .ffaa-number-field {
+  flex: 1 1 auto;
+  height: 100%;
+}
+
 .tool-field .auction-budget-input input {
-  height: auto;
-  padding: 0;
+  height: 100%;
+  padding: 0 46px 0 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;

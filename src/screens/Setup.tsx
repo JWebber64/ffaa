@@ -11,6 +11,7 @@ import {
     Stack,
     Text,
   } from "@/ui/custom";
+  import { NumericInput } from "@/ui/NumericInput";
   import { useState } from "react";
   import type { ChangeEvent } from "react"; // 👈 type-only
   import { useNavigate } from "react-router-dom";
@@ -111,9 +112,9 @@ import {
   
             <HStack gap={2} alignItems="center">
               <Text>Budget ($)</Text>
-              {/* Native control keeps this legacy screen independent from a UI framework. */}
-              <input
-                type="number"
+              {/* Shared numeric control keeps this legacy screen consistent with the app. */}
+              <NumericInput
+                aria-label="Budget"
                 value={budget}
                 min={50}
                 onChange={updateBudget}
@@ -165,8 +166,8 @@ import {
                 <GridItem key={p}>
                   <HStack spacing={3} alignItems="center">
                     <Text w="70px">{p}</Text>
-                    <input
-                      type="number"
+                    <NumericInput
+                      aria-label={`${p} roster slots`}
                       min={0}
                       value={roster[p]}
                       onChange={updateRoster(p)}

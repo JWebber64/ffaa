@@ -1,4 +1,4 @@
-import { BadgeCheck, Minus, Plus, RotateCcw, Search, Trash2, UserPlus } from "lucide-react";
+import { BadgeCheck, RotateCcw, Search, Trash2, UserPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -17,6 +17,7 @@ import {
 import { readTeamRaterNavigationState } from "@/screens/tools/teamRaterNavigation";
 import { useToolData } from "@/screens/tools/useToolData";
 import { PositionToggle } from "@/ui/PositionToggle";
+import { NumericInput } from "@/ui/NumericInput";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 import { UniversalSelect } from "@/ui/UniversalSelect";
 
@@ -211,17 +212,14 @@ export function TeamRater() {
               <div className="team-slot-control" data-position={slotColorPosition(position)} key={position}>
                 <span>{label}</span>
                 <div className="team-slot-stepper">
-                  <button type="button" aria-label={`Decrease ${label} slots`} disabled={count <= 0} onClick={() => updateSlot(position, count - 1)}><Minus size={14} aria-hidden="true" /></button>
-                  <input
+                  <NumericInput
                     aria-label={`${label} slot count`}
                     inputMode="numeric"
                     max={20}
                     min={0}
                     onChange={(event) => updateSlot(position, Number(event.target.value))}
-                    type="number"
                     value={count}
                   />
-                  <button type="button" aria-label={`Increase ${label} slots`} disabled={count >= 20} onClick={() => updateSlot(position, count + 1)}><Plus size={14} aria-hidden="true" /></button>
                 </div>
               </div>
             );
