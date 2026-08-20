@@ -1,0 +1,33 @@
+[
+  {
+    "season": 2024,
+    "label": "2024 GOAT auction workbook",
+    "spreadsheetId": "1pzaZhWcNRxIRy4WoqtkjVxwuo2oOTMb3goChwqXhLAo",
+    "auctionGid": "1550733683",
+    "teamsGid": "396445092",
+    "budgetPerTeam": 200,
+    "teamCount": 12,
+    "expectedRosterSpots": 144,
+    "expectedSales": 135,
+    "expectedSpend": 2379,
+    "playerAliases": {
+      "Hollywood Brown": "Marquise Brown"
+    },
+    "reviewNotes": {
+      "Jaylen Warren": "The $74 price is unusual but agrees with the workbook team totals and the Week 1 roster; preserved exactly as recorded."
+    }
+  },
+  {
+    "season": 2025,
+    "label": "2025 GOAT auction workbook",
+    "spreadsheetId": "1g6PnM3RSUzNc7dDHa1LDFI8LWkEmr1saVRhiC_eb_CI",
+    "auctionGid": "1110586020",
+    "teamsGid": "264321884",
+    "budgetPerTeam": 200,
+    "teamCount": 12,
+    "expectedRosterSpots": 144,
+    "expectedSales": 136,
+    "expectedSpend": 2367
+  }
+]
+

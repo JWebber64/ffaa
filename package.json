@@ -20,6 +20,7 @@
     "public-data:pull": "tsx scripts/fetch-public-fantasy-data.ts --season=2026",
     "analytics-data:pull": "tsx scripts/pull-analytics-data.ts",
     "league:history:import": "tsx scripts/import-sleeper-league-history.ts",
+    "league:history:goat:validate": "tsx scripts/import-sleeper-league-history.ts --league=1385319428408774656 --auction-sources=scripts/config/goat-auction-sources.json --dry-run --output=reports/goat-league-history-import-with-auctions.json --auction-report=reports/goat-auction-import-validation.json",
     "players:pull": "tsx scripts/build-player-pool.ts --top=300",
     "players:check": "node -e \"console.log(require('./src/data/player-pool-2026.json').length + ' players')\"",
     "test:script": "node dist/scripts/test-script.js"

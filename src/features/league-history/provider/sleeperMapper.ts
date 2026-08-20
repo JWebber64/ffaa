@@ -132,9 +132,9 @@ export interface DraftImportPayload {
     playerName: string;
     position: string;
     nflTeam: string;
-    pickNumber: number;
-    round: number;
-    draftSlot: number;
+    pickNumber: number | null;
+    round: number | null;
+    draftSlot: number | null;
     auctionPrice: number | null;
     isKeeper: boolean;
     metadata: Record<string, JsonValue>;

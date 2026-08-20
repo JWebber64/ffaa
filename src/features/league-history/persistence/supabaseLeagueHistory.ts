@@ -248,11 +248,12 @@ function mapDraftPick(row: DatabaseRow): HistoricalDraftPick {
     playerName: stringValue(row.player_name),
     position: stringValue(row.position),
     nflTeam: stringValue(row.nfl_team),
-    pickNumber: numberValue(row.pick_number),
-    round: numberValue(row.round),
-    draftSlot: numberValue(row.draft_slot),
+    pickNumber: nullableNumber(row.pick_number),
+    round: nullableNumber(row.round),
+    draftSlot: nullableNumber(row.draft_slot),
     auctionPrice: nullableNumber(row.auction_price),
     isKeeper: booleanValue(row.is_keeper),
+    metadata: objectValue(row.metadata),
   };
 }
 

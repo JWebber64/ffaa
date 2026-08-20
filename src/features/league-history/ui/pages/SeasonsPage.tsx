@@ -44,7 +44,12 @@ export function SeasonArchivePage() {
   const champion = championFranchise?.managerId ? managerById.get(championFranchise.managerId) : null;
   const drafts = snapshot.drafts.filter((draft) => draft.leagueSeasonId === season.id);
   const draftIds = new Set(drafts.map((draft) => draft.id));
-  const draftPicks = snapshot.draftPicks.filter((pick) => draftIds.has(pick.draftId)).sort((a, b) => a.pickNumber - b.pickNumber);
+  const draftPicks = snapshot.draftPicks.filter((pick) => draftIds.has(pick.draftId)).sort((a, b) => {
+    if (a.pickNumber != null && b.pickNumber != null) return a.pickNumber - b.pickNumber;
+    if (a.pickNumber != null) return -1;
+    if (b.pickNumber != null) return 1;
+    return a.playerName.localeCompare(b.playerName);
+  });
   const transactions = snapshot.transactions.filter((transaction) => transaction.leagueSeasonId === season.id)
     .sort((left, right) => (Date.parse(right.occurredAt ?? "") || 0) - (Date.parse(left.occurredAt ?? "") || 0));
   const seasonIndex = snapshot.seasons.findIndex((row) => row.id === season.id);
