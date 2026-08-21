@@ -65,13 +65,15 @@ function payload(): LeagueHistoryImportPayload {
         { providerRosterId: 2, manager: { providerUserId: "bob-id", currentUsername: "bob", displayName: "Bob", avatarUrl: "" }, historicalUsername: "bob", teamName: "Bob Team", avatarUrl: "", finalRank: 2, regularSeasonRank: 2, playoffSeed: 2, wins: 8, losses: 6, ties: 0, pointsFor: 90, pointsAgainst: 100, playoffFinish: "Runner-up" },
       ],
       weeklyResults: [
-        { week: 1, providerRosterId: 1, score: 10, starterScore: 10, players: [player("a1", "Alpha One", "RB"), player("a2", "Alpha Two", "WR"), player("marquise", "Marquise Brown", "WR")] },
-        { week: 1, providerRosterId: 2, score: 9, starterScore: 9, players: [player("b1", "Beta One", "QB"), player("b2", "Beta Two", "TE"), player("b3", "Beta Three", "RB")] },
+        { week: 1, providerRosterId: 1, score: 10, starterScore: 10, benchScore: 0, optimalScore: 10, lineupEfficiency: 1, pointsLeftOnBench: 0, actualStartingPlayerIds: ["a1", "a2", "marquise"], optimalStartingPlayerIds: ["a1", "a2", "marquise"], bestMissedSubstitution: null, optimalStartersUsed: 3, analyticsStatus: "valid", analyticsReason: "", unsupportedSlots: [], missingSlots: [], calculationVersion: "test", isComplete: true, players: [player("a1", "Alpha One", "RB"), player("a2", "Alpha Two", "WR"), player("marquise", "Marquise Brown", "WR")] },
+        { week: 1, providerRosterId: 2, score: 9, starterScore: 9, benchScore: 0, optimalScore: 9, lineupEfficiency: 1, pointsLeftOnBench: 0, actualStartingPlayerIds: ["b1", "b2", "b3"], optimalStartingPlayerIds: ["b1", "b2", "b3"], bestMissedSubstitution: null, optimalStartersUsed: 3, analyticsStatus: "valid", analyticsReason: "", unsupportedSlots: [], missingSlots: [], calculationVersion: "test", isComplete: true, players: [player("b1", "Beta One", "QB"), player("b2", "Beta Two", "TE"), player("b3", "Beta Three", "RB")] },
       ],
       matchups: [],
       playoffMatches: [],
       drafts: [{ providerDraftId: "draft-2025", draftType: "snake", status: "complete", budget: null, rounds: 4, startedAt: null, completedAt: null, settings: {}, raw: {}, picks: [], tradedPicks: [] }],
       transactions: [],
+      awards: [],
+      moments: [],
     }],
   };
 }

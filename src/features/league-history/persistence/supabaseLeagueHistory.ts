@@ -1,5 +1,7 @@
 import type {
   FantasyLeague,
+  FantasyLeagueAward,
+  FantasyLeagueMoment,
   HistoricalDraft,
   HistoricalDraftPick,
   HistoricalMatchup,
@@ -7,10 +9,13 @@ import type {
   HistoricalTransactionAsset,
   JsonValue,
   LeagueHistorySnapshot,
+  LeagueWeekPayload,
   LeagueSeason,
   Manager,
   PlayoffMatch,
   SeasonFranchise,
+  WeeklyPlayerResult,
+  WeeklyRosterResult,
 } from "../domain/types";
 
 type DatabaseRow = Record<string, unknown>;
@@ -23,6 +28,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3
 const REST_PAGE_SIZE = 1_000;
 const IN_FILTER_CHUNK_SIZE = 100;
 const requestCache = new Map<string, Promise<LeagueHistorySnapshot>>();
+const completedWeekCache = new Map<string, LeagueWeekPayload>();
 
 function stringValue(value: unknown) {
   return typeof value === "string" ? value : "";
@@ -54,17 +60,22 @@ function stringArray(value: unknown) {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
 }
 
+function objectArray(value: unknown) {
+  return Array.isArray(value) ? value.filter((item): item is DatabaseRow => Boolean(item) && typeof item === "object" && !Array.isArray(item)) : [];
+}
+
 function inFilter(ids: string[]) {
   return `in.(${ids.join(",")})`;
 }
 
-async function selectRows(table: string, query: URLSearchParams) {
+async function selectRows(table: string, query: URLSearchParams, options: { signal?: AbortSignal } = {}) {
   if (!SUPABASE_URL || !SUPABASE_KEY) {
     throw new Error("League history storage is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.");
   }
   const rows: DatabaseRow[] = [];
   for (let offset = 0; ; offset += REST_PAGE_SIZE) {
     const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`, {
+      ...(options.signal ? { signal: options.signal } : {}),
       headers: {
         apikey: SUPABASE_KEY,
         Authorization: `Bearer ${SUPABASE_KEY}`,
@@ -85,7 +96,7 @@ async function selectRows(table: string, query: URLSearchParams) {
   return rows;
 }
 
-async function selectRelatedRows(table: string, column: string, ids: string[]) {
+async function selectRelatedRows(table: string, column: string, ids: string[], options: { signal?: AbortSignal } = {}) {
   if (!ids.length) return [];
   const chunks: string[][] = [];
   for (let index = 0; index < ids.length; index += IN_FILTER_CHUNK_SIZE) {
@@ -94,7 +105,7 @@ async function selectRelatedRows(table: string, column: string, ids: string[]) {
   const pages = await Promise.all(chunks.map((chunk) => {
     const params = query();
     params.set(column, inFilter(chunk));
-    return selectRows(table, params);
+    return selectRows(table, params, options);
   }));
   return pages.flat();
 }
@@ -290,6 +301,107 @@ function mapTransactionAsset(row: DatabaseRow): HistoricalTransactionAsset {
   };
 }
 
+function mapMissedSubstitution(value: unknown): WeeklyRosterResult["bestMissedSubstitution"] {
+  const row = objectArray([value])[0];
+  if (!row) return null;
+  const incomingPlayerId = stringValue(row.incomingPlayerId ?? row.incoming_player_id);
+  const outgoingPlayerId = stringValue(row.outgoingPlayerId ?? row.outgoing_player_id);
+  if (!incomingPlayerId || !outgoingPlayerId) return null;
+  return {
+    incomingPlayerId,
+    incomingPlayerName: stringValue(row.incomingPlayerName ?? row.incoming_player_name),
+    incomingPoints: numberValue(row.incomingPoints ?? row.incoming_points),
+    outgoingPlayerId,
+    outgoingPlayerName: stringValue(row.outgoingPlayerName ?? row.outgoing_player_name),
+    outgoingPoints: numberValue(row.outgoingPoints ?? row.outgoing_points),
+    gain: numberValue(row.gain),
+  };
+}
+
+function mapWeeklyRosterResult(row: DatabaseRow): WeeklyRosterResult {
+  const status = stringValue(row.analytics_status);
+  return {
+    id: stringValue(row.id),
+    leagueSeasonId: stringValue(row.league_season_id),
+    franchiseId: stringValue(row.franchise_id),
+    week: numberValue(row.week),
+    score: numberValue(row.score),
+    starterScore: nullableNumber(row.starter_score),
+    benchScore: nullableNumber(row.bench_score),
+    optimalScore: nullableNumber(row.optimal_score),
+    lineupEfficiency: nullableNumber(row.lineup_efficiency),
+    pointsLeftOnBench: nullableNumber(row.points_left_on_bench),
+    actualStartingPlayerIds: stringArray(row.actual_starting_player_ids),
+    optimalStartingPlayerIds: stringArray(row.optimal_starting_player_ids),
+    bestMissedSubstitution: mapMissedSubstitution(row.best_missed_substitution),
+    optimalStartersUsed: nullableNumber(row.optimal_starters_used),
+    analyticsStatus: status === "valid" || status === "unsupported" ? status : "incomplete",
+    analyticsReason: stringValue(row.analytics_reason),
+    unsupportedSlots: stringArray(row.unsupported_slots),
+    missingSlots: stringArray(row.missing_slots),
+    calculationVersion: stringValue(row.calculation_version),
+  };
+}
+
+function mapWeeklyPlayerResult(row: DatabaseRow): WeeklyPlayerResult {
+  return {
+    id: stringValue(row.id),
+    weeklyRosterResultId: stringValue(row.weekly_roster_result_id),
+    providerPlayerId: stringValue(row.provider_player_id),
+    playerName: stringValue(row.player_name),
+    position: stringValue(row.position),
+    isStarter: booleanValue(row.is_starter),
+    fantasyPoints: nullableNumber(row.fantasy_points),
+  };
+}
+
+function mapAward(row: DatabaseRow): FantasyLeagueAward {
+  return {
+    id: stringValue(row.id),
+    leagueId: stringValue(row.league_id),
+    leagueSeasonId: stringValue(row.league_season_id),
+    week: numberValue(row.week),
+    franchiseId: nullableString(row.franchise_id),
+    managerId: nullableString(row.manager_id),
+    weeklyRosterResultId: nullableString(row.weekly_roster_result_id),
+    sourceMatchupId: nullableString(row.source_matchup_id),
+    providerPlayerId: nullableString(row.provider_player_id),
+    playerName: stringValue(row.player_name),
+    awardType: stringValue(row.award_type),
+    title: stringValue(row.title),
+    description: stringValue(row.description),
+    numericValue: nullableNumber(row.numeric_value),
+    sourceType: stringValue(row.source_type),
+    sourceKey: stringValue(row.source_key),
+    calculationVersion: stringValue(row.calculation_version),
+    metadata: objectValue(row.metadata),
+  };
+}
+
+function mapMoment(row: DatabaseRow): FantasyLeagueMoment {
+  return {
+    id: stringValue(row.id),
+    leagueId: stringValue(row.league_id),
+    leagueSeasonId: stringValue(row.league_season_id),
+    week: nullableNumber(row.week),
+    momentType: stringValue(row.moment_type),
+    title: stringValue(row.title),
+    description: stringValue(row.description),
+    occurredAt: nullableString(row.occurred_at),
+    sourceType: stringValue(row.source_type),
+    sourceId: nullableString(row.source_id),
+    managerIds: stringArray(row.manager_ids),
+    providerPlayerId: nullableString(row.provider_player_id),
+    playerName: stringValue(row.player_name),
+    previousValue: nullableNumber(row.previous_value),
+    newValue: nullableNumber(row.new_value),
+    sourceKey: stringValue(row.source_key),
+    calculationVersion: stringValue(row.calculation_version),
+    isManual: booleanValue(row.is_manual),
+    metadata: objectValue(row.metadata),
+  };
+}
+
 async function loadSnapshot(routeId: string): Promise<LeagueHistorySnapshot> {
   const leagueRow = await resolveLeague(routeId);
   if (!leagueRow) throw new Error("This Sleeper league has not been imported into permanent history yet.");
@@ -363,4 +475,75 @@ export function loadLeagueHistory(routeId: string, options: { refresh?: boolean 
 
 export function leagueHistoryStorageConfigured() {
   return Boolean(SUPABASE_URL && SUPABASE_KEY);
+}
+
+export async function loadLeagueWeek(
+  leagueId: string,
+  season: LeagueSeason,
+  week: number,
+  options: { refresh?: boolean; signal?: AbortSignal } = {},
+): Promise<LeagueWeekPayload> {
+  const cacheKey = `${leagueId}:${season.id}:${week}`;
+  if (options.refresh) completedWeekCache.delete(cacheKey);
+  const cached = completedWeekCache.get(cacheKey);
+  if (cached) return cached;
+  const rosterQuery = query();
+  rosterQuery.set("league_season_id", `eq.${season.id}`);
+  rosterQuery.set("week", `eq.${week}`);
+  rosterQuery.set("order", "franchise_id.asc");
+  const awardQuery = query();
+  awardQuery.set("league_id", `eq.${leagueId}`);
+  awardQuery.set("league_season_id", `eq.${season.id}`);
+  awardQuery.set("week", `eq.${week}`);
+  awardQuery.set("order", "award_type.asc");
+  const momentQuery = query();
+  momentQuery.set("league_id", `eq.${leagueId}`);
+  momentQuery.set("league_season_id", `eq.${season.id}`);
+  momentQuery.set("week", `eq.${week}`);
+  momentQuery.set("order", "created_at.asc");
+  const matchupQuery = query("id,is_complete");
+  matchupQuery.set("league_season_id", `eq.${season.id}`);
+  matchupQuery.set("week", `eq.${week}`);
+  const [rosterRows, awardRows, momentRows, matchupRows] = await Promise.all([
+    selectRows("fantasy_weekly_roster_results", rosterQuery, options),
+    selectRows("fantasy_league_awards", awardQuery, options),
+    selectRows("fantasy_league_moments", momentQuery, options),
+    selectRows("fantasy_matchups", matchupQuery, options),
+  ]);
+  const weeklyResults = rosterRows.map(mapWeeklyRosterResult);
+  const weeklyPlayerResults = (await selectRelatedRows(
+    "fantasy_weekly_player_results",
+    "weekly_roster_result_id",
+    weeklyResults.map((result) => result.id),
+    options,
+  )).map(mapWeeklyPlayerResult);
+  const hasCompletedMatchup = matchupRows.some((row) => booleanValue(row.is_complete));
+  const hasPlayerPayload = weeklyResults.every((result) => weeklyPlayerResults.some((player) => player.weeklyRosterResultId === result.id));
+  const status: LeagueWeekPayload["status"] = !weeklyResults.length || !hasCompletedMatchup
+    ? "empty"
+    : weeklyResults.length < season.totalRosters || !hasPlayerPayload
+      ? "partial"
+      : "complete";
+  const payload: LeagueWeekPayload = {
+    leagueId,
+    leagueSeasonId: season.id,
+    season: season.season,
+    week,
+    status,
+    weeklyResults,
+    weeklyPlayerResults,
+    awards: awardRows.map(mapAward),
+    moments: momentRows.map(mapMoment),
+    source: "Sleeper source",
+  };
+  if (status === "complete") completedWeekCache.set(cacheKey, payload);
+  return payload;
+}
+
+export function clearLeagueWeekCache(leagueId?: string) {
+  if (!leagueId) {
+    completedWeekCache.clear();
+    return;
+  }
+  for (const key of completedWeekCache.keys()) if (key.startsWith(`${leagueId}:`)) completedWeekCache.delete(key);
 }

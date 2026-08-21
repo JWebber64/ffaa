@@ -1,4 +1,11 @@
 import type { JsonValue } from "../domain/types";
+import { generateLeagueMoments, type GeneratedLeagueMoment } from "../analytics/leagueMoments";
+import {
+  optimizeLegalLineup,
+  type LineupOptimizationResult,
+  type MissedSubstitution,
+} from "../analytics/lineupOptimizer";
+import { generateWeeklyAwards, type GeneratedWeeklyAward } from "../analytics/weeklyAwards";
 import {
   getSleeperLeagueDraftTypeOverride,
   isIgnoredSleeperDraft,
@@ -51,6 +58,8 @@ export interface SeasonImportPayload {
   playoffMatches: PlayoffMatchImportPayload[];
   drafts: DraftImportPayload[];
   transactions: TransactionImportPayload[];
+  awards: GeneratedWeeklyAward[];
+  moments: GeneratedLeagueMoment[];
 }
 
 export interface FranchiseImportPayload {
@@ -80,6 +89,20 @@ export interface WeeklyResultImportPayload {
   providerRosterId: number;
   score: number;
   starterScore: number;
+  benchScore: number;
+  optimalScore: number | null;
+  lineupEfficiency: number | null;
+  pointsLeftOnBench: number | null;
+  actualStartingPlayerIds: string[];
+  optimalStartingPlayerIds: string[];
+  bestMissedSubstitution: MissedSubstitution | null;
+  optimalStartersUsed: number;
+  analyticsStatus: LineupOptimizationResult["status"];
+  analyticsReason: string;
+  unsupportedSlots: string[];
+  missingSlots: string[];
+  calculationVersion: string;
+  isComplete: boolean;
   players: Array<{
     providerPlayerId: string;
     playerName: string;
@@ -364,7 +387,7 @@ function mapSeason(
       playoffFinish: placements.finish.get(roster.roster_id) ?? "",
     };
   });
-  const weeklyResults: WeeklyResultImportPayload[] = [];
+  const weeklyResults: Array<Pick<WeeklyResultImportPayload, "week" | "providerRosterId" | "score" | "players">> = [];
   const matchups: MatchupImportPayload[] = [];
   for (const weekGroup of bundle.matchups) {
     const groups = new Map<number, SleeperMatchupRow[]>();
@@ -375,7 +398,6 @@ function mapSeason(
         week: weekGroup.week,
         providerRosterId: row.roster_id,
         score,
-        starterScore: score,
         players: (row.players ?? []).map((playerId) => {
           const player = playerReference(playerId, players);
           return {
@@ -414,6 +436,60 @@ function mapSeason(
       });
     }
   }
+  const completedRosterWeeks = new Set(matchups.flatMap((matchup) => matchup.isComplete
+    ? [`${matchup.week}:${matchup.rosterAId}`, `${matchup.week}:${matchup.rosterBId}`]
+    : []));
+  const derivedWeeklyResults: WeeklyResultImportPayload[] = weeklyResults.map((result) => {
+    const isComplete = league.status === "complete"
+      || result.score !== 0
+      || completedRosterWeeks.has(`${result.week}:${result.providerRosterId}`);
+    const analytics = optimizeLegalLineup(result.players, league.roster_positions, { isComplete });
+    return {
+      ...result,
+      starterScore: analytics.starterScore,
+      benchScore: analytics.benchScore,
+      optimalScore: analytics.optimalScore,
+      lineupEfficiency: analytics.lineupEfficiency,
+      pointsLeftOnBench: analytics.pointsLeftOnBench,
+      actualStartingPlayerIds: analytics.actualStartingPlayerIds,
+      optimalStartingPlayerIds: analytics.optimalStartingPlayerIds,
+      bestMissedSubstitution: analytics.bestMissedSubstitution,
+      optimalStartersUsed: analytics.optimalStartersUsed,
+      analyticsStatus: analytics.status,
+      analyticsReason: analytics.reason,
+      unsupportedSlots: analytics.unsupportedSlots,
+      missingSlots: analytics.missingSlots,
+      calculationVersion: analytics.calculationVersion,
+      isComplete,
+    };
+  });
+  const awards = [...new Set(derivedWeeklyResults.map((result) => result.week))].flatMap((week) => generateWeeklyAwards({
+    leagueExternalId: league.league_id,
+    season: numberValue(league.season),
+    week,
+    rosters: derivedWeeklyResults.filter((result) => result.week === week).map((result) => ({
+      ...result,
+      analytics: {
+        status: result.analyticsStatus,
+        reason: result.analyticsReason,
+        unsupportedSlots: result.unsupportedSlots,
+        missingSlots: result.missingSlots,
+        starterScore: result.starterScore,
+        benchScore: result.benchScore,
+        optimalScore: result.optimalScore,
+        pointsLeftOnBench: result.pointsLeftOnBench,
+        lineupEfficiency: result.lineupEfficiency,
+        optimalStartingPlayerIds: result.optimalStartingPlayerIds,
+        actualStartingPlayerIds: result.actualStartingPlayerIds,
+        optimalAssignments: [],
+        actualAssignments: [],
+        bestMissedSubstitution: result.bestMissedSubstitution,
+        optimalStartersUsed: result.optimalStartersUsed,
+        calculationVersion: result.calculationVersion as LineupOptimizationResult["calculationVersion"],
+      },
+    })),
+    matchups: matchups.filter((matchup) => matchup.week === week),
+  }));
   const drafts = bundle.drafts
     .filter(({ draft }) => !isIgnoredSleeperDraft(draft.draft_id))
     .map(({ draft, picks, tradedPicks }): DraftImportPayload => ({
@@ -468,7 +544,7 @@ function mapSeason(
     providerDraftId: league.draft_id ?? null,
     raw: league as unknown as Record<string, JsonValue>,
     franchises,
-    weeklyResults,
+    weeklyResults: derivedWeeklyResults,
     matchups,
     playoffMatches: [
       ...bundle.winnersBracket.map((match) => mapBracketMatch(match, "winners")),
@@ -476,6 +552,8 @@ function mapSeason(
     ],
     drafts,
     transactions: bundle.transactions.map((transaction) => mapTransaction(transaction, players)),
+    awards,
+    moments: [],
   };
 }
 
@@ -492,6 +570,12 @@ export function mapSleeperHistory(
     bundle.seasons.map((season) => season.league.league_id),
   );
   const leagueDraftType = draftTypeOverride ?? currentDraft?.type ?? "fantasy";
+  const seasons = bundle.seasons.map((season) => mapSeason(season, players, draftTypeOverride));
+  const moments = generateLeagueMoments(seasons);
+  const seasonsWithMoments = seasons.map((season) => ({
+    ...season,
+    moments: moments.filter((moment) => moment.season === season.season),
+  }));
   return {
     provider: "sleeper",
     requestedExternalLeagueId: bundle.requestedLeagueId,
@@ -507,6 +591,6 @@ export function mapSleeperHistory(
         draftTypeOverride,
       },
     },
-    seasons: bundle.seasons.map((season) => mapSeason(season, players, draftTypeOverride)),
+    seasons: seasonsWithMoments,
   };
 }

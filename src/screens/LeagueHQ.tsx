@@ -5,6 +5,7 @@ import {
   Award,
   BookOpen,
   CalendarClock,
+  CalendarDays,
   CheckCircle2,
   ChevronDown,
   ClipboardCheck,
@@ -326,9 +327,14 @@ export default function LeagueHQ() {
             <PencilLine size={16} aria-hidden="true" /> Commissioner Studio
           </Button>
           {data.sleeper ? (
-            <Link to={`/league/${data.sleeper.leagueId}`}>
-              <Button variant="secondary"><History size={16} aria-hidden="true" /> Permanent history</Button>
-            </Link>
+            <>
+              <Link className="league-hero-history-link" to={`/league/${data.sleeper.leagueId}/week`}>
+                <CalendarDays size={16} aria-hidden="true" /> This Week
+              </Link>
+              <Link className="league-hero-history-link" to={`/league/${data.sleeper.leagueId}`}>
+                <History size={16} aria-hidden="true" /> League History
+              </Link>
+            </>
           ) : null}
           <span>{data.sleeper ? "Live Sleeper results + commissioner context" : "Local commissioner file"}</span>
         </div>
@@ -637,7 +643,7 @@ export default function LeagueHQ() {
 
         {activeView === "seasons" ? (
           <section>
-            <SectionHeading eyebrow="Season archive" title="Reviews, awards & superlatives" detail="Weekly headlines now; permanent history when the season closes." />
+            <SectionHeading eyebrow="Season archive" title="Reviews, awards & superlatives" detail="Weekly headlines now; League History keeps every completed season connected." />
             {data.weekRecaps.length ? (
               <div className="league-recap-grid">
                 {data.weekRecaps.map((week) => (

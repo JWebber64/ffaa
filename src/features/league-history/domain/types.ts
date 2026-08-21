@@ -91,6 +91,23 @@ export interface WeeklyRosterResult {
   optimalScore: number | null;
   lineupEfficiency: number | null;
   pointsLeftOnBench: number | null;
+  actualStartingPlayerIds: string[];
+  optimalStartingPlayerIds: string[];
+  bestMissedSubstitution: {
+    incomingPlayerId: string;
+    incomingPlayerName: string;
+    incomingPoints: number;
+    outgoingPlayerId: string;
+    outgoingPlayerName: string;
+    outgoingPoints: number;
+    gain: number;
+  } | null;
+  optimalStartersUsed: number | null;
+  analyticsStatus: "valid" | "incomplete" | "unsupported";
+  analyticsReason: string;
+  unsupportedSlots: string[];
+  missingSlots: string[];
+  calculationVersion: string;
 }
 
 export interface WeeklyPlayerResult {
@@ -101,6 +118,62 @@ export interface WeeklyPlayerResult {
   position: string;
   isStarter: boolean;
   fantasyPoints: number | null;
+}
+
+export interface FantasyLeagueAward {
+  id: string;
+  leagueId: string;
+  leagueSeasonId: string;
+  week: number;
+  franchiseId: string | null;
+  managerId: string | null;
+  weeklyRosterResultId: string | null;
+  sourceMatchupId: string | null;
+  providerPlayerId: string | null;
+  playerName: string;
+  awardType: string;
+  title: string;
+  description: string;
+  numericValue: number | null;
+  sourceType: string;
+  sourceKey: string;
+  calculationVersion: string;
+  metadata: Record<string, JsonValue>;
+}
+
+export interface FantasyLeagueMoment {
+  id: string;
+  leagueId: string;
+  leagueSeasonId: string;
+  week: number | null;
+  momentType: string;
+  title: string;
+  description: string;
+  occurredAt: string | null;
+  sourceType: string;
+  sourceId: string | null;
+  managerIds: string[];
+  providerPlayerId: string | null;
+  playerName: string;
+  previousValue: number | null;
+  newValue: number | null;
+  sourceKey: string;
+  calculationVersion: string;
+  isManual: boolean;
+  metadata: Record<string, JsonValue>;
+}
+
+export interface LeagueWeekPayload {
+  leagueId: string;
+  leagueSeasonId: string;
+  season: number;
+  week: number;
+  status: "complete" | "empty" | "partial";
+  weeklyResults: WeeklyRosterResult[];
+  weeklyPlayerResults: WeeklyPlayerResult[];
+  awards: FantasyLeagueAward[];
+  moments: FantasyLeagueMoment[];
+  source: "Sleeper source";
 }
 
 export interface PlayoffMatch {

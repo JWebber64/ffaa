@@ -83,6 +83,28 @@ async function writeImportChunks(payload: LeagueHistoryImportPayload, chunksDire
   console.log(`[league-history] wrote ${chunkNumber} resumable import chunks to ${absoluteDirectory}`);
 }
 
+async function callImportRpc(
+  supabaseUrl: string,
+  secretKey: string,
+  functionName: string,
+  payload: LeagueHistoryImportPayload,
+) {
+  const response = await fetch(`${supabaseUrl}/rest/v1/rpc/${functionName}`, {
+    method: "POST",
+    headers: {
+      apikey: secretKey,
+      Authorization: `Bearer ${secretKey}`,
+      "Content-Type": "application/json",
+      "Content-Profile": "app",
+      "Accept-Profile": "app",
+    },
+    body: JSON.stringify({ payload }),
+  });
+  const body = await response.text();
+  if (!response.ok) throw new Error(`Supabase ${functionName} failed (${response.status}): ${body.slice(0, 500)}`);
+  return JSON.parse(body) as Record<string, unknown>;
+}
+
 async function main() {
   const leagueId = option("league") || process.argv.find((argument) => /^\d{10,}$/.test(argument)) || "";
   if (!leagueId) {
@@ -93,7 +115,7 @@ async function main() {
   console.log(`[league-history] discovering Sleeper season chain for ${leagueId}`);
   const history = await client.loadHistory(leagueId);
   let payload = mapSleeperHistory(history, players);
-  console.log(`[league-history] mapped ${payload.seasons.length} seasons, ${payload.seasons.reduce((sum, season) => sum + season.matchups.length, 0)} matchups, ${payload.seasons.reduce((sum, season) => sum + season.transactions.length, 0)} transactions, and ${payload.seasons.reduce((sum, season) => sum + season.drafts.reduce((draftSum, draft) => draftSum + draft.picks.length, 0), 0)} draft picks`);
+  console.log(`[league-history] mapped ${payload.seasons.length} seasons, ${payload.seasons.reduce((sum, season) => sum + season.matchups.length, 0)} matchups, ${payload.seasons.reduce((sum, season) => sum + season.transactions.length, 0)} transactions, ${payload.seasons.reduce((sum, season) => sum + season.drafts.reduce((draftSum, draft) => draftSum + draft.picks.length, 0), 0)} draft picks, ${payload.seasons.reduce((sum, season) => sum + season.awards.length, 0)} weekly awards, and ${payload.seasons.reduce((sum, season) => sum + season.moments.length, 0)} permanent moments`);
 
   const auctionSourcesPath = option("auction-sources");
   if (auctionSourcesPath) {
@@ -114,7 +136,11 @@ async function main() {
     }
   }
 
-  const selectedSeasons = option("only-seasons").split(",").map((value) => Number(value.trim())).filter(Number.isFinite);
+  const selectedSeasons = option("only-seasons").split(",")
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .map(Number)
+    .filter(Number.isFinite);
   if (selectedSeasons.length) payload = { ...payload, seasons: payload.seasons.filter((season) => selectedSeasons.includes(season.season)) };
   if (hasFlag("drafts-only")) {
     payload = { ...payload, seasons: payload.seasons.map((season) => ({
@@ -123,6 +149,8 @@ async function main() {
       matchups: [],
       playoffMatches: [],
       transactions: [],
+      awards: [],
+      moments: [],
     })) };
   }
   if (selectedSeasons.length || hasFlag("drafts-only")) {
@@ -145,22 +173,16 @@ async function main() {
   if (!supabaseUrl || !secretKey) {
     throw new Error("Set SUPABASE_URL and SUPABASE_SECRET_KEY for the server-side import. Never use a VITE_ key for imports.");
   }
-  const response = await fetch(`${supabaseUrl}/rest/v1/rpc/import_fantasy_league_history`, {
-    method: "POST",
-    headers: {
-      apikey: secretKey,
-      Authorization: `Bearer ${secretKey}`,
-      "Content-Type": "application/json",
-      "Content-Profile": "app",
-      "Accept-Profile": "app",
-    },
-    body: JSON.stringify({ payload }),
-  });
-  const body = await response.text();
-  if (!response.ok) throw new Error(`Supabase import failed (${response.status}): ${body.slice(0, 500)}`);
-  const result = JSON.parse(body) as { status?: string; error?: string; leagueId?: string; seasonsImported?: number };
+  const result = await callImportRpc(supabaseUrl, secretKey, "import_fantasy_league_history", payload) as {
+    status?: string; error?: string; leagueId?: string; seasonsImported?: number;
+  };
   if (result.status !== "complete") throw new Error(result.error || "Supabase returned an incomplete import.");
   console.log(`[league-history] import complete: league ${result.leagueId}, ${result.seasonsImported} seasons`);
+  const derivations = await callImportRpc(supabaseUrl, secretKey, "import_fantasy_weekly_derivations", payload) as {
+    status?: string; weeklyRowsUpdated?: number; awardsUpserted?: number; momentsUpserted?: number;
+  };
+  if (derivations.status !== "complete") throw new Error("Supabase returned an incomplete weekly derivation import.");
+  console.log(`[league-history] weekly derivations complete: ${derivations.weeklyRowsUpdated ?? 0} lineups, ${derivations.awardsUpserted ?? 0} awards, ${derivations.momentsUpserted ?? 0} moments`);
 }
 
 main().catch((error: unknown) => {

@@ -3,3 +3,7 @@ export * from "./config";
 export * from "./goat";
 export * from "./headToHead";
 export * from "./records";
+export * from "./lineupOptimizer";
+export * from "./weeklyAwards";
+export * from "./leagueMoments";
+export * from "./weeklyWorkspace";
