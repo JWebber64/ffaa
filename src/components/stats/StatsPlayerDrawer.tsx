@@ -1,8 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
-import { Database, X } from "lucide-react";
+import { AlertCircle, Database, LoaderCircle, RotateCw, X } from "lucide-react";
 
 import { TeamMark } from "@/components/player/TeamMark";
+import {
+  loadPlayerCareerStats,
+} from "@/data/playerCareerStats";
+import type {
+  PlayerCareerScoringMode,
+  PlayerCareerSeason,
+  PlayerCareerStatsResult,
+} from "@/data/playerCareerStats";
+import "@/components/stats/StatsPlayerDrawer.css";
 
 export interface StatsPlayerMetric {
   label: string;
@@ -43,6 +52,12 @@ export interface StatsPlayerDetail {
   usageMetrics: StatsPlayerMetric[];
   weeks: StatsPlayerWeek[];
   sources: StatsPlayerSource[];
+  career: {
+    playerId?: string;
+    playerName: string;
+    position: string;
+    scoring: PlayerCareerScoringMode;
+  };
 }
 
 interface StatsPlayerDrawerProps {
@@ -52,6 +67,7 @@ interface StatsPlayerDrawerProps {
 
 const DRAWER_TABS = [
   { value: "overview", label: "Overview" },
+  { value: "career", label: "Career" },
   { value: "game-log", label: "Game log" },
   { value: "sources", label: "Sources" },
 ] as const;
@@ -72,12 +88,216 @@ function MetricGrid({ metrics }: { metrics: StatsPlayerMetric[] }) {
   );
 }
 
+type CareerColumn = {
+  id: string;
+  label: string;
+  value: (season: PlayerCareerSeason) => string;
+  align?: "left" | "right";
+};
+
+function formatCareerNumber(value: number, decimals = 0) {
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+function careerColumns(position: string): CareerColumn[] {
+  const common: CareerColumn[] = [
+    { id: "season", label: "Season", value: (row) => String(row.season), align: "left" },
+    { id: "team", label: "Team", value: (row) => row.team || "—", align: "left" },
+    { id: "games", label: "G", value: (row) => formatCareerNumber(row.games) },
+  ];
+  const scoring: CareerColumn[] = [
+    { id: "fantasyPoints", label: "FPTS", value: (row) => formatCareerNumber(row.fantasyPoints, 1) },
+    {
+      id: "fantasyPointsPerGame",
+      label: "FPG",
+      value: (row) => row.fantasyPointsPerGame === null
+        ? "—"
+        : formatCareerNumber(row.fantasyPointsPerGame, 1),
+    },
+  ];
+
+  if (position === "QB") {
+    return [...common,
+      { id: "completions", label: "Cmp", value: (row) => formatCareerNumber(row.completions) },
+      { id: "passingAttempts", label: "Att", value: (row) => formatCareerNumber(row.passingAttempts) },
+      { id: "passingYards", label: "Pass Yds", value: (row) => formatCareerNumber(row.passingYards) },
+      { id: "passingTouchdowns", label: "Pass TD", value: (row) => formatCareerNumber(row.passingTouchdowns) },
+      { id: "interceptions", label: "INT", value: (row) => formatCareerNumber(row.interceptions) },
+      { id: "rushingYards", label: "Rush Yds", value: (row) => formatCareerNumber(row.rushingYards) },
+      { id: "rushingTouchdowns", label: "Rush TD", value: (row) => formatCareerNumber(row.rushingTouchdowns) },
+      ...scoring,
+    ];
+  }
+
+  if (position === "K") {
+    return [...common,
+      { id: "fieldGoalsMade", label: "FG", value: (row) => formatCareerNumber(row.fieldGoalsMade) },
+      { id: "fieldGoalsAttempted", label: "FGA", value: (row) => formatCareerNumber(row.fieldGoalsAttempted) },
+      {
+        id: "fieldGoalPercentage",
+        label: "FG%",
+        value: (row) => row.fieldGoalPercentage === null
+          ? "—"
+          : `${formatCareerNumber(row.fieldGoalPercentage * 100, 1)}%`,
+      },
+      { id: "extraPointsMade", label: "XP", value: (row) => formatCareerNumber(row.extraPointsMade) },
+      { id: "extraPointsAttempted", label: "XPA", value: (row) => formatCareerNumber(row.extraPointsAttempted) },
+      ...scoring,
+    ];
+  }
+
+  const receiving: CareerColumn[] = [
+    { id: "targets", label: "Tgt", value: (row) => formatCareerNumber(row.targets) },
+    { id: "receptions", label: "Rec", value: (row) => formatCareerNumber(row.receptions) },
+    { id: "receivingYards", label: "Rec Yds", value: (row) => formatCareerNumber(row.receivingYards) },
+    { id: "receivingTouchdowns", label: "Rec TD", value: (row) => formatCareerNumber(row.receivingTouchdowns) },
+  ];
+  const rushing: CareerColumn[] = [
+    { id: "carries", label: "Car", value: (row) => formatCareerNumber(row.carries) },
+    { id: "rushingYards", label: "Rush Yds", value: (row) => formatCareerNumber(row.rushingYards) },
+    { id: "rushingTouchdowns", label: "Rush TD", value: (row) => formatCareerNumber(row.rushingTouchdowns) },
+  ];
+  return position === "RB"
+    ? [...common, ...rushing, ...receiving, ...scoring]
+    : [...common, ...receiving, ...rushing, ...scoring];
+}
+
+function CareerPanel({
+  player,
+  result,
+  loading,
+  error,
+  onRetry,
+}: {
+  player: StatsPlayerDetail;
+  result: PlayerCareerStatsResult | null;
+  loading: boolean;
+  error: string | null;
+  onRetry: () => void;
+}) {
+  if (player.position === "DEF") {
+    return (
+      <p className="stats-drawer-empty">
+        Career player totals are not available for team D/ST entries.
+      </p>
+    );
+  }
+
+  if (loading && !result) {
+    return (
+      <div className="stats-career-status" role="status" aria-live="polite">
+        <LoaderCircle size={20} className="stats-career-spinner" aria-hidden="true" />
+        <div>
+          <strong>Loading full NFL career</strong>
+          <span>Checking every nflverse season back to 1999…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !result) {
+    return (
+      <div className="stats-career-status is-error" role="alert">
+        <AlertCircle size={20} aria-hidden="true" />
+        <div>
+          <strong>Career stats are temporarily unavailable</strong>
+          <span>{error}</span>
+          <button type="button" onClick={onRetry}>
+            <RotateCw size={14} aria-hidden="true" />
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const seasons = result?.seasons ?? [];
+  if (!seasons.length) {
+    return (
+      <p className="stats-drawer-empty">
+        No NFL regular-season stats are available for this player yet.
+      </p>
+    );
+  }
+
+  const games = seasons.reduce((sum, season) => sum + season.games, 0);
+  const fantasyPoints = seasons.reduce((sum, season) => sum + season.fantasyPoints, 0);
+  const columns = careerColumns(player.position);
+  const scoringLabel = player.career.scoring === "halfPpr"
+    ? "Half PPR"
+    : player.career.scoring.toUpperCase();
+
+  return (
+    <>
+      <dl className="stats-career-summary">
+        <div><dt>Seasons played</dt><dd>{seasons.length}</dd></div>
+        <div><dt>Games</dt><dd>{games.toLocaleString()}</dd></div>
+        <div><dt>Career FPTS</dt><dd>{formatCareerNumber(fantasyPoints, 1)}</dd></div>
+        <div><dt>Career FPG</dt><dd>{games ? formatCareerNumber(fantasyPoints / games, 1) : "—"}</dd></div>
+      </dl>
+
+      {result?.unavailableSeasons.length ? (
+        <div className="stats-career-notice" role="status">
+          <AlertCircle size={16} aria-hidden="true" />
+          <span>
+            {result.unavailableSeasons.length} source season{result.unavailableSeasons.length === 1 ? "" : "s"} could not be checked. The rows below include every available season.
+          </span>
+        </div>
+      ) : null}
+
+      <p className="stats-career-context">
+        Regular-season totals · {scoringLabel} fantasy scoring · Team is the most recent club listed for that season.
+      </p>
+      <div className="stats-drawer-table-shell stats-career-table-shell">
+        <table className="stats-drawer-table stats-career-table">
+          <caption className="sr-only">
+            {player.name} NFL regular-season statistics by year
+          </caption>
+          <thead>
+            <tr>
+              {columns.map((column) => (
+                <th key={column.id} scope="col" className={column.align === "left" ? "is-left" : undefined}>
+                  {column.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {seasons.map((season) => (
+              <tr key={`${season.playerId}-${season.season}`}>
+                {columns.map((column) => (
+                  <td key={column.id} className={column.align === "left" ? "is-left" : undefined}>
+                    {column.value(season)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="stats-career-coverage">
+        nflverse player summaries cover {result?.coverageStart}–{result?.coverageEnd}. Seasons are shown newest first.
+      </p>
+    </>
+  );
+}
+
 export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
   const [tab, setTab] = useState<DrawerTab>("overview");
+  const [careerResult, setCareerResult] = useState<PlayerCareerStatsResult | null>(null);
+  const [careerLoading, setCareerLoading] = useState(false);
+  const [careerError, setCareerError] = useState<string | null>(null);
+  const [careerAttempt, setCareerAttempt] = useState(0);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const playerId = player?.id ?? null;
+  const careerRequestKey = player
+    ? `${player.id}|${player.career.playerId ?? player.career.playerName}|${player.career.scoring}`
+    : null;
 
   useEffect(() => {
     if (!playerId) return;
@@ -123,6 +343,33 @@ export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
   useEffect(() => {
     setTab("overview");
   }, [playerId]);
+
+  useEffect(() => {
+    setCareerResult(null);
+    setCareerError(null);
+    setCareerLoading(false);
+    setCareerAttempt(0);
+  }, [careerRequestKey]);
+
+  useEffect(() => {
+    if (tab !== "career" || !player || player.position === "DEF") return;
+    const controller = new AbortController();
+    setCareerLoading(true);
+    setCareerError(null);
+    loadPlayerCareerStats({
+      ...player.career,
+      signal: controller.signal,
+    })
+      .then(setCareerResult)
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+        setCareerError(error instanceof Error ? error.message : String(error));
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setCareerLoading(false);
+      });
+    return () => controller.abort();
+  }, [careerAttempt, player, tab]);
 
   function moveTab(event: ReactKeyboardEvent<HTMLButtonElement>, currentIndex: number) {
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
@@ -219,10 +466,30 @@ export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
             </>
           ) : null}
 
+          {tab === "career" ? (
+            <section aria-labelledby="stats-career-heading">
+              <div className="stats-drawer-section-head">
+                <h3 id="stats-career-heading">NFL career by season</h3>
+                <span>{careerResult?.seasons.length ? `${careerResult.seasons.length} seasons` : "Regular season"}</span>
+              </div>
+              <CareerPanel
+                player={player}
+                result={careerResult}
+                loading={careerLoading}
+                error={careerError}
+                onRetry={() => setCareerAttempt((attempt) => attempt + 1)}
+              />
+            </section>
+          ) : null}
+
           {tab === "game-log" ? (
             <section aria-labelledby="stats-game-log-heading">
               <div className="stats-drawer-section-head">
-                <h3 id="stats-game-log-heading">Recent games</h3>
+                <h3 id="stats-game-log-heading">
+                  {player.weeks[0]
+                    ? `${player.weeks[0].season} regular-season game log`
+                    : "Season game log"}
+                </h3>
                 <span>{player.weeks.length} games</span>
               </div>
               {player.weeks.length ? (
