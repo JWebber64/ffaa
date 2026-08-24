@@ -7611,10 +7611,14 @@ html, body, #root {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(132px, 0.28fr) minmax(136px, auto);
+  grid-template-columns: minmax(280px, 1fr) minmax(136px, auto);
   gap: 8px;
   align-items: end;
   padding: 14px 14px 0;
+}
+
+.offline-player-toolbar.is-custom-player {
+  grid-template-columns: minmax(280px, 1fr) minmax(132px, 0.28fr) minmax(156px, auto);
 }
 
 .offline-position-field {

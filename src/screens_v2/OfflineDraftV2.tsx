@@ -513,6 +513,7 @@ export default function OfflineDraftV2() {
   const totalSpent = teams.reduce((sum, team) => sum + team.spent, 0);
   const priceValue = clampWholeDollar(price);
   const customName = playerQuery.trim();
+  const isCustomPlayer = Boolean(customName && !selectedPlayer);
   const canAssign = Boolean(selectedTeam && priceValue !== null && (selectedPlayer || customName));
 
   function persistDraft(nextTeams = teams, nextConfig = offlineConfig) {
@@ -932,7 +933,7 @@ export default function OfflineDraftV2() {
             />
           </div>
 
-          <div className="offline-player-toolbar">
+          <div className={cn("offline-player-toolbar", isCustomPlayer ? "is-custom-player" : "")}>
             <label className="offline-search-field">
               <span>
                 <Search size={14} aria-hidden="true" />
@@ -950,28 +951,26 @@ export default function OfflineDraftV2() {
               />
             </label>
 
-            <div className="offline-position-field">
-              <SelectWrapper
-                label="Position"
-                value={selectedPlayer ? normalizeManualPosition(selectedPlayer.pos) : manualPosition}
-                onValueChange={(value) => {
-                  setManualPosition(normalizeManualPosition(value));
-                  setSelectedPlayerId(null);
-                }}
-                disabled={!!selectedPlayer}
-                className="offline-select-trigger"
-              >
-                {MANUAL_POSITIONS.map((position) => (
-                  <SelectItem key={position} value={position} position={positionSelectToken(position)}>
-                    {position}
-                  </SelectItem>
-                ))}
-              </SelectWrapper>
-            </div>
+            {isCustomPlayer ? (
+              <div className="offline-position-field">
+                <SelectWrapper
+                  label="Custom position"
+                  value={manualPosition}
+                  onValueChange={(value) => setManualPosition(normalizeManualPosition(value))}
+                  className="offline-select-trigger"
+                >
+                  {MANUAL_POSITIONS.map((position) => (
+                    <SelectItem key={position} value={position} position={positionSelectToken(position)}>
+                      {position}
+                    </SelectItem>
+                  ))}
+                </SelectWrapper>
+              </div>
+            ) : null}
 
             <Button size="lg" onClick={assignCurrentPlayer} disabled={!canAssign}>
               <Plus size={17} aria-hidden="true" />
-              Assign
+              {isCustomPlayer ? "Assign custom" : "Assign"}
             </Button>
           </div>
 
