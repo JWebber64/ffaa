@@ -26,6 +26,7 @@ reports/
 codex-*.html
 codex-*.png
 league-desktop.png
+supabase/.temp/
 
 # Editor directories and files
 .vscode/*
