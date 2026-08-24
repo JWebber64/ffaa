@@ -26,7 +26,6 @@ import type {
   StatsPlayerDetail,
   StatsPlayerMetric,
   StatsPlayerSource,
-  StatsPlayerWeek,
 } from "@/components/stats/StatsPlayerDrawer";
 import { StatsSparkline } from "@/components/stats/StatsSparkline";
 import { StatsViewTabs } from "@/components/stats/StatsViewTabs";
@@ -34,6 +33,8 @@ import type { StatsView } from "@/components/stats/statsViewOptions";
 import "@/components/stats/auctionValues.css";
 import { loadPlayerPool } from "@/data/loadPlayerPool";
 import { FANTASY_SEASON } from "@/config/fantasySeason";
+import { NFLVERSE_CAREER_LATEST_SEASON } from "@/data/playerCareerStats";
+import { buildPlayerGameLog } from "@/data/playerGameLog";
 import { buildPlayerStatRows } from "@/data/playerStatCategories";
 import type { PlayerStatRow } from "@/data/playerStatCategories";
 import type { SleeperPlayerRow } from "@/data/playerStatCategories";
@@ -495,7 +496,7 @@ function playerColumns(view: StatsView): StatsTableColumn<HubPlayerRow>[] {
   const playerColumn: StatsTableColumn<HubPlayerRow> = {
     id: "player",
     label: "Player",
-    description: "Open the player card for game logs, usage, and source details.",
+    description: "Open the player card for full career seasons, season game logs, usage, and source details.",
     align: "left",
     sticky: true,
     sortValue: (row) => row.name,
@@ -1144,14 +1145,13 @@ function playerDetail(
   teamCount: number,
 ): StatsPlayerDetail {
   const recentDelta = row.last3FantasyPointsPerGame - row.fantasyPointsPerGame;
-  const sources: StatsPlayerSource[] = [];
-  if (row.summary) {
-    sources.push({
-      name: "nflverse",
-      detail: "Weekly player stats, fantasy scoring, opportunity, and game context.",
-      updatedAt: String(season),
-    });
-  }
+  const sources: StatsPlayerSource[] = [{
+    name: "nflverse",
+    detail: "Regular-season career summaries plus weekly player stats, fantasy scoring, opportunity, and game context.",
+    updatedAt: row.summary
+      ? `${season} weekly · career through ${NFLVERSE_CAREER_LATEST_SEASON}`
+      : `Career through ${NFLVERSE_CAREER_LATEST_SEASON}`,
+  }];
   if (row.adpRow) {
     sources.push({
       name: FANTASY_FOOTBALL_CALCULATOR_SOURCE.name,
@@ -1202,28 +1202,7 @@ function playerDetail(
     sources.push({ name: "GameHQ player pool", detail: "Local player identity and draft metadata." });
   }
 
-  const weeks: StatsPlayerWeek[] = (row.summary?.weeklyRows ?? [])
-    .slice(-12)
-    .reverse()
-    .map((week) => ({
-      id: `${week.season}-${week.week}-${week.gameId || week.playerId}`,
-      season: week.season,
-      week: week.week,
-      team: week.team,
-      opponent: week.opponent,
-      fantasyPoints: week.selectedFantasyPoints,
-      carries: week.stats.carries ?? 0,
-      targets: week.stats.targets ?? 0,
-      receptions: week.stats.receptions ?? 0,
-      totalYards:
-        (week.stats.passing_yards ?? 0) +
-        (week.stats.rushing_yards ?? 0) +
-        (week.stats.receiving_yards ?? 0),
-      totalTouchdowns:
-        (week.stats.passing_tds ?? 0) +
-        (week.stats.rushing_tds ?? 0) +
-        (week.stats.receiving_tds ?? 0),
-    }));
+  const weeks = buildPlayerGameLog(row.summary?.weeklyRows ?? []);
 
   return {
     id: row.id,
@@ -1254,6 +1233,16 @@ function playerDetail(
     ],
     weeks,
     sources,
+    career: {
+      ...(row.summary?.playerId
+        ? { playerId: row.summary.playerId }
+        : /^00-/.test(row.id)
+          ? { playerId: row.id }
+          : {}),
+      playerName: row.name,
+      position: row.position,
+      scoring,
+    },
   };
 }
 
@@ -2341,7 +2330,7 @@ export default function StatsExplorer() {
       <div className="stats-hub-note">
         <Info size={17} aria-hidden="true" />
         <span>
-          Everything shown comes from active sources. Definitions, source details, and recent game logs are available by opening a player row; empty placeholder categories are no longer exposed.
+          Everything shown comes from active sources. Full NFL career seasons, definitions, source details, and complete selected-season game logs are available by opening a player row; empty placeholder categories are no longer exposed.
         </span>
       </div>
 

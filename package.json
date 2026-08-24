@@ -19,6 +19,7 @@
     "values:public:pull": "tsx scripts/fetch-public-auction-values.ts",
     "values:pulse": "tsx scripts/check-value-sources.ts",
     "public-data:pull": "tsx scripts/fetch-public-fantasy-data.ts --season=2026",
+    "career-data:pull": "tsx scripts/fetch-player-career-data.ts",
     "analytics-data:pull": "tsx scripts/pull-analytics-data.ts",
     "league:history:import": "tsx scripts/import-sleeper-league-history.ts",
     "league:history:goat:validate": "tsx scripts/import-sleeper-league-history.ts --league=1385319428408774656 --auction-sources=scripts/config/goat-auction-sources.json --dry-run --output=reports/goat-league-history-import-with-auctions.json --auction-report=reports/goat-auction-import-validation.json",

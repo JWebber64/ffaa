@@ -1,0 +1,179 @@
+.stats-drawer-body,
+.stats-drawer-body section {
+  min-width: 0;
+}
+
+.stats-drawer-tabs button:focus-visible {
+  border-radius: 6px 6px 0 0;
+  outline: 2px solid rgba(94, 234, 212, 0.72);
+  outline-offset: -3px;
+}
+
+.stats-career-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.stats-career-summary > div {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.stats-career-summary dt {
+  color: rgba(148, 163, 184, 0.66);
+  font-size: 0.66rem;
+}
+
+.stats-career-summary dd {
+  margin: 7px 0 0;
+  color: rgba(241, 245, 249, 0.94);
+  font-size: 1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-career-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 16px;
+  border: 1px solid rgba(94, 234, 212, 0.13);
+  border-radius: 10px;
+  background: rgba(94, 234, 212, 0.035);
+  color: rgba(94, 234, 212, 0.78);
+}
+
+.stats-career-status.is-error {
+  border-color: rgba(251, 113, 133, 0.18);
+  background: rgba(251, 113, 133, 0.05);
+  color: rgba(253, 164, 175, 0.9);
+}
+
+.stats-career-status > svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.stats-career-status strong,
+.stats-career-status span {
+  display: block;
+}
+
+.stats-career-status strong {
+  color: rgba(226, 232, 240, 0.92);
+  font-size: 0.8rem;
+}
+
+.stats-career-status span {
+  margin-top: 4px;
+  color: rgba(148, 163, 184, 0.72);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.stats-career-status button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 7px 10px;
+  border: 1px solid rgba(251, 113, 133, 0.24);
+  border-radius: 8px;
+  background: rgba(251, 113, 133, 0.08);
+  color: rgba(255, 228, 230, 0.9);
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+.stats-career-spinner {
+  animation: stats-career-spin 900ms linear infinite;
+}
+
+@keyframes stats-career-spin {
+  to { transform: rotate(360deg); }
+}
+
+.stats-career-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 9px 10px;
+  border: 1px solid rgba(251, 191, 36, 0.15);
+  border-radius: 8px;
+  background: rgba(251, 191, 36, 0.045);
+  color: rgba(253, 230, 138, 0.78);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.stats-career-notice svg {
+  flex: none;
+}
+
+.stats-career-context,
+.stats-career-coverage {
+  margin: 0;
+  color: rgba(148, 163, 184, 0.62);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.stats-career-context {
+  margin-bottom: 9px;
+}
+
+.stats-career-coverage {
+  margin-top: 9px;
+}
+
+.stats-career-table-shell {
+  width: 100%;
+  max-width: 100%;
+  scrollbar-color: rgba(94, 234, 212, 0.28) rgba(255, 255, 255, 0.03);
+}
+
+.stats-career-table th.is-left,
+.stats-career-table td.is-left {
+  text-align: left;
+}
+
+.stats-career-table th:first-child,
+.stats-career-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: rgb(8, 19, 15);
+}
+
+.stats-career-table th:first-child {
+  z-index: 2;
+  background: rgb(12, 24, 20);
+}
+
+@media (max-width: 720px) {
+  .stats-drawer-tabs {
+    overflow-x: auto;
+    padding-inline: 12px;
+  }
+
+  .stats-drawer-tabs button {
+    flex: none;
+  }
+
+  .stats-career-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stats-career-spinner {
+    animation-duration: 1800ms;
+  }
+}
+
