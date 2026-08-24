@@ -22,6 +22,7 @@ import { Input } from "../ui/Input";
 import { PositionToggle } from "../ui/PositionToggle";
 import { SelectItem, SelectWrapper } from "../ui/SelectWrapper";
 import { cn } from "../ui/cn";
+import { compareOfflineDraftPlayers, suggestedPrice } from "./offlineDraftPlayerOrder";
 
 const STORAGE_KEY = "ffaa.offlineDraft.v1";
 const DEFAULT_TEAM_COUNT: TeamCountV2 = 12;
@@ -327,12 +328,6 @@ function loadSavedDraft(): OfflineDraftState {
   }
 }
 
-function suggestedPrice(player: Player) {
-  const value = player.auctionValue ?? player.projectedValue;
-  if (typeof value !== "number" || !Number.isFinite(value)) return 1;
-  return Math.max(1, Math.round(value));
-}
-
 function playerMeta(player: Player) {
   const value = player.auctionValue ?? player.projectedValue;
   return [
@@ -506,7 +501,7 @@ export default function OfflineDraftV2() {
     return playerPool
       .filter((player) => !draftedPlayerIds.has(player.id))
       .filter((player) => matchesPlayer(player, playerQuery, positionFilter))
-      .sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999));
+      .sort(compareOfflineDraftPlayers);
   }, [draftedPlayerIds, playerPool, playerQuery, positionFilter]);
 
   const totalPlayers = teams.reduce((sum, team) => sum + team.roster.length, 0);
