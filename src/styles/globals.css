@@ -12659,9 +12659,10 @@ body,
 }
 
 .analytics-position-control .ffaa-position-button {
+  flex: 1 1 0;
   min-width: 0;
   height: 34px;
-  padding-inline: 10px;
+  padding-inline: 4px;
 }
 
 .analytics-note {

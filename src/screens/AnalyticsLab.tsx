@@ -24,7 +24,7 @@ const SEASONS = [2025, 2024, 2023, 2022] as const;
 const MIN_GAME_OPTIONS = [3, 5, 8] as const;
 const WEEK_OPTIONS = Array.from({ length: 18 }, (_, index) => index + 1);
 
-const POSITION_OPTIONS = ["ALL", "QB", "RB", "WR", "TE"] as const;
+const POSITION_OPTIONS = ["ALL", "QB", "RB", "WR", "TE", "K", "DEF"] as const;
 
 function numberFromQuery(value: string | null, fallback: number, minimum: number, maximum: number) {
   const parsed = Number(value);

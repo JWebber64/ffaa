@@ -1,7 +1,7 @@
 import { appUrl } from "@/lib/appBasePath";
 
 export type AnalyticsScoringMode = "standard" | "halfPpr" | "ppr";
-export type AnalyticsPosition = "ALL" | "QB" | "RB" | "WR" | "TE";
+export type AnalyticsPosition = "ALL" | "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
 
 export type AnalyticsLoadOptions = {
   season: number;
@@ -158,7 +158,7 @@ function scoringReceptionValue(scoring: AnalyticsScoringMode) {
 }
 
 function isAnalyticsPosition(value: string | undefined): value is Exclude<AnalyticsPosition, "ALL"> {
-  return value === "QB" || value === "RB" || value === "WR" || value === "TE";
+  return value === "QB" || value === "RB" || value === "WR" || value === "TE" || value === "K" || value === "DEF";
 }
 
 function inRange(value: number, start: number, end: number) {
