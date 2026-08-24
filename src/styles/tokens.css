@@ -1,17 +1,17 @@
 :root {
-  /* --- Dark base --- */
-  /* Requested page background: #070D09 with subtle emerald glow */
-  --bg-0: #070D09;        /* page */
-  /* Surfaces tuned to the same green-black family (removes blue/purple cast) */
-  --bg-1: #08120B;        /* deep surface */
-  --bg-2: #0B1910;        /* raised surface */
+  /* Stadium-green neutrals with clear separation across dense surfaces. */
+  --bg-0: #10241a;
+  --bg-1: #183529;
+  --bg-2: #214536;
 
   /* Borders */
-  --line-0: rgba(255,255,255,0.06);
-  --line-1: rgba(255,255,255,0.08);   /* hairline border */
+  --line-0: rgba(229, 244, 235, 0.16);
+  --line-1: rgba(229, 244, 235, 0.28);
 
-  --text-0: rgba(255,255,255,0.92);
-  --text-1: rgba(255,255,255,0.68);
+  --text-0: #f7fbf8;
+  --text-1: #c7dacf;
+  --text-2: #aac2b4;
+  --text-3: #8eaa9a;
 
   /* --- Brand accents (Material-ish) --- */
   --a1: #10B981;  /* emerald */
@@ -40,10 +40,10 @@
   --pos-db:     #1E3A8A; /* Dark blue */
   --pos-idpflex:#0891B2; /* Same as FLEX */
 
-  /* --- Glass (rgba so backdrop blur works) --- */
-  --glass-1: rgba(255,255,255,0.06);  /* card */
-  --glass-2: rgba(255,255,255,0.08);  /* panel */
-  --glass-3: rgba(255,255,255,0.10);  /* pill */
+  /* Legacy glass names resolve to the brighter product surfaces. */
+  --glass-1: #183529;
+  --glass-2: #214536;
+  --glass-3: #2a5542;
 
   /* Specular highlights (top sheen) */
   --spec-1: rgba(255,255,255,0.18);
@@ -53,8 +53,8 @@
   --glass-tint-1: rgba(255,255,255,0.12);
   --glass-tint-2: rgba(255,255,255,0.05);
   --glass-tint-3: rgba(255,255,255,0.02);
-  --glass-edge: rgba(255,255,255,0.14);
-  --glass-edge-soft: rgba(255,255,255,0.08);
+  --glass-edge: var(--line-1);
+  --glass-edge-soft: var(--line-0);
   --glass-spec-strong: rgba(255,255,255,0.26);
   --glass-spec-soft: rgba(255,255,255,0.10);
   --glass-inner: rgba(255,255,255,0.07);

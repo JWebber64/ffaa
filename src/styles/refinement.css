@@ -3361,3 +3361,299 @@ dd,
   background-image: none !important;
   box-shadow: none !important;
 }
+
+/* --------------------------------------------------------------------------
+ * Visibility uplift
+ * Brighter semantic layers keep the night-game identity without near-black
+ * headers, panels, cards, or form controls collapsing into one surface.
+ * ----------------------------------------------------------------------- */
+
+:root {
+  --ffaa-header-surface: #183a2b;
+  --ffaa-control-surface: #1d3e2f;
+  --ffaa-toolbar-surface: rgba(24, 53, 41, 0.96);
+  --ffaa-panel-background: linear-gradient(180deg, #1d3f30, #173326);
+  --ffaa-panel-background-strong: linear-gradient(180deg, #224a38, #19382a);
+  --ffaa-card-background: linear-gradient(145deg, #204534, #173226);
+  --ffaa-card-background-hover: linear-gradient(145deg, #28503e, #1b3b2d);
+  --football-field: #1a4030;
+  --football-ink: #10271c;
+}
+
+html,
+body,
+#root {
+  background: var(--bg-0) !important;
+}
+
+.ffaa-bg {
+  background:
+    linear-gradient(180deg, rgba(16, 39, 28, 0.08), rgba(13, 31, 23, 0.58)),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent calc(10% - 1px),
+      rgba(232, 240, 235, 0.025) calc(10% - 1px),
+      rgba(232, 240, 235, 0.025) 10%
+    ),
+    radial-gradient(circle at 13% 8%, rgba(120, 168, 196, 0.16), transparent 27%),
+    radial-gradient(circle at 88% 2%, rgba(196, 103, 45, 0.12), transparent 24%),
+    linear-gradient(145deg, #18392b, var(--football-ink) 48%, #153326) !important;
+}
+
+.app-header {
+  border-bottom-color: var(--line-1);
+  background: color-mix(in srgb, var(--ffaa-header-surface) 98%, transparent);
+}
+
+.app-nav-link {
+  color: var(--text-1);
+}
+
+.ui-button-secondary {
+  border-color: var(--line-1) !important;
+  background: linear-gradient(180deg, #284f3d, #203f31) !important;
+}
+
+.ui-button-secondary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #315d49, #274c3b) !important;
+}
+
+.ui-input-field,
+.ffaa-control,
+.select-trigger,
+.ffaa-custom-select-trigger,
+.stats-select-trigger,
+.setup-input,
+.setup-select,
+.host-input,
+.join-input,
+.offline-input,
+.offline-select-trigger,
+.tool-field input,
+.cui-input {
+  border-color: var(--line-1) !important;
+  background: var(--ffaa-control-surface) !important;
+  color: var(--text-0) !important;
+}
+
+.ui-input-field::placeholder,
+.ffaa-control::placeholder,
+.setup-input::placeholder,
+.host-input::placeholder,
+.join-input::placeholder,
+.offline-input::placeholder,
+.tool-field input::placeholder,
+.league-connect-input input::placeholder,
+.studio-form-grid input::placeholder,
+.studio-manager-list textarea::placeholder,
+.studio-rivalry-list textarea::placeholder,
+.studio-futures-list textarea::placeholder {
+  color: var(--text-3) !important;
+  opacity: 1;
+}
+
+.ffaa-custom-select-menu,
+.select-content,
+.ffaa-dropdown-content {
+  border-color: var(--line-1);
+  background:
+    radial-gradient(130% 150% at 0% 0%, rgba(45, 212, 191, 0.16), transparent 48%),
+    linear-gradient(180deg, #28513e, var(--bg-1)) !important;
+}
+
+.ffaa-custom-select-option {
+  color: var(--text-1);
+}
+
+.ffaa-custom-select-option.is-selected {
+  background: color-mix(in srgb, var(--select-position-color) 18%, var(--bg-2));
+}
+
+.custom-select-trigger option,
+.cui-select option,
+.league-sync-switch select,
+.league-connect-form select,
+.league-ballot select,
+.league-json,
+.studio-form-grid input,
+.studio-order-list input,
+.studio-manager-list textarea,
+.studio-rivalry-list input,
+.studio-rivalry-list textarea,
+.studio-futures-list input,
+.studio-futures-list textarea {
+  border-color: var(--line-1) !important;
+  background: var(--ffaa-control-surface) !important;
+  color: var(--text-0) !important;
+}
+
+.glass-panel,
+.glass-card,
+.liquid-card,
+.control-card-surface,
+.setup-card,
+.setup-panel,
+.setup-summary,
+.host-panel,
+.join-panel,
+.results-primary-card,
+.results-side-card,
+.results-winner-card,
+.results-team-card,
+.offline-panel,
+.offline-setup-panel,
+.host-status-card,
+.join-status-card,
+.results-status-card,
+.stats-hub-controls,
+.stats-hub-panel,
+.analytics-controls,
+.analytics-chart-card,
+.analytics-player-spotlight,
+.analytics-attribution,
+.tools-principles,
+.tools-control-panel,
+.tools-methodology,
+.tool-data-note,
+.compare-player-card,
+.compare-source-grid article,
+.team-player-search,
+.team-rater-result,
+.auction-builder-settings,
+.auction-team-card,
+.auction-board,
+.line-source-card,
+.league-connect-panel,
+.league-panel,
+.league-rule,
+.league-manager-card,
+.league-recap,
+.league-rivalry,
+.league-quote-grid blockquote,
+.league-futures-grid article,
+.league-ballot,
+.league-awards-grid article,
+.league-season,
+.league-record-table,
+.league-model-note,
+.league-draft-hero,
+.league-draft-order,
+.draft-command-tile,
+.draft-bid-header-card,
+.draft-side-panel,
+.draft-board-card,
+.draft-player-queue-panel,
+.mobile-manager-status,
+.mobile-bid-console,
+.mobile-nomination-panel,
+.mobile-roster-panel,
+.team-panel,
+.draft-player-list,
+.draft-log-list,
+.draft-queue-results,
+.draft-queue-list {
+  border-color: var(--line-1) !important;
+  background: var(--ffaa-panel-background) !important;
+}
+
+.draft-command-focus {
+  border-color: color-mix(in srgb, var(--a1) 42%, var(--line-1)) !important;
+  background: var(--ffaa-panel-background-strong) !important;
+}
+
+.tools-card,
+.home-capability-list article {
+  border-color: var(--line-1);
+  background: var(--ffaa-card-background) !important;
+}
+
+.tools-card:hover,
+.home-capability-list article:hover {
+  background: var(--ffaa-card-background-hover) !important;
+}
+
+.stats-view-tabs,
+.analytics-section-nav,
+.league-tabs,
+.stats-hub-source-strip,
+.offline-setup-summary,
+.offline-console-toolbar,
+.league-sync-bar {
+  border-color: var(--line-1);
+  background: var(--ffaa-toolbar-surface) !important;
+}
+
+.stats-hub-table-shell,
+.tool-table-shell,
+.home-comparison {
+  border-color: var(--line-1);
+  background: var(--bg-1) !important;
+}
+
+.stats-hub-table th,
+.stats-hub-table th.is-sticky,
+.tool-table thead th,
+.auction-table thead th,
+.compare-table th:first-child {
+  background: var(--bg-2) !important;
+}
+
+.stats-hub-table tbody tr {
+  --stats-hub-row-background: var(--bg-1);
+}
+
+.stats-hub-table tbody tr:nth-child(even) {
+  --stats-hub-row-background: color-mix(in srgb, var(--bg-1) 78%, var(--bg-2));
+}
+
+.stats-hub-table tbody tr:hover {
+  --stats-hub-row-background: var(--bg-2);
+}
+
+.home-hero,
+.home-brief,
+.home-playbook-photo figcaption,
+.home-section {
+  border-color: var(--line-1);
+  background: var(--ffaa-panel-background) !important;
+}
+
+.home-proof-strip > span {
+  border-color: var(--line-1);
+  background: rgba(24, 53, 41, 0.92);
+}
+
+.home-research-links {
+  border-color: var(--line-1);
+  background-image:
+    linear-gradient(90deg, rgba(11, 30, 20, 0.86), rgba(11, 30, 20, 0.48)),
+    var(--football-banner-image);
+}
+
+.setup-hero,
+.host-hero,
+.join-hero,
+.results-hero,
+.stats-hub .stats-hero,
+.analytics-hero,
+.tools-hero,
+.tools-page-hero,
+.league-hero {
+  border-color: var(--line-1) !important;
+  background-image:
+    linear-gradient(90deg, rgba(10, 28, 19, 0.9), rgba(10, 30, 20, 0.72) 48%, rgba(10, 28, 19, 0.36)),
+    linear-gradient(0deg, rgba(10, 27, 19, 0.5), transparent),
+    var(--football-banner-image) !important;
+}
+
+.auction-budget-input,
+.team-slot-stepper input {
+  border-color: var(--line-1);
+  background: var(--ffaa-control-surface);
+}
+
+.tool-field .auction-budget-input input {
+  border: 0 !important;
+  background: transparent !important;
+}
