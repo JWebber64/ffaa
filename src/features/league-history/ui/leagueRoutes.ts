@@ -9,6 +9,7 @@ const RECOVERABLE_SECTIONS = [
   "records",
   "seasons",
   "drafts",
+  "payouts",
   "trades",
   "waivers",
   "h2h",

@@ -12,6 +12,7 @@ import {
   Swords,
   Trophy,
   Users,
+  WalletCards,
 } from "lucide-react";
 import { Link, Navigate, NavLink, Outlet, Route, Routes, useLocation, useParams } from "react-router-dom";
 
@@ -26,6 +27,7 @@ import { SeasonArchivePage, SeasonsPage } from "./pages/SeasonsPage";
 import { LeaderboardsPage } from "./pages/LeaderboardsPage";
 import { DraftHistoryPage, TransactionHistoryPage } from "./pages/ActivityPage";
 import { WeekPage } from "./pages/WeekPage";
+import { PayoutsPage } from "./pages/PayoutsPage";
 import { leagueHistoryPath, recoverLeagueHistoryPath } from "./leagueRoutes";
 import "./league-history.css";
 
@@ -40,6 +42,7 @@ const HISTORY_NAV = [
   { to: "seasons", label: "Seasons", icon: BookOpen },
   { to: "leaderboards", label: "Leaderboards", icon: ChartNoAxesColumnIncreasing },
   { to: "drafts", label: "Drafts", icon: ScrollText },
+  { to: "payouts", label: "Payouts", icon: WalletCards },
   { to: "transactions", label: "Transactions", icon: Activity },
 ] as const;
 
@@ -120,6 +123,7 @@ export default function LeagueHistoryApp() {
         <Route path="seasons/:season" element={<SeasonArchivePage />} />
         <Route path="leaderboards" element={<LeaderboardsPage />} />
         <Route path="drafts" element={<DraftHistoryPage />} />
+        <Route path="payouts" element={<PayoutsPage />} />
         <Route path="transactions" element={<TransactionHistoryPage />} />
         <Route path="trades" element={<TransactionHistoryPage defaultType="trade" />} />
         <Route path="waivers" element={<TransactionHistoryPage defaultType="waiver" />} />

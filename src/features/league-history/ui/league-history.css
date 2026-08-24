@@ -888,6 +888,85 @@
   .history-week-footer-nav > span { flex: 1 1 100%; }
 }
 
+/* Public payout ledger */
+.history-payout-page { gap: 20px; }
+.history-payout-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.history-payout-summary > article {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--glass-edge-soft);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--bg-1) 95%, transparent);
+}
+.history-payout-summary span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-1);
+  font-size: 0.72rem;
+  font-weight: 760;
+}
+.history-payout-summary strong { display: block; margin-top: 10px; font-size: clamp(1.4rem, 2.4vw, 2rem); letter-spacing: -0.04em; }
+.history-payout-summary small { display: block; margin-top: 7px; color: var(--text-1); font-size: 0.66rem; line-height: 1.4; }
+.history-payout-summary article[data-status="paid"] { border-color: color-mix(in srgb, var(--a1) 34%, var(--glass-edge-soft)); }
+.history-payout-summary article[data-status="paid"] span { color: var(--a1); }
+.history-payout-summary article[data-status="processing"] { border-color: color-mix(in srgb, var(--warn) 38%, var(--glass-edge-soft)); }
+.history-payout-summary article[data-status="processing"] span { color: var(--warn); }
+.history-payout-feature-grid { grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.45fr); }
+.history-payout-awards-table { min-width: 680px; }
+.history-payout-awards-table th:first-child,
+.history-payout-awards-table td:first-child,
+.history-payout-awards-table th:nth-child(2),
+.history-payout-awards-table td:nth-child(2) { text-align: left; }
+.history-payout-source-panel p { font-size: 0.76rem; line-height: 1.55; }
+.history-payout-source-panel dl { display: grid; gap: 1px; overflow: hidden; margin: 16px 0 0; border: 1px solid var(--line-0); border-radius: 9px; background: var(--line-0); }
+.history-payout-source-panel dl > div { display: grid; gap: 4px; padding: 11px 12px; background: var(--bg-2); }
+.history-payout-source-panel dt { color: var(--text-1); font-size: 0.61rem; font-weight: 760; text-transform: uppercase; }
+.history-payout-source-panel dd { margin: 0; overflow-wrap: anywhere; font-size: 0.7rem; font-weight: 760; }
+.history-payout-weeks { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 7px; }
+.history-payout-weeks > article { min-width: 0; padding: 11px; border: 1px solid var(--line-0); border-radius: 8px; background: var(--bg-2); }
+.history-payout-weeks span,
+.history-payout-weeks small { display: block; color: var(--text-1); font-size: 0.61rem; }
+.history-payout-weeks strong { display: block; overflow: hidden; margin: 5px 0 3px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.history-payout-ledger-table { min-width: 880px; }
+.history-payout-ledger-table th:nth-child(2),
+.history-payout-ledger-table td:nth-child(2) { max-width: 320px; text-align: left; white-space: normal; }
+.history-payment-status { display: inline-flex; min-height: 25px; align-items: center; padding: 4px 7px; border: 1px solid var(--line-0); border-radius: 999px; background: var(--bg-2); color: var(--text-1); font-size: 0.61rem; font-weight: 780; white-space: nowrap; }
+.history-payment-status[data-status="paid"] { border-color: color-mix(in srgb, var(--a1) 40%, var(--line-0)); color: var(--a1); }
+.history-payment-status[data-status="processing"] { border-color: color-mix(in srgb, var(--warn) 45%, var(--line-0)); color: var(--warn); }
+.history-payment-status[data-status="unmarked"] { border-color: color-mix(in srgb, var(--a2) 28%, var(--line-0)); }
+.history-payment-status[data-status="not_applicable"] { opacity: 0.68; }
+.history-payout-carryover { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 17px 19px; border: 1px solid color-mix(in srgb, var(--a2) 34%, var(--line-0)); border-radius: 11px; background: color-mix(in srgb, var(--a2) 7%, var(--bg-1)); }
+.history-payout-carryover div { min-width: 0; }
+.history-payout-carryover div > span,
+.history-payout-carryover div > strong,
+.history-payout-carryover div > small { display: block; }
+.history-payout-carryover div > span { color: var(--a2); font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.history-payout-carryover div > strong { margin-top: 4px; overflow-wrap: anywhere; }
+.history-payout-carryover div > small { margin-top: 4px; color: var(--text-1); }
+.history-payout-carryover > strong { flex: 0 0 auto; color: var(--a1); font-size: 1.35rem; }
+
+@media (max-width: 1100px) {
+  .history-payout-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .history-payout-weeks { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 780px) {
+  .history-payout-feature-grid { grid-template-columns: 1fr; }
+  .history-payout-weeks { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+  .history-payout-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .history-payout-summary > article { padding: 14px; }
+  .history-payout-weeks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .history-payout-carryover { align-items: flex-start; flex-direction: column; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .history-decision-chevron { transition: none; }
   .history-week-loading > span { animation: none; }

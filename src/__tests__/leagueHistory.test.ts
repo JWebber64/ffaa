@@ -93,6 +93,7 @@ describe("normalized league history analytics", () => {
     ["/ff/league/123/leaderboards/h2h", "/league/123/h2h"],
     ["/ff/league/123/managers/history/champions", "/league/123/history/champions"],
     ["/ff/league/123/h2h/leaderboards", "/league/123/leaderboards"],
+    ["/ff/league/123/managers/payouts", "/league/123/payouts"],
     ["/ff/league/123/unknown", "/league/123"],
   ])("recovers malformed nested league path %s", (pathname, expected) => {
     expect(recoverLeagueHistoryPath("123", pathname)).toBe(expected);
