@@ -7,6 +7,7 @@ import { TeamMark } from "@/components/player/TeamMark";
 import { ToolLayout } from "@/components/tools/ToolLayout";
 import { ToolMetricBar } from "@/components/tools/ToolMetricBar";
 import { ToolPlayerPicker } from "@/components/tools/ToolPlayerPicker";
+import { TeamPointsSummary } from "@/components/tools/TeamPointsSummary";
 import type { ToolPlayer, ToolPosition, ToolScoring } from "@/data/toolPlayerData";
 import {
   DEFAULT_TEAM_RATER_SLOTS,
@@ -311,6 +312,7 @@ export function TeamRater() {
               <p>{lineupDescription}</p>
             </div>
           </div>
+          <TeamPointsSummary players={roster} scoring={scoring} />
           <div className="team-rating-components">
             {rating.components.map((component) => (
               <ToolMetricBar key={component.id} label={component.label} value={roster.length ? component.score : 0} detail={`${Math.round(component.weight * 100)}% of grade · ${component.detail}`} />
