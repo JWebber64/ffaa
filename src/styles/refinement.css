@@ -3371,6 +3371,7 @@ dd,
 :root {
   --ffaa-header-surface: #183a2b;
   --ffaa-control-surface: oklch(0.432 0.062 162.472);
+  --ffaa-inner-surface: var(--bg-2);
   --ffaa-toolbar-surface: rgba(24, 53, 41, 0.96);
   --ffaa-panel-background: linear-gradient(180deg, #1d3f30, #173326);
   --ffaa-panel-background-strong: linear-gradient(180deg, #224a38, #19382a);
@@ -3668,4 +3669,108 @@ body,
 .tool-field .auction-budget-input input {
   border: 0 !important;
   background: transparent !important;
+}
+
+/* Neutral child tiles sit above cards and below form controls in the surface stack. */
+.setup-hero-metric,
+.setup-summary-item,
+.results-summary-item,
+.stats-hub-summary-card,
+.analytics-summary-grid > div,
+.tool-summary-grid article,
+.setup-stat-card,
+.host-manager-card,
+.join-step,
+.join-room-meta-item,
+.results-team-metrics > div,
+.offline-console-stat,
+.offline-setup-summary > div,
+.setup-hero-metric:first-child,
+.setup-summary-item:first-child,
+.results-summary-item:first-child,
+.stats-hub-summary-card:first-child,
+.analytics-summary-grid > div:first-child,
+.tool-summary-grid article:first-child {
+  background: var(--ffaa-inner-surface) !important;
+}
+
+.setup-roster .roster-row,
+.host-actions-grid .host-action,
+.stats-hub-source,
+.stats-drawer-metric,
+.stats-career-summary > div,
+.stats-drawer-source-list article,
+.team-rater-league-summary,
+.team-rater-roster li,
+.team-points-summary-grid > div,
+.rated-lineup-list > div,
+.schedule-presets button,
+.auction-slot-control,
+.auction-drafted-player,
+.league-pulse-track article,
+.league-manager-stats > div,
+.league-recap-facts span,
+.league-podium span,
+.league-season-honors > div,
+.league-draft-order > div > span,
+.team-detail-stats div,
+.team-detail-row,
+.mobile-context-item {
+  background: var(--ffaa-inner-surface) !important;
+}
+
+.team-slot-control {
+  background: color-mix(in srgb, var(--slot-color) 7%, var(--ffaa-inner-surface)) !important;
+}
+
+.host-actions-grid .host-action:hover {
+  background: color-mix(in srgb, white 6%, var(--ffaa-inner-surface)) !important;
+}
+
+.schedule-presets button.is-active {
+  background: color-mix(in srgb, var(--tools-green) 14%, var(--ffaa-inner-surface)) !important;
+}
+
+.league-pulse-track article:hover {
+  background: color-mix(in srgb, var(--a1) 7%, var(--ffaa-inner-surface)) !important;
+}
+
+.team-detail-row.is-filled {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--team-slot-color) 13%, transparent), transparent),
+    var(--ffaa-inner-surface) !important;
+}
+
+.offline-board-wrap .team-slot-line,
+.offline-board-wrap .team-slot-line.is-filled {
+  background: color-mix(in srgb, var(--team-slot-color) 7%, var(--ffaa-inner-surface)) !important;
+}
+
+.offline-board-wrap .team-slot-line.is-filled {
+  background: color-mix(in srgb, var(--team-slot-color) 12%, var(--ffaa-inner-surface)) !important;
+}
+
+/* League History has its own stylesheet, but shares the same raised hierarchy. */
+.history-leader-strip > div,
+.history-season-rail > a,
+.history-rivalry-facts > div,
+.history-season-rivalries > div,
+.history-meeting-list > article,
+.history-matchup-grid article,
+.history-transaction-mini > div,
+.history-goat-formula span,
+.history-draft-summary > div,
+.history-position-spend > span,
+.history-transaction-assets > span,
+.history-trade-receipt,
+.history-decision-rank,
+.history-decision-metrics > div,
+.history-decision-impact,
+.history-lineup-compare header,
+.history-decision-facts > div,
+.history-missed-swap,
+.history-week-standings-head,
+.history-payout-source-panel dl > div,
+.history-payout-weeks > article {
+  background: var(--ffaa-inner-surface) !important;
 }

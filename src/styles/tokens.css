@@ -2,7 +2,7 @@
   /* Stadium-green neutrals with clear separation across dense surfaces. */
   --bg-0: #10241a;
   --bg-1: #183529;
-  --bg-2: #214536;
+  --bg-2: oklch(0.398 0.054 163);
 
   /* Borders */
   --line-0: rgba(229, 244, 235, 0.16);
