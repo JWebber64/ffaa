@@ -45,12 +45,20 @@ cataloged or displayed, but do not receive independent consensus weight when
 that would double-count their underlying inputs.
 
 The fair-value board is calibrated to the active league's complete auction pool.
-Every drafted player retains the $1 minimum. When imported dollar boards leave
-a league-wide shortfall, the remaining money is spread evenly across draftable
-skill players instead of multiplying already-expensive stars. If the preliminary
-board overspends, only above-minimum premiums are reduced proportionally. The
-drafted universe is derived from the actual team count and roster size; IR slots
-are excluded.
+Every drafted player retains the $1 minimum, and the bottom 15% of the modeled
+draft pool forms a replacement-price tier. The remaining premium dollars follow
+a mild top-heavy curve so the board reflects how real auction rooms concentrate
+spending while still conserving every league dollar. The drafted universe is
+derived from the actual team count, roster size, and eligible roster positions;
+IR slots are excluded, and K/DST are not valued as draftable when the active
+league does not roster them.
+
+When a user connects a public Sleeper league in League HQ, GameHQ stores that
+league's scoring, team count, roster template, and auction budget from the
+Sleeper draft when available. Stats Auction Values and Build a Team use the most
+recently connected league by default and display the active assumptions. When
+Sleeper does not publish an auction budget, GameHQ labels and uses the standard
+$200 fallback.
 
 Published auction values are combined with a median. Projection, ADP, rank, and
 market-index signals can adjust fair value but never count as additional auction

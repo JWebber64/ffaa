@@ -45,6 +45,7 @@ import {
 import { CommissionerStudio } from "../features/league-hq/CommissionerStudio";
 import { useLeagueHQ } from "../features/league-hq/useLeagueHQ";
 import {
+  auctionSettingsSummary,
   useSleeperLeagueConnections,
   type SleeperLeagueConnectionSummary,
 } from "../features/league-hq/sleeperConnections";
@@ -207,6 +208,7 @@ export default function LeagueHQ() {
       totalRosters: currentManagers,
       sourceUrl: connection.sourceUrl,
       lastUsedAt: new Date().toISOString(),
+      ...(connection.auctionSettings ? { auctionSettings: connection.auctionSettings } : {}),
     });
   }, [rememberConnection]);
 
@@ -365,7 +367,7 @@ export default function LeagueHQ() {
           <strong>{data.sleeper ? `Connected to ${data.sleeper.leagueName}` : activeLeagueId ? `Connecting league ${activeLeagueId}` : "No Sleeper league connected"}</strong>
           <small>
             {sleeperSync.message || (data.sleeper
-              ? `${data.sleeper.seasonsImported} seasons imported / last synced ${new Date(data.sleeper.syncedAt).toLocaleString()}`
+              ? `${data.sleeper.seasonsImported} seasons imported / last synced ${new Date(data.sleeper.syncedAt).toLocaleString()}${data.sleeper.auctionSettings ? ` / Auction values use ${auctionSettingsSummary(data.sleeper.auctionSettings)}` : ""}`
               : activeLeagueId ? `League ${activeLeagueId}` : "Connect any public Sleeper league to begin." )}
           </small>
         </div>

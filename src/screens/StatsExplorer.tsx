@@ -32,6 +32,10 @@ import { StatsViewTabs } from "@/components/stats/StatsViewTabs";
 import type { StatsView } from "@/components/stats/statsViewOptions";
 import "@/components/stats/auctionValues.css";
 import { loadPlayerPool } from "@/data/loadPlayerPool";
+import {
+  normalizeAuctionValueRosterSlots,
+  normalizeAuctionValueScoring,
+} from "@/data/auctionValueSettings";
 import { FANTASY_SEASON } from "@/config/fantasySeason";
 import { NFLVERSE_CAREER_LATEST_SEASON } from "@/data/playerCareerStats";
 import { buildPlayerGameLog } from "@/data/playerGameLog";
@@ -51,6 +55,7 @@ import type {
   SleeperTrendingSignal,
 } from "@/data/publicFantasySignals";
 import { AUCTION_VALUE_SOURCE_COLUMNS } from "@/data/playerValues";
+import type { AuctionValueRosterSlot } from "@/data/playerValues";
 import { loadSleeperAuctionDraft } from "@/data/sleeperAuctionDraft";
 import type { SleeperAuctionDraftResult } from "@/data/sleeperAuctionDraft";
 import {
@@ -70,6 +75,10 @@ import { PositionToggle } from "@/ui/PositionToggle";
 import { SelectItem, SelectWrapper } from "@/ui/SelectWrapper";
 import type { PlayerValueSource } from "@/types/draft";
 import { appUrl } from "@/lib/appBasePath";
+import {
+  auctionSettingsSummary,
+  useSleeperLeagueConnections,
+} from "@/features/league-hq/sleeperConnections";
 
 type HubScoring = WeeklyFantasyScoringMode;
 type PositionFilter = "ALL" | "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
@@ -1143,6 +1152,9 @@ function playerDetail(
   scoring: HubScoring,
   season: number,
   teamCount: number,
+  rosterSize: number,
+  budget: number,
+  leagueName?: string,
 ): StatsPlayerDetail {
   const recentDelta = row.last3FantasyPointsPerGame - row.fantasyPointsPerGame;
   const sources: StatsPlayerSource[] = [{
@@ -1192,7 +1204,7 @@ function playerDetail(
     ];
     sources.push({
       name: "GameHQ auction value model",
-      detail: `${teamCount}-team, $200-budget consensus with 15 drafted players per team${auctionSourceNames.length ? ` using ${auctionSourceNames.join(", ")}` : ""}. The full league pool is calibrated to spend exactly ${teamCount * 200} dollars.`,
+      detail: `${leagueName ? `${leagueName}: ` : ""}${teamCount}-team, $${budget}-budget consensus with ${rosterSize} drafted players per team${auctionSourceNames.length ? ` using ${auctionSourceNames.join(", ")}` : ""}. The full league pool is calibrated to spend exactly ${teamCount * budget} dollars.`,
       ...(row.projection?.player.valueUpdatedAt
         ? { updatedAt: String(row.projection.player.valueUpdatedAt) }
         : {}),
@@ -1272,11 +1284,29 @@ function listedNumber(value: string | null, fallback: number, options: readonly 
   return Number.isInteger(parsed) && options.includes(parsed) ? parsed : fallback;
 }
 
+const ROSTER_SIZE_OPTIONS = [9, 10, 12, 14, 15, 16, 18, 20] as const;
+
+function standardRosterSlots(rosterSize: number): AuctionValueRosterSlot[] {
+  const starters: AuctionValueRosterSlot[] = [
+    { slot: "QB", count: 1 },
+    { slot: "RB", count: 2 },
+    { slot: "WR", count: 2 },
+    { slot: "TE", count: 1 },
+    { slot: "FLEX", count: 1 },
+    { slot: "K", count: 1 },
+    { slot: "DEF", count: 1 },
+  ];
+  const bench = Math.max(0, rosterSize - 9);
+  return bench ? [...starters, { slot: "BENCH", count: bench }] : starters;
+}
+
 export default function StatsExplorer() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { connections } = useSleeperLeagueConnections();
   const view = parseView(searchParams.get("view"));
-  const scoring = parseScoring(searchParams.get("scoring"));
+  const valueView = view === "draft" || view === "auction";
+  const customScoring = parseScoring(searchParams.get("scoring"));
   const seasonType = parseSeasonType(searchParams.get("games"));
   const season = boundedNumber(
     searchParams.get("season"),
@@ -1287,7 +1317,49 @@ export default function StatsExplorer() {
   const weeklySeason = view === "trends" ? TREND_BASELINE_SEASON : season;
   const weekStart = boundedNumber(searchParams.get("from"), 1, 1, 22);
   const weekEnd = boundedNumber(searchParams.get("to"), 18, 1, 22);
-  const teamCount = listedNumber(searchParams.get("teams"), 12, TEAM_COUNT_OPTIONS);
+  const customTeamCount = listedNumber(searchParams.get("teams"), 12, TEAM_COUNT_OPTIONS);
+  const customRosterSize = listedNumber(searchParams.get("roster"), 15, ROSTER_SIZE_OPTIONS);
+  const customBudget = boundedNumber(searchParams.get("budget"), 200, 1, 1000);
+  const requestedValueProfile = searchParams.get("league");
+  const connectedValueProfiles = useMemo(
+    () => connections.filter((connection) => connection.auctionSettings),
+    [connections],
+  );
+  const activeValueConnection = useMemo(
+    () => valueView
+      ? connectedValueProfiles.find((connection) => connection.leagueId === requestedValueProfile)
+        ?? (requestedValueProfile === null ? connectedValueProfiles[0] : undefined)
+      : undefined,
+    [connectedValueProfiles, requestedValueProfile, valueView],
+  );
+  const activeValueSettings = activeValueConnection?.auctionSettings;
+  const activeValueLeagueName = activeValueConnection?.leagueName ?? "";
+  const scoring = activeValueSettings
+    ? normalizeAuctionValueScoring(activeValueSettings.scoring)
+    : customScoring;
+  const teamCount = activeValueSettings
+    ? Math.max(1, Math.round(Number(activeValueSettings.teamCount)))
+    : customTeamCount;
+  const rosterSize = activeValueSettings
+    ? Math.max(1, Math.round(Number(activeValueSettings.rosterSize)))
+    : customRosterSize;
+  const budget = activeValueSettings
+    ? Math.max(1, Math.round(Number(activeValueSettings.budget)))
+    : customBudget;
+  const rosterSlotsKey = activeValueSettings
+    ? normalizeAuctionValueRosterSlots(activeValueSettings.rosterSlots)
+        .map((slot) => `${slot.slot}:${slot.count}`)
+        .join(",")
+    : "";
+  const rosterSlots = useMemo(
+    () => rosterSlotsKey
+      ? rosterSlotsKey.split(",").map((entry) => {
+          const [slot, count] = entry.split(":");
+          return { slot: slot ?? "BENCH", count: Number(count) || 0 };
+        })
+      : standardRosterSlots(rosterSize),
+    [rosterSize, rosterSlotsKey],
+  );
   const rowLimit = listedNumber(searchParams.get("rows"), 50, ROW_LIMIT_OPTIONS);
   const search = searchParams.get("q") ?? "";
   const requestedPosition = (searchParams.get("position") ?? "ALL").toUpperCase();
@@ -1316,8 +1388,8 @@ export default function StatsExplorer() {
   const [sort, setSort] = useState<StatsSortState>(() => DEFAULT_SORTS[view]);
 
   const playerPool = useMemo(
-    () => loadPlayerPool({ scoring, teamCount, rosterSize: 15 }),
-    [scoring, teamCount],
+    () => loadPlayerPool({ scoring, teamCount, rosterSize, rosterSlots, budget }),
+    [budget, rosterSize, rosterSlots, scoring, teamCount],
   );
   const projectionRows = useMemo(
     () => buildPlayerStatRows(playerPool, [], sleeperDirectory),
@@ -1331,6 +1403,17 @@ export default function StatsExplorer() {
       else next.set(key, value);
     }
     setSearchParams(next, { replace: true });
+  }
+
+  function updateCustomValueSettings(updates: Record<string, string | null>) {
+    updateQuery({
+      league: "custom",
+      scoring: scoring === "ppr" ? null : scoring,
+      teams: teamCount === 12 ? null : String(teamCount),
+      roster: rosterSize === 15 ? null : String(rosterSize),
+      budget: budget === 200 ? null : String(budget),
+      ...updates,
+    });
   }
 
   async function importSleeperAuction(event: FormEvent<HTMLFormElement>) {
@@ -1887,8 +1970,18 @@ export default function StatsExplorer() {
   const selectedPlayer = useMemo(() => {
     if (!selectedPlayerId) return null;
     const row = playerRows.find((candidate) => candidate.id === selectedPlayerId);
-    return row ? playerDetail(row, scoring, weeklySeason, teamCount) : null;
-  }, [playerRows, scoring, selectedPlayerId, teamCount, weeklySeason]);
+    return row
+      ? playerDetail(
+          row,
+          scoring,
+          weeklySeason,
+          teamCount,
+          rosterSize,
+          budget,
+          activeValueLeagueName,
+        )
+      : null;
+  }, [activeValueLeagueName, budget, playerRows, rosterSize, scoring, selectedPlayerId, teamCount, weeklySeason]);
   const closePlayer = useCallback(() => setSelectedPlayerId(null), [setSelectedPlayerId]);
 
   const viewResultCount =
@@ -2104,8 +2197,26 @@ export default function StatsExplorer() {
           </div>
         )}
 
+        {valueView ? (
+          <div className="stats-select-shell">
+            <SelectWrapper
+              label="Value profile"
+              value={activeValueConnection?.leagueId ?? "custom"}
+              onValueChange={(value) => value === "custom"
+                ? updateCustomValueSettings({})
+                : updateQuery({ league: value, scoring: null, teams: null, roster: null, budget: null })}
+              className="stats-select-trigger"
+            >
+              <SelectItem value="custom">Custom settings</SelectItem>
+              {connectedValueProfiles.map((connection) => (
+                <SelectItem key={connection.leagueId} value={connection.leagueId}>{connection.leagueName}</SelectItem>
+              ))}
+            </SelectWrapper>
+          </div>
+        ) : null}
+
         <div className="stats-select-shell">
-          <SelectWrapper label="Scoring" value={scoring} onValueChange={(value) => updateQuery({ scoring: value === "ppr" ? null : value })} className="stats-select-trigger">
+          <SelectWrapper label="Scoring" value={scoring} onValueChange={(value) => valueView ? updateCustomValueSettings({ scoring: value === "ppr" ? null : value }) : updateQuery({ scoring: value === "ppr" ? null : value })} className="stats-select-trigger">
             <SelectItem value="ppr">PPR</SelectItem>
             <SelectItem value="halfPpr">Half PPR</SelectItem>
             <SelectItem value="standard">Standard</SelectItem>
@@ -2122,8 +2233,16 @@ export default function StatsExplorer() {
           </div>
         ) : view !== "trends" ? (
           <div className="stats-select-shell">
-            <SelectWrapper label="League size" value={String(teamCount)} onValueChange={(value) => updateQuery({ teams: value === "12" ? null : value })} className="stats-select-trigger">
+            <SelectWrapper label="League size" value={String(teamCount)} onValueChange={(value) => valueView ? updateCustomValueSettings({ teams: value === "12" ? null : value }) : updateQuery({ teams: value === "12" ? null : value })} className="stats-select-trigger">
               {TEAM_COUNT_OPTIONS.map((option) => <SelectItem key={option} value={String(option)}>{option} teams</SelectItem>)}
+            </SelectWrapper>
+          </div>
+        ) : null}
+
+        {valueView ? (
+          <div className="stats-select-shell">
+            <SelectWrapper label="Roster size" value={String(rosterSize)} onValueChange={(value) => updateCustomValueSettings({ roster: value === "15" ? null : value })} className="stats-select-trigger">
+              {ROSTER_SIZE_OPTIONS.map((option) => <SelectItem key={option} value={String(option)}>{option} players</SelectItem>)}
             </SelectWrapper>
           </div>
         ) : null}
@@ -2269,7 +2388,7 @@ export default function StatsExplorer() {
         </div>
       ) : null}
       {view === "draft" && adpError ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>Live ADP is temporarily unavailable. Projection and auction data remain usable. {adpError}</span></div> : null}
-      {view === "draft" ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>Fair Value is recalculated for the selected scoring and league size using 15-player rosters. Market Median contains only compatible imported auction-dollar boards. Neither is the actual sale price.</span></div> : null}
+      {valueView ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>{activeValueConnection && activeValueSettings ? `Using ${activeValueConnection.leagueName}: ${auctionSettingsSummary(activeValueSettings)}. ` : `Using custom settings: ${teamCount} teams · ${scoring === "ppr" ? "Full PPR" : scoring === "halfPpr" ? "Half PPR" : "Standard"} · $${budget} budget · ${rosterSize} drafted players per team. `}Fair Value recalculates from these settings and conserves the full $${(teamCount * budget).toLocaleString()} league budget. Market Median remains the compatible published-market reference. {!connectedValueProfiles.length ? <a href={appUrl("/league")}>Connect a Sleeper league</a> : null}</span></div> : null}
       {view === "auction" ? (
         <>
           <div className="stats-hub-note stats-auction-attribution">

@@ -449,6 +449,7 @@ export default function OfflineDraftV2() {
       scoring: normalizeAuctionValueScoring(offlineConfig.scoring),
       teamCount: offlineConfig.teamCount,
       rosterSize: draftedRosterSize(offlineConfig.rosterSlots),
+      rosterSlots: offlineConfig.rosterSlots,
       budget: offlineConfig.defaultBudget,
     }),
     [

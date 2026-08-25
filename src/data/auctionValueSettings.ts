@@ -1,9 +1,7 @@
 import type { LoadPlayerPoolOptions } from "./loadPlayerPool";
+import type { AuctionValueRosterSlot } from "./playerValues";
 
-type RosterSlotLike = {
-  slot?: unknown;
-  count?: unknown;
-};
+type RosterSlotLike = AuctionValueRosterSlot;
 
 export type AuctionLeagueSettingsLike = {
   scoring?: unknown;
@@ -16,7 +14,7 @@ export type AuctionLeagueSettingsLike = {
 };
 
 export type ResolvedAuctionValueOptions = Required<
-  Pick<LoadPlayerPoolOptions, "scoring" | "teamCount" | "rosterSize" | "budget">
+  Pick<LoadPlayerPoolOptions, "scoring" | "teamCount" | "rosterSize" | "budget" | "rosterSlots">
 >;
 
 function positiveNumber(value: unknown) {
@@ -48,6 +46,17 @@ export function draftedRosterSize(
   return size > 0 ? size : fallback;
 }
 
+export function normalizeAuctionValueRosterSlots(
+  slots: readonly RosterSlotLike[] | undefined,
+) {
+  if (!Array.isArray(slots)) return [];
+  return slots.flatMap((entry): Array<{ slot: string; count: number }> => {
+    const slot = String(entry.slot ?? "").trim().toUpperCase();
+    const count = Math.max(0, Math.round(positiveNumber(entry.count) ?? 0));
+    return slot && count > 0 ? [{ slot, count }] : [];
+  });
+}
+
 export function auctionValueOptionsFromSettings(
   settings: AuctionLeagueSettingsLike | null | undefined,
 ): ResolvedAuctionValueOptions {
@@ -65,6 +74,7 @@ export function auctionValueOptionsFromSettings(
     scoring: normalizeAuctionValueScoring(settings?.scoring),
     teamCount,
     rosterSize: draftedRosterSize(settings?.rosterSlots),
+    rosterSlots: normalizeAuctionValueRosterSlots(settings?.rosterSlots),
     budget,
   };
 }
@@ -75,5 +85,8 @@ export function auctionValueOptionsKey(options: LoadPlayerPoolOptions) {
     options.teamCount ?? 12,
     options.rosterSize ?? 15,
     options.budget ?? 200,
+    normalizeAuctionValueRosterSlots(options.rosterSlots)
+      .map((slot) => `${slot.slot}:${slot.count}`)
+      .join(","),
   ].join("|");
 }

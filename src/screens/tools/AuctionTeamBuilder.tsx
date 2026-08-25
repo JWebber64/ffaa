@@ -1,6 +1,6 @@
 import { ArrowDownAZ, ArrowUpAZ, Gauge, Gavel, Minus, Plus, RotateCcw, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { ToolDataStatus } from "@/components/tools/ToolDataStatus";
 import { TeamMark } from "@/components/player/TeamMark";
@@ -12,6 +12,11 @@ import { PositionToggle } from "@/ui/PositionToggle";
 import { NumericInput } from "@/ui/NumericInput";
 import { UniversalSelect } from "@/ui/UniversalSelect";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
+import {
+  auctionSettingsSummary,
+  useSleeperLeagueConnections,
+  type SleeperLeagueAuctionSettings,
+} from "@/features/league-hq/sleeperConnections";
 
 type SortKey = "value" | "rank" | "name" | "position" | "projection";
 type DraftPick = { playerId: string; bid: number };
@@ -22,6 +27,22 @@ const SLOT_LABELS: Record<SlotKey, string> = { QB: "QB", RB: "RB", WR: "WR", TE:
 const DEFAULT_SLOTS: Record<SlotKey, number> = { QB: 1, RB: 2, WR: 2, TE: 1, FLEX: 1, K: 1, DEF: 1, BENCH: 6 };
 function money(value: number) { return `$${Math.max(0, Math.round(value))}`; }
 function clamp(value: number, min: number, max: number) { return Math.max(min, Math.min(max, value)); }
+
+function builderSlotsFromLeague(settings: SleeperLeagueAuctionSettings) {
+  const slots: Record<SlotKey, number> = { QB: 0, RB: 0, WR: 0, TE: 0, FLEX: 0, K: 0, DEF: 0, BENCH: 0 };
+  for (const entry of settings.rosterSlots) {
+    const rawSlot = String(entry.slot).toUpperCase();
+    const slot = rawSlot === "DST"
+      ? "DEF"
+      : rawSlot === "BN"
+        ? "BENCH"
+        : rawSlot === "SUPER_FLEX" || rawSlot === "REC_FLEX" || rawSlot === "WRRB_FLEX"
+          ? "FLEX"
+          : rawSlot;
+    if (slot in slots) slots[slot as SlotKey] += Number(entry.count) || 0;
+  }
+  return slots;
+}
 
 function sortPlayers(players: ToolPlayer[], key: SortKey, direction: "asc" | "desc") {
   const sorted = [...players].sort((a, b) => {
@@ -36,10 +57,14 @@ function sortPlayers(players: ToolPlayer[], key: SortKey, direction: "asc" | "de
 
 export function AuctionTeamBuilder() {
   const navigate = useNavigate();
-  const [scoring, setScoring] = useState<ToolScoring>("ppr");
-  const [teamCount, setTeamCount] = useState(12);
-  const [budget, setBudget] = useState(200);
-  const [slots, setSlots] = useState(DEFAULT_SLOTS);
+  const { connections } = useSleeperLeagueConnections();
+  const initialConnection = connections.find((connection) => connection.auctionSettings);
+  const initialSettings = initialConnection?.auctionSettings;
+  const [valueProfileId, setValueProfileId] = useState(() => initialConnection?.leagueId ?? "custom");
+  const [scoring, setScoring] = useState<ToolScoring>(() => initialSettings?.scoring ?? "ppr");
+  const [teamCount, setTeamCount] = useState(() => initialSettings?.teamCount ?? 12);
+  const [budget, setBudget] = useState(() => initialSettings?.budget ?? 200);
+  const [slots, setSlots] = useState(() => initialSettings ? builderSlotsFromLeague(initialSettings) : DEFAULT_SLOTS);
   const [picks, setPicks] = useState<DraftPick[]>([]);
   const [query, setQuery] = useState("");
   const [position, setPosition] = useState<ToolPosition | "ALL">("ALL");
@@ -48,7 +73,16 @@ export function AuctionTeamBuilder() {
   const [selectedId, setSelectedId] = useState("");
   const [bid, setBid] = useState(1);
   const rosterSize = Object.values(slots).reduce((sum, count) => sum + count, 0);
-  const { players, loading, error } = useToolData(scoring, { teamCount, budget, rosterSize });
+  const activeValueConnection = useMemo(
+    () => connections.find((connection) => connection.leagueId === valueProfileId && connection.auctionSettings),
+    [connections, valueProfileId],
+  );
+  const rosterSlots = useMemo(
+    () => activeValueConnection?.auctionSettings?.rosterSlots
+      ?? SLOT_ORDER.flatMap((slot) => slots[slot] > 0 ? [{ slot, count: slots[slot] }] : []),
+    [activeValueConnection?.auctionSettings?.rosterSlots, slots],
+  );
+  const { players, loading, error } = useToolData(scoring, { teamCount, budget, rosterSize, rosterSlots });
   const pickIds = useMemo(() => new Set(picks.map((pick) => pick.playerId)), [picks]);
   const spent = picks.reduce((sum, pick) => sum + pick.bid, 0);
   const openSpots = Math.max(0, rosterSize - picks.length);
@@ -102,9 +136,34 @@ export function AuctionTeamBuilder() {
     setSelectedId("");
   }
   function updateSlot(slot: SlotKey, delta: number) {
+    setValueProfileId("custom");
     setSlots((current) => ({ ...current, [slot]: clamp((current[slot] ?? 0) + delta, 0, 20) }));
   }
-  function reset() { setSlots(DEFAULT_SLOTS); setPicks([]); setSelectedId(""); setBudget(200); }
+  function applyValueProfile(profileId: string) {
+    setValueProfileId(profileId);
+    if (profileId === "custom") return;
+    const settings = connections.find((connection) => connection.leagueId === profileId)?.auctionSettings;
+    if (!settings) return;
+    setScoring(settings.scoring);
+    setTeamCount(settings.teamCount);
+    setBudget(settings.budget);
+    setSlots(builderSlotsFromLeague(settings));
+    setPicks([]);
+    setSelectedId("");
+  }
+  function reset() {
+    if (activeValueConnection?.auctionSettings) {
+      applyValueProfile(activeValueConnection.leagueId);
+      return;
+    }
+    setValueProfileId("custom");
+    setScoring("ppr");
+    setTeamCount(12);
+    setSlots(DEFAULT_SLOTS);
+    setPicks([]);
+    setSelectedId("");
+    setBudget(200);
+  }
   function changeSort(next: SortKey) {
     if (sortKey === next) setDirection((current) => current === "desc" ? "asc" : "desc");
     else { setSortKey(next); setDirection(next === "name" ? "asc" : "desc"); }
@@ -125,9 +184,10 @@ export function AuctionTeamBuilder() {
   return (
     <ToolLayout eyebrow="Auction room" title="Build a Team" description="Set your wallet and roster demand, then draft a team against a sortable fair-value and market board." methodology={<p>Fair values are recalculated directly for your budget, league size, scoring, and roster depth. Market is the median of compatible imported auction-dollar sources. Your actual bid is the number you enter; the recommendation is a starting point, not a prediction.</p>}>
       <div className="tools-control-panel auction-builder-controls">
-        <label className="tool-field"><span>Budget</span><span className="auction-budget-input"><b>$</b><NumericInput aria-label="Auction budget" min="1" max="1000" value={budget} onChange={(event) => setBudget(clamp(Number(event.target.value) || 1, 1, 1000))} /></span></label>
-        <label className="tool-field"><span>League size</span><UniversalSelect value={teamCount} onValueChange={(value) => setTeamCount(Number(value))}>{[8, 10, 12, 14, 16].map((size) => <option key={size} value={size}>{size} teams</option>)}</UniversalSelect></label>
-        <label className="tool-field"><span>Scoring</span><UniversalSelect value={scoring} onValueChange={(value) => setScoring(value as ToolScoring)}><option value="ppr">PPR</option><option value="halfPpr">Half PPR</option><option value="standard">Standard</option></UniversalSelect></label>
+        <label className="tool-field"><span>Value profile</span><UniversalSelect value={valueProfileId} onValueChange={applyValueProfile}><option value="custom">Custom settings</option>{connections.filter((connection) => connection.auctionSettings).map((connection) => <option key={connection.leagueId} value={connection.leagueId}>{connection.leagueName}</option>)}</UniversalSelect></label>
+        <label className="tool-field"><span>Budget</span><span className="auction-budget-input"><b>$</b><NumericInput aria-label="Auction budget" min="1" max="1000" value={budget} onChange={(event) => { setValueProfileId("custom"); setBudget(clamp(Number(event.target.value) || 1, 1, 1000)); }} /></span></label>
+        <label className="tool-field"><span>League size</span><UniversalSelect value={teamCount} onValueChange={(value) => { setValueProfileId("custom"); setTeamCount(Number(value)); }}>{[8, 10, 12, 14, 16].map((size) => <option key={size} value={size}>{size} teams</option>)}</UniversalSelect></label>
+        <label className="tool-field"><span>Scoring</span><UniversalSelect value={scoring} onValueChange={(value) => { setValueProfileId("custom"); setScoring(value as ToolScoring); }}><option value="ppr">PPR</option><option value="halfPpr">Half PPR</option><option value="standard">Standard</option></UniversalSelect></label>
         <div className="auction-wallet-summary">
           <div className="auction-wallet-copy">
             <span>Wallet</span>
@@ -138,6 +198,12 @@ export function AuctionTeamBuilder() {
             <Gauge size={16} aria-hidden="true" /> Rate My Team
           </button>
         </div>
+      </div>
+
+      <div className="auction-value-profile-summary" role="status">
+        <div><span>Fair Value settings</span><strong>{activeValueConnection?.auctionSettings ? `Using ${activeValueConnection.leagueName}` : "Using custom settings"}</strong></div>
+        <small>{activeValueConnection?.auctionSettings ? auctionSettingsSummary(activeValueConnection.auctionSettings) : `${teamCount} teams · ${scoring === "ppr" ? "Full PPR" : scoring === "halfPpr" ? "Half PPR" : "Standard"} · $${budget} budget · ${rosterSize} drafted players per team`}{activeValueConnection?.auctionSettings?.budgetSource === "gamehq-default" ? " · Sleeper does not publish an auction budget, so GameHQ is using $200" : ""}</small>
+        <Link to="/league">Manage Sleeper leagues</Link>
       </div>
 
       <section className="auction-builder-settings" aria-labelledby="auction-settings-title">

@@ -14,6 +14,8 @@ import type {
   LeagueStoryline,
   LeagueWeekRecap,
 } from "./leagueHQData";
+import type { AuctionScoring } from "../../data/playerValues";
+import type { SleeperLeagueAuctionSettings } from "./sleeperConnections";
 
 const SLEEPER_API = "https://api.sleeper.app/v1";
 const MAX_HISTORY_SEASONS = 10;
@@ -295,6 +297,27 @@ function scoringLabel(scoring: JsonRecord) {
   if (reception === 0.5) return "Half PPR";
   if (reception === 0) return "Standard";
   return `${reception} points per reception`;
+}
+
+function auctionScoring(scoring: JsonRecord): AuctionScoring {
+  const reception = numberValue(scoring.rec);
+  if (reception >= 0.75) return "ppr";
+  if (reception >= 0.25) return "halfPpr";
+  return "standard";
+}
+
+function auctionRosterSlots(positions: string[], reserveSlots: number) {
+  const counts = new Map<string, number>();
+  for (const rawPosition of positions) {
+    const position = rawPosition === "BN"
+      ? "BENCH"
+      : rawPosition === "DST"
+        ? "DEF"
+        : rawPosition;
+    counts.set(position, (counts.get(position) ?? 0) + 1);
+  }
+  if (reserveSlots > 0) counts.set("IR", reserveSlots);
+  return [...counts.entries()].map(([slot, count]) => ({ slot, count }));
 }
 
 function rosterSummary(positions: string[], reserveSlots: number) {
@@ -1087,6 +1110,19 @@ export async function loadSleeperLeagueHQ(
     currentDraft?.status ?? current.league.status
   );
   const syncTime = options.now ?? new Date();
+  const valueRosterSlots = auctionRosterSlots(current.league.roster_positions, reserveSlots);
+  const auctionSettings: SleeperLeagueAuctionSettings = {
+    scoring: auctionScoring(current.league.scoring_settings),
+    scoringLabel: scoringLabel(current.league.scoring_settings),
+    teamCount: numberValue(current.league.total_rosters),
+    budget: draftBudget || 200,
+    budgetSource: draftBudget ? "sleeper-draft" : "gamehq-default",
+    rosterSize: valueRosterSlots.reduce(
+      (sum, slot) => slot.slot === "IR" ? sum : sum + slot.count,
+      0,
+    ),
+    rosterSlots: valueRosterSlots,
+  };
   const seasonLeagueIds = Object.fromEntries(
     bundles.map((bundle) => [bundle.league.season, bundle.league.league_id])
   );
@@ -1102,6 +1138,7 @@ export async function loadSleeperLeagueHQ(
       seasonLeagueIds,
       seasonsImported: bundles.length,
       managersImported: managers.length,
+      auctionSettings,
     },
     identity: {
       name: current.league.name,

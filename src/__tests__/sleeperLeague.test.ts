@@ -146,6 +146,22 @@ describe("Sleeper League HQ import", () => {
     expect(result.data.futures.reduce((sum, future) => sum + (future.fairProbability ?? 0), 0)).toBeCloseTo(1, 2);
     expect(result.data.storylines?.map((story) => story.id)).toContain("power-favorite");
     expect(result.data.sleeper?.syncedAt).toBe("2026-08-10T00:00:00.000Z");
+    expect(result.data.sleeper?.auctionSettings).toMatchObject({
+      scoring: "ppr",
+      scoringLabel: "Full PPR",
+      teamCount: 2,
+      budget: 200,
+      budgetSource: "sleeper-draft",
+      rosterSize: 5,
+      rosterSlots: [
+        { slot: "QB", count: 1 },
+        { slot: "RB", count: 1 },
+        { slot: "WR", count: 1 },
+        { slot: "FLEX", count: 1 },
+        { slot: "BENCH", count: 1 },
+        { slot: "IR", count: 1 },
+      ],
+    });
   });
 
   it("preserves commissioner-written profile and rivalry copy during refresh", async () => {

@@ -19,14 +19,15 @@ export function useToolData(
   valueOptions: Omit<LoadPlayerPoolOptions, "scoring"> = {},
   enabled = true,
 ): ToolDataState {
-  const { budget, rosterSize, teamCount } = valueOptions;
+  const { budget, rosterSize, rosterSlots, teamCount } = valueOptions;
   const resolvedValueOptions = useMemo<Omit<LoadPlayerPoolOptions, "scoring">>(
     () => ({
       ...(typeof budget === "number" ? { budget } : {}),
       ...(typeof rosterSize === "number" ? { rosterSize } : {}),
+      ...(rosterSlots?.length ? { rosterSlots } : {}),
       ...(typeof teamCount === "number" ? { teamCount } : {}),
     }),
-    [budget, rosterSize, teamCount],
+    [budget, rosterSize, rosterSlots, teamCount],
   );
   const draftPlayers = useMemo(
     () => buildCurrentToolPlayers(scoring, [], resolvedValueOptions),

@@ -31,6 +31,13 @@ describe("auction value league settings", () => {
       scoring: "halfPpr",
       teamCount: 14,
       rosterSize: 14,
+      rosterSlots: [
+        { slot: "QB", count: 1 },
+        { slot: "RB", count: 3 },
+        { slot: "WR", count: 3 },
+        { slot: "BENCH", count: 7 },
+        { slot: "IR", count: 1 },
+      ],
       budget: 250,
     });
   });

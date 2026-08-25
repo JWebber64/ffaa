@@ -272,6 +272,7 @@ export default function DraftRoomV2() {
   const {
     budget: valueBudget,
     rosterSize: valueRosterSize,
+    rosterSlots: valueRosterSlots,
     scoring: valueScoring,
     teamCount: valueTeamCount,
   } = auctionValueOptionsFromSettings(valueSettings);
@@ -279,10 +280,11 @@ export default function DraftRoomV2() {
     () => loadPlayerPool({
       budget: valueBudget,
       rosterSize: valueRosterSize,
+      rosterSlots: valueRosterSlots,
       scoring: valueScoring,
       teamCount: valueTeamCount,
     }),
-    [valueBudget, valueRosterSize, valueScoring, valueTeamCount],
+    [valueBudget, valueRosterSize, valueRosterSlots, valueScoring, valueTeamCount],
   );
   const safePhase = snap?.phase ?? "lobby";
   const { playSound } = useAuctionSound();

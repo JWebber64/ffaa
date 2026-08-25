@@ -134,6 +134,84 @@ describe("player value consensus", () => {
     expect(valued.reduce((sum, player) => sum + (player.auctionValue ?? 0), 0)).toBe(1200);
   });
 
+  it("raises premium tiers when a league drafts fewer players", () => {
+    const players = Array.from({ length: 180 }, (_, index) =>
+      makePlayer({
+        id: `depth-${index + 1}`,
+        name: `Depth Player ${index + 1}`,
+        pos: index % 2 === 0 ? "RB" : "WR",
+        rank: index + 1,
+      }),
+    );
+    const longRoster = applyConsensusAuctionValues(players, 200, {
+      teamCount: 12,
+      rosterSize: 15,
+      rosterSlots: [
+        { slot: "RB", count: 2 },
+        { slot: "WR", count: 2 },
+        { slot: "FLEX", count: 1 },
+        { slot: "BENCH", count: 10 },
+      ],
+    });
+    const shortRoster = applyConsensusAuctionValues(players, 200, {
+      teamCount: 12,
+      rosterSize: 12,
+      rosterSlots: [
+        { slot: "RB", count: 2 },
+        { slot: "WR", count: 3 },
+        { slot: "FLEX", count: 1 },
+        { slot: "BENCH", count: 6 },
+      ],
+    });
+    const topTwelve = (rows: Player[]) => [...rows]
+      .sort((left, right) => (right.auctionValue ?? 0) - (left.auctionValue ?? 0))
+      .slice(0, 12)
+      .reduce((sum, player) => sum + (player.auctionValue ?? 0), 0);
+
+    expect(topTwelve(shortRoster)).toBeGreaterThan(topTwelve(longRoster));
+    expect([...shortRoster]
+      .sort((left, right) => (right.auctionValue ?? 0) - (left.auctionValue ?? 0))
+      .slice(0, 144)
+      .reduce((sum, player) => sum + (player.auctionValue ?? 0), 0)).toBe(2400);
+  });
+
+  it("does not reserve auction dollars for positions absent from the roster template", () => {
+    const skillPlayers = Array.from({ length: 144 }, (_, index) =>
+      makePlayer({
+        id: `skill-${index + 1}`,
+        name: `Skill Player ${index + 1}`,
+        pos: index % 4 === 0 ? "QB" : index % 4 === 1 ? "RB" : index % 4 === 2 ? "WR" : "TE",
+        rank: index + 25,
+      }),
+    );
+    const specialists = Array.from({ length: 24 }, (_, index) =>
+      makePlayer({
+        id: `specialist-${index + 1}`,
+        name: `Specialist ${index + 1}`,
+        pos: index < 12 ? "K" : "DEF",
+        rank: index + 1,
+      }),
+    );
+    const valued = applyConsensusAuctionValues([...specialists, ...skillPlayers], 200, {
+      teamCount: 12,
+      rosterSize: 12,
+      rosterSlots: [
+        { slot: "QB", count: 1 },
+        { slot: "RB", count: 2 },
+        { slot: "WR", count: 3 },
+        { slot: "TE", count: 1 },
+        { slot: "FLEX", count: 1 },
+        { slot: "BENCH", count: 4 },
+      ],
+    });
+
+    expect(valued
+      .filter((player) => player.pos === "K" || player.pos === "DEF")
+      .every((player) => player.auctionValue === 1)).toBe(true);
+    expect(valued.filter((player) => !["K", "DEF"].includes(player.pos))
+      .reduce((sum, player) => sum + (player.auctionValue ?? 0), 0)).toBe(2400);
+  });
+
   it("uses standard-compatible boards without blending PPR-only values", () => {
     const [player] = applyConsensusAuctionValues([
       makePlayer({

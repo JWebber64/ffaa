@@ -29,12 +29,31 @@ const VALUE_UPDATED_AT = FANTASY_SEASON_VALUE_UPDATED_AT;
 
 export type AuctionScoring = "standard" | "halfPpr" | "ppr";
 
+export type AuctionValueRosterSlot = {
+  slot?: unknown;
+  count?: unknown;
+};
+
 export type AuctionValueOptions = {
   scoring?: AuctionScoring;
   teamCount?: number;
   rosterSize?: number;
+  rosterSlots?: readonly AuctionValueRosterSlot[];
   calibrate?: boolean;
 };
+
+const DEFAULT_AUCTION_ROSTER_SLOTS: AuctionValueRosterSlot[] = [
+  { slot: "QB", count: 1 },
+  { slot: "RB", count: 2 },
+  { slot: "WR", count: 2 },
+  { slot: "TE", count: 1 },
+  { slot: "FLEX", count: 1 },
+  { slot: "K", count: 1 },
+  { slot: "DEF", count: 1 },
+  { slot: "BENCH", count: 6 },
+];
+const MINIMUM_BID_SHARE = 0.15;
+const PREMIUM_CURVE_EXPONENT = 1.05;
 
 export const AUCTION_VALUE_SOURCE_COLUMNS = [
   { id: "sleeper-paid", label: "Sleeper Paid", shortLabel: "SL Paid" },
@@ -363,6 +382,70 @@ type ParsedProjectionRow = {
   updatedAt?: string;
 };
 
+function normalizedRosterSlot(value: unknown) {
+  const slot = String(value ?? "").trim().toUpperCase().replace(/[\s-]+/g, "_");
+  if (slot === "DST" || slot === "D/ST") return "DEF";
+  if (slot === "BN") return "BENCH";
+  if (slot === "REC_FLEX" || slot === "WRRB_FLEX" || slot === "RB_WR_TE") return "FLEX";
+  return slot;
+}
+
+function rosterSlotCount(value: unknown) {
+  const count = Number(value);
+  return Number.isFinite(count) && count > 0 ? Math.round(count) : 0;
+}
+
+function rosterPositionDemand(
+  teamCount: number,
+  rosterSlots: readonly AuctionValueRosterSlot[] | undefined,
+) {
+  const slots = rosterSlots?.length ? rosterSlots : DEFAULT_AUCTION_ROSTER_SLOTS;
+  const perTeam: Record<NormalizedPosition, number> = {
+    QB: 0,
+    RB: 0,
+    WR: 0,
+    TE: 0,
+    K: 0,
+    DEF: 0,
+  };
+  let flex = 0;
+  let superFlex = 0;
+
+  for (const entry of slots) {
+    const slot = normalizedRosterSlot(entry.slot);
+    const count = rosterSlotCount(entry.count);
+    if (!count) continue;
+    if (slot in perTeam) perTeam[slot as NormalizedPosition] += count;
+    else if (slot === "FLEX") flex += count;
+    else if (slot === "SUPER_FLEX") superFlex += count;
+  }
+
+  return {
+    allowed: new Set<NormalizedPosition>([
+      ...(perTeam.QB > 0 || superFlex > 0 ? ["QB" as const] : []),
+      ...(perTeam.RB > 0 || flex > 0 || superFlex > 0 ? ["RB" as const] : []),
+      ...(perTeam.WR > 0 || flex > 0 || superFlex > 0 ? ["WR" as const] : []),
+      ...(perTeam.TE > 0 || flex > 0 || superFlex > 0 ? ["TE" as const] : []),
+      ...(perTeam.K > 0 ? ["K" as const] : []),
+      ...(perTeam.DEF > 0 ? ["DEF" as const] : []),
+    ]),
+    required: Object.fromEntries(
+      (Object.keys(perTeam) as NormalizedPosition[]).map((position) => [
+        position,
+        Math.round(perTeam[position] * teamCount),
+      ]),
+    ) as Record<NormalizedPosition, number>,
+    replacement: {
+      QB: teamCount * (perTeam.QB + superFlex * 0.7),
+      RB: teamCount * (perTeam.RB + flex * 0.5 + superFlex * 0.1),
+      WR: teamCount * (perTeam.WR + flex * 0.5 + superFlex * 0.1),
+      TE: teamCount * (perTeam.TE + superFlex * 0.1),
+      K: teamCount * perTeam.K,
+      DEF: teamCount * perTeam.DEF,
+    } satisfies Record<NormalizedPosition, number>,
+  };
+}
+
 function cleanNumber(value: unknown): number | null {
   const numberValue =
     typeof value === "string" ? Number(value.replace(/[$,%\s,]/g, "")) : Number(value);
@@ -481,15 +564,21 @@ function rowUpdatedAt(row: ExternalValueRow, source: SourceDefinition) {
   return readString(row, ["updatedAt", "updated at", "date", "asOf", "as of"]) || source.updatedAt;
 }
 
-function projectionReplacementPointsForLeague(rows: ParsedProjectionRow[], teamCount: number) {
-  const replacementCounts: Record<NormalizedPosition, number> = {
-    QB: teamCount,
-    RB: teamCount * 2.5,
-    WR: teamCount * 3,
-    TE: teamCount,
-    K: teamCount,
-    DEF: teamCount,
-  };
+function projectionReplacementPointsForLeague(
+  rows: ParsedProjectionRow[],
+  teamCount: number,
+  rosterSlots: readonly AuctionValueRosterSlot[] | undefined,
+) {
+  const replacementCounts = rosterSlots?.length
+    ? rosterPositionDemand(teamCount, rosterSlots).replacement
+    : {
+        QB: teamCount,
+        RB: teamCount * 2.5,
+        WR: teamCount * 3,
+        TE: teamCount,
+        K: teamCount,
+        DEF: teamCount,
+      };
   const replacements: Partial<Record<NormalizedPosition, number>> = {};
 
   for (const pos of Object.keys(replacementCounts) as NormalizedPosition[]) {
@@ -504,8 +593,13 @@ function projectionReplacementPointsForLeague(rows: ParsedProjectionRow[], teamC
   return replacements;
 }
 
-function projectionDollarCandidates(rows: ParsedProjectionRow[], budget: number, teamCount: number) {
-  const replacements = projectionReplacementPointsForLeague(rows, teamCount);
+function projectionDollarCandidates(
+  rows: ParsedProjectionRow[],
+  budget: number,
+  teamCount: number,
+  rosterSlots: readonly AuctionValueRosterSlot[] | undefined,
+) {
+  const replacements = projectionReplacementPointsForLeague(rows, teamCount, rosterSlots);
 
   const withSurplus = rows.map((row) => {
     const replacement = replacements[row.pos] ?? 0;
@@ -600,6 +694,7 @@ function buildExternalValueMap(
   targetBudget: number,
   scoring: AuctionScoring,
   teamCount: number,
+  rosterSlots: readonly AuctionValueRosterSlot[] | undefined,
 ) {
   const map = new Map<string, SourceCandidate[]>();
 
@@ -639,6 +734,7 @@ function buildExternalValueMap(
       projectionRows,
       targetBudget,
       teamCount,
+      rosterSlots,
     )) {
       addCandidate(map, keys, candidate);
     }
@@ -883,8 +979,12 @@ function calibrationUniverse(
   values: PreliminaryPlayerValue[],
   teamCount: number,
   draftedPlayerCount: number,
+  rosterSlots: readonly AuctionValueRosterSlot[] | undefined,
 ) {
-  const sorted = [...values].sort(
+  const demand = rosterPositionDemand(teamCount, rosterSlots);
+  const sorted = values
+    .filter((entry) => !rosterSlots?.length || demand.allowed.has(entry.player.pos as NormalizedPosition))
+    .sort(
     (left, right) =>
       right.preliminaryValue - left.preliminaryValue ||
       (left.player.rank ?? Number.MAX_SAFE_INTEGER) -
@@ -892,10 +992,11 @@ function calibrationUniverse(
   );
   const selected = new Map<string, PreliminaryPlayerValue>();
 
-  for (const position of ["K", "DEF"] as const) {
+  for (const position of Object.keys(demand.required) as NormalizedPosition[]) {
+    if (demand.required[position] <= 0) continue;
     sorted
       .filter((entry) => entry.player.pos === position)
-      .slice(0, teamCount)
+      .slice(0, demand.required[position])
       .forEach((entry) => selected.set(entry.player.id, entry));
   }
 
@@ -910,7 +1011,9 @@ function calibrationUniverse(
 function calibratedDollarMap(
   values: PreliminaryPlayerValue[],
   budget: number,
-  options: Required<Pick<AuctionValueOptions, "teamCount" | "rosterSize">>,
+  options: Required<Pick<AuctionValueOptions, "teamCount" | "rosterSize">> & {
+    rosterSlots: readonly AuctionValueRosterSlot[] | undefined;
+  },
 ) {
   const draftedPlayerCount = options.teamCount * options.rosterSize;
   const totalBudget = options.teamCount * budget;
@@ -922,38 +1025,42 @@ function calibratedDollarMap(
     return null;
   }
 
-  const universe = calibrationUniverse(values, options.teamCount, draftedPlayerCount);
+  const universe = calibrationUniverse(
+    values,
+    options.teamCount,
+    draftedPlayerCount,
+    options.rosterSlots,
+  );
   if (universe.length !== draftedPlayerCount) return null;
 
-  const rawTotal = universe.reduce(
-    (sum, entry) => sum + Math.max(1, entry.preliminaryValue),
-    0,
+  const sortedUniverse = [...universe].sort(
+    (left, right) =>
+      right.preliminaryValue - left.preliminaryValue ||
+      (left.player.rank ?? Number.MAX_SAFE_INTEGER) -
+        (right.player.rank ?? Number.MAX_SAFE_INTEGER),
   );
-  if (rawTotal <= 0) return null;
+  const minimumBidCount = Math.max(1, Math.round(draftedPlayerCount * MINIMUM_BID_SHARE));
+  const minimumBidIds = new Set(
+    sortedUniverse.slice(Math.max(0, sortedUniverse.length - minimumBidCount)).map((entry) => entry.player.id),
+  );
+  const premiumPool = totalBudget - draftedPlayerCount;
+  const premiumWeights = new Map(
+    universe.map((entry) => [
+      entry.player.id,
+      minimumBidIds.has(entry.player.id)
+        ? 0
+        : Math.pow(Math.max(0, entry.preliminaryValue - 1), PREMIUM_CURVE_EXPONENT),
+    ]),
+  );
+  const premiumWeightTotal = [...premiumWeights.values()].reduce((sum, value) => sum + value, 0);
+  if (premiumWeightTotal <= 0) return null;
 
-  const shortfall = totalBudget - rawTotal;
-  const eligibleForShortfall = universe.filter(
-    (entry) => entry.player.pos !== "K" && entry.player.pos !== "DEF",
-  );
-  const shortfallShare = shortfall > 0 && eligibleForShortfall.length > 0
-    ? shortfall / eligibleForShortfall.length
-    : 0;
-  const rawPremium = universe.reduce(
-    (sum, entry) => sum + Math.max(0, entry.preliminaryValue - 1),
-    0,
-  );
-  const premiumScale = shortfall < 0 && rawPremium > 0
-    ? Math.max(0, (rawPremium + shortfall) / rawPremium)
-    : 1;
-
-  // When a published dollar board leaves a league-wide shortfall, spread it
-  // evenly across draftable skill players instead of multiplying star prices.
-  // If the model overspends, reduce only above-minimum premiums proportionally.
+  // Auction rooms concentrate their budget on starters and leave a real $1
+  // replacement tier. Shape only the premiums, preserve every minimum bid,
+  // and continue to conserve the complete league budget exactly.
   const scaled = universe.map((entry) => {
-    const base = Math.max(1, entry.preliminaryValue);
-    const exact = shortfall >= 0
-      ? base + (entry.player.pos === "K" || entry.player.pos === "DEF" ? 0 : shortfallShare)
-      : 1 + Math.max(0, base - 1) * premiumScale;
+    const weight = premiumWeights.get(entry.player.id) ?? 0;
+    const exact = 1 + premiumPool * weight / premiumWeightTotal;
     const floor = Math.max(1, Math.floor(exact));
     return { id: entry.player.id, exact, floor, fraction: exact - floor };
   });
@@ -984,7 +1091,8 @@ export function applyConsensusAuctionValues(
   const scoring = options.scoring ?? "ppr";
   const teamCount = Math.max(1, Math.round(options.teamCount ?? DEFAULT_TEAM_COUNT));
   const rosterSize = Math.max(1, Math.round(options.rosterSize ?? DEFAULT_ROSTER_SIZE));
-  const externalValues = buildExternalValueMap(budget, scoring, teamCount);
+  const rosterSlots = options.rosterSlots;
+  const externalValues = buildExternalValueMap(budget, scoring, teamCount, rosterSlots);
 
   const preliminary = players.flatMap((player): PreliminaryPlayerValue[] => {
     const externalSources = playerKeys(player.name, player.pos, player.nflTeam).flatMap(
@@ -1013,7 +1121,7 @@ export function applyConsensusAuctionValues(
 
   const calibrated = options.calibrate === false
     ? null
-    : calibratedDollarMap(preliminary, budget, { teamCount, rosterSize });
+    : calibratedDollarMap(preliminary, budget, { teamCount, rosterSize, rosterSlots });
   const preliminaryMap = new Map(preliminary.map((entry) => [entry.player.id, entry]));
 
   return players.map((player) => {

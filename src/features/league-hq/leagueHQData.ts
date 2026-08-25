@@ -1,4 +1,5 @@
 import { FANTASY_SEASON } from "../../config/fantasySeason";
+import type { SleeperLeagueAuctionSettings } from "./sleeperConnections";
 
 export interface LeagueIdentity {
   name: string;
@@ -190,6 +191,7 @@ export interface LeagueSleeperConnection {
   seasonLeagueIds: Record<string, string>;
   seasonsImported: number;
   managersImported: number;
+  auctionSettings?: SleeperLeagueAuctionSettings;
 }
 
 export interface LeagueBallot {

@@ -18,6 +18,22 @@ function connection(
     totalRosters: 12,
     sourceUrl: `https://sleeper.com/leagues/${leagueId}`,
     lastUsedAt,
+    auctionSettings: {
+      scoring: "ppr",
+      scoringLabel: "Full PPR",
+      teamCount: 12,
+      budget: 200,
+      budgetSource: "sleeper-draft",
+      rosterSize: 12,
+      rosterSlots: [
+        { slot: "QB", count: 1 },
+        { slot: "RB", count: 2 },
+        { slot: "WR", count: 3 },
+        { slot: "TE", count: 1 },
+        { slot: "FLEX", count: 1 },
+        { slot: "BENCH", count: 4 },
+      ],
+    },
   };
 }
 
@@ -36,6 +52,7 @@ describe("Sleeper league connections", () => {
       leagueName: "League 222222222222",
       totalRosters: 0,
     });
+    expect(parsed[0]?.auctionSettings).toMatchObject({ rosterSize: 12, scoring: "ppr" });
     expect(parseSleeperLeagueConnections("not-json")).toEqual([]);
   });
 

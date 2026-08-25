@@ -555,7 +555,7 @@
 .tool-metric-bar > small { color: var(--text-3); font-size: 0.62rem; line-height: 1.35; }
 
 /* Auction team builder */
-.auction-builder-controls { grid-template-columns: minmax(130px, .65fr) minmax(150px, .8fr) minmax(150px, .8fr) minmax(220px, 1fr); align-items: stretch; }
+.auction-builder-controls { grid-template-columns: minmax(180px, 1fr) minmax(120px, .55fr) minmax(140px, .68fr) minmax(140px, .68fr) minmax(220px, 1fr); align-items: stretch; }
 .auction-budget-input, .auction-selected-ticket label > span { display: flex; align-items: center; gap: 4px; height: 40px; padding: 0 10px; border: 1px solid rgba(255,255,255,.1); border-radius: 9px; background: rgba(255,255,255,.035); }
 .auction-budget-input b, .auction-selected-ticket label b { color: var(--tools-green); }
 .auction-budget-input input, .auction-selected-ticket label input { width: 100%; border: 0; outline: 0; color: var(--text-0); background: transparent; font: inherit; font-weight: 800; }
@@ -564,6 +564,13 @@
 .auction-wallet-copy span, .auction-wallet-copy small { overflow: hidden; color: var(--text-3); font-size: .66rem; line-height: 1.22; text-overflow: ellipsis; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
 .auction-wallet-summary > strong { color: var(--tools-cyan); font-size: 1.55rem; }
 .auction-wallet-summary .tool-button { min-width: 148px; white-space: nowrap; }
+.auction-value-profile-summary { display: grid; grid-template-columns: minmax(190px, auto) minmax(0, 1fr) auto; align-items: center; gap: 8px 16px; padding: 11px 14px; border: 1px solid rgba(52,211,153,.17); border-radius: 11px; background: rgba(52,211,153,.05); }
+.auction-value-profile-summary > div { display: grid; gap: 2px; }
+.auction-value-profile-summary span { color: var(--tools-green); font-size: .64rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.auction-value-profile-summary strong { font-size: .78rem; }
+.auction-value-profile-summary small { color: var(--text-3); font-size: .68rem; line-height: 1.4; }
+.auction-value-profile-summary a { color: var(--tools-cyan); font-size: .7rem; font-weight: 800; text-decoration: none; white-space: nowrap; }
+.auction-value-profile-summary a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .auction-builder-settings { display: grid; gap: 14px; padding: 18px; border: 1px solid rgba(255,255,255,.08); border-radius: 14px; background: rgba(7,18,14,.78); }
 .auction-slot-grid { display: grid; grid-template-columns: repeat(8, minmax(78px, 1fr)); gap: 8px; }
 .auction-slot-control { display: grid; gap: 8px; padding: 10px; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; background: rgba(255,255,255,.025); }
@@ -770,6 +777,8 @@
   .team-player-search-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .auction-builder-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .auction-board-controls { grid-template-columns: 1fr; }
+  .auction-value-profile-summary { grid-template-columns: 1fr; }
+  .auction-value-profile-summary a { justify-self: start; }
   .auction-position-toggle { width: 100%; justify-self: stretch; }
   .auction-selected-ticket { align-items: stretch; flex-wrap: wrap; }
   .auction-selected-ticket > div { flex-basis: 100%; }
