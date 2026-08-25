@@ -3370,7 +3370,7 @@ dd,
 
 :root {
   --ffaa-header-surface: #183a2b;
-  --ffaa-control-surface: #1d3e2f;
+  --ffaa-control-surface: oklch(0.432 0.062 162.472);
   --ffaa-toolbar-surface: rgba(24, 53, 41, 0.96);
   --ffaa-panel-background: linear-gradient(180deg, #1d3f30, #173326);
   --ffaa-panel-background-strong: linear-gradient(180deg, #224a38, #19382a);
@@ -3431,7 +3431,27 @@ body,
 .offline-input,
 .offline-select-trigger,
 .tool-field input,
-.cui-input {
+.cui-input,
+.offline-search-field input,
+.history-draft-search input,
+.stats-select-label select,
+.league-sync-switch select,
+.league-connect-form select,
+.league-sorter select,
+.league-ballot select,
+.league-json,
+.studio-form-grid input,
+.studio-order-list input,
+.studio-manager-list textarea,
+.studio-rivalry-list input,
+.studio-rivalry-list textarea,
+.studio-futures-list input,
+.studio-futures-list textarea,
+.mobile-search-field,
+.league-connect-input,
+.auction-budget-input,
+.auction-selected-ticket label > span,
+.team-slot-stepper input {
   border-color: var(--line-1) !important;
   background: var(--ffaa-control-surface) !important;
   color: var(--text-0) !important;
@@ -3443,6 +3463,9 @@ body,
 .host-input::placeholder,
 .join-input::placeholder,
 .offline-input::placeholder,
+.offline-search-field input::placeholder,
+.history-draft-search input::placeholder,
+.mobile-search-field input::placeholder,
 .tool-field input::placeholder,
 .league-connect-input input::placeholder,
 .studio-form-grid input::placeholder,
@@ -3471,18 +3494,7 @@ body,
 }
 
 .custom-select-trigger option,
-.cui-select option,
-.league-sync-switch select,
-.league-connect-form select,
-.league-ballot select,
-.league-json,
-.studio-form-grid input,
-.studio-order-list input,
-.studio-manager-list textarea,
-.studio-rivalry-list input,
-.studio-rivalry-list textarea,
-.studio-futures-list input,
-.studio-futures-list textarea {
+.cui-select option {
   border-color: var(--line-1) !important;
   background: var(--ffaa-control-surface) !important;
   color: var(--text-0) !important;
