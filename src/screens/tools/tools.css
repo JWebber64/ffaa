@@ -555,7 +555,7 @@
 .tool-metric-bar > small { color: var(--text-3); font-size: 0.62rem; line-height: 1.35; }
 
 /* Auction team builder */
-.auction-builder-controls { grid-template-columns: minmax(180px, 1fr) minmax(120px, .55fr) minmax(140px, .68fr) minmax(140px, .68fr) minmax(220px, 1fr); align-items: stretch; }
+.auction-builder-controls { grid-template-columns: minmax(180px, 1fr) minmax(120px, .55fr) minmax(140px, .68fr) minmax(140px, .68fr) minmax(330px, 1.35fr); align-items: stretch; }
 .auction-budget-input, .auction-selected-ticket label > span { display: flex; align-items: center; gap: 4px; height: 40px; padding: 0 10px; border: 1px solid rgba(255,255,255,.1); border-radius: 9px; background: rgba(255,255,255,.035); }
 .auction-budget-input b, .auction-selected-ticket label b { color: var(--tools-green); }
 .auction-budget-input input, .auction-selected-ticket label input { width: 100%; border: 0; outline: 0; color: var(--text-0); background: transparent; font: inherit; font-weight: 800; }
