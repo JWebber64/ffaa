@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import type { LeagueHistorySnapshot, LeagueWeekPayload } from "./domain/types";
-import { loadLeagueWeek } from "./persistence/supabaseLeagueHistory";
+import { loadLeagueWeek } from "./persistence/firebaseLeagueHistory";
 
 type LeagueWeekState = {
   status: "idle" | "loading" | "ready" | "error";

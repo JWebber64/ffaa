@@ -1,5 +1,7 @@
 # Step 5 Verification Checklist
 
+> Archived Supabase prototype evidence. Current multiplayer verification targets Firebase.
+
 ## Implementation Summary
 ✅ Created useEnsureSupabaseSession hook for anonymous auth
 ✅ Updated AppShellV2 to ensure session globally with auth status badges

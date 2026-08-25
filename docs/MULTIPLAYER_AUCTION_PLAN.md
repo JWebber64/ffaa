@@ -1,5 +1,7 @@
 # Multiplayer Auction Plan
 
+> Archived implementation plan. The shipped multiplayer backend uses Firebase Authentication and Cloud Firestore; Supabase references below describe the superseded prototype.
+
 ## Overview
 
 Transform the existing single-device auction draft into a real-time multiplayer experience supporting 1 host + 11 connected managers.

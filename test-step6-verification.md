@@ -1,5 +1,7 @@
 # Step 6 Verification Checklist
 
+> Archived Supabase prototype evidence. Current multiplayer verification targets Firebase.
+
 ## Implementation Summary
 ✅ Created useDraftSnapshot hook for realtime snapshot subscription
 ✅ Added appendDraftAction dispatcher to multiplayer/api.ts

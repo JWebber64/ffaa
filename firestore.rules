@@ -6,6 +6,18 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Permanent league history is public read-only data. Imports run through a
+    // separately authorized server or one-time migration rule, never the app.
+    match /leagueHistories/{historyId} {
+      allow read: if true;
+      allow write: if false;
+
+      match /{document=**} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+
     match /drafts/{draftId} {
       function draftPath() {
         return /databases/$(database)/documents/drafts/$(draftId);

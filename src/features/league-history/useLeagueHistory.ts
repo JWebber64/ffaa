@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { LeagueHistorySnapshot } from "./domain/types";
-import { loadLeagueHistory } from "./persistence/supabaseLeagueHistory";
+import { loadLeagueHistory } from "./persistence/firebaseLeagueHistory";
 
 type LeagueHistoryState = {
   status: "loading" | "ready" | "error";
