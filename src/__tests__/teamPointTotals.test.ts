@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import type { PlayerCareerSeason } from "../data/playerCareerStats";
-import { careerFantasyPoints, sumAvailablePlayerPoints } from "../data/teamPointTotals";
+import {
+  careerFantasyPoints,
+  careerFantasyPointsPerGame,
+  sumAvailablePlayerPoints,
+} from "../data/teamPointTotals";
 import type { ToolPlayer, ToolPosition } from "../data/toolPlayerData";
 
 function player(id: string, position: ToolPosition, projectedPoints: number | null): ToolPlayer {
@@ -92,5 +96,18 @@ describe("team point totals", () => {
     expect(careerFantasyPoints([
       careerSeason({ position: "K", fantasyPoints: 0, fieldGoalsMade: 30, extraPointsMade: 42 }),
     ], "K")).toBe(132);
+  });
+
+  it("calculates career points per game across every recorded season", () => {
+    expect(careerFantasyPointsPerGame([
+      careerSeason({ games: 17, fantasyPoints: 200 }),
+      careerSeason({ season: 2024, games: 15, fantasyPoints: 175 }),
+    ], "RB")).toBeCloseTo(375 / 32);
+  });
+
+  it("does not report career points per game without recorded games", () => {
+    expect(careerFantasyPointsPerGame([
+      careerSeason({ games: 0, fantasyPoints: 0 }),
+    ], "RB")).toBeNull();
   });
 });

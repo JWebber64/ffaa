@@ -144,6 +144,10 @@ export function TeamRater() {
     () => rateFantasyTeam(roster, players, { teamCount, scoring, slots }),
     [players, roster, scoring, slots, teamCount],
   );
+  const starterPlayers = useMemo(
+    () => rating.lineup.map((entry) => entry.player),
+    [rating.lineup],
+  );
   const lineupDescription = formatLineup(slots) || "No starting positions configured";
 
   function updateSlot(position: TeamRaterSlotPosition, count: number) {
@@ -312,7 +316,7 @@ export function TeamRater() {
               <p>{lineupDescription}</p>
             </div>
           </div>
-          <TeamPointsSummary players={roster} scoring={scoring} />
+          <TeamPointsSummary players={roster} starters={starterPlayers} scoring={scoring} />
           <div className="team-rating-components">
             {rating.components.map((component) => (
               <ToolMetricBar key={component.id} label={component.label} value={roster.length ? component.score : 0} detail={`${Math.round(component.weight * 100)}% of grade · ${component.detail}`} />

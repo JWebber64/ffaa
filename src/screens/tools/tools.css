@@ -547,14 +547,17 @@
 .team-grade-hero p { margin: 6px 0 0; color: var(--text-3); font-size: 0.72rem; line-height: 1.4; }
 .team-rating-components { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; margin-top: 20px; }
 
-.team-points-summary { display: grid; gap: 10px; margin: 16px 0 18px; padding: 13px; border: 1px solid rgba(34,211,238,0.14); border-radius: 10px; background: rgba(34,211,238,0.035); }
+.team-points-summaries { display: grid; gap: 8px; margin: 16px 0 18px; }
+.team-points-summaries-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 10px; }
+.team-points-summary { display: grid; align-content: start; gap: 10px; min-width: 0; padding: 13px; border: 1px solid rgba(34,211,238,0.14); border-radius: 10px; background: rgba(34,211,238,0.035); }
 .team-points-summary-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; }
 .team-points-summary-head > div { display: grid; gap: 2px; }
 .team-points-summary-head span { color: var(--tools-cyan); font-size: 0.62rem; font-weight: 850; letter-spacing: 0.09em; text-transform: uppercase; }
 .team-points-summary-head strong { font-size: 0.76rem; }
 .team-points-summary-head > small,
-.team-points-summary > p { margin: 0; color: var(--text-3); font-size: 0.61rem; line-height: 1.4; }
-.team-points-summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.team-points-summary-note { margin: 0; color: var(--text-3); font-size: 0.61rem; line-height: 1.4; }
+.team-points-summary-head > small { max-width: 190px; text-align: right; }
+.team-points-summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
 .team-points-summary-grid > div { min-width: 0; padding: 9px; border-radius: 8px; background: rgba(255,255,255,0.035); }
 .team-points-summary-grid dt { color: var(--text-2); font-size: 0.6rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
 .team-points-summary-grid dd { margin: 4px 0 1px; color: var(--text-0); font-size: clamp(1rem, 2vw, 1.28rem); font-weight: 850; font-variant-numeric: tabular-nums; letter-spacing: -0.025em; }
@@ -801,6 +804,7 @@
   .compare-player-grid { overflow-x: auto; grid-template-columns: repeat(var(--compare-columns, 2), minmax(190px, 1fr)); }
   .team-rating-components { grid-template-columns: 1fr; }
   .team-points-summary-head { align-items: start; flex-direction: column; gap: 4px; }
+  .team-points-summary-head > small { max-width: none; text-align: left; }
   .schedule-presets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tools-methodology { grid-template-columns: 1fr; gap: 8px; }
 }
@@ -829,7 +833,6 @@
   .line-source-grid { grid-template-columns: 1fr; }
   .team-grade-hero { align-items: flex-start; }
   .team-grade-ring { width: 84px; height: 84px; }
-  .team-points-summary-grid { grid-template-columns: 1fr; }
   .team-points-summary-grid small { white-space: normal; }
   .rated-lineup-list > div { grid-template-columns: 46px minmax(0,1fr); }
   .rated-lineup-list > div > small { grid-column: 2; }
