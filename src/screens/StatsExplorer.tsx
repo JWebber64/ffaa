@@ -2388,7 +2388,9 @@ export default function StatsExplorer() {
         </div>
       ) : null}
       {view === "draft" && adpError ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>Live ADP is temporarily unavailable. Projection and auction data remain usable. {adpError}</span></div> : null}
-      {valueView ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>{activeValueConnection && activeValueSettings ? `Using ${activeValueConnection.leagueName}: ${auctionSettingsSummary(activeValueSettings)}. ` : `Using custom settings: ${teamCount} teams · ${scoring === "ppr" ? "Full PPR" : scoring === "halfPpr" ? "Half PPR" : "Standard"} · $${budget} budget · ${rosterSize} drafted players per team. `}Fair Value recalculates from these settings and conserves the full $${(teamCount * budget).toLocaleString()} league budget. Market Median remains the compatible published-market reference. {!connectedValueProfiles.length ? <a href={appUrl("/league")}>Connect a Sleeper league</a> : null}</span></div> : null}
+      {valueView ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>{activeValueConnection && activeValueSettings ? `Using ${activeValueConnection.leagueName}: ${auctionSettingsSummary(activeValueSettings)}. ` : `Using custom settings: ${teamCount} teams · ${scoring === "ppr" ? "Full PPR" : scoring === "halfPpr" ? "Half PPR" : "Standard"} · $${budget} budget · ${rosterSize} drafted players per team. `}Fair Value recalculates from these settings and conserves the full ${
+        (teamCount * budget).toLocaleString()
+      } league budget. Market Median remains the compatible published-market reference. {!connectedValueProfiles.length ? <a href={appUrl("/league")}>Connect a Sleeper league</a> : null}</span></div> : null}
       {view === "auction" ? (
         <>
           <div className="stats-hub-note stats-auction-attribution">
