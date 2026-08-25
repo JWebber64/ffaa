@@ -3451,8 +3451,7 @@ body,
 .mobile-search-field,
 .league-connect-input,
 .auction-budget-input,
-.auction-selected-ticket label > span,
-.team-slot-stepper input {
+.auction-selected-ticket label > span {
   border-color: var(--line-1) !important;
   background: var(--ffaa-control-surface) !important;
   color: var(--text-0) !important;
@@ -3660,8 +3659,7 @@ body,
     var(--football-banner-image) !important;
 }
 
-.auction-budget-input,
-.team-slot-stepper input {
+.auction-budget-input {
   border-color: var(--line-1);
   background: var(--ffaa-control-surface);
 }

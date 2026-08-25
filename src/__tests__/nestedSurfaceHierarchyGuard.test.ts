@@ -81,12 +81,24 @@ describe("app-wide nested surface hierarchy guard", () => {
     expect(refinementCss).toMatch(/\.team-detail-row\.is-filled\s*\{[^}]*var\(--team-slot-color\)[^}]*var\(--ffaa-inner-surface\)[^}]*!important/s);
   });
 
-  it("keeps position-count wrappers transparent and identifies them by position color", () => {
-    expect(toolsCss).toMatch(/\.team-slot-control\s*\{[^}]*padding:\s*0[^}]*border:\s*0[^}]*background:\s*transparent/s);
-    expect(toolsCss).toMatch(/\.auction-slot-control\s*\{[^}]*padding:\s*0[^}]*border:\s*0[^}]*background:\s*transparent/s);
+  it("keeps position-colored outer cards without a nested green Team Rater control", () => {
+    expect(toolsCss).toMatch(/\.team-slot-control\s*\{[^}]*padding:\s*10px[^}]*border:\s*1px solid[^}]*var\(--slot-color\)[^}]*background:\s*color-mix[^}]*var\(--slot-color\)/s);
+    expect(toolsCss).toMatch(/\.auction-slot-control\s*\{[^}]*padding:\s*10px[^}]*border:\s*1px solid[^}]*var\(--slot-color\)[^}]*background:\s*color-mix[^}]*var\(--slot-color\)/s);
     expect(toolsCss).toMatch(/\.team-slot-control\[data-position="qb"\]\s*\{[^}]*var\(--pos-qb\)/s);
     expect(toolsCss).toMatch(/\.auction-slot-control\[data-position="def"\]\s*\{[^}]*var\(--pos-dst\)/s);
     expect(toolsCss).toMatch(/\.team-slot-control\s*>\s*span\s*\{[^}]*var\(--slot-color\)/s);
     expect(toolsCss).toMatch(/\.auction-slot-control\s*>\s*span\s*\{[^}]*var\(--slot-color\)/s);
+    expect(toolsCss).toMatch(/\.team-slot-stepper input\s*\{[^}]*border:\s*0[^}]*background:\s*transparent/s);
+    expect(toolsCss).toMatch(/\.team-slot-stepper \.ffaa-number-stepper\s*\{[^}]*border:\s*0[^}]*background:\s*transparent[^}]*box-shadow:\s*none/s);
+
+    const nestedControlSurfaceRules: string[] = [];
+    postcss.parse(refinementCss).walkRules((rule) => {
+      if (!rule.selectors.includes(".team-slot-stepper input")) return;
+      const hasControlSurface = rule.nodes.some(
+        (node) => node.type === "decl" && node.prop === "background" && node.value.includes("--ffaa-control-surface"),
+      );
+      if (hasControlSurface) nestedControlSurfaceRules.push(rule.selector);
+    });
+    expect(nestedControlSurfaceRules).toEqual([]);
   });
 });
