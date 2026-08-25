@@ -3705,7 +3705,6 @@ body,
 .team-points-summary-grid > div,
 .rated-lineup-list > div,
 .schedule-presets button,
-.auction-slot-control,
 .auction-drafted-player,
 .league-pulse-track article,
 .league-manager-stats > div,
@@ -3717,10 +3716,6 @@ body,
 .team-detail-row,
 .mobile-context-item {
   background: var(--ffaa-inner-surface) !important;
-}
-
-.team-slot-control {
-  background: color-mix(in srgb, var(--slot-color) 7%, var(--ffaa-inner-surface)) !important;
 }
 
 .host-actions-grid .host-action:hover {

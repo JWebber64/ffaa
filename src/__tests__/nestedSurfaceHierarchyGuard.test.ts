@@ -7,6 +7,7 @@ import postcss from "postcss";
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const tokensCss = readFileSync(resolve(projectRoot, "src/styles/tokens.css"), "utf8");
 const refinementCss = readFileSync(resolve(projectRoot, "src/styles/refinement.css"), "utf8");
+const toolsCss = readFileSync(resolve(projectRoot, "src/screens/tools/tools.css"), "utf8");
 
 function hexToOklabLightness(hex: string) {
   const channels = [1, 3, 5].map((index) => Number.parseInt(hex.slice(index, index + 2), 16) / 255);
@@ -62,8 +63,6 @@ describe("app-wide nested surface hierarchy guard", () => {
       ".stats-hub-summary-card:first-child",
       ".analytics-summary-grid > div",
       ".analytics-summary-grid > div:first-child",
-      ".auction-slot-control",
-      ".team-slot-control",
       ".team-points-summary-grid > div",
       ".schedule-presets button",
       ".league-manager-stats > div",
@@ -78,8 +77,16 @@ describe("app-wide nested surface hierarchy guard", () => {
   });
 
   it("keeps active and position-tinted child states above the neutral layer", () => {
-    expect(refinementCss).toMatch(/\.team-slot-control\s*\{[^}]*var\(--slot-color\)[^}]*var\(--ffaa-inner-surface\)[^}]*!important/s);
     expect(refinementCss).toMatch(/\.schedule-presets button\.is-active\s*\{[^}]*var\(--tools-green\)[^}]*var\(--ffaa-inner-surface\)[^}]*!important/s);
     expect(refinementCss).toMatch(/\.team-detail-row\.is-filled\s*\{[^}]*var\(--team-slot-color\)[^}]*var\(--ffaa-inner-surface\)[^}]*!important/s);
+  });
+
+  it("keeps position-count wrappers transparent and identifies them by position color", () => {
+    expect(toolsCss).toMatch(/\.team-slot-control\s*\{[^}]*padding:\s*0[^}]*border:\s*0[^}]*background:\s*transparent/s);
+    expect(toolsCss).toMatch(/\.auction-slot-control\s*\{[^}]*padding:\s*0[^}]*border:\s*0[^}]*background:\s*transparent/s);
+    expect(toolsCss).toMatch(/\.team-slot-control\[data-position="qb"\]\s*\{[^}]*var\(--pos-qb\)/s);
+    expect(toolsCss).toMatch(/\.auction-slot-control\[data-position="def"\]\s*\{[^}]*var\(--pos-dst\)/s);
+    expect(toolsCss).toMatch(/\.team-slot-control\s*>\s*span\s*\{[^}]*var\(--slot-color\)/s);
+    expect(toolsCss).toMatch(/\.auction-slot-control\s*>\s*span\s*\{[^}]*var\(--slot-color\)/s);
   });
 });
