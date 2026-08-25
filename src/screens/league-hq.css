@@ -50,6 +50,15 @@
   text-transform: uppercase;
 }
 
+.league-kicker,
+.league-section-heading > span {
+  color: var(--a3);
+}
+
+.league-dialog-head span {
+  color: var(--a2);
+}
+
 .league-hero h1 {
   max-width: 760px;
   margin: 14px 0 8px;
@@ -137,7 +146,11 @@
   cursor: pointer;
 }
 .league-tabs button:hover { color: var(--text-0, white); background: rgba(255, 255, 255, 0.045); }
-.league-tabs button.is-active { border-color: rgba(52, 211, 153, 0.22); background: rgba(16, 185, 129, 0.13); color: #a7f3d0; }
+.league-tabs button.is-active {
+  border-color: color-mix(in srgb, var(--a2) 42%, var(--line-1));
+  background: color-mix(in srgb, var(--a2) 14%, var(--bg-2));
+  color: color-mix(in srgb, var(--a2) 82%, white);
+}
 
 .league-sync-bar {
   display: grid;

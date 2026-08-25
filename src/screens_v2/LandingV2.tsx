@@ -152,8 +152,8 @@ export default function LandingV2() {
 
       <figure className="home-playbook-photo">
         <img
-          src={appUrl("images/football-playbook-banner.png")}
-          alt="A football resting on dark turf beside a drawn play route."
+          src={appUrl("images/draft-room-editorial.png")}
+          alt="A prepared fantasy football draft table overlooking a stadium at night."
         />
         <figcaption>
           <span>Draft preparation</span>

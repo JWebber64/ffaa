@@ -1,27 +1,27 @@
 :root {
-  /* Stadium-green neutrals with clear separation across dense surfaces. */
-  --bg-0: #10241a;
-  --bg-1: #183529;
-  --bg-2: oklch(0.398 0.054 163);
+  /* Broadcast-night neutrals keep dense surfaces calm and let state colors work. */
+  --bg-0: #0c1420;
+  --bg-1: #121c2a;
+  --bg-2: oklch(0.39 0.035 250);
 
   /* Borders */
-  --line-0: rgba(229, 244, 235, 0.16);
-  --line-1: rgba(229, 244, 235, 0.28);
+  --line-0: rgba(210, 224, 238, 0.16);
+  --line-1: rgba(210, 224, 238, 0.28);
 
-  --text-0: #f7fbf8;
-  --text-1: #c7dacf;
-  --text-2: #aac2b4;
-  --text-3: #8eaa9a;
+  --text-0: #f4f1e8;
+  --text-1: #b7c2ce;
+  --text-2: #9eabb9;
+  --text-3: #7f8e9f;
 
-  /* --- Brand accents (Material-ish) --- */
-  --a1: #10B981;  /* emerald */
-  --a2: #14B8A6;  /* teal */
-  --a3: #60A5FA;  /* sky */
+  /* --- Semantic accents --- */
+  --a1: #2fc994;  /* live / success */
+  --a2: #78a8c4;  /* selection / information */
+  --a3: #d6a84f;  /* awards / milestones */
 
   /* --- Soft glows --- */
-  --glow-a1: rgba(16,185,129,0.35);
-  --glow-a2: rgba(20,184,166,0.30);
-  --glow-a3: rgba(96,165,250,0.25);
+  --glow-a1: rgba(47, 201, 148, 0.28);
+  --glow-a2: rgba(120, 168, 196, 0.26);
+  --glow-a3: rgba(214, 168, 79, 0.22);
 
   /* --- Position colors (corrected) --- */
   --pos-qb:   #DC2626; /* Red */
@@ -41,9 +41,9 @@
   --pos-idpflex:#0891B2; /* Same as FLEX */
 
   /* Legacy glass names resolve to the brighter product surfaces. */
-  --glass-1: #183529;
-  --glass-2: #214536;
-  --glass-3: #2a5542;
+  --glass-1: #121c2a;
+  --glass-2: oklch(0.39 0.035 250);
+  --glass-3: #24374b;
 
   /* Specular highlights (top sheen) */
   --spec-1: rgba(255,255,255,0.18);
@@ -82,7 +82,7 @@
   --r-xl: 16px;
 
   /* Focus ring */
-  --focus: rgba(20,184,166,0.35);
+  --focus: rgba(120, 168, 196, 0.42);
 
   /* --- Legacy variable aliases for compatibility --- */
   /* Surface aliases */

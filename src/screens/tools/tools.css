@@ -1,9 +1,9 @@
 .tools-hub,
 .tools-page {
-  --tools-green: #34d399;
-  --tools-cyan: #22d3ee;
-  --tools-blue: #60a5fa;
-  --tools-amber: #fbbf24;
+  --tools-green: #2fc994;
+  --tools-cyan: #78a8c4;
+  --tools-blue: #8bb8d0;
+  --tools-amber: #d6a84f;
   --tools-red: #fb7185;
   display: grid;
   gap: 20px;
@@ -42,7 +42,7 @@
 .tool-subsection-head > div > span,
 .compare-player-card > span,
 .team-grade-hero > div:last-child > span {
-  color: var(--tools-green);
+  color: var(--tools-cyan);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -97,9 +97,9 @@
 
 .tools-primary-link,
 .tool-button.is-primary {
-  color: #03150e;
-  background: linear-gradient(135deg, #6ee7b7, #22d3ee);
-  box-shadow: 0 10px 28px rgba(34,211,238,0.15);
+  color: #140b06;
+  background: linear-gradient(180deg, #e89558, #d97a3f);
+  box-shadow: 0 10px 28px rgba(140, 65, 20, 0.24);
 }
 
 .tools-secondary-link,
@@ -119,7 +119,7 @@
 .tools-secondary-link:hover,
 .tool-button:hover:not(:disabled) {
   transform: translateY(-1px);
-  border-color: rgba(52,211,153,0.36);
+  border-color: rgba(217, 122, 63, 0.5);
 }
 
 .tool-button:disabled {
