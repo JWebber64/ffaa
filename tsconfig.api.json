@@ -5,5 +5,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["api", "server", "shared"]
+  "include": ["server", "shared"]
 }

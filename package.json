@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --debug=false",
     "build": "tsc -b && vite build",
-    "build:vercel": "tsc -b && tsc -p tsconfig.api.json && vite build --base=/ff/",
+    "build:functions": "node scripts/build-league-history-function.mjs",
+    "build:vercel": "npm run build:functions && tsc -b && tsc -p tsconfig.api.json && vite build --base=/ff/",
     "build:scripts": "tsc -p tsconfig.scripts.json",
     "lint": "eslint .",
     "test": "vitest",
@@ -58,6 +59,7 @@
     "@vitejs/plugin-react": "^6.0.5",
     "@vitest/coverage-v8": "^4.0.18",
     "autoprefixer": "^10.4.27",
+    "esbuild": "0.28.2",
     "eslint": "^10.2.1",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",

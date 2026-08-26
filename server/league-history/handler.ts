@@ -6,7 +6,7 @@ import {
 import {
   getAutomaticLeagueHistoryImportStatus,
   runAutomaticLeagueHistoryImport,
-} from "../../server/league-history/automaticImport";
+} from "./automaticImport";
 
 interface ApiRequest {
   method?: string;

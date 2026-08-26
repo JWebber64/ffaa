@@ -3,9 +3,9 @@
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
   "functions": {
-    "api/league-history/import.ts": {
+    "api/league-history/import.js": {
       "maxDuration": 300,
-      "includeFiles": "src/data/players-2026-sleeper.json"
+      "includeFiles": "api/league-history/.generated/import.js"
     }
   },
   "redirects": [
