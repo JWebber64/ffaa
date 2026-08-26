@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 
 import { StatsSparkline } from "@/components/stats/StatsSparkline";
 import { TeamMark } from "@/components/player/TeamMark";
+import { formatTeamBye } from "@/components/player/teamMarkUtils";
 import { ToolDataStatus } from "@/components/tools/ToolDataStatus";
 import { ToolLayout } from "@/components/tools/ToolLayout";
 import { ToolPlayerPicker } from "@/components/tools/ToolPlayerPicker";
@@ -145,7 +146,7 @@ export function PlayerCompare() {
           <article className="compare-player-card" key={player.id}>
             <span className="compare-player-kicker">
               <TeamMark team={player.team} size="sm" />
-              <span>{player.position} · {player.team || "FA"}</span>
+              <span>{player.position} · {formatTeamBye(player.team || "FA", player.byeWeek)}</span>
             </span>
             <h2>{player.name}</h2>
             <p>{player.injuryStatus || player.status || "No active injury designation"}</p>

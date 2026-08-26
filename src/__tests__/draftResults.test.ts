@@ -130,6 +130,9 @@ describe("draft results report", () => {
       projectedValue: 125,
       netValue: 50,
       bestValue: { playerId: "a-qb", surplus: 30 },
+      players: expect.arrayContaining([
+        expect.objectContaining({ playerId: "a-qb", byeWeek: 6 }),
+      ]),
     });
     expect(report.teams[0]!.score).toBeGreaterThan(report.teams[1]!.score);
     expect(report.teams[0]!.rating.components.map((component) => component.id)).toContain("starters");
@@ -142,6 +145,7 @@ describe("draft results report", () => {
 
     expect(csv).toContain('"Alpha, United"');
     expect(csv).toContain('"Josh ""Air"" Allen"');
+    expect(csv).toContain("NFL Team,Bye Week,Lineup Slot");
     expect(csv.split("\r\n")).toHaveLength(5);
     expect(json.teams[0]?.name).toBe("Alpha, United");
   });

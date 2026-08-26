@@ -20,6 +20,7 @@ import { getFirebaseDraftById } from "../multiplayer/firebaseBackend";
 import { getLocalDraftById, isLocalMultiplayerMode } from "../multiplayer/localMode";
 import { GlassCard, GlassPanel, GlassPill } from "../components/premium";
 import { TeamMark } from "../components/player/TeamMark";
+import { formatTeamBye } from "../components/player/teamMarkUtils";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 
@@ -345,7 +346,7 @@ export default function ResultsV2() {
                                     <TeamMark team={player.nflTeam} size="xs" />
                                     <span className="results-player-copy">
                                       <strong>{player.name}</strong>
-                                      <span>{player.nflTeam}</span>
+                                      <span>{formatTeamBye(player.nflTeam, player.byeWeek)}</span>
                                     </span>
                                   </span>
                                 </td>

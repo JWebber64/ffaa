@@ -1,4 +1,5 @@
 import type { ToolPlayer } from "@/data/toolPlayerData";
+import { formatTeamBye } from "@/components/player/teamMarkUtils";
 import { UniversalSelect } from "@/ui/UniversalSelect";
 
 interface ToolPlayerPickerProps {
@@ -42,7 +43,7 @@ export function ToolPlayerPicker({
             value={player.id}
             disabled={excludedIds?.has(player.id) && player.id !== value}
           >
-            {player.name} · {player.position} · {player.team || "FA"} · {player.auctionValue === null ? "No value" : `$${Math.round(player.auctionValue)}`}
+            {player.name} · {player.position} · {formatTeamBye(player.team || "FA", player.byeWeek)} · {player.auctionValue === null ? "No value" : `$${Math.round(player.auctionValue)}`}
           </option>
         ))}
       </UniversalSelect>

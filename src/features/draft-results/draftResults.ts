@@ -38,6 +38,7 @@ export interface DraftResultPlayer {
   name: string;
   position: string;
   nflTeam: string;
+  byeWeek: number | null;
   price: number;
   projectedValue: number | null;
   projectedPoints: number | null;
@@ -185,6 +186,7 @@ function playerRows(team: DraftTeam, roster: ToolPlayer[], rating: TeamRatingRes
       name: player.name,
       position: String(player.pos ?? "—").replace("DST", "DEF"),
       nflTeam: String(player.team ?? "FA"),
+      byeWeek: optionalNumber(player.byeWeek) ?? matched?.byeWeek ?? null,
       price,
       projectedValue,
       projectedPoints,
@@ -323,7 +325,7 @@ function csvCell(value: unknown) {
 
 export function createDraftResultsCsv(report: DraftResultsReport) {
   const header = [
-    "Rank", "Team", "Grade", "Score", "Player", "Position", "NFL Team", "Lineup Slot",
+    "Rank", "Team", "Grade", "Score", "Player", "Position", "NFL Team", "Bye Week", "Lineup Slot",
     "Price", "GameHQ Fair Value", "Surplus", "Projected Points",
   ];
   const rows = report.teams.flatMap((team) => team.players.map((player) => [
@@ -334,6 +336,7 @@ export function createDraftResultsCsv(report: DraftResultsReport) {
     player.name,
     player.position,
     player.nflTeam,
+    player.byeWeek ?? "",
     player.lineupSlot,
     report.draftType === "auction" ? player.price : "",
     player.projectedValue ?? "",

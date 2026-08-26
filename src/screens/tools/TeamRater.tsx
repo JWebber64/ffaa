@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 
 import { ToolDataStatus } from "@/components/tools/ToolDataStatus";
 import { TeamMark } from "@/components/player/TeamMark";
+import { formatTeamBye } from "@/components/player/teamMarkUtils";
 import { ToolLayout } from "@/components/tools/ToolLayout";
 import { ToolMetricBar } from "@/components/tools/ToolMetricBar";
 import { ToolPlayerPicker } from "@/components/tools/ToolPlayerPicker";
@@ -134,7 +135,7 @@ export function TeamRater() {
         if (rosterIdSet.has(player.id)) return false;
         if (playerPosition !== "ALL" && player.position !== playerPosition) return false;
         if (!query) return true;
-        return `${player.name} ${player.team} ${player.position}`.toLowerCase().includes(query);
+        return `${player.name} ${player.team} ${player.position} ${formatTeamBye(player.team, player.byeWeek)}`.toLowerCase().includes(query);
       }),
       playerSort,
     );
@@ -295,7 +296,7 @@ export function TeamRater() {
                     <TeamMark team={player.team} size="xs" />
                     <span className={`tool-position-tag is-${player.position.toLowerCase()}`}>{player.position}</span>
                   </span>
-                  <div><strong>{player.name}</strong><small>{player.team || "FA"} · Proj {formatNumber(player.projectedPoints)}</small></div>
+                  <div><strong>{player.name}</strong><small>{formatTeamBye(player.team || "FA", player.byeWeek)} · Proj {formatNumber(player.projectedPoints)}</small></div>
                   <button type="button" aria-label={`Remove ${player.name}`} onClick={() => setRosterIds((current) => current.filter((id) => id !== player.id))}>
                     <Trash2 size={15} aria-hidden="true" />
                   </button>
@@ -334,7 +335,7 @@ export function TeamRater() {
                 <div key={`${entry.slot}-${entry.player.id}`}>
                   <span>{SLOT_LABELS[entry.slot]}</span>
                   <strong>{entry.player.name}</strong>
-                  <small>{formatNumber(entry.player.projectedPoints)} pts · {Math.round(entry.projectionPercentile)}th percentile</small>
+                  <small>{formatTeamBye(entry.player.team || "FA", entry.player.byeWeek)} · {formatNumber(entry.player.projectedPoints)} pts · {Math.round(entry.projectionPercentile)}th percentile</small>
                 </div>
               ))}
               {rating.missingSlots.map((slot) => <div className="is-missing" key={slot}><span>{slot.replace("SUPERFLEX", "SFLEX")}</span><strong>Open starter</strong><small>Add an eligible player</small></div>)}
