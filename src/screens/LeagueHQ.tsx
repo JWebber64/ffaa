@@ -627,35 +627,37 @@ export default function LeagueHQ() {
                 </div>
               </section>
 
-              <section className="league-panel">
-                <SectionHeading eyebrow="All-time" title="League leaders" />
-                <div className="league-leader-list">
-                  {leaders.map((leader) => (
-                    <div key={leader.id}>
-                      <span>{leader.label}</span>
-                      <strong>{managerLabel(leader.managerId)}</strong>
-                      <b>{leader.value}</b>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <section className="league-panel">
-                <SectionHeading eyebrow="Last-place archive" title="Wall of shame" />
-                {lastPlaces.length ? (
-                  <div className="league-shame-list">
-                    {lastPlaces.map((season) => (
-                      <div key={season.year}><strong>{season.year}</strong><span>{season.lastPlaceTeam || managerLabel(season.lastPlaceManagerId)}</span><small>{season.lastPlaceRecord}</small></div>
+              <div className="league-overview-side">
+                <section className="league-panel">
+                  <SectionHeading eyebrow="All-time" title="League leaders" />
+                  <div className="league-leader-list">
+                    {leaders.map((leader) => (
+                      <div key={leader.id}>
+                        <span>{leader.label}</span>
+                        <strong>{managerLabel(leader.managerId)}</strong>
+                        <b>{leader.value}</b>
+                      </div>
                     ))}
                   </div>
-                ) : <EmptyState title="The wall is clean" detail="Last-place finishes appear here after seasons are imported." />}
-              </section>
+                </section>
 
-              <section className="league-panel league-draft-card">
-                <SectionHeading eyebrow="Draft Central" title={countdown.label} detail={countdown.detail} />
-                <CalendarClock aria-hidden="true" />
-                <div><Button size="sm" onClick={() => chooseView("draft")}>Open Draft Central</Button></div>
-              </section>
+                <section className="league-panel">
+                  <SectionHeading eyebrow="Last-place archive" title="Wall of shame" />
+                  {lastPlaces.length ? (
+                    <div className="league-shame-list">
+                      {lastPlaces.map((season) => (
+                        <div key={season.year}><strong>{season.year}</strong><span>{season.lastPlaceTeam || managerLabel(season.lastPlaceManagerId)}</span><small>{season.lastPlaceRecord}</small></div>
+                      ))}
+                    </div>
+                  ) : <EmptyState title="The wall is clean" detail="Last-place finishes appear here after seasons are imported." />}
+                </section>
+
+                <section className="league-panel league-draft-card">
+                  <SectionHeading eyebrow="Draft Central" title={countdown.label} detail={countdown.detail} />
+                  <CalendarClock aria-hidden="true" />
+                  <div><Button size="sm" onClick={() => chooseView("draft")}>Open Draft Central</Button></div>
+                </section>
+              </div>
             </div>
           </>
         ) : null}

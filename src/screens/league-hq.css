@@ -354,7 +354,8 @@
 .league-banner strong { margin-top: 5px; font-size: 1.05rem; }
 .league-banner small { margin-top: 5px; color: var(--text-2, #94a3b8); }
 
-.league-overview-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.75fr); gap: 16px; margin-top: 44px; }
+.league-overview-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.75fr); align-items: start; gap: 16px; margin-top: 44px; }
+.league-overview-side { display: grid; align-content: start; gap: 16px; }
 .league-panel,
 .league-rule,
 .league-manager-card,
@@ -370,7 +371,6 @@
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.035);
 }
 .league-panel { padding: 24px; }
-.league-standings-panel { grid-row: span 2; }
 .league-table-wrap { overflow-x: auto; }
 .league-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
 .league-table th { padding: 11px 12px; border-bottom: 1px solid var(--league-line); color: var(--text-2, #94a3b8); font-size: 0.65rem; letter-spacing: 0.09em; text-align: left; text-transform: uppercase; }
