@@ -49,12 +49,15 @@ const HISTORY_NAV = [
 function LeagueHistoryLayout() {
   const { leagueId = "" } = useParams();
   const state = useLeagueHistory(leagueId);
-  if (state.status === "loading") {
+  if (state.status === "loading" || state.status === "importing") {
+    const importing = state.status === "importing";
     return (
       <main className="history-shell history-state" aria-busy="true">
-        <div className="history-state-kicker">League History</div>
-        <h1>Loading league history</h1>
-        <p>Reading normalized seasons, managers, matchups, drafts, and transactions.</p>
+        <div className="history-state-kicker">{importing ? "Automatic Sleeper import" : "League History"}</div>
+        <h1>{importing ? "Preparing League History" : "Loading league history"}</h1>
+        <p>{importing
+          ? "This league is being normalized and saved automatically. The first import can take a minute."
+          : "Reading normalized seasons, managers, matchups, drafts, and transactions."}</p>
         <div className="history-skeleton" aria-hidden="true"><span /><span /><span /></div>
       </main>
     );

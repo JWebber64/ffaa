@@ -26,6 +26,19 @@ import {
 const requestCache = new Map<string, Promise<LeagueHistorySnapshot>>();
 const completedWeekCache = new Map<string, LeagueWeekPayload>();
 
+export class LeagueHistoryNotImportedError extends Error {
+  readonly code = "league-history/not-imported";
+
+  constructor() {
+    super("This Sleeper league has not been imported into permanent history yet.");
+    this.name = "LeagueHistoryNotImportedError";
+  }
+}
+
+export function isLeagueHistoryNotImportedError(error: unknown): error is LeagueHistoryNotImportedError {
+  return error instanceof LeagueHistoryNotImportedError;
+}
+
 function throwIfAborted(signal?: AbortSignal) {
   if (!signal?.aborted) return;
   const error = new Error("League history request was cancelled.");
@@ -59,12 +72,12 @@ function readRoot(reference: DocumentReference, value: unknown) {
 
 async function loadSnapshot(routeId: string): Promise<LeagueHistorySnapshot> {
   const reference = await resolveHistoryReference(routeId);
-  if (!reference) throw new Error("This Sleeper league has not been imported into permanent history yet.");
+  if (!reference) throw new LeagueHistoryNotImportedError();
   const [rootSnapshot, chunksSnapshot] = await Promise.all([
     getDoc(reference),
     getDocs(collection(reference, FIRESTORE_SNAPSHOT_COLLECTION)),
   ]);
-  if (!rootSnapshot.exists()) throw new Error("This Sleeper league has not been imported into permanent history yet.");
+  if (!rootSnapshot.exists()) throw new LeagueHistoryNotImportedError();
   const root = readRoot(reference, rootSnapshot.data());
   const chunks = chunksSnapshot.docs.map((row) => row.data() as FirestoreSnapshotChunk);
   return assembleLeagueHistorySnapshot(root, chunks);

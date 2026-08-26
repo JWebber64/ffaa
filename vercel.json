@@ -2,6 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
+  "functions": {
+    "api/league-history/import.ts": {
+      "maxDuration": 300,
+      "includeFiles": "src/data/players-2026-sleeper.json"
+    }
+  },
   "redirects": [
     {
       "source": "/",
@@ -15,6 +21,10 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/ff/api/league-history/import",
+      "destination": "/api/league-history/import"
+    },
     {
       "source": "/ff/ffc-api/:path*",
       "destination": "https://fantasyfootballcalculator.com/api/v1/:path*"

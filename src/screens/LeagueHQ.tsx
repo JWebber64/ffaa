@@ -57,6 +57,7 @@ import {
   type SleeperLeagueChoice,
 } from "../features/league-hq/sleeperLeague";
 import { leagueHistoryPath, leagueRivalryPath } from "../features/league-history/ui/leagueRoutes";
+import { startLeagueHistoryImport } from "../features/league-history/automaticImport";
 import { FANTASY_SEASON } from "../config/fantasySeason";
 import "./league-hq.css";
 
@@ -303,12 +304,13 @@ export default function LeagueHQ() {
       auctionSettings: choice.auctionSettings,
     }));
     rememberConnections(additions);
+    for (const addition of additions) void startLeagueHistoryImport(addition.leagueId);
     chooseLeague(additions[0]!.leagueId);
     setSelectedLeagueIds([]);
     setLookupState((current) => ({
       ...current,
       status: "success",
-      message: `${additions.length} ${additions.length === 1 ? "league" : "leagues"} added. ${additions[0]!.leagueName} is now active.`,
+      message: `${additions.length} ${additions.length === 1 ? "league" : "leagues"} added. ${additions[0]!.leagueName} is now active, and League History is importing automatically.`,
     }));
   };
 

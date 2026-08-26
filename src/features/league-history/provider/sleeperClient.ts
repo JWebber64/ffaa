@@ -20,6 +20,7 @@ export interface SleeperClientOptions {
   fetcher?: typeof fetch;
   signal?: AbortSignal;
   now?: Date;
+  maxChainLength?: number;
 }
 
 function numberValue(value: unknown) {
@@ -29,10 +30,12 @@ function numberValue(value: unknown) {
 export class SleeperApiClient {
   private readonly fetcher: typeof fetch;
   private readonly signal: AbortSignal | undefined;
+  private readonly maxChainLength: number;
 
   constructor(options: SleeperClientOptions = {}) {
     this.fetcher = options.fetcher ?? fetch;
     this.signal = options.signal;
+    this.maxChainLength = Math.min(MAX_CHAIN_LENGTH, Math.max(1, options.maxChainLength ?? MAX_CHAIN_LENGTH));
   }
 
   async get<T>(path: string): Promise<T> {
@@ -86,7 +89,7 @@ export class SleeperApiClient {
     const seen = new Set<string>();
     const seasons: SleeperSeasonBundle[] = [];
     let nextLeagueId = requestedLeagueId;
-    while (nextLeagueId && !seen.has(nextLeagueId) && seasons.length < MAX_CHAIN_LENGTH) {
+    while (nextLeagueId && !seen.has(nextLeagueId) && seasons.length < this.maxChainLength) {
       seen.add(nextLeagueId);
       const league = await this.get<SleeperLeague>(`/league/${nextLeagueId}`);
       seasons.push(await this.loadSeason(league, state));
