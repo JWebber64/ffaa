@@ -77,7 +77,7 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   font-family: var(--font-sans);
-  overflow-x: hidden;
+  overflow-x: clip;
   margin: 0;
   padding: 0;
   background: var(--bg-0);
@@ -11026,7 +11026,7 @@ body,
 .landing-shell,
 .hero-v5 {
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .ui-button {
