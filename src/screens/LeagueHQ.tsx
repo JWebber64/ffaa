@@ -29,6 +29,7 @@ import {
   WifiOff,
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
+import { appUrl } from "../lib/appBasePath";
 import { useDraftStore } from "../store/draftStore";
 import { Button } from "../ui/Button";
 import {
@@ -657,6 +658,21 @@ export default function LeagueHQ() {
                   <CalendarClock aria-hidden="true" />
                   <div><Button size="sm" onClick={() => chooseView("draft")}>Open Draft Central</Button></div>
                 </section>
+
+                <figure className="league-overview-editorial">
+                  <img
+                    src={appUrl("images/league-overview-archive.jpg")}
+                    alt="An open championship ledger beside brass football trophies and folded green pennants."
+                    width="1536"
+                    height="1024"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <figcaption>
+                    <span>League archive</span>
+                    <strong>Every season belongs in the record.</strong>
+                  </figcaption>
+                </figure>
               </div>
             </div>
           </>

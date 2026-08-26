@@ -8,6 +8,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { appUrl } from "../../lib/appBasePath";
 
 const TOOL_CARDS = [
   {
@@ -17,6 +18,7 @@ const TOOL_CARDS = [
     detail: "Sortable auction board",
     icon: Gavel,
     tone: "amber",
+    image: "images/tool-auction-room.jpg",
   },
   {
     to: "/tools/player-compare",
@@ -25,6 +27,7 @@ const TOOL_CARDS = [
     detail: "2026 projections + 2025 actuals",
     icon: Scale,
     tone: "cyan",
+    image: "images/tool-player-compare.jpg",
   },
   {
     to: "/tools/team-rater",
@@ -33,6 +36,7 @@ const TOOL_CARDS = [
     detail: "Redraft · configurable scoring",
     icon: UsersRound,
     tone: "green",
+    image: "images/tool-team-rater.jpg",
   },
   {
     to: "/tools/schedule",
@@ -41,6 +45,7 @@ const TOOL_CARDS = [
     detail: "Full 272-game schedule",
     icon: CalendarRange,
     tone: "amber",
+    image: "images/tool-schedule-lab.jpg",
   },
   {
     to: "/tools/offensive-line",
@@ -49,6 +54,7 @@ const TOOL_CARDS = [
     detail: "2025 outcome-based context",
     icon: ChartNoAxesCombined,
     tone: "blue",
+    image: "images/tool-offensive-line.jpg",
   },
 ] as const;
 
@@ -91,6 +97,9 @@ export function ToolsHub() {
           const Icon = tool.icon;
           return (
             <Link className={`tools-card is-${tool.tone}`} to={tool.to} key={tool.to}>
+              <span className="tools-card-media" aria-hidden="true">
+                <img src={appUrl(tool.image)} alt="" width="1672" height="941" loading="lazy" decoding="async" />
+              </span>
               <div className="tools-card-icon"><Icon size={22} aria-hidden="true" /></div>
               <div className="tools-card-copy">
                 <span>{tool.detail}</span>

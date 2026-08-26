@@ -42,6 +42,7 @@ export default function AppShellV2() {
     "--football-hero-image": `url("${appUrl("images/football-night-hero.png")}")`,
     "--football-banner-image": `url("${appUrl("images/football-playbook-banner.png")}")`,
     "--draft-editorial-image": `url("${appUrl("images/draft-room-editorial.png")}")`,
+    "--results-editorial-image": `url("${appUrl("images/results-championship.jpg")}")`,
     "--research-editorial-image": `url("${appUrl("images/research-film-room.png")}")`,
     "--league-editorial-image": `url("${appUrl("images/league-history-trophy-room.png")}")`,
   } as CSSProperties;

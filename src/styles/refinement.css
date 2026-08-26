@@ -3681,8 +3681,7 @@ body,
 
 .setup-hero,
 .host-hero,
-.join-hero,
-.results-hero {
+.join-hero {
   border-color: var(--line-1) !important;
   background-image:
     linear-gradient(90deg, rgba(6, 16, 12, 0.95), rgba(10, 31, 22, 0.76) 48%, rgba(6, 16, 12, 0.32)),
@@ -3716,6 +3715,18 @@ body,
   background-position: center, center, center 56% !important;
   background-repeat: no-repeat !important;
   background-size: auto, auto, cover !important;
+}
+
+.results-hero {
+  background-color: var(--bg-1) !important;
+  border-color: var(--line-1) !important;
+  background-image:
+    linear-gradient(90deg, rgba(6, 16, 12, 0.95), rgba(10, 31, 22, 0.72) 48%, rgba(6, 16, 12, 0.24)),
+    linear-gradient(0deg, rgba(6, 16, 12, 0.54), transparent),
+    var(--results-editorial-image) !important;
+  background-position: center, center, right center !important;
+  background-repeat: no-repeat !important;
+  background-size: auto, auto, auto 100% !important;
 }
 
 /* Keep the trophy intact in the wide League HQ masthead instead of forcing the
@@ -3859,9 +3870,12 @@ body,
 @media (max-width: 640px) {
   .setup-hero,
   .host-hero,
-  .join-hero,
-  .results-hero {
+  .join-hero {
     background-position: center, center, 58% 54% !important;
+  }
+
+  .results-hero {
+    background-position: center, center, center !important;
   }
 
   .stats-hub .stats-hero,
