@@ -1220,7 +1220,7 @@ export default function DraftRoomV2() {
                       />
                       <div className="draft-bid-stepper">
                         <span className="draft-bid-stepper-visual" aria-hidden="true">
-                          <ChevronsUpDown size={16} strokeWidth={2.4} />
+                          <ChevronsUpDown size={14} strokeWidth={2.4} />
                         </span>
                         <button
                           className="draft-bid-stepper-hit draft-bid-stepper-hit-up"
@@ -1515,7 +1515,7 @@ export default function DraftRoomV2() {
                           />
                           <div className="draft-bid-stepper draft-opening-bid-stepper">
                             <span className="draft-bid-stepper-visual" aria-hidden="true">
-                              <ChevronsUpDown size={16} strokeWidth={2.4} />
+                              <ChevronsUpDown size={14} strokeWidth={2.4} />
                             </span>
                             <button
                               className="draft-bid-stepper-hit draft-bid-stepper-hit-up"

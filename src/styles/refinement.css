@@ -1319,10 +1319,9 @@ dd,
 }
 
 .stats-select-shell .ffaa-custom-select-icon {
-  border-color: var(--ffaa-rule);
-  border-radius: 6px;
-  background: var(--ffaa-surface-raised);
-  background-image: none;
+  border-color: var(--ffaa-field-border);
+  border-radius: 8px;
+  background: var(--ffaa-field-surface);
   box-shadow: none;
 }
 
@@ -1333,12 +1332,11 @@ dd,
 }
 
 .ffaa-custom-select-icon {
-  width: 24px;
-  height: 24px;
-  border-color: var(--ffaa-rule);
-  border-radius: 6px;
-  background: var(--ffaa-surface-raised);
-  background-image: none;
+  width: 28px;
+  height: 28px;
+  border-color: var(--ffaa-field-border);
+  border-radius: 8px;
+  background: var(--ffaa-field-surface);
   box-shadow: none;
 }
 
@@ -1346,13 +1344,19 @@ dd,
 .setup-budget-block,
 .offline-setup-roster .roster-row,
 .offline-setup-roster .roster-stepper,
-.offline-setup-team-number,
-.draft-bid-stepper,
-.offline-money-stepper-control {
+.offline-setup-team-number {
   border-color: var(--ffaa-rule);
   border-radius: 9px;
   background: var(--ffaa-surface-raised);
   background-image: none;
+  box-shadow: none;
+}
+
+.draft-bid-stepper,
+.offline-money-stepper-control {
+  border-color: var(--ffaa-field-border);
+  border-radius: 8px;
+  background: var(--ffaa-field-surface);
   box-shadow: none;
 }
 
@@ -3373,7 +3377,7 @@ dd,
 :root {
   --ffaa-accent: var(--a1);
   --ffaa-header-surface: #0c1914;
-  --ffaa-control-surface: oklch(0.44 0.04 155);
+  --ffaa-control-surface: var(--ffaa-field-surface);
   --ffaa-inner-surface: var(--bg-2);
   --ffaa-toolbar-surface: rgba(15, 28, 23, 0.96);
   --ffaa-panel-background: linear-gradient(180deg, #14261f, #0f1c18);
@@ -3477,7 +3481,7 @@ body,
 .league-connect-input,
 .auction-budget-input,
 .auction-selected-ticket label > span {
-  border-color: var(--line-1) !important;
+  border-color: var(--ffaa-field-border) !important;
   background: var(--ffaa-control-surface) !important;
   color: var(--text-0) !important;
 }
@@ -3760,8 +3764,8 @@ body,
 
 .auction-budget-input,
 .auction-selected-ticket label > span {
-  border-color: var(--ffaa-number-field-border) !important;
-  background: var(--ffaa-number-field-surface) !important;
+  border-color: var(--ffaa-field-border) !important;
+  background: var(--ffaa-field-surface) !important;
 }
 
 .tool-field .auction-budget-input input {

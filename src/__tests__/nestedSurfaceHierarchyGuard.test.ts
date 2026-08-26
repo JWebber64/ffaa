@@ -21,14 +21,12 @@ function hexToOklabLightness(hex: string) {
 }
 
 describe("app-wide nested surface hierarchy guard", () => {
-  it("keeps raised tiles separate from both cards and form controls", () => {
+  it("keeps raised tiles separate from cards while fields use their shared surface", () => {
     const raised = tokensCss.match(/--bg-2:\s*oklch\(([0-9.]+)/);
-    const control = refinementCss.match(/--ffaa-control-surface:\s*oklch\(([0-9.]+)/);
     const panel = refinementCss.match(/--ffaa-panel-background:\s*linear-gradient\([^,]+,\s*(#[0-9a-f]{6})/i);
     const card = refinementCss.match(/--ffaa-card-background:\s*linear-gradient\([^,]+,\s*(#[0-9a-f]{6})/i);
 
     expect(raised).not.toBeNull();
-    expect(control).not.toBeNull();
     expect(panel).not.toBeNull();
     expect(card).not.toBeNull();
 
@@ -39,7 +37,7 @@ describe("app-wide nested surface hierarchy guard", () => {
     );
 
     expect(raisedLightness - parentLightness).toBeGreaterThanOrEqual(0.04);
-    expect(Number(control?.[1]) - raisedLightness).toBeGreaterThanOrEqual(0.03);
+    expect(refinementCss).toMatch(/--ffaa-control-surface:\s*var\(--ffaa-field-surface\)/);
   });
 
   it("covers nested tile families across every routed product area", () => {

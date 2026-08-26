@@ -408,6 +408,7 @@ export default function HostSetupV2() {
                                 });
                               }}
                               className="setup-budget-input"
+                              shellClassName="setup-budget-field"
                             />
                           </label>
                         ))}

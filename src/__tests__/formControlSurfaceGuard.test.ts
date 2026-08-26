@@ -9,25 +9,15 @@ const refinementCss = readFileSync(resolve(projectRoot, "src/styles/refinement.c
 const globalsCss = readFileSync(resolve(projectRoot, "src/styles/globals.css"), "utf8");
 const leagueCss = readFileSync(resolve(projectRoot, "src/screens/league-hq.css"), "utf8");
 
-function hexToOklabLightness(hex: string) {
-  const channels = [1, 3, 5].map((index) => Number.parseInt(hex.slice(index, index + 2), 16) / 255);
-  const [red = 0, green = 0, blue = 0] = channels.map((channel) =>
-    channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
-  );
-  const l = Math.cbrt(0.4122214708 * red + 0.5363325363 * green + 0.0514459929 * blue);
-  const m = Math.cbrt(0.2119034982 * red + 0.6806995451 * green + 0.1073969566 * blue);
-  const s = Math.cbrt(0.0883024619 * red + 0.2817188376 * green + 0.6299787005 * blue);
-  return 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s;
-}
-
 describe("app-wide form control surface guard", () => {
-  it("keeps form controls visibly separate from the panel surface", () => {
-    const control = refinementCss.match(/--ffaa-control-surface:\s*oklch\(([0-9.]+)/);
-    const panel = refinementCss.match(/--ffaa-panel-background:\s*linear-gradient\([^,]+,\s*(#[0-9a-f]{6})/i);
-
-    expect(control).not.toBeNull();
-    expect(panel).not.toBeNull();
-    expect(Number(control?.[1]) - hexToOklabLightness(panel?.[1] ?? "#000000")).toBeGreaterThanOrEqual(0.08);
+  it("uses one dark-teal surface for fields and their arrow controls", () => {
+    expect(globalsCss).toMatch(/--ffaa-field-surface:\s*\n\s*linear-gradient/);
+    expect(refinementCss).toMatch(/--ffaa-control-surface:\s*var\(--ffaa-field-surface\)/);
+    expect(globalsCss).toMatch(/--ffaa-number-field-surface:\s*var\(--ffaa-field-surface\)/);
+    expect(globalsCss).toMatch(/\.ffaa-custom-select-icon\s*\{[^}]*background:\s*var\(--ffaa-field-surface\)/s);
+    expect(globalsCss).toMatch(/\.draft-bid-stepper\s*\{[^}]*background:\s*var\(--ffaa-field-surface\)/s);
+    expect(globalsCss).toMatch(/\.ffaa-number-stepper\s*\{[^}]*background:\s*var\(--ffaa-field-surface\)/s);
+    expect(refinementCss).not.toMatch(/(?:\.ffaa-custom-select-icon|\.draft-bid-stepper)[^{]*\{[^}]*background-image:\s*none/s);
   });
 
   it("applies the shared surface to primitive and raw page controls", () => {
@@ -43,6 +33,12 @@ describe("app-wide form control surface guard", () => {
 
     expect([...coveredSelectors]).toEqual(expect.arrayContaining([
       ".ui-input-field",
+      ".setup-input",
+      ".setup-select",
+      ".host-input",
+      ".join-input",
+      ".offline-input",
+      ".offline-select-trigger",
       ".ffaa-custom-select-trigger",
       ".cui-input",
       ".tool-field input",

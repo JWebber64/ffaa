@@ -20,10 +20,12 @@ html, body, #root {
   --scrollbar-track: rgba(3,13,9,0.72);
   --scrollbar-thumb: rgba(45,212,191,0.42);
   --scrollbar-thumb-hover: rgba(52,211,153,0.68);
-  --ffaa-number-field-border: rgba(45,212,191,0.24);
-  --ffaa-number-field-surface:
+  --ffaa-field-border: rgba(45,212,191,0.24);
+  --ffaa-field-surface:
     linear-gradient(180deg, rgba(45,212,191,0.18), rgba(45,212,191,0.06)),
     rgba(7,18,14,0.86);
+  --ffaa-number-field-border: var(--ffaa-field-border);
+  --ffaa-number-field-surface: var(--ffaa-field-surface);
 }
 
 * {
@@ -741,32 +743,30 @@ html, body, #root {
   position: relative;
   z-index: 1;
   flex: 0 0 auto;
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  border: 1px solid rgba(45,212,191,0.22);
-  background:
-    radial-gradient(circle at 42% 30%, rgba(255,255,255,0.16), transparent 46%),
-    rgba(20,184,166,0.12);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  width: 28px;
+  height: 28px;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--ffaa-field-border);
+  background: var(--ffaa-field-surface);
+  box-shadow: none;
 }
 
 .ffaa-custom-select-icon::before {
   content: "";
   position: absolute;
-  left: 7px;
-  top: 7px;
+  left: 50%;
+  top: 50%;
   width: 8px;
   height: 8px;
   border-right: 2px solid rgba(204,251,241,0.9);
   border-bottom: 2px solid rgba(204,251,241,0.9);
-  transform: rotate(45deg);
-  transition: transform 160ms ease, top 160ms ease;
+  transform: translate(-50%, -65%) rotate(45deg);
+  transition: transform 160ms ease;
 }
 
 .ffaa-custom-select-trigger[aria-expanded="true"] .ffaa-custom-select-icon::before {
-  top: 9px;
-  transform: rotate(225deg);
+  transform: translate(-50%, -35%) rotate(225deg);
 }
 
 .ffaa-custom-select-popover {
@@ -2327,6 +2327,22 @@ html, body, #root {
   max-width: 100%;
 }
 
+.setup-budget-field > .setup-budget-input {
+  padding-right: 36px !important;
+}
+
+.setup-budget-field > .ffaa-number-stepper {
+  right: 5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+}
+
+.setup-budget-field .ffaa-number-stepper-visual svg {
+  width: 12px;
+  height: 12px;
+}
+
 .setup-checklist {
   display: flex;
   flex-direction: column;
@@ -3343,17 +3359,17 @@ html, body, #root {
   min-height: 0;
   border-radius: 11px;
   padding-left: 9px;
-  padding-right: 36px;
+  padding-right: 42px;
   font-size: 0.88rem;
 }
 
 .draft-bid-header-controls .draft-bid-stepper {
   top: 50%;
-  right: 6px;
+  right: 7px;
   bottom: auto;
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   transform: translateY(-50%);
 }
 
@@ -3486,7 +3502,7 @@ html, body, #root {
 .draft-bid-custom-field .ui-input-field {
   height: 100%;
   border-radius: 14px;
-  padding-right: 46px;
+  padding-right: 42px;
   font-size: 1.05rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
@@ -3507,19 +3523,17 @@ html, body, #root {
 .draft-bid-stepper {
   position: absolute;
   top: 50%;
-  right: 8px;
+  right: 7px;
   bottom: auto;
   z-index: 1;
   display: block;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   overflow: hidden;
-  border-radius: 10px;
-  border: 1px solid rgba(45,212,191,0.24);
-  background:
-    linear-gradient(180deg, rgba(45,212,191,0.18), rgba(45,212,191,0.06)),
-    rgba(7,18,14,0.86);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 0 16px rgba(45,212,191,0.14);
+  border-radius: 8px;
+  border: 1px solid var(--ffaa-field-border);
+  background: var(--ffaa-field-surface);
+  box-shadow: none;
   transform: translateY(-50%);
 }
 
@@ -3540,13 +3554,13 @@ html, body, #root {
 
 .draft-bid-stepper-visual svg {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 .draft-bid-header-controls .draft-bid-stepper-visual svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 .draft-bid-stepper:has(button:disabled) .draft-bid-stepper-visual {
@@ -3599,9 +3613,9 @@ html, body, #root {
 }
 
 .ffaa-number-field > input[type="number"] {
-  padding-right: 46px;
-  border-color: var(--ffaa-number-field-border) !important;
-  background: var(--ffaa-number-field-surface) !important;
+  padding-right: 42px;
+  border-color: var(--ffaa-field-border) !important;
+  background: var(--ffaa-field-surface) !important;
   appearance: textfield;
   -moz-appearance: textfield;
 }
@@ -3616,16 +3630,16 @@ html, body, #root {
 .ffaa-number-stepper {
   position: absolute;
   top: 50%;
-  right: 8px;
+  right: 7px;
   z-index: 4;
   display: block;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   overflow: hidden;
-  border: 1px solid var(--ffaa-number-field-border);
-  border-radius: 10px;
-  background: var(--ffaa-number-field-surface);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 0 16px rgba(45,212,191,0.14);
+  border: 1px solid var(--ffaa-field-border);
+  border-radius: 8px;
+  background: var(--ffaa-field-surface);
+  box-shadow: none;
   transform: translateY(-50%);
 }
 
@@ -3642,8 +3656,8 @@ html, body, #root {
 
 .ffaa-number-stepper-visual svg {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 .ffaa-number-stepper button {
@@ -4055,7 +4069,7 @@ html, body, #root {
   text-align: center;
   font-weight: 850;
   padding-left: 14px;
-  padding-right: 46px;
+  padding-right: 42px;
 }
 
 .draft-opening-bid-control.has-error .draft-opening-bid-input {
@@ -7590,16 +7604,16 @@ html, body, #root {
 .offline-money-field .ui-input-field {
   min-height: 42px;
   height: 42px;
-  padding-right: 46px;
+  padding-right: 42px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
 .offline-money-stepper-control {
-  right: 6px;
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
+  right: 7px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
 }
 
 .offline-select-trigger {

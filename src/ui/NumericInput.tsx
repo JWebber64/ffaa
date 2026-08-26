@@ -90,13 +90,13 @@ export const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps
         min={min}
         readOnly={readOnly}
         step={step}
-        style={{ ...style, width: "100%", paddingRight: "46px" }}
+        style={{ ...style, width: "100%", paddingRight: "42px" }}
         type="number"
         value={value}
       />
       <span className="ffaa-number-stepper">
         <span className="ffaa-number-stepper-visual" aria-hidden="true">
-          <ChevronsUpDown size={16} strokeWidth={2.4} />
+          <ChevronsUpDown size={14} strokeWidth={2.4} />
         </span>
         <button
           aria-label={`Increase ${label}`}
