@@ -354,7 +354,6 @@ const Auctioneer: React.FC = () => {
                     textOverflow="ellipsis"
                     _hover={{
                       bg: isDisabled ? 'gray.800' : currentBidder === team.id ? 'blue.500' : 'gray.700',
-                      transform: isDisabled ? 'none' : 'translateY(-2px)',
                       boxShadow: isDisabled ? 'none' : 'md',
                     }}
                     _disabled={{

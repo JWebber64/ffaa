@@ -118,7 +118,6 @@
 .tools-primary-link:hover,
 .tools-secondary-link:hover,
 .tool-button:hover:not(:disabled) {
-  transform: translateY(-1px);
   border-color: rgba(66, 207, 142, 0.52);
 }
 
@@ -218,7 +217,7 @@
   color: var(--text-0);
   background: linear-gradient(145deg, rgba(15,27,23,0.94), rgba(5,14,12,0.96));
   text-decoration: none;
-  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .tools-card::after {
@@ -237,7 +236,6 @@
 .tools-card.is-blue { --card-tone: var(--tools-blue); }
 
 .tools-card:hover {
-  transform: translateY(-3px);
   border-color: color-mix(in srgb, var(--card-tone) 42%, transparent);
   box-shadow: 0 18px 46px rgba(0,0,0,0.22);
 }
@@ -862,17 +860,18 @@
 
 /* Editorial art fills the existing card footprint without adding spacer height. */
 .tools-card {
-  grid-template-columns: 48px minmax(0, 1fr) minmax(300px, 360px);
-  min-height: 260px;
+  grid-template-columns: 44px minmax(0, 1fr) minmax(180px, 220px);
+  min-height: 220px;
+  padding: 22px;
 }
 
 .tools-card-grid {
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .tools-card:last-child {
   grid-column: auto;
-  min-height: 260px;
+  min-height: 220px;
 }
 
 .tools-card-media {
@@ -912,6 +911,16 @@
 .tools-card:hover .tools-card-media img {
   transform: scale(1.025);
   filter: brightness(0.9) saturate(0.9);
+}
+
+@media (max-width: 1180px) {
+  .tools-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tools-card {
+    grid-template-columns: 48px minmax(0, 1fr) minmax(260px, 320px);
+  }
 }
 
 @media (max-width: 760px) {

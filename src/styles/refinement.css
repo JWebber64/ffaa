@@ -1562,7 +1562,6 @@ dd,
 
 .cui-button:hover:not(:disabled) {
   filter: none;
-  transform: translateY(-1px);
 }
 
 .cui-button:active:not(:disabled) {
@@ -1916,7 +1915,6 @@ dd,
 .app-nav-link:hover {
   border-color: rgba(225, 241, 232, 0.08);
   background: rgba(255, 255, 255, 0.045);
-  transform: translateY(-1px);
 }
 
 .app-nav-link.is-active {
@@ -1938,7 +1936,6 @@ dd,
 .ui-button-primary:hover:not(:disabled) {
   background: linear-gradient(180deg, #50e5b4, #37cf9b) !important;
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.26), 0 12px 30px rgba(20, 158, 112, 0.25) !important;
-  transform: translateY(-1px);
 }
 
 .ui-button-secondary {
@@ -1951,7 +1948,6 @@ dd,
   border-color: rgba(57, 214, 162, 0.38) !important;
   background: linear-gradient(180deg, #182d22, #12231a) !important;
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.045), 0 10px 24px rgba(0, 0, 0, 0.18) !important;
-  transform: translateY(-1px);
 }
 
 .ui-input-field,
@@ -2100,7 +2096,6 @@ dd,
 
 .home-capability-list article:hover {
   border-color: rgba(57, 214, 162, 0.27);
-  transform: translateY(-2px);
 }
 
 .home-capability-list svg {
@@ -2426,7 +2421,6 @@ dd,
   border-color: rgba(57, 214, 162, 0.3);
   background: linear-gradient(145deg, rgba(18, 42, 29, 0.98), rgba(9, 24, 16, 0.98));
   box-shadow: 0 1px rgba(255, 255, 255, 0.035), 0 22px 48px rgba(0, 0, 0, 0.23);
-  transform: translateY(-3px);
 }
 
 .tools-card-index {

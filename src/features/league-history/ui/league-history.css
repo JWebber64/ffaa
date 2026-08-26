@@ -187,7 +187,7 @@
 .history-archive-card { position: relative; display: grid; gap: 12px; min-width: 0; padding: 18px; border: 1px solid var(--glass-edge-soft); border-radius: 11px; background: color-mix(in srgb, var(--bg-1) 95%, transparent); color: var(--text-0); text-decoration: none; }
 .history-manager-card { grid-template-columns: auto 1fr; align-items: start; }
 .history-manager-card:hover,
-.history-archive-card:hover { border-color: color-mix(in srgb, var(--a2) 55%, var(--line-0)); transform: translateY(-1px); }
+.history-archive-card:hover { border-color: color-mix(in srgb, var(--a2) 55%, var(--line-0)); }
 .history-manager-avatar,
 .history-profile-avatar { position: relative; display: grid; flex: 0 0 auto; width: 50px; height: 50px; place-items: center; overflow: visible; border: 1px solid var(--line-1); border-radius: 11px; background: var(--bg-2); color: var(--text-1); }
 .history-manager-avatar img,
