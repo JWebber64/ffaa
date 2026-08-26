@@ -41,10 +41,10 @@ async function responseJson(response: Response, label: string) {
   return payload;
 }
 
-export async function getFirestoreAccessToken() {
+export async function getFirestoreAccessToken(requestOidcToken?: string) {
   if (cachedToken && cachedToken.expiresAt - Date.now() > 60_000) return cachedToken.value;
-  const oidcToken = process.env.VERCEL_OIDC_TOKEN?.trim();
-  if (!oidcToken) throw new Error("VERCEL_OIDC_TOKEN is unavailable for the history importer.");
+  const oidcToken = requestOidcToken?.trim() || process.env.VERCEL_OIDC_TOKEN?.trim();
+  if (!oidcToken) throw new Error("The Vercel OIDC token is unavailable for the history importer.");
   validateVercelIdentity(oidcToken);
 
   const providerAudience = `//iam.googleapis.com/projects/${GOOGLE_CLOUD_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${WORKLOAD_IDENTITY_POOL}/providers/${WORKLOAD_IDENTITY_PROVIDER}`;

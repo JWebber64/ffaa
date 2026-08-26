@@ -61,10 +61,10 @@ function historyResponse(leagueId: string, document: FirestoreDocument): LeagueH
   };
 }
 
-async function findExistingHistory(leagueId: string) {
-  const direct = await getFirestoreDocument(`${FIRESTORE_HISTORY_COLLECTION}/${leagueId}`);
+async function findExistingHistory(leagueId: string, oidcToken?: string) {
+  const direct = await getFirestoreDocument(`${FIRESTORE_HISTORY_COLLECTION}/${leagueId}`, oidcToken);
   if (direct) return historyResponse(leagueId, direct);
-  const alias = await findLeagueHistoryByRouteId(leagueId);
+  const alias = await findLeagueHistoryByRouteId(leagueId, oidcToken);
   return alias ? historyResponse(leagueId, alias) : null;
 }
 
@@ -74,9 +74,9 @@ function isFreshRunningJob(job: ImportJob | null) {
   return Number.isFinite(startedAt) && Date.now() - startedAt < IMPORT_LOCK_WINDOW_MS;
 }
 
-async function acquireImportLock(leagueId: string) {
+async function acquireImportLock(leagueId: string, oidcToken?: string) {
   const path = `${IMPORT_JOB_COLLECTION}/${leagueId}`;
-  const existing = await getFirestoreDocument(path);
+  const existing = await getFirestoreDocument(path, oidcToken);
   const job = firestoreObject(existing) as ImportJob | null;
   if (isFreshRunningJob(job)) return false;
   const now = new Date().toISOString();
@@ -93,7 +93,7 @@ async function acquireImportLock(leagueId: string) {
       : { exists: false },
   };
   try {
-    await commitFirestoreWrites([write]);
+    await commitFirestoreWrites([write], oidcToken);
     return true;
   } catch (error) {
     const status = (error as Error & { status?: number }).status;
@@ -115,14 +115,14 @@ function updateWrite(path: string, data: unknown): FirestoreWrite {
   return { update: firestoreDocument(path, data as Record<string, unknown>) };
 }
 
-async function persistBundle(leagueId: string, bundle: FirestoreLeagueHistoryBundle) {
+async function persistBundle(leagueId: string, bundle: FirestoreLeagueHistoryBundle, oidcToken?: string) {
   const rootPath = `${FIRESTORE_HISTORY_COLLECTION}/${bundle.historyId}`;
   const chunksPath = `${rootPath}/${FIRESTORE_SNAPSHOT_COLLECTION}`;
   const weeksPath = `${rootPath}/${FIRESTORE_WEEK_COLLECTION}`;
   const jobPath = `${IMPORT_JOB_COLLECTION}/${leagueId}`;
   const [existingChunks, existingWeeks] = await Promise.all([
-    listFirestoreDocumentNames(chunksPath),
-    listFirestoreDocumentNames(weeksPath),
+    listFirestoreDocumentNames(chunksPath, oidcToken),
+    listFirestoreDocumentNames(weeksPath, oidcToken),
   ]);
   const desiredChunkNames = new Set(bundle.chunks.map((entry) => firestoreDocument(`${chunksPath}/${entry.id}`, {}).name));
   const desiredWeekNames = new Set(bundle.weeks.map((entry) => firestoreDocument(`${weeksPath}/${entry.id}`, {}).name));
@@ -132,7 +132,7 @@ async function persistBundle(leagueId: string, bundle: FirestoreLeagueHistoryBun
     ...existingChunks.filter((name) => !desiredChunkNames.has(name)).map((name): FirestoreWrite => ({ delete: name })),
     ...existingWeeks.filter((name) => !desiredWeekNames.has(name)).map((name): FirestoreWrite => ({ delete: name })),
   ];
-  await commitFirestoreWrites(dataWrites);
+  await commitFirestoreWrites(dataWrites, oidcToken);
   const now = new Date().toISOString();
   await commitFirestoreWrites([
     {
@@ -148,17 +148,17 @@ async function persistBundle(leagueId: string, bundle: FirestoreLeagueHistoryBun
       message: "League History is ready.",
       counts: bundle.root.counts,
     }),
-  ]);
+  ], oidcToken);
 }
 
-async function importSleeperLeagueHistory(leagueId: string): Promise<LeagueHistoryImportResponse> {
+async function importSleeperLeagueHistory(leagueId: string, oidcToken?: string): Promise<LeagueHistoryImportResponse> {
   const history = await new SleeperApiClient({ maxChainLength: MAX_AUTOMATIC_SEASONS }).loadHistory(leagueId);
   const payload = mapSleeperHistory(history, playerReferences());
   const bundle = buildFirestoreLeagueHistoryBundle(payload);
   try {
-    await persistBundle(leagueId, bundle);
+    await persistBundle(leagueId, bundle, oidcToken);
   } catch (error) {
-    const existing = await findExistingHistory(leagueId);
+    const existing = await findExistingHistory(leagueId, oidcToken);
     if (existing) return existing;
     throw error;
   }
@@ -171,7 +171,7 @@ async function importSleeperLeagueHistory(leagueId: string): Promise<LeagueHisto
   };
 }
 
-async function recordImportFailure(leagueId: string, error: unknown) {
+async function recordImportFailure(leagueId: string, error: unknown, oidcToken?: string) {
   const message = error instanceof Error ? error.message : "Automatic League History import failed.";
   const now = new Date().toISOString();
   await commitFirestoreWrites([updateWrite(`${IMPORT_JOB_COLLECTION}/${leagueId}`, {
@@ -180,27 +180,30 @@ async function recordImportFailure(leagueId: string, error: unknown) {
     startedAt: now,
     updatedAt: now,
     message,
-  })]).catch(() => undefined);
+  })], oidcToken).catch(() => undefined);
 }
 
-const defaultDependencies: AutomaticImportDependencies = {
-  findExisting: findExistingHistory,
-  acquireLock: acquireImportLock,
-  importLeague: importSleeperLeagueHistory,
-  recordFailure: recordImportFailure,
-};
+function automaticImportDependencies(oidcToken?: string): AutomaticImportDependencies {
+  return {
+    findExisting: (leagueId) => findExistingHistory(leagueId, oidcToken),
+    acquireLock: (leagueId) => acquireImportLock(leagueId, oidcToken),
+    importLeague: (leagueId) => importSleeperLeagueHistory(leagueId, oidcToken),
+    recordFailure: (leagueId, error) => recordImportFailure(leagueId, error, oidcToken),
+  };
+}
 
 export async function runAutomaticLeagueHistoryImport(
   leagueId: string,
-  dependencies: AutomaticImportDependencies = defaultDependencies,
+  oidcToken?: string,
+  dependencies: AutomaticImportDependencies = automaticImportDependencies(oidcToken),
 ) {
   return runAutomaticLeagueHistoryImportWorkflow(leagueId, dependencies);
 }
 
-export async function getAutomaticLeagueHistoryImportStatus(leagueId: string) {
-  const existing = await findExistingHistory(leagueId);
+export async function getAutomaticLeagueHistoryImportStatus(leagueId: string, oidcToken?: string) {
+  const existing = await findExistingHistory(leagueId, oidcToken);
   if (existing) return existing;
-  const jobDocument = await getFirestoreDocument(`${IMPORT_JOB_COLLECTION}/${leagueId}`);
+  const jobDocument = await getFirestoreDocument(`${IMPORT_JOB_COLLECTION}/${leagueId}`, oidcToken);
   const job = firestoreObject(jobDocument) as ImportJob | null;
   if (isFreshRunningJob(job)) {
     return {

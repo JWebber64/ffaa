@@ -77,9 +77,12 @@ export default async function handler(request: ApiRequest, response: ApiResponse
     return;
   }
   try {
+    // Vercel Functions receive the request-scoped token in this header. The
+    // environment variable is only populated during builds and local development.
+    const oidcToken = header(request, "x-vercel-oidc-token");
     const result = request.method === "GET"
-      ? await getAutomaticLeagueHistoryImportStatus(leagueId)
-      : await runAutomaticLeagueHistoryImport(leagueId);
+      ? await getAutomaticLeagueHistoryImportStatus(leagueId, oidcToken)
+      : await runAutomaticLeagueHistoryImport(leagueId, oidcToken);
     response.status(result.status === "importing" ? 202 : result.status === "ready" ? 200 : 409).json(result);
   } catch (error) {
     console.error("[league-history-import]", error);

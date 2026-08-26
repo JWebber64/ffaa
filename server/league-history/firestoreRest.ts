@@ -75,7 +75,7 @@ export function firestoreObject(document: FirestoreDocument | null) {
   return Object.fromEntries(Object.entries(document.fields ?? {}).map(([key, value]) => [key, fromFirestoreValue(value)]));
 }
 
-async function authorizedFetch(url: string, init: RequestInit = {}) {
+async function authorizedFetch(url: string, init: RequestInit = {}, oidcToken?: string) {
   if (FIRESTORE_EMULATOR_HOST) {
     return fetch(url, {
       ...init,
@@ -85,7 +85,7 @@ async function authorizedFetch(url: string, init: RequestInit = {}) {
       },
     });
   }
-  const token = await getFirestoreAccessToken();
+  const token = await getFirestoreAccessToken(oidcToken);
   return fetch(url, {
     ...init,
     headers: {
@@ -102,14 +102,14 @@ async function errorMessage(response: Response) {
   return String(error?.message ?? `Firestore returned ${response.status}.`);
 }
 
-export async function getFirestoreDocument(path: string) {
-  const response = await authorizedFetch(`${DOCUMENTS_ROOT}/${path}`);
+export async function getFirestoreDocument(path: string, oidcToken?: string) {
+  const response = await authorizedFetch(`${DOCUMENTS_ROOT}/${path}`, {}, oidcToken);
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(await errorMessage(response));
   return response.json() as Promise<FirestoreDocument>;
 }
 
-export async function findLeagueHistoryByRouteId(routeId: string) {
+export async function findLeagueHistoryByRouteId(routeId: string, oidcToken?: string) {
   const response = await authorizedFetch(`${DOCUMENTS_ROOT}:runQuery`, {
     method: "POST",
     body: JSON.stringify({
@@ -125,19 +125,19 @@ export async function findLeagueHistoryByRouteId(routeId: string) {
         limit: 1,
       },
     }),
-  });
+  }, oidcToken);
   if (!response.ok) throw new Error(await errorMessage(response));
   const rows = await response.json() as Array<{ document?: FirestoreDocument }>;
   return rows.find((row) => row.document)?.document ?? null;
 }
 
-export async function listFirestoreDocumentNames(path: string) {
+export async function listFirestoreDocumentNames(path: string, oidcToken?: string) {
   const names: string[] = [];
   let pageToken = "";
   do {
     const query = new URLSearchParams({ pageSize: "300" });
     if (pageToken) query.set("pageToken", pageToken);
-    const response = await authorizedFetch(`${DOCUMENTS_ROOT}/${path}?${query}`);
+    const response = await authorizedFetch(`${DOCUMENTS_ROOT}/${path}?${query}`, {}, oidcToken);
     if (response.status === 404) return names;
     if (!response.ok) throw new Error(await errorMessage(response));
     const payload = await response.json() as { documents?: FirestoreDocument[]; nextPageToken?: string };
@@ -165,12 +165,12 @@ export function splitFirestoreWrites(writes: FirestoreWrite[]) {
   return groups;
 }
 
-export async function commitFirestoreWrites(writes: FirestoreWrite[]) {
+export async function commitFirestoreWrites(writes: FirestoreWrite[], oidcToken?: string) {
   for (const group of splitFirestoreWrites(writes)) {
     const response = await authorizedFetch(`${DOCUMENTS_ROOT}:commit`, {
       method: "POST",
       body: JSON.stringify({ writes: group }),
-    });
+    }, oidcToken);
     if (!response.ok) {
       const error = new Error(await errorMessage(response)) as Error & { status?: number };
       error.status = response.status;
