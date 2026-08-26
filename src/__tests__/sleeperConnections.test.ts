@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  MAX_SLEEPER_LEAGUE_CONNECTIONS,
   mergeSleeperLeagueConnection,
+  mergeSleeperLeagueConnections,
   parseSleeperLeagueConnections,
   type SleeperLeagueConnectionSummary,
 } from "../features/league-hq/sleeperConnections";
@@ -64,5 +66,21 @@ describe("Sleeper league connections", () => {
     const merged = mergeSleeperLeagueConnection([oldAlpha, beta], newAlpha);
 
     expect(merged.map((item) => item.leagueName)).toEqual(["New Alpha", "Beta"]);
+  });
+
+  it("adds several leagues atomically and keeps the most recent twelve", () => {
+    const additions = Array.from({ length: MAX_SLEEPER_LEAGUE_CONNECTIONS + 2 }, (_, index) => (
+      connection(
+        String(100000000000 + index),
+        `League ${index}`,
+        new Date(Date.UTC(2026, 7, 10, 0, 0, index)).toISOString(),
+      )
+    ));
+
+    const merged = mergeSleeperLeagueConnections([], additions);
+
+    expect(merged).toHaveLength(MAX_SLEEPER_LEAGUE_CONNECTIONS);
+    expect(merged[0]?.leagueName).toBe(`League ${MAX_SLEEPER_LEAGUE_CONNECTIONS + 1}`);
+    expect(merged.at(-1)?.leagueName).toBe("League 2");
   });
 });

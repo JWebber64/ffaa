@@ -45,6 +45,7 @@ import {
 import { CommissionerStudio } from "../features/league-hq/CommissionerStudio";
 import { useLeagueHQ } from "../features/league-hq/useLeagueHQ";
 import {
+  MAX_SLEEPER_LEAGUE_CONNECTIONS,
   auctionSettingsSummary,
   useSleeperLeagueConnections,
   type SleeperLeagueConnectionSummary,
@@ -129,17 +130,25 @@ export default function LeagueHQ() {
   const nominationSeconds = useDraftStore((state) => state.auctionSettings.countdownSeconds);
   const antiSnipeSeconds = useDraftStore((state) => state.auctionSettings.antiSnipeSeconds);
   const [searchParams, setSearchParams] = useSearchParams();
-  const { connections, rememberConnection, forgetConnection } = useSleeperLeagueConnections();
+  const {
+    connections,
+    activeLeagueId: savedActiveLeagueId,
+    rememberConnection,
+    rememberConnections,
+    forgetConnection,
+    setActiveLeagueId,
+  } = useSleeperLeagueConnections();
   const requestedLeagueId = searchParams.get("league")?.trim() ?? "";
   const activeLeagueId = /^\d{10,}$/.test(requestedLeagueId)
     ? requestedLeagueId
-    : connections[0]?.leagueId ?? "";
+    : savedActiveLeagueId;
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [recordSort, setRecordSort] = useState<RecordSort>("titles");
   const [sleeperSync, setSleeperSync] = useState<SleeperSyncState>({ status: "idle", message: "" });
   const [connectionOpen, setConnectionOpen] = useState(false);
   const [leagueLookup, setLeagueLookup] = useState("");
   const [lookupSeason, setLookupSeason] = useState(FANTASY_SEASON);
+  const [selectedLeagueIds, setSelectedLeagueIds] = useState<string[]>([]);
   const [lookupState, setLookupState] = useState<SleeperLookupState>({
     status: "idle",
     message: "",
@@ -193,11 +202,17 @@ export default function LeagueHQ() {
 
   const chooseLeague = useCallback((leagueId: string) => {
     if (!/^\d{10,}$/.test(leagueId)) return;
+    setActiveLeagueId(leagueId);
     const next = new URLSearchParams(searchParams);
     next.set("league", leagueId);
     setSearchParams(next);
     setSleeperSync({ status: "idle", message: "" });
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setActiveLeagueId, setSearchParams]);
+
+  useEffect(() => {
+    if (!/^\d{10,}$/.test(requestedLeagueId) || requestedLeagueId === savedActiveLeagueId) return;
+    setActiveLeagueId(requestedLeagueId);
+  }, [requestedLeagueId, savedActiveLeagueId, setActiveLeagueId]);
 
   const rememberImportedLeague = useCallback((connection: LeagueSleeperConnection, currentManagers: number) => {
     rememberConnection({
@@ -259,21 +274,43 @@ export default function LeagueHQ() {
 
   useEffect(() => () => lookupAbortRef.current?.abort(), []);
 
-  const connectChoice = useCallback((choice: SleeperLeagueChoice) => {
-    const connection: SleeperLeagueConnectionSummary = {
+  const availableConnectionSlots = Math.max(0, MAX_SLEEPER_LEAGUE_CONNECTIONS - connections.length);
+  const selectedChoices = lookupState.choices.filter(
+    (choice) => selectedLeagueIds.includes(choice.leagueId)
+      && !connections.some((connection) => connection.leagueId === choice.leagueId),
+  );
+
+  const toggleLeagueSelection = (leagueId: string) => {
+    setSelectedLeagueIds((current) => {
+      if (current.includes(leagueId)) return current.filter((id) => id !== leagueId);
+      if (current.length >= availableConnectionSlots) return current;
+      return [...current, leagueId];
+    });
+  };
+
+  const addSelectedLeagues = () => {
+    if (!selectedChoices.length) return;
+    const now = Date.now();
+    const additions: SleeperLeagueConnectionSummary[] = selectedChoices.map((choice, index) => ({
       leagueId: choice.leagueId,
       leagueName: choice.name,
       season: choice.season,
       status: choice.status,
       totalRosters: choice.totalRosters,
       sourceUrl: choice.sourceUrl,
-      lastUsedAt: new Date().toISOString(),
-    };
-    rememberConnection(connection);
-    chooseLeague(choice.leagueId);
-    setConnectionOpen(false);
-    setLookupState({ status: "idle", message: "", choices: [] });
-  }, [chooseLeague, rememberConnection]);
+      lastUsedAt: new Date(now - index).toISOString(),
+      ...(choice.avatarUrl ? { avatarUrl: choice.avatarUrl } : {}),
+      auctionSettings: choice.auctionSettings,
+    }));
+    rememberConnections(additions);
+    chooseLeague(additions[0]!.leagueId);
+    setSelectedLeagueIds([]);
+    setLookupState((current) => ({
+      ...current,
+      status: "success",
+      message: `${additions.length} ${additions.length === 1 ? "league" : "leagues"} added. ${additions[0]!.leagueName} is now active.`,
+    }));
+  };
 
   const findLeagues = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -284,6 +321,7 @@ export default function LeagueHQ() {
     try {
       const result = await findSleeperLeagues(leagueLookup, lookupSeason, { signal: controller.signal });
       if (!result.leagues.length) {
+        setSelectedLeagueIds([]);
         setLookupState({
           status: "error",
           message: `${result.displayName} has no NFL leagues for ${lookupSeason}. Try another season or paste a league ID.`,
@@ -291,17 +329,23 @@ export default function LeagueHQ() {
         });
         return;
       }
-      if (result.leagues.length === 1) {
-        connectChoice(result.leagues[0]!);
-        return;
-      }
+      const unsavedLeagueIds = result.leagues
+        .filter((choice) => !connections.some((connection) => connection.leagueId === choice.leagueId))
+        .slice(0, availableConnectionSlots)
+        .map((choice) => choice.leagueId);
+      setSelectedLeagueIds(unsavedLeagueIds);
       setLookupState({
         status: "success",
-        message: `Choose one of ${result.displayName}’s ${result.leagues.length} leagues.`,
+        message: unsavedLeagueIds.length
+          ? `${unsavedLeagueIds.length} new ${unsavedLeagueIds.length === 1 ? "league is" : "leagues are"} selected. Review the list, then add ${unsavedLeagueIds.length === 1 ? "it" : "them"}.`
+          : availableConnectionSlots
+            ? `${result.displayName}’s ${result.leagues.length === 1 ? "league is" : "leagues are"} already saved on this device.`
+            : `You have reached the ${MAX_SLEEPER_LEAGUE_CONNECTIONS}-league limit. Remove a saved league before adding another.`,
         choices: result.leagues,
       });
     } catch (error) {
       if (controller.signal.aborted) return;
+      setSelectedLeagueIds([]);
       setLookupState({
         status: "error",
         message: error instanceof Error ? error.message : "Sleeper league lookup failed. Try again.",
@@ -372,7 +416,7 @@ export default function LeagueHQ() {
           </small>
         </div>
         <label className="league-sync-switch">
-          <span>Saved league</span>
+          <span>Active league</span>
           <select value={activeLeagueId} onChange={(event) => chooseLeague(event.target.value)}>
             {!activeLeagueId ? <option value="">Choose a league</option> : null}
             {activeLeagueId && !connections.some((connection) => connection.leagueId === activeLeagueId) ? (
@@ -380,7 +424,7 @@ export default function LeagueHQ() {
             ) : null}
             {connections.map((connection) => (
               <option key={connection.leagueId} value={connection.leagueId}>
-                {connection.leagueName} · {connection.season}
+                {connection.leagueName} · {connection.season} · {connection.totalRosters || "—"} teams
               </option>
             ))}
           </select>
@@ -398,7 +442,7 @@ export default function LeagueHQ() {
           <RefreshCw size={15} aria-hidden="true" /> Refresh Sleeper
         </Button>
         <Button variant="secondary" size="sm" onClick={() => setConnectionOpen((open) => !open)}>
-          <Plus size={15} aria-hidden="true" /> Connect league
+          <Plus size={15} aria-hidden="true" /> {connections.length ? "Manage leagues" : "Connect leagues"}
         </Button>
       </section>
 
@@ -406,9 +450,9 @@ export default function LeagueHQ() {
         <section className="league-connect-panel" aria-labelledby="league-connect-title">
           <header>
             <div>
-              <span>Sleeper league connection</span>
-              <h2 id="league-connect-title">Open any public Sleeper league</h2>
-              <p>Enter a username to choose from their leagues, or paste a numeric league ID for a direct connection.</p>
+              <span>Sleeper league manager</span>
+              <h2 id="league-connect-title">Add and manage Sleeper leagues</h2>
+              <p>Find every league under a Sleeper username and add several at once, or paste a league ID for a direct connection.</p>
             </div>
             <Button variant="secondary" size="sm" onClick={() => setConnectionOpen(false)}>Close</Button>
           </header>
@@ -439,24 +483,54 @@ export default function LeagueHQ() {
             <p className={`league-connect-message is-${lookupState.status}`} role="status">{lookupState.message}</p>
           ) : null}
           {lookupState.choices.length ? (
-            <div className="league-connect-choices">
-              {lookupState.choices.map((choice) => (
-                <button type="button" key={choice.leagueId} onClick={() => connectChoice(choice)}>
-                  {choice.avatarUrl ? <img src={choice.avatarUrl} alt="" /> : <Trophy aria-hidden="true" />}
-                  <span><strong>{choice.name}</strong><small>{choice.season} · {choice.totalRosters} teams · {choice.status.replace(/_/g, " ")}</small></span>
-                  <Plus aria-hidden="true" />
-                </button>
-              ))}
+            <div className="league-connect-results" aria-label="Sleeper league search results">
+              <div className="league-connect-choices">
+                {lookupState.choices.map((choice) => {
+                  const isSaved = connections.some((connection) => connection.leagueId === choice.leagueId);
+                  const isSelected = selectedLeagueIds.includes(choice.leagueId);
+                  const selectionLimitReached = !isSelected && selectedLeagueIds.length >= availableConnectionSlots;
+                  return (
+                    <label
+                      className={`league-connect-choice${isSelected ? " is-selected" : ""}${isSaved ? " is-saved" : ""}`}
+                      key={choice.leagueId}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSaved || isSelected}
+                        disabled={isSaved || selectionLimitReached}
+                        onChange={() => toggleLeagueSelection(choice.leagueId)}
+                      />
+                      {choice.avatarUrl ? <img src={choice.avatarUrl} alt="" /> : <Trophy aria-hidden="true" />}
+                      <span className="league-connect-choice-copy">
+                        <strong>{choice.name}</strong>
+                        <small>{choice.season} · {choice.totalRosters} teams · {choice.status.replace(/_/g, " ")}</small>
+                      </span>
+                      <span className="league-connect-choice-state">
+                        {isSaved ? <><CheckCircle2 size={15} aria-hidden="true" /> Added</> : isSelected ? "Selected" : "Select"}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+              <div className="league-connect-actions">
+                <span>{connections.length} of {MAX_SLEEPER_LEAGUE_CONNECTIONS} leagues saved on this device</span>
+                <Button type="button" onClick={addSelectedLeagues} disabled={!selectedChoices.length}>
+                  <Plus size={15} aria-hidden="true" /> Add selected {selectedChoices.length ? `(${selectedChoices.length})` : ""}
+                </Button>
+              </div>
             </div>
           ) : null}
           {connections.length ? (
             <div className="league-saved-list">
-              <span>Saved on this device</span>
+              <span>Saved leagues on this device</span>
               {connections.map((connection) => (
-                <div key={connection.leagueId}>
+                <div className={connection.leagueId === activeLeagueId ? "is-active" : ""} key={connection.leagueId}>
                   <button type="button" onClick={() => chooseLeague(connection.leagueId)}>
-                    <strong>{connection.leagueName}</strong>
-                    <small>{connection.season} · {connection.totalRosters || "—"} teams</small>
+                    <span className="league-saved-name">
+                      {connection.avatarUrl ? <img src={connection.avatarUrl} alt="" /> : null}
+                      <strong>{connection.leagueName}</strong>
+                    </span>
+                    <small>{connection.season} · {connection.totalRosters || "—"} teams{connection.leagueId === activeLeagueId ? " · Active" : ""}</small>
                   </button>
                   <button
                     type="button"
@@ -473,7 +547,8 @@ export default function LeagueHQ() {
                         }
                       }
                     }}
-                    aria-label={`Forget ${connection.leagueName}`}
+                    aria-label={`Remove ${connection.leagueName} from this device`}
+                    title={`Remove ${connection.leagueName} from this device`}
                   >
                     <Trash2 size={15} aria-hidden="true" />
                   </button>

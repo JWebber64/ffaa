@@ -127,6 +127,7 @@ export interface SleeperLeagueChoice {
   totalRosters: number;
   avatarUrl: string;
   sourceUrl: string;
+  auctionSettings: SleeperLeagueAuctionSettings;
 }
 
 export interface SleeperLeagueLookupResult {
@@ -187,6 +188,7 @@ function leagueChoice(league: SleeperLeague): SleeperLeagueChoice {
     totalRosters: numberValue(league.total_rosters),
     avatarUrl: league.avatar ? `https://sleepercdn.com/avatars/thumbs/${league.avatar}` : "",
     sourceUrl: `https://sleeper.com/leagues/${league.league_id}`,
+    auctionSettings: auctionSettingsFromLeague(league),
   };
 }
 
@@ -318,6 +320,25 @@ function auctionRosterSlots(positions: string[], reserveSlots: number) {
   }
   if (reserveSlots > 0) counts.set("IR", reserveSlots);
   return [...counts.entries()].map(([slot, count]) => ({ slot, count }));
+}
+
+function auctionSettingsFromLeague(league: SleeperLeague, draftBudget = 0): SleeperLeagueAuctionSettings {
+  const rosterSlots = auctionRosterSlots(
+    league.roster_positions ?? [],
+    numberValue(league.settings?.reserve_slots),
+  );
+  return {
+    scoring: auctionScoring(league.scoring_settings ?? {}),
+    scoringLabel: scoringLabel(league.scoring_settings ?? {}),
+    teamCount: numberValue(league.total_rosters),
+    budget: draftBudget || 200,
+    budgetSource: draftBudget ? "sleeper-draft" : "gamehq-default",
+    rosterSize: rosterSlots.reduce(
+      (sum, slot) => slot.slot === "IR" ? sum : sum + slot.count,
+      0,
+    ),
+    rosterSlots,
+  };
 }
 
 function rosterSummary(positions: string[], reserveSlots: number) {
@@ -1110,19 +1131,7 @@ export async function loadSleeperLeagueHQ(
     currentDraft?.status ?? current.league.status
   );
   const syncTime = options.now ?? new Date();
-  const valueRosterSlots = auctionRosterSlots(current.league.roster_positions, reserveSlots);
-  const auctionSettings: SleeperLeagueAuctionSettings = {
-    scoring: auctionScoring(current.league.scoring_settings),
-    scoringLabel: scoringLabel(current.league.scoring_settings),
-    teamCount: numberValue(current.league.total_rosters),
-    budget: draftBudget || 200,
-    budgetSource: draftBudget ? "sleeper-draft" : "gamehq-default",
-    rosterSize: valueRosterSlots.reduce(
-      (sum, slot) => slot.slot === "IR" ? sum : sum + slot.count,
-      0,
-    ),
-    rosterSlots: valueRosterSlots,
-  };
+  const auctionSettings = auctionSettingsFromLeague(current.league, draftBudget);
   const seasonLeagueIds = Object.fromEntries(
     bundles.map((bundle) => [bundle.league.season, bundle.league.league_id])
   );

@@ -1303,7 +1303,7 @@ function standardRosterSlots(rosterSize: number): AuctionValueRosterSlot[] {
 export default function StatsExplorer() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { connections } = useSleeperLeagueConnections();
+  const { connections, activeLeagueId, setActiveLeagueId } = useSleeperLeagueConnections();
   const view = parseView(searchParams.get("view"));
   const valueView = view === "draft" || view === "auction";
   const customScoring = parseScoring(searchParams.get("scoring"));
@@ -1328,9 +1328,12 @@ export default function StatsExplorer() {
   const activeValueConnection = useMemo(
     () => valueView
       ? connectedValueProfiles.find((connection) => connection.leagueId === requestedValueProfile)
-        ?? (requestedValueProfile === null ? connectedValueProfiles[0] : undefined)
+        ?? (requestedValueProfile === null
+          ? connectedValueProfiles.find((connection) => connection.leagueId === activeLeagueId)
+            ?? connectedValueProfiles[0]
+          : undefined)
       : undefined,
-    [connectedValueProfiles, requestedValueProfile, valueView],
+    [activeLeagueId, connectedValueProfiles, requestedValueProfile, valueView],
   );
   const activeValueSettings = activeValueConnection?.auctionSettings;
   const activeValueLeagueName = activeValueConnection?.leagueName ?? "";
@@ -2202,9 +2205,14 @@ export default function StatsExplorer() {
             <SelectWrapper
               label="Value profile"
               value={activeValueConnection?.leagueId ?? "custom"}
-              onValueChange={(value) => value === "custom"
-                ? updateCustomValueSettings({})
-                : updateQuery({ league: value, scoring: null, teams: null, roster: null, budget: null })}
+              onValueChange={(value) => {
+                if (value === "custom") {
+                  updateCustomValueSettings({});
+                  return;
+                }
+                setActiveLeagueId(value);
+                updateQuery({ league: value, scoring: null, teams: null, roster: null, budget: null });
+              }}
               className="stats-select-trigger"
             >
               <SelectItem value="custom">Custom settings</SelectItem>

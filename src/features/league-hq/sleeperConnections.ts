@@ -1,9 +1,15 @@
-import { useCallback, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 import type { AuctionScoring } from "../../data/playerValues";
 
 const CONNECTIONS_KEY = "ffaa.sleeperLeagueConnections.v1";
-const MAX_CONNECTIONS = 12;
+const ACTIVE_LEAGUE_KEY = "ffaa.activeSleeperLeague.v1";
+export const MAX_SLEEPER_LEAGUE_CONNECTIONS = 12;
+
+const storeListeners = new Set<() => void>();
+let observedConnectionsRaw: string | null | undefined;
+let observedConnections: SleeperLeagueConnectionSummary[] = [];
+let storageListenerAttached = false;
 
 export interface SleeperLeagueAuctionSettings {
   scoring: AuctionScoring;
@@ -23,6 +29,7 @@ export interface SleeperLeagueConnectionSummary {
   totalRosters: number;
   sourceUrl: string;
   lastUsedAt: string;
+  avatarUrl?: string;
   auctionSettings?: SleeperLeagueAuctionSettings;
 }
 
@@ -87,6 +94,7 @@ export function parseSleeperLeagueConnections(raw: string | null) {
         totalRosters: Math.max(0, Number(entry.totalRosters) || 0),
         sourceUrl: String(entry.sourceUrl ?? `https://sleeper.com/leagues/${leagueId}`),
         lastUsedAt: String(entry.lastUsedAt ?? ""),
+        ...(String(entry.avatarUrl ?? "").trim() ? { avatarUrl: String(entry.avatarUrl).trim() } : {}),
         ...(auctionSettings ? { auctionSettings } : {}),
       }];
     });
@@ -105,43 +113,119 @@ export function auctionSettingsSummary(settings: SleeperLeagueAuctionSettings) {
 export function mergeSleeperLeagueConnection(
   connections: SleeperLeagueConnectionSummary[],
   connection: SleeperLeagueConnectionSummary,
-) {
+): SleeperLeagueConnectionSummary[] {
+  const existing = connections.find((item) => item.leagueId === connection.leagueId);
+  const auctionSettings = connection.auctionSettings ?? existing?.auctionSettings;
+  const merged: SleeperLeagueConnectionSummary = {
+    ...existing,
+    ...connection,
+    ...(auctionSettings ? { auctionSettings } : {}),
+  };
   return [
-    connection,
+    merged,
     ...connections.filter((item) => item.leagueId !== connection.leagueId),
   ]
     .sort((left, right) => right.lastUsedAt.localeCompare(left.lastUsedAt))
-    .slice(0, MAX_CONNECTIONS);
+    .slice(0, MAX_SLEEPER_LEAGUE_CONNECTIONS);
 }
 
-function loadConnections() {
-  if (typeof window === "undefined") return [];
-  return parseSleeperLeagueConnections(window.localStorage.getItem(CONNECTIONS_KEY));
+export function mergeSleeperLeagueConnections(
+  connections: SleeperLeagueConnectionSummary[],
+  additions: SleeperLeagueConnectionSummary[],
+) {
+  return additions.reduce<SleeperLeagueConnectionSummary[]>(
+    (current, addition) => mergeSleeperLeagueConnection(current, addition),
+    connections,
+  );
+}
+
+function readConnectionsSnapshot() {
+  if (typeof window === "undefined") return observedConnections;
+  const raw = window.localStorage.getItem(CONNECTIONS_KEY);
+  if (raw !== observedConnectionsRaw) {
+    observedConnectionsRaw = raw;
+    observedConnections = parseSleeperLeagueConnections(raw);
+  }
+  return observedConnections;
+}
+
+function readActiveLeagueSnapshot() {
+  if (typeof window === "undefined") return "";
+  const saved = window.localStorage.getItem(ACTIVE_LEAGUE_KEY)?.trim() ?? "";
+  const connections = readConnectionsSnapshot();
+  return connections.some((connection) => connection.leagueId === saved)
+    ? saved
+    : connections[0]?.leagueId ?? "";
+}
+
+function emitStoreChange() {
+  for (const listener of storeListeners) listener();
+}
+
+function handleStorageChange(event: StorageEvent) {
+  if (event.key !== CONNECTIONS_KEY && event.key !== ACTIVE_LEAGUE_KEY && event.key !== null) return;
+  observedConnectionsRaw = undefined;
+  emitStoreChange();
+}
+
+function subscribeToStore(listener: () => void) {
+  storeListeners.add(listener);
+  if (typeof window !== "undefined" && !storageListenerAttached) {
+    window.addEventListener("storage", handleStorageChange);
+    storageListenerAttached = true;
+  }
+  return () => {
+    storeListeners.delete(listener);
+  };
 }
 
 function persistConnections(connections: SleeperLeagueConnectionSummary[]) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(CONNECTIONS_KEY, JSON.stringify(connections));
+  observedConnectionsRaw = undefined;
+  emitStoreChange();
+}
+
+function persistActiveLeague(leagueId: string) {
+  if (typeof window === "undefined") return;
+  if (leagueId) window.localStorage.setItem(ACTIVE_LEAGUE_KEY, leagueId);
+  else window.localStorage.removeItem(ACTIVE_LEAGUE_KEY);
+  emitStoreChange();
 }
 
 export function useSleeperLeagueConnections() {
-  const [connections, setConnections] = useState<SleeperLeagueConnectionSummary[]>(loadConnections);
+  const connections = useSyncExternalStore(subscribeToStore, readConnectionsSnapshot, () => observedConnections);
+  const activeLeagueId = useSyncExternalStore(subscribeToStore, readActiveLeagueSnapshot, () => "");
 
   const rememberConnection = useCallback((connection: SleeperLeagueConnectionSummary) => {
-    setConnections((current) => {
-      const next = mergeSleeperLeagueConnection(current, connection);
-      persistConnections(next);
-      return next;
-    });
+    persistConnections(mergeSleeperLeagueConnection(readConnectionsSnapshot(), connection));
+  }, []);
+
+  const rememberConnections = useCallback((additions: SleeperLeagueConnectionSummary[]) => {
+    if (!additions.length) return;
+    persistConnections(mergeSleeperLeagueConnections(readConnectionsSnapshot(), additions));
   }, []);
 
   const forgetConnection = useCallback((leagueId: string) => {
-    setConnections((current) => {
-      const next = current.filter((connection) => connection.leagueId !== leagueId);
-      persistConnections(next);
-      return next;
-    });
+    const previousActiveLeagueId = readActiveLeagueSnapshot();
+    const next = readConnectionsSnapshot().filter((connection) => connection.leagueId !== leagueId);
+    persistConnections(next);
+    if (previousActiveLeagueId === leagueId || !next.some((connection) => connection.leagueId === previousActiveLeagueId)) {
+      persistActiveLeague(next[0]?.leagueId ?? "");
+    }
   }, []);
 
-  return { connections, rememberConnection, forgetConnection };
+  const setActiveLeagueId = useCallback((leagueId: string) => {
+    if (leagueId && !/^\d{10,}$/.test(leagueId)) return;
+    persistActiveLeague(leagueId);
+  }, []);
+
+  return {
+    connections,
+    activeLeagueId,
+    rememberConnection,
+    rememberConnections,
+    forgetConnection,
+    setActiveLeagueId,
+  };
 }

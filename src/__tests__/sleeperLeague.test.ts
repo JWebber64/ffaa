@@ -78,7 +78,16 @@ describe("Sleeper League HQ import", () => {
         ["/user/test-manager", { user_id: "user-123", display_name: "Test Manager" }],
         ["/user/user-123/leagues/nfl/2026", [
           { league_id: "222222222222", name: "Zeta League", season: "2026", status: "pre_draft", total_rosters: 12 },
-          { league_id: "111111111111", name: "Alpha League", season: "2026", status: "in_season", total_rosters: 10 },
+          {
+            league_id: "111111111111",
+            name: "Alpha League",
+            season: "2026",
+            status: "in_season",
+            total_rosters: 10,
+            settings: { reserve_slots: 2 },
+            scoring_settings: { rec: 0.5 },
+            roster_positions: ["QB", "RB", "WR", "TE", "FLEX", "BN", "BN"],
+          },
         ]],
       ]);
       if (!payloads.has(path)) return new Response("not found", { status: 404 });
@@ -94,6 +103,13 @@ describe("Sleeper League HQ import", () => {
     expect(result.displayName).toBe("Test Manager");
     expect(result.leagues.map((league) => league.name)).toEqual(["Alpha League", "Zeta League"]);
     expect(result.leagues[0]).toMatchObject({ leagueId: "111111111111", totalRosters: 10 });
+    expect(result.leagues[0]?.auctionSettings).toMatchObject({
+      scoring: "halfPpr",
+      teamCount: 10,
+      budget: 200,
+      budgetSource: "gamehq-default",
+      rosterSize: 7,
+    });
   });
 
   it("returns a direct league choice for a pasted URL", async () => {

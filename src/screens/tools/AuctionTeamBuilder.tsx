@@ -58,8 +58,10 @@ function sortPlayers(players: ToolPlayer[], key: SortKey, direction: "asc" | "de
 
 export function AuctionTeamBuilder() {
   const navigate = useNavigate();
-  const { connections } = useSleeperLeagueConnections();
-  const initialConnection = connections.find((connection) => connection.auctionSettings);
+  const { connections, activeLeagueId, setActiveLeagueId } = useSleeperLeagueConnections();
+  const initialConnection = connections.find(
+    (connection) => connection.leagueId === activeLeagueId && connection.auctionSettings,
+  ) ?? connections.find((connection) => connection.auctionSettings);
   const initialSettings = initialConnection?.auctionSettings;
   const [valueProfileId, setValueProfileId] = useState(() => initialConnection?.leagueId ?? "custom");
   const [scoring, setScoring] = useState<ToolScoring>(() => initialSettings?.scoring ?? "ppr");
@@ -158,6 +160,7 @@ export function AuctionTeamBuilder() {
     if (profileId === "custom") return;
     const settings = connections.find((connection) => connection.leagueId === profileId)?.auctionSettings;
     if (!settings) return;
+    setActiveLeagueId(profileId);
     setScoring(settings.scoring);
     setTeamCount(settings.teamCount);
     setBudget(settings.budget);
