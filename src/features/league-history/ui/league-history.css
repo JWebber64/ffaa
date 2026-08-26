@@ -14,9 +14,10 @@
   border: 1px solid var(--glass-edge);
   border-radius: 14px 14px 0 0;
   background:
-    linear-gradient(90deg, rgba(8, 17, 29, 0.96), rgba(12, 24, 39, 0.84) 56%, rgba(8, 17, 29, 0.48)),
+    linear-gradient(90deg, rgba(6, 16, 12, 0.96), rgba(10, 31, 22, 0.82) 56%, rgba(6, 16, 12, 0.43)),
     var(--league-editorial-image);
-  background-position: center 46%;
+  background-position: center 52%;
+  background-repeat: no-repeat;
   background-size: cover;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.25);
 }

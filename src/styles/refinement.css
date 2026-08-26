@@ -2734,7 +2734,7 @@ dd,
   --football-chalk-muted: #c8d0ca;
   --football-leather: #c4672d;
   --football-leather-light: #e49a5e;
-  --football-broadcast: #78a8c4;
+  --football-broadcast: #9bb1a6;
   --football-floodlight: #d9ebe2;
   --football-field: #0a2117;
   --football-ink: #030907;
@@ -3371,17 +3371,17 @@ dd,
  * ----------------------------------------------------------------------- */
 
 :root {
-  --ffaa-accent: var(--a2);
-  --ffaa-header-surface: #0f1926;
-  --ffaa-control-surface: oklch(0.44 0.04 250);
+  --ffaa-accent: var(--a1);
+  --ffaa-header-surface: #0c1914;
+  --ffaa-control-surface: oklch(0.44 0.04 155);
   --ffaa-inner-surface: var(--bg-2);
-  --ffaa-toolbar-surface: rgba(18, 28, 42, 0.96);
-  --ffaa-panel-background: linear-gradient(180deg, #162333, #111b29);
-  --ffaa-panel-background-strong: linear-gradient(180deg, #1c2d40, #152334);
-  --ffaa-card-background: linear-gradient(145deg, #172536, #101b29);
-  --ffaa-card-background-hover: linear-gradient(145deg, #1d3044, #142438);
-  --football-field: #14253a;
-  --football-ink: #08111d;
+  --ffaa-toolbar-surface: rgba(15, 28, 23, 0.96);
+  --ffaa-panel-background: linear-gradient(180deg, #14261f, #0f1c18);
+  --ffaa-panel-background-strong: linear-gradient(180deg, #1a3027, #13241e);
+  --ffaa-card-background: linear-gradient(145deg, #162a22, #0e1d18);
+  --ffaa-card-background-hover: linear-gradient(145deg, #1d352b, #14271f);
+  --football-field: #153528;
+  --football-ink: #06100c;
 }
 
 html,
@@ -3392,17 +3392,17 @@ body,
 
 .ffaa-bg {
   background:
-    linear-gradient(180deg, rgba(12, 20, 32, 0.08), rgba(8, 17, 29, 0.62)),
+    linear-gradient(180deg, rgba(9, 18, 15, 0.08), rgba(6, 16, 12, 0.64)),
     repeating-linear-gradient(
       90deg,
       transparent 0,
       transparent calc(10% - 1px),
-      rgba(210, 224, 238, 0.025) calc(10% - 1px),
-      rgba(210, 224, 238, 0.025) 10%
+      rgba(211, 229, 219, 0.025) calc(10% - 1px),
+      rgba(211, 229, 219, 0.025) 10%
     ),
-    radial-gradient(circle at 13% 8%, rgba(120, 168, 196, 0.16), transparent 27%),
+    radial-gradient(circle at 13% 8%, rgba(66, 207, 142, 0.14), transparent 27%),
     radial-gradient(circle at 88% 2%, rgba(217, 122, 63, 0.13), transparent 24%),
-    linear-gradient(145deg, #111f31, var(--football-ink) 48%, #0d1a29) !important;
+    linear-gradient(145deg, #10231b, var(--football-ink) 48%, #0b1b15) !important;
 }
 
 .app-header {
@@ -3415,34 +3415,34 @@ body,
 }
 
 .app-nav-link.is-active {
-  border-color: color-mix(in srgb, var(--a2) 34%, var(--line-1));
-  background: color-mix(in srgb, var(--a2) 13%, var(--bg-2));
+  border-color: color-mix(in srgb, var(--a1) 34%, var(--line-1));
+  background: color-mix(in srgb, var(--a1) 13%, var(--bg-2));
   color: var(--text-0);
 }
 
 .ui-button-primary,
 .cui-button-primary,
 .home-actions .ui-button-primary {
-  border-color: rgba(246, 174, 121, 0.7) !important;
-  background: linear-gradient(180deg, #e89558, #d97a3f) !important;
-  box-shadow: inset 0 1px rgba(255, 255, 255, 0.26), 0 10px 26px rgba(140, 65, 20, 0.24) !important;
-  color: #140b06 !important;
+  border-color: rgba(126, 235, 177, 0.72) !important;
+  background: linear-gradient(180deg, #55dda0, #2cad75) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.26), 0 10px 26px rgba(24, 117, 75, 0.25) !important;
+  color: #04110c !important;
 }
 
 .ui-button-primary:hover:not(:disabled),
 .cui-button-primary:hover:not(:disabled),
 .home-actions .ui-button-primary:hover:not(:disabled) {
-  background: linear-gradient(180deg, #f0a56d, #e18449) !important;
-  box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 13px 32px rgba(140, 65, 20, 0.3) !important;
+  background: linear-gradient(180deg, #70e8b0, #37bf83) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 13px 32px rgba(24, 117, 75, 0.32) !important;
 }
 
 .ui-button-secondary {
   border-color: var(--line-1) !important;
-  background: linear-gradient(180deg, #213145, #18263a) !important;
+  background: linear-gradient(180deg, #20352c, #172a22) !important;
 }
 
 .ui-button-secondary:hover:not(:disabled) {
-  background: linear-gradient(180deg, #2a3d55, #203149) !important;
+  background: linear-gradient(180deg, #29463a, #1d352b) !important;
 }
 
 .ui-input-field,
@@ -3506,8 +3506,8 @@ body,
 .ffaa-dropdown-content {
   border-color: var(--line-1);
   background:
-    radial-gradient(130% 150% at 0% 0%, rgba(120, 168, 196, 0.16), transparent 48%),
-    linear-gradient(180deg, #1d3148, var(--bg-1)) !important;
+    radial-gradient(130% 150% at 0% 0%, rgba(66, 207, 142, 0.15), transparent 48%),
+    linear-gradient(180deg, #19362a, var(--bg-1)) !important;
 }
 
 .ffaa-custom-select-option {
@@ -3624,9 +3624,9 @@ body,
 .stats-view-tabs > button.is-active,
 .analytics-section-nav a[aria-current="page"],
 .league-tabs button.is-active {
-  border-color: color-mix(in srgb, var(--a2) 42%, var(--line-1)) !important;
-  background: color-mix(in srgb, var(--a2) 14%, var(--bg-2)) !important;
-  color: color-mix(in srgb, var(--a2) 82%, white) !important;
+  border-color: color-mix(in srgb, var(--a1) 42%, var(--line-1)) !important;
+  background: color-mix(in srgb, var(--a1) 14%, var(--bg-2)) !important;
+  color: color-mix(in srgb, var(--a1) 82%, white) !important;
 }
 
 .stats-hub-table-shell,
@@ -3666,14 +3666,17 @@ body,
 
 .home-proof-strip > span {
   border-color: var(--line-1);
-  background: rgba(18, 28, 42, 0.92);
+  background: rgba(15, 28, 23, 0.92);
 }
 
 .home-research-links {
   border-color: var(--line-1);
   background-image:
-    linear-gradient(90deg, rgba(8, 17, 29, 0.9), rgba(8, 17, 29, 0.52)),
-    var(--football-banner-image);
+    linear-gradient(90deg, rgba(6, 16, 12, 0.91), rgba(8, 24, 17, 0.5)),
+    var(--football-banner-image) !important;
+  background-position: center, center 60% !important;
+  background-repeat: no-repeat !important;
+  background-size: auto, cover !important;
 }
 
 .setup-hero,
@@ -3682,9 +3685,12 @@ body,
 .results-hero {
   border-color: var(--line-1) !important;
   background-image:
-    linear-gradient(90deg, rgba(8, 17, 29, 0.94), rgba(12, 24, 39, 0.76) 48%, rgba(8, 17, 29, 0.34)),
-    linear-gradient(0deg, rgba(8, 17, 29, 0.58), transparent),
+    linear-gradient(90deg, rgba(6, 16, 12, 0.95), rgba(10, 31, 22, 0.76) 48%, rgba(6, 16, 12, 0.32)),
+    linear-gradient(0deg, rgba(6, 16, 12, 0.58), transparent),
     var(--draft-editorial-image) !important;
+  background-position: center, center, center 54% !important;
+  background-repeat: no-repeat !important;
+  background-size: auto, auto, cover !important;
 }
 
 .stats-hub .stats-hero,
@@ -3693,17 +3699,23 @@ body,
 .tools-page-hero {
   border-color: var(--line-1) !important;
   background-image:
-    linear-gradient(90deg, rgba(8, 17, 29, 0.95), rgba(12, 24, 39, 0.74) 48%, rgba(8, 17, 29, 0.3)),
-    linear-gradient(0deg, rgba(8, 17, 29, 0.58), transparent),
+    linear-gradient(90deg, rgba(6, 16, 12, 0.96), rgba(10, 31, 22, 0.74) 48%, rgba(6, 16, 12, 0.28)),
+    linear-gradient(0deg, rgba(6, 16, 12, 0.58), transparent),
     var(--research-editorial-image) !important;
+  background-position: center, center, center 50% !important;
+  background-repeat: no-repeat !important;
+  background-size: auto, auto, cover !important;
 }
 
 .league-hero {
   border-color: var(--line-1) !important;
   background-image:
-    linear-gradient(90deg, rgba(8, 17, 29, 0.94), rgba(15, 24, 38, 0.72) 48%, rgba(8, 17, 29, 0.28)),
-    linear-gradient(0deg, rgba(8, 17, 29, 0.56), transparent),
+    linear-gradient(90deg, rgba(6, 16, 12, 0.95), rgba(11, 31, 22, 0.72) 48%, rgba(6, 16, 12, 0.26)),
+    linear-gradient(0deg, rgba(6, 16, 12, 0.56), transparent),
     var(--league-editorial-image) !important;
+  background-position: center, center, center 56% !important;
+  background-repeat: no-repeat !important;
+  background-size: auto, auto, cover !important;
 }
 
 .auction-budget-input {
@@ -3813,4 +3825,24 @@ body,
 .history-payout-source-panel dl > div,
 .history-payout-weeks > article {
   background: var(--ffaa-inner-surface) !important;
+}
+
+@media (max-width: 640px) {
+  .setup-hero,
+  .host-hero,
+  .join-hero,
+  .results-hero {
+    background-position: center, center, 58% 54% !important;
+  }
+
+  .stats-hub .stats-hero,
+  .analytics-hero,
+  .tools-hero,
+  .tools-page-hero {
+    background-position: center, center, 68% 52% !important;
+  }
+
+  .league-hero {
+    background-position: center, center, 52% 58% !important;
+  }
 }

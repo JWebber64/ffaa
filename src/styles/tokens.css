@@ -1,26 +1,26 @@
 :root {
-  /* Broadcast-night neutrals keep dense surfaces calm and let state colors work. */
-  --bg-0: #0c1420;
-  --bg-1: #121c2a;
-  --bg-2: oklch(0.39 0.035 250);
+  /* Graphite-evergreen neutrals keep green primary without tinting every surface. */
+  --bg-0: #09120f;
+  --bg-1: #0f1c17;
+  --bg-2: oklch(0.39 0.035 155);
 
   /* Borders */
-  --line-0: rgba(210, 224, 238, 0.16);
-  --line-1: rgba(210, 224, 238, 0.28);
+  --line-0: rgba(211, 229, 219, 0.16);
+  --line-1: rgba(211, 229, 219, 0.28);
 
   --text-0: #f4f1e8;
-  --text-1: #b7c2ce;
-  --text-2: #9eabb9;
-  --text-3: #7f8e9f;
+  --text-1: #bdc8c2;
+  --text-2: #a4b2aa;
+  --text-3: #83958c;
 
   /* --- Semantic accents --- */
-  --a1: #2fc994;  /* live / success */
-  --a2: #78a8c4;  /* selection / information */
+  --a1: #42cf8e;  /* brand / action / live / success */
+  --a2: #9bb1a6;  /* supporting information / neutral selection */
   --a3: #d6a84f;  /* awards / milestones */
 
   /* --- Soft glows --- */
-  --glow-a1: rgba(47, 201, 148, 0.28);
-  --glow-a2: rgba(120, 168, 196, 0.26);
+  --glow-a1: rgba(66, 207, 142, 0.28);
+  --glow-a2: rgba(155, 177, 166, 0.24);
   --glow-a3: rgba(214, 168, 79, 0.22);
 
   /* --- Position colors (corrected) --- */
@@ -41,9 +41,9 @@
   --pos-idpflex:#0891B2; /* Same as FLEX */
 
   /* Legacy glass names resolve to the brighter product surfaces. */
-  --glass-1: #121c2a;
-  --glass-2: oklch(0.39 0.035 250);
-  --glass-3: #24374b;
+  --glass-1: #0f1c17;
+  --glass-2: oklch(0.39 0.035 155);
+  --glass-3: #274239;
 
   /* Specular highlights (top sheen) */
   --spec-1: rgba(255,255,255,0.18);
@@ -82,7 +82,7 @@
   --r-xl: 16px;
 
   /* Focus ring */
-  --focus: rgba(120, 168, 196, 0.42);
+  --focus: rgba(66, 207, 142, 0.42);
 
   /* --- Legacy variable aliases for compatibility --- */
   /* Surface aliases */
@@ -101,7 +101,7 @@
   --stroke2: var(--focus);
 
   /* Accent aliases */
-  --accent: var(--a2);
+  --accent: var(--a1);
   --accent2: var(--a3);
   --accent-1: var(--a1);
   --accent-2: var(--a2);
