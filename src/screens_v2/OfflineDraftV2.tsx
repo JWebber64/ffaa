@@ -20,8 +20,10 @@ import type { Player } from "../types/draft";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { PositionToggle } from "../ui/PositionToggle";
+import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "../ui/positionToggleOptions";
 import { SelectItem, SelectWrapper } from "../ui/SelectWrapper";
 import { cn } from "../ui/cn";
+import { matchesPositionFilter } from "../utils/positionFilter";
 import { compareOfflineDraftPlayers, suggestedPrice } from "./offlineDraftPlayerOrder";
 
 const STORAGE_KEY = "ffaa.offlineDraft.v1";
@@ -32,7 +34,7 @@ const TEAM_COUNT_OPTIONS: TeamCountV2[] = [8, 10, 12, 14, 16];
 const MANUAL_POSITIONS = ["QB", "RB", "WR", "TE", "K", "DEF"] as const;
 const SLOT_TYPE_SET = new Set<string>(SLOT_TYPES);
 
-type PositionFilter = "ALL" | "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
+type PositionFilter = "ALL" | "QB" | "RB" | "WR" | "TE" | "FLEX" | "K" | "DEF";
 type ManualPosition = (typeof MANUAL_POSITIONS)[number];
 
 type OfflineRosterPlayer = Required<Pick<RosterPlayer, "playerId" | "name" | "price" | "pos">> &
@@ -66,16 +68,6 @@ type LastAssignment = {
   playerId: string;
   playerName: string;
 };
-
-const POSITION_FILTER_OPTIONS = [
-  { value: "ALL", label: "All" },
-  { value: "QB", label: "QB", position: "QB" },
-  { value: "RB", label: "RB", position: "RB" },
-  { value: "WR", label: "WR", position: "WR" },
-  { value: "TE", label: "TE", position: "TE" },
-  { value: "K", label: "K", position: "K" },
-  { value: "DEF", label: "DEF", position: "DST" },
-] as const;
 
 function money(value: number) {
   return `$${value}`;
@@ -344,7 +336,7 @@ function playerMeta(player: Player) {
 }
 
 function matchesPlayer(player: Player, query: string, positionFilter: PositionFilter) {
-  if (positionFilter !== "ALL" && String(player.pos).toUpperCase() !== positionFilter) {
+  if (!matchesPositionFilter(player.pos, positionFilter)) {
     return false;
   }
 
@@ -973,7 +965,7 @@ export default function OfflineDraftV2() {
           <PositionToggle
             ariaLabel="Filter offline draft player search by position"
             className="offline-filter-row"
-            options={POSITION_FILTER_OPTIONS}
+            options={DEFAULT_POSITION_TOGGLE_OPTIONS}
             value={positionFilter}
             onChange={setPositionFilter}
           />

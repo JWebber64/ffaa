@@ -18,13 +18,14 @@ import type {
 } from "@/data/analyticsData";
 import { Button } from "@/ui/Button";
 import { PositionToggle } from "@/ui/PositionToggle";
+import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 import { SelectItem, SelectWrapper } from "@/ui/SelectWrapper";
 
 const SEASONS = [2025, 2024, 2023, 2022] as const;
 const MIN_GAME_OPTIONS = [3, 5, 8] as const;
 const WEEK_OPTIONS = Array.from({ length: 18 }, (_, index) => index + 1);
 
-const POSITION_OPTIONS = ["ALL", "QB", "RB", "WR", "TE", "K", "DEF"] as const;
+const POSITION_OPTIONS = ["ALL", "QB", "RB", "WR", "TE", "FLEX", "K", "DEF"] as const;
 
 function numberFromQuery(value: string | null, fallback: number, minimum: number, maximum: number) {
   const parsed = Number(value);
@@ -301,7 +302,7 @@ export function AnalyticsLab() {
           <PositionToggle
             ariaLabel="Filter Analytics Lab by position"
             value={position}
-            options={POSITION_OPTIONS.map((value) => ({ value, label: value === "ALL" ? "All" : value, ...(value === "ALL" ? {} : { position: value }) }))}
+            options={DEFAULT_POSITION_TOGGLE_OPTIONS}
             onChange={(value) => updateQuery({ position: value })}
           />
         </div>
@@ -387,7 +388,7 @@ export function AnalyticsLab() {
             </div>
           </section>
 
-          {(position === "ALL" || position === "RB") ? (
+          {(position === "ALL" || position === "RB" || position === "FLEX") ? (
             <section id="running-backs" className="analytics-section">
               <div className="analytics-section-heading">
                 <span><Activity size={18} aria-hidden="true" />NFL Next Gen Stats</span>
@@ -438,7 +439,7 @@ export function AnalyticsLab() {
             </section>
           ) : null}
 
-          {(position === "ALL" || position === "WR" || position === "TE") ? (
+          {(position === "ALL" || position === "WR" || position === "TE" || position === "FLEX") ? (
             <section id="receivers" className="analytics-section">
               <div className="analytics-section-heading">
                 <span><ChartNoAxesCombined size={18} aria-hidden="true" />Opportunity profile</span>

@@ -14,6 +14,7 @@ import { PositionToggle } from "@/ui/PositionToggle";
 import { NumericInput } from "@/ui/NumericInput";
 import { UniversalSelect } from "@/ui/UniversalSelect";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
+import { matchesPositionFilter } from "@/utils/positionFilter";
 import {
   auctionSettingsSummary,
   useSleeperLeagueConnections,
@@ -71,7 +72,7 @@ export function AuctionTeamBuilder() {
   const [slots, setSlots] = useState(() => initialSettings ? builderSlotsFromLeague(initialSettings) : DEFAULT_SLOTS);
   const [picks, setPicks] = useState<DraftPick[]>([]);
   const [query, setQuery] = useState("");
-  const [position, setPosition] = useState<ToolPosition | "ALL">("ALL");
+  const [position, setPosition] = useState<ToolPosition | "FLEX" | "ALL">("ALL");
   const [sortKey, setSortKey] = useState<SortKey>("value");
   const [direction, setDirection] = useState<"asc" | "desc">("desc");
   const [selectedId, setSelectedId] = useState("");
@@ -97,7 +98,7 @@ export function AuctionTeamBuilder() {
     const normalized = query.trim().toLowerCase();
     return sortPlayers(players.filter((player) => {
       if (pickIds.has(player.id)) return false;
-      if (position !== "ALL" && player.position !== position) return false;
+      if (!matchesPositionFilter(player.position, position)) return false;
       return !normalized || `${player.name} ${player.team} ${player.position} ${formatTeamBye(player.team, player.byeWeek)}`.toLowerCase().includes(normalized);
     }), sortKey, direction).slice(0, 160);
   }, [direction, pickIds, players, position, query, sortKey]);
@@ -246,7 +247,7 @@ export function AuctionTeamBuilder() {
               <span>Search</span>
               <span className="tool-input-with-icon"><Search size={14} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Player or team" /></span>
             </label>
-            <PositionToggle<ToolPosition | "ALL">
+            <PositionToggle<ToolPosition | "FLEX" | "ALL">
               ariaLabel="Filter auction player board by position"
               className="auction-position-toggle"
               options={DEFAULT_POSITION_TOGGLE_OPTIONS}

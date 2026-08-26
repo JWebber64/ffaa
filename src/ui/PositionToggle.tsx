@@ -44,6 +44,7 @@ export function PositionToggle<TValue extends string = string>({
     <div
       aria-label={ariaLabel}
       className={cn("ffaa-position-toggle", className)}
+      data-option-count={options.length}
       role="group"
       style={{ "--position-toggle-count": options.length } as CSSProperties}
     >

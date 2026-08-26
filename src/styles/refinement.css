@@ -3869,6 +3869,16 @@ body,
 }
 
 @media (max-width: 640px) {
+  .ffaa-position-toggle[data-option-count="8"] {
+    gap: 2px;
+    padding: 3px;
+  }
+
+  .ffaa-position-toggle[data-option-count="8"] .ffaa-position-button {
+    padding-inline: 2px;
+    font-size: 0.6rem;
+  }
+
   .setup-hero,
   .host-hero,
   .join-hero {

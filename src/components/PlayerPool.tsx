@@ -14,6 +14,7 @@ import {
 } from '@/ui/custom';
 import { Search } from 'lucide-react';
 import { PositionToggle } from '../ui/PositionToggle';
+import { DEFAULT_POSITION_TOGGLE_OPTIONS, type DefaultPositionToggleValue } from '../ui/positionToggleOptions';
 import type { Position as PositionType } from '../types/draft';
 import { useDraftStore, useDraftSelectors } from '../store/draftStore';
 import { useGlobalPlayers } from '../hooks/useGlobalPlayers';
@@ -23,7 +24,7 @@ import { TeamMark } from './player/TeamMark';
 import { formatByeWeek } from './player/teamMarkUtils';
 
 type Pos = Exclude<PositionType, 'FLEX' | 'BENCH' | 'IR'>;
-type TabValue = 'ALL' | Pos | 'FLEX';
+type TabValue = DefaultPositionToggleValue;
 
 const POS_ORDER: readonly Pos[] = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'] as const;
 const POSITION_NAMES: Record<Pos, string> = {
@@ -35,12 +36,7 @@ const POSITION_NAMES: Record<Pos, string> = {
   DEF: 'Defenses/STs'
 };
 
-const ALL_TABS: readonly TabValue[] = ['ALL', ...POS_ORDER, 'FLEX'] as const;
-const PLAYER_POOL_POSITION_OPTIONS = ALL_TABS.map((value) => ({
-  value,
-  label: value === 'ALL' ? 'All' : value,
-  ...(value === 'ALL' ? {} : { position: value }),
-}));
+const ALL_TABS: readonly TabValue[] = DEFAULT_POSITION_TOGGLE_OPTIONS.map((option) => option.value);
 
 // Helper function to map positions to correct color schemes
 const getPositionColorForBadge = (pos: string) => {
@@ -328,7 +324,7 @@ const PlayerPool: React.FC<PlayerPoolProps> = ({
           <PositionToggle<TabValue>
             ariaLabel="Filter player pool by position"
             className="player-pool-position-toggle"
-            options={PLAYER_POOL_POSITION_OPTIONS}
+            options={DEFAULT_POSITION_TOGGLE_OPTIONS}
             value={activeTab}
             onChange={handlePositionTabClick}
           />

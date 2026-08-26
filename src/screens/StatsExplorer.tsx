@@ -72,30 +72,23 @@ import winWithOddsRowsJson from "@/data/players-2026-winwithodds.json";
 import { Button } from "@/ui/Button";
 import { Input } from "@/ui/Input";
 import { PositionToggle } from "@/ui/PositionToggle";
+import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 import { SelectItem, SelectWrapper } from "@/ui/SelectWrapper";
 import type { PlayerValueSource } from "@/types/draft";
 import { appUrl } from "@/lib/appBasePath";
+import { matchesPositionFilter } from "@/utils/positionFilter";
 import {
   auctionSettingsSummary,
   useSleeperLeagueConnections,
 } from "@/features/league-hq/sleeperConnections";
 
 type HubScoring = WeeklyFantasyScoringMode;
-type PositionFilter = "ALL" | "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
-type FantasyPosition = Exclude<PositionFilter, "ALL">;
+type FantasyPosition = "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
+type PositionFilter = "ALL" | "FLEX" | FantasyPosition;
 const POSITION_FILTER_ORDER: readonly PositionFilter[] = [
-  "ALL", "QB", "RB", "WR", "TE", "K", "DEF",
+  "ALL", "QB", "RB", "WR", "TE", "FLEX", "K", "DEF",
 ];
-
-function buildPositionToggleOptions(positions: PositionFilter[]) {
-  return positions.map((position) => ({
-    value: position,
-    label: position === "ALL" ? "All" : position,
-    ...(position === "ALL"
-      ? {}
-      : { position: position === "DEF" ? "DST" : position }),
-  }));
-}
+const POSITION_FILTERS: ReadonlySet<PositionFilter> = new Set(POSITION_FILTER_ORDER);
 
 type WinWithOddsProjection = Record<string, unknown> & {
   id?: string;
@@ -1367,7 +1360,7 @@ export default function StatsExplorer() {
   const search = searchParams.get("q") ?? "";
   const requestedPosition = (searchParams.get("position") ?? "ALL").toUpperCase();
   const positionFilter: PositionFilter =
-    requestedPosition === "ALL" || FANTASY_POSITIONS.has(requestedPosition as FantasyPosition)
+    POSITION_FILTERS.has(requestedPosition as PositionFilter)
       ? (requestedPosition as PositionFilter)
       : "ALL";
   const requestedTeamFilter = normalizeTeam(searchParams.get("team") ?? "ALL") || "ALL";
@@ -1802,7 +1795,7 @@ export default function StatsExplorer() {
   const filteredPlayerRows = useMemo(() => {
     const needle = search.trim().toLowerCase();
     return playerRows.filter((row) => {
-      const positionMatches = positionFilter === "ALL" || row.position === positionFilter;
+      const positionMatches = matchesPositionFilter(row.position, positionFilter);
       const teamMatches = teamFilter === "ALL" || row.team === teamFilter;
       const searchMatches =
         !needle || `${row.name} ${row.position} ${row.team} ${row.status}`.toLowerCase().includes(needle);
@@ -1840,11 +1833,6 @@ export default function StatsExplorer() {
   const sortedTeamRows = useMemo(
     () => sortRows(filteredTeamRows, currentTeamColumns, sort),
     [currentTeamColumns, filteredTeamRows, sort],
-  );
-
-  const positionToggleOptions = useMemo(
-    () => buildPositionToggleOptions([...POSITION_FILTER_ORDER]),
-    [],
   );
 
   const cards = useMemo<SummaryCard[]>(() => {
@@ -2178,7 +2166,7 @@ export default function StatsExplorer() {
               <span>Position</span>
               <PositionToggle
                 ariaLabel="Filter stats by position"
-                options={positionToggleOptions}
+                options={DEFAULT_POSITION_TOGGLE_OPTIONS}
                 value={positionFilter}
                 onChange={(value) => updateQuery({ position: value === "ALL" ? null : value })}
               />

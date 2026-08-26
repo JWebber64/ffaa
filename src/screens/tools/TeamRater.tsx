@@ -22,9 +22,10 @@ import { PositionToggle } from "@/ui/PositionToggle";
 import { NumericInput } from "@/ui/NumericInput";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 import { UniversalSelect } from "@/ui/UniversalSelect";
+import { matchesPositionFilter } from "@/utils/positionFilter";
 
 type PlayerSort = "rank" | "projection" | "auction" | "position" | "name";
-type PlayerPositionFilter = "ALL" | ToolPosition;
+type PlayerPositionFilter = "ALL" | "FLEX" | ToolPosition;
 
 const SLOT_ORDER: TeamRaterSlotPosition[] = [
   "QB",
@@ -133,7 +134,7 @@ export function TeamRater() {
     return sortPlayers(
       players.filter((player) => {
         if (rosterIdSet.has(player.id)) return false;
-        if (playerPosition !== "ALL" && player.position !== playerPosition) return false;
+        if (!matchesPositionFilter(player.position, playerPosition)) return false;
         if (!query) return true;
         return `${player.name} ${player.team} ${player.position} ${formatTeamBye(player.team, player.byeWeek)}`.toLowerCase().includes(query);
       }),

@@ -22,8 +22,12 @@ describe("PositionToggle", () => {
     expect(screen.getByRole("group", { name: "Position filter" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "All" }).style.getPropertyValue("--position-toggle-color")).toBe("var(--a2)");
     expect(screen.getByRole("button", { name: "QB" }).style.getPropertyValue("--position-toggle-color")).toBe("var(--pos-qb)");
+    expect(screen.getByRole("button", { name: "FLEX" }).style.getPropertyValue("--position-toggle-color")).toBe("var(--pos-flex)");
     expect(screen.getByRole("button", { name: "DEF" }).style.getPropertyValue("--position-toggle-color")).toBe("var(--pos-dst)");
     expect(screen.getByRole("button", { name: "WR" }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getAllByRole("button").map((button) => button.textContent)).toEqual([
+      "All", "QB", "RB", "WR", "TE", "FLEX", "K", "DEF",
+    ]);
   });
 
   it("reports the newly selected position", () => {

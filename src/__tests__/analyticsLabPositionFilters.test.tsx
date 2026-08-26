@@ -25,7 +25,7 @@ describe("Analytics Lab position filters", () => {
     loadAnalyticsDataMock.mockResolvedValue({ players: [], teams: [] });
   });
 
-  it("offers kicker and team-defense filters and applies them", async () => {
+  it("offers FLEX, kicker, and team-defense filters and applies them", async () => {
     render(
       <MemoryRouter initialEntries={["/analytics"]}>
         <AnalyticsLab />
@@ -35,11 +35,25 @@ describe("Analytics Lab position filters", () => {
     const positionFilters = screen.getByRole("group", {
       name: "Filter Analytics Lab by position",
     });
+    const flexFilter = within(positionFilters).getByRole("button", { name: "FLEX" });
     const kickerFilter = within(positionFilters).getByRole("button", { name: "K" });
     const defenseFilter = within(positionFilters).getByRole("button", { name: "DEF" });
 
+    expect(flexFilter).toHaveAttribute("aria-pressed", "false");
     expect(kickerFilter).toHaveAttribute("aria-pressed", "false");
     expect(defenseFilter).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(flexFilter);
+
+    await waitFor(() => {
+      expect(flexFilter).toHaveAttribute("aria-pressed", "true");
+      expect(loadAnalyticsDataMock).toHaveBeenCalledWith(
+        expect.objectContaining({ position: "FLEX" }),
+      );
+    });
+    expect(screen.getByRole("heading", { name: "Running back lab" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Receiver lab" })).toBeVisible();
+    expect(screen.queryByRole("heading", { name: "Quarterback lab" })).toBeNull();
 
     fireEvent.click(kickerFilter);
 

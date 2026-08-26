@@ -1,7 +1,9 @@
 import { appUrl } from "@/lib/appBasePath";
+import { matchesPositionFilter } from "@/utils/positionFilter";
 
 export type AnalyticsScoringMode = "standard" | "halfPpr" | "ppr";
-export type AnalyticsPosition = "ALL" | "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
+export type AnalyticsPlayerPosition = "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
+export type AnalyticsPosition = "ALL" | "FLEX" | AnalyticsPlayerPosition;
 
 export type AnalyticsLoadOptions = {
   season: number;
@@ -16,7 +18,7 @@ export type AnalyticsLoadOptions = {
 export type AnalyticsPlayerMetric = {
   id: string;
   name: string;
-  position: Exclude<AnalyticsPosition, "ALL">;
+  position: AnalyticsPlayerPosition;
   team: string;
   games: number;
   actualPoints: number;
@@ -157,7 +159,7 @@ function scoringReceptionValue(scoring: AnalyticsScoringMode) {
   return 0;
 }
 
-function isAnalyticsPosition(value: string | undefined): value is Exclude<AnalyticsPosition, "ALL"> {
+function isAnalyticsPosition(value: string | undefined): value is AnalyticsPlayerPosition {
   return value === "QB" || value === "RB" || value === "WR" || value === "TE" || value === "K" || value === "DEF";
 }
 
@@ -351,7 +353,7 @@ export async function loadAnalyticsData(options: AnalyticsLoadOptions): Promise<
       numberValue(row.season) !== options.season ||
       !isAnalyticsPosition(position) ||
       !inRange(week, options.weekStart, options.weekEnd) ||
-      (options.position !== "ALL" && position !== options.position) ||
+      !matchesPositionFilter(position, options.position) ||
       (options.team !== "ALL" && team !== options.team)
     ) {
       continue;
@@ -392,7 +394,7 @@ export async function loadAnalyticsData(options: AnalyticsLoadOptions): Promise<
       row.season_type !== "REG" ||
       week === 0 ||
       !inRange(week, options.weekStart, options.weekEnd) ||
-      (options.position !== "ALL" && row.player_position !== options.position) ||
+      !matchesPositionFilter(row.player_position, options.position) ||
       (options.team !== "ALL" && team !== options.team)
     ) {
       continue;
@@ -419,7 +421,7 @@ export async function loadAnalyticsData(options: AnalyticsLoadOptions): Promise<
       row.season_type !== "REG" ||
       week === 0 ||
       !inRange(week, options.weekStart, options.weekEnd) ||
-      (options.position !== "ALL" && row.player_position !== options.position) ||
+      !matchesPositionFilter(row.player_position, options.position) ||
       (options.team !== "ALL" && team !== options.team)
     ) {
       continue;

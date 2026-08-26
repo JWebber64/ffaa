@@ -24,7 +24,9 @@ import { useToast } from "../ui/toastContext";
 import { DropdownMenu, DropdownMenuItem } from "../ui/DropdownMenu";
 import { ModalLite } from "../ui/ModalLite";
 import { PositionToggle } from "../ui/PositionToggle";
+import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "../ui/positionToggleOptions";
 import { toastError } from "../utils/toastError";
+import { matchesPositionFilter } from "../utils/positionFilter";
 import { useDraftSnapshot } from "../hooks/useDraftSnapshot";
 import {
   appendDraftAction,
@@ -146,16 +148,6 @@ function toDraftPlayer(player: Player) {
   return draftPlayer;
 }
 
-const PLAYER_POSITION_FILTERS = [
-  { value: "ALL", label: "All" },
-  { value: "QB", label: "QB", position: "QB" },
-  { value: "RB", label: "RB", position: "RB" },
-  { value: "WR", label: "WR", position: "WR" },
-  { value: "TE", label: "TE", position: "TE" },
-  { value: "K", label: "K", position: "K" },
-  { value: "DEF", label: "DEF", position: "DST" },
-] as const;
-
 const ACTIVE_DRAFT_SESSION_KEYS = ["hostLobbyV2", "joinLobbyV2"];
 
 function clearActiveDraftSessionStorage() {
@@ -188,13 +180,6 @@ function createOptimisticBid(
     expiresAt: new Date(submittedAt + Math.max(1, bidSeconds) * 1000).toISOString(),
     createdAt: submittedAt,
   };
-}
-
-function matchesPositionFilter(playerPos: unknown, filter: string) {
-  if (filter === "ALL") return true;
-  const normalizedPos = String(playerPos ?? "").toUpperCase();
-  if (filter === "DEF") return normalizedPos === "DEF" || normalizedPos === "DST";
-  return normalizedPos === filter;
 }
 
 function matchesPlayerQuery(player: Player, query: string) {
@@ -1557,7 +1542,7 @@ export default function DraftRoomV2() {
                 </div>
                 <PositionToggle
                   ariaLabel="Filter nominate player search by position"
-                  options={PLAYER_POSITION_FILTERS}
+                  options={DEFAULT_POSITION_TOGGLE_OPTIONS}
                   value={positionFilter}
                   onChange={setPositionFilter}
                 />
