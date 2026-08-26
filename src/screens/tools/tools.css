@@ -517,7 +517,7 @@
 .team-slot-control[data-position="all"] { --slot-color: var(--pos-bench); }
 .team-slot-control > span { overflow: hidden; color: color-mix(in srgb, var(--slot-color) 50%, white); font-size: 0.67rem; font-weight: 850; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .team-slot-stepper { width: 100%; }
-.team-slot-stepper input { width: 100%; height: 40px; padding-left: 0; border: 0; border-radius: 0; color: var(--text-0); background: transparent; font: inherit; font-size: 0.78rem; font-weight: 850; }
+.team-slot-stepper input { width: 100%; height: 40px; padding-left: 0; border: 0 !important; border-radius: 0; color: var(--text-0); background: transparent !important; font: inherit; font-size: 0.78rem; font-weight: 850; }
 .team-slot-stepper .ffaa-number-stepper { right: 0; border: 0; background: transparent; box-shadow: none; }
 .team-slot-stepper .ffaa-number-stepper-visual { color: color-mix(in srgb, var(--slot-color) 50%, white); }
 .team-slot-stepper .ffaa-number-stepper button:hover:not(:disabled) { background: color-mix(in srgb, var(--slot-color) 14%, transparent); }

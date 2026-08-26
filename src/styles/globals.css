@@ -20,6 +20,10 @@ html, body, #root {
   --scrollbar-track: rgba(3,13,9,0.72);
   --scrollbar-thumb: rgba(45,212,191,0.42);
   --scrollbar-thumb-hover: rgba(52,211,153,0.68);
+  --ffaa-number-field-border: rgba(45,212,191,0.24);
+  --ffaa-number-field-surface:
+    linear-gradient(180deg, rgba(45,212,191,0.18), rgba(45,212,191,0.06)),
+    rgba(7,18,14,0.86);
 }
 
 * {
@@ -3596,6 +3600,8 @@ html, body, #root {
 
 .ffaa-number-field > input[type="number"] {
   padding-right: 46px;
+  border-color: var(--ffaa-number-field-border) !important;
+  background: var(--ffaa-number-field-surface) !important;
   appearance: textfield;
   -moz-appearance: textfield;
 }
@@ -3616,11 +3622,9 @@ html, body, #root {
   width: 32px;
   height: 32px;
   overflow: hidden;
-  border: 1px solid rgba(45,212,191,0.24);
+  border: 1px solid var(--ffaa-number-field-border);
   border-radius: 10px;
-  background:
-    linear-gradient(180deg, rgba(45,212,191,0.18), rgba(45,212,191,0.06)),
-    rgba(7,18,14,0.86);
+  background: var(--ffaa-number-field-surface);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 0 16px rgba(45,212,191,0.14);
   transform: translateY(-50%);
 }

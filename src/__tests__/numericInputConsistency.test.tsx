@@ -40,6 +40,17 @@ describe("numeric input consistency", () => {
     expect(design).toContain("Do not expose browser-native number arrows");
   });
 
+  it("uses the stepper palette across the complete numeric field", () => {
+    const globals = readFileSync(resolve(projectRoot, "src/styles/globals.css"), "utf8");
+    const refinement = readFileSync(resolve(projectRoot, "src/styles/refinement.css"), "utf8");
+    const tools = readFileSync(resolve(projectRoot, "src/screens/tools/tools.css"), "utf8");
+
+    expect(globals).toMatch(/\.ffaa-number-field > input\[type="number"\]\s*\{[^}]*background:\s*var\(--ffaa-number-field-surface\)\s*!important/s);
+    expect(globals).toMatch(/\.ffaa-number-stepper\s*\{[^}]*background:\s*var\(--ffaa-number-field-surface\)/s);
+    expect(refinement).toMatch(/\.auction-budget-input,[\s\S]*?\.auction-selected-ticket label > span\s*\{[^}]*background:\s*var\(--ffaa-number-field-surface\)\s*!important/s);
+    expect(tools).toMatch(/\.team-slot-stepper input\s*\{[^}]*background:\s*transparent\s*!important/s);
+  });
+
   it("increments and decrements a controlled value through accessible hit regions", () => {
     render(<ControlledBudget />);
     const input = screen.getByRole("spinbutton", { name: "Auction budget" }) as HTMLInputElement;

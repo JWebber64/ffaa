@@ -3758,9 +3758,10 @@ body,
   }
 }
 
-.auction-budget-input {
-  border-color: var(--line-1);
-  background: var(--ffaa-control-surface);
+.auction-budget-input,
+.auction-selected-ticket label > span {
+  border-color: var(--ffaa-number-field-border) !important;
+  background: var(--ffaa-number-field-surface) !important;
 }
 
 .tool-field .auction-budget-input input {
