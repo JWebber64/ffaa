@@ -1,5 +1,5 @@
 import { lazy, type CSSProperties } from "react";
-import { BarChart3, Bug, ChartNoAxesCombined, ClipboardList, Home, Settings2, Trophy, UserPlus, Wrench } from "lucide-react";
+import { BadgeDollarSign, BarChart3, Bug, ChartNoAxesCombined, ClipboardList, Home, Settings2, Trophy, UserPlus, Wrench } from "lucide-react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
 import { useDebugDrawerState } from "../hooks/useDebugDrawer";
@@ -13,6 +13,7 @@ const primaryNav = [
   { to: "/offline-draft", label: "Offline", icon: ClipboardList, match: (path: string) => path.startsWith("/offline-draft") },
   { to: "/host/setup", label: "Setup", icon: Settings2, match: (path: string) => path.startsWith("/host") },
   { to: "/stats", label: "Stats", icon: BarChart3, match: (path: string) => path.startsWith("/stats") },
+  { to: "/auction-values", label: "Auction Values", icon: BadgeDollarSign, match: (path: string) => path.startsWith("/auction-values") },
   { to: "/analytics", label: "Analytics", icon: ChartNoAxesCombined, match: (path: string) => path.startsWith("/analytics") },
   { to: "/tools", label: "Tools", icon: Wrench, match: (path: string) => path.startsWith("/tools") },
   { to: "/league", label: "League HQ", icon: Trophy, match: (path: string) => path.startsWith("/league") },
@@ -28,10 +29,11 @@ export default function AppShellV2() {
   const pathIsHost = loc.pathname.startsWith("/host");
   const pathIsOffline = loc.pathname.startsWith("/offline-draft");
   const pathIsStats = loc.pathname.startsWith("/stats");
+  const pathIsAuctionValues = loc.pathname.startsWith("/auction-values");
   const pathIsAnalytics = loc.pathname.startsWith("/analytics");
   const pathIsTools = loc.pathname.startsWith("/tools");
   const pathIsLeague = loc.pathname.startsWith("/league");
-  const pathIsPublicResearch = pathIsStats || pathIsAnalytics || pathIsTools;
+  const pathIsPublicResearch = pathIsStats || pathIsAuctionValues || pathIsAnalytics || pathIsTools;
   const pathIsNoAuth = pathIsPublicResearch || pathIsLeague;
   const pathIsDraft = loc.pathname.startsWith("/draft") || pathIsOffline;
   const realtimeLabel = pathIsLeague ? "league data" : pathIsPublicResearch ? "public data" : pathIsOffline ? "offline" : "lobby";
@@ -52,6 +54,7 @@ export default function AppShellV2() {
     if (loc.pathname.startsWith("/host")) return "Host";
     if (loc.pathname.startsWith("/offline-draft")) return "Offline Draft";
     if (loc.pathname.startsWith("/stats")) return "Stats";
+    if (loc.pathname.startsWith("/auction-values")) return "Auction Values";
     if (loc.pathname.startsWith("/analytics")) return "Analytics";
     if (loc.pathname.startsWith("/tools")) return "Tools";
     if (loc.pathname.startsWith("/league")) return "League HQ";

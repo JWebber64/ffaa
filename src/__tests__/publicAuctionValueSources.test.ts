@@ -18,12 +18,13 @@ describe("public auction value sources", () => {
     expect(new Set(PUBLIC_AUCTION_VALUE_SOURCES.map((source) => source.id)).size).toBe(22);
   });
 
-  it("contains normalized rows from the eight extractable public boards", () => {
+  it("contains normalized rows from the nine extractable public boards", () => {
     const counts = new Map<string, number>();
     for (const row of rows) counts.set(row.sourceId, (counts.get(row.sourceId) ?? 0) + 1);
 
-    expect(rows.length).toBeGreaterThanOrEqual(1_400);
-    expect(counts.size).toBe(8);
+    expect(rows.length).toBeGreaterThanOrEqual(2_200);
+    expect(counts.size).toBe(9);
+    expect(counts.get("usa-today")).toBe(750);
     expect(counts.get("fftoday")).toBeGreaterThanOrEqual(600);
     expect(counts.get("sports-illustrated")).toBeGreaterThanOrEqual(230);
     expect(counts.get("rtsports-aav")).toBeGreaterThanOrEqual(200);
