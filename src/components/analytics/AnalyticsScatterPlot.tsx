@@ -27,7 +27,7 @@ export type AnalyticsScatterPlotProps = {
 };
 
 const POINT_COLORS: Record<string, string> = {
-  QB: "#60a5fa",
+  QB: "var(--green-400)",
   RB: "#34d399",
   WR: "#c084fc",
   TE: "#fbbf24",
@@ -198,7 +198,7 @@ export function AnalyticsScatterPlot({
                   cx={layout.x(point.x)}
                   cy={layout.y(point.y)}
                   r={layout.radius(point.size)}
-                  fill={POINT_COLORS[point.position] ?? "#5eead4"}
+                  fill={POINT_COLORS[point.position] ?? "var(--green-200)"}
                 />
                 {selected || hovered ? (
                   <text x={layout.x(point.x)} y={layout.y(point.y) - layout.radius(point.size) - 9} textAnchor="middle" className="analytics-point-label">

@@ -1,49 +1,171 @@
 :root {
-  /* Graphite-evergreen neutrals keep green primary without tinting every surface. */
-  --bg-0: #09120f;
-  --bg-1: #0f1c17;
-  --bg-2: oklch(0.39 0.035 155);
+  --font-sans: "Manrope", "IBM Plex Sans", "Fira Sans", "Noto Sans", sans-serif;
+  --font-display: "Teko", "Oswald", "Impact", sans-serif;
 
-  /* Borders */
-  --line-0: rgba(211, 229, 219, 0.16);
-  --line-1: rgba(211, 229, 219, 0.28);
+  /*
+   * Primitive color ramps.
+   * Green is the product color; neutral gray carries the interface hierarchy.
+   * Position, warning, and danger colors remain semantic exceptions.
+   */
+  --green-50: oklch(0.97 0.025 150);
+  --green-100: oklch(0.93 0.045 150);
+  --green-200: oklch(0.86 0.08 150);
+  --green-300: oklch(0.78 0.125 150);
+  --green-400: oklch(0.7 0.155 150);
+  --green-500: oklch(0.63 0.16 150);
+  --green-600: oklch(0.55 0.145 150);
+  --green-700: oklch(0.46 0.11 150);
+  --green-800: oklch(0.38 0.075 150);
+  --green-900: oklch(0.3 0.045 150);
+  --green-950: oklch(0.22 0.025 150);
 
-  --text-0: #f4f1e8;
-  --text-1: #bdc8c2;
-  --text-2: #a4b2aa;
-  --text-3: #83958c;
+  --gray-50: oklch(0.97 0.006 160);
+  --gray-100: oklch(0.92 0.008 160);
+  --gray-200: oklch(0.84 0.009 160);
+  --gray-300: oklch(0.74 0.011 160);
+  --gray-400: oklch(0.64 0.012 160);
+  --gray-500: oklch(0.54 0.012 160);
+  --gray-600: oklch(0.44 0.012 160);
+  --gray-700: oklch(0.35 0.012 160);
+  --gray-800: oklch(0.27 0.011 160);
+  --gray-900: oklch(0.21 0.009 160);
+  --gray-950: oklch(0.16 0.008 160);
 
-  /* --- Semantic accents --- */
-  --a1: #42cf8e;  /* brand / action / live / success */
-  --a2: #9bb1a6;  /* supporting information / neutral selection */
-  --a3: #d6a84f;  /* awards / milestones */
+  /* Named surfaces: every page maps cards and controls to these roles. */
+  --color-surface-page: var(--gray-950);
+  --color-surface-header: color-mix(in oklch, var(--gray-950) 72%, var(--green-950));
+  --color-surface-card-primary: var(--gray-900);
+  --color-surface-card-secondary: var(--gray-800);
+  --color-surface-card-tertiary: color-mix(in oklch, var(--gray-800) 78%, var(--gray-700));
+  --color-surface-overlay: color-mix(in oklch, var(--gray-800) 82%, var(--green-950));
+  --color-surface-field: color-mix(in oklch, var(--gray-900) 58%, var(--gray-800));
+  --color-surface-field-hover: var(--gray-800);
+  --color-surface-field-disabled: color-mix(in oklch, var(--gray-900) 82%, var(--gray-800));
+  --color-surface-hover: color-mix(in oklch, var(--gray-800) 84%, var(--green-900));
+  --color-surface-selected: color-mix(in oklch, var(--green-800) 42%, var(--gray-800));
+  --color-surface-table-header: color-mix(in oklch, var(--gray-800) 86%, var(--green-950));
+  --color-surface-navigation: var(--color-surface-header);
+  --color-surface-toolbar: color-mix(in oklch, var(--color-surface-card-primary) 94%, transparent);
+  --color-surface-menu: var(--color-surface-overlay);
+  --color-surface-modal: var(--color-surface-overlay);
+  --color-surface-tooltip: var(--gray-700);
+  --color-surface-table-row: var(--color-surface-card-primary);
+  --color-surface-table-row-alt: color-mix(in oklch, var(--color-surface-card-primary) 72%, var(--color-surface-card-secondary));
+  --color-surface-table-row-hover: var(--color-surface-hover);
+  --color-surface-badge-neutral: var(--gray-700);
+  --color-surface-badge-brand: color-mix(in oklch, var(--green-700) 48%, var(--gray-800));
+
+  /* Named borders and text. */
+  --color-border-subtle: color-mix(in oklch, var(--gray-200) 14%, transparent);
+  --color-border-default: color-mix(in oklch, var(--gray-200) 24%, transparent);
+  --color-border-strong: color-mix(in oklch, var(--gray-100) 38%, transparent);
+  --color-border-brand: color-mix(in oklch, var(--green-400) 58%, transparent);
+  --color-text-primary: var(--gray-50);
+  --color-text-secondary: var(--gray-200);
+  --color-text-muted: var(--gray-300);
+  --color-text-disabled: var(--gray-500);
+  --color-text-on-brand: var(--gray-950);
+  --color-text-link: var(--green-200);
+  --color-text-link-hover: var(--green-100);
+  --color-text-placeholder: var(--gray-400);
+
+  /* Named control roles. */
+  --color-button-primary: var(--green-400);
+  --color-button-primary-hover: var(--green-300);
+  --color-button-primary-text: var(--color-text-on-brand);
+  --color-button-secondary: var(--gray-800);
+  --color-button-secondary-hover: var(--gray-700);
+  --color-button-secondary-text: var(--color-text-primary);
+  --color-button-quiet-hover: color-mix(in oklch, var(--green-500) 11%, transparent);
+  --color-button-danger: color-mix(in oklch, var(--color-status-danger) 14%, var(--gray-800));
+  --color-button-danger-hover: color-mix(in oklch, var(--color-status-danger) 21%, var(--gray-800));
+  --color-field-focus: var(--green-400);
+  --color-focus-ring: color-mix(in oklch, var(--green-300) 52%, transparent);
+
+  /* Status colors are reserved for meaning, not general decoration. */
+  --color-status-success: var(--green-400);
+  --color-status-warning: oklch(0.78 0.14 75);
+  --color-status-danger: oklch(0.68 0.19 25);
+
+  /* Compatibility names point to the semantic system above. */
+  --bg-0: var(--color-surface-page);
+  --bg-1: var(--color-surface-card-primary);
+  --bg-2: var(--color-surface-card-secondary);
+  --surface-canvas: var(--color-surface-page);
+  --surface-base: var(--color-surface-card-primary);
+  --surface-raised: var(--color-surface-card-secondary);
+  --surface-overlay: var(--color-surface-overlay);
+  --surface-control: var(--color-surface-field);
+  --surface-table-header: var(--color-surface-table-header);
+  --surface-hover: var(--color-surface-hover);
+  --surface-selected: var(--color-surface-selected);
+  --line-0: var(--color-border-subtle);
+  --line-1: var(--color-border-default);
+  --text-0: var(--color-text-primary);
+  --text-1: var(--color-text-secondary);
+  --text-2: var(--color-text-muted);
+  --text-3: var(--color-text-disabled);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted: var(--color-text-muted);
+  --text-disabled: var(--color-text-disabled);
+  --text-positive: var(--color-status-success);
+  --text-warning: var(--color-status-warning);
+  --text-negative: var(--color-status-danger);
+
+  /* Shared accents: green is the only general product accent. */
+  --a1: var(--color-status-success);
+  --a2: var(--green-400);
+  --a3: oklch(0.78 0.13 85);
+  --accent-live: var(--color-status-success);
+  --accent-action: var(--green-400);
+  --accent-history: var(--green-300);
+  --accent-danger: var(--color-status-danger);
+  --brand-emerald: var(--green-400);
+  --brand-leather: var(--green-600);
+  --brand-gold: var(--a3);
+  --brand-broadcast: var(--gray-300);
+  --brand-info: var(--green-300);
+
+  --football-chalk: #f3f0e7;
+  --football-chalk-muted: #c8d0ca;
+  --football-leather: #c4672d;
+  --football-leather-light: #e49a5e;
+  --football-broadcast: var(--green-300);
+  --football-floodlight: #d9ebe2;
+  --football-field: var(--green-950);
+  --football-ink: var(--gray-950);
+  --team-primary: #33433a;
+  --team-secondary: #111a15;
+  --team-accent: #9fb3a7;
+  --team-foreground: #f7fbf8;
 
   /* --- Soft glows --- */
-  --glow-a1: rgba(66, 207, 142, 0.28);
-  --glow-a2: rgba(155, 177, 166, 0.24);
-  --glow-a3: rgba(214, 168, 79, 0.22);
+  --glow-a1: color-mix(in oklch, var(--green-400) 28%, transparent);
+  --glow-a2: color-mix(in oklch, var(--green-300) 24%, transparent);
+  --glow-a3: color-mix(in oklch, var(--a3) 22%, transparent);
 
-  /* --- Position colors (corrected) --- */
-  --pos-qb:   #DC2626; /* Red */
-  --pos-rb:   #16A34A; /* Green */
-  --pos-wr:   #2563EB; /* Blue */
-  --pos-te:   #EA580C; /* Orange */
-  --pos-flex: #0891B2; /* Mixed/Cyan */
-  --pos-k:    #9333EA; /* Purple */
-  --pos-dst:  #374151; /* Dark Gray */
-  --pos-bench:#6B7280; /* Gray */
+  /* Position identity stays inside the approved green and gray ramps. */
+  --pos-qb: var(--green-700);
+  --pos-rb: var(--green-500);
+  --pos-wr: var(--green-300);
+  --pos-te: var(--green-600);
+  --pos-flex: var(--green-200);
+  --pos-k: var(--gray-300);
+  --pos-dst: var(--gray-600);
+  --pos-bench: var(--gray-500);
 
-  /* IDP / misc - darker shades of base colors */
-  --pos-ir:     #374151; /* Dark slate */
-  --pos-dl:     #991B1B; /* Dark red */
-  --pos-lb:     #14532D; /* Dark green */
-  --pos-db:     #1E3A8A; /* Dark blue */
-  --pos-idpflex:#0891B2; /* Same as FLEX */
+  /* IDP and reserve roles reuse darker approved shades. */
+  --pos-ir: var(--gray-700);
+  --pos-dl: var(--green-800);
+  --pos-lb: var(--green-600);
+  --pos-db: var(--gray-400);
+  --pos-idpflex: var(--green-500);
 
-  /* Legacy glass names resolve to the brighter product surfaces. */
-  --glass-1: #0f1c17;
-  --glass-2: oklch(0.39 0.035 155);
-  --glass-3: #274239;
+  /* Legacy glass names resolve to named card layers. */
+  --glass-1: var(--color-surface-card-primary);
+  --glass-2: var(--color-surface-card-secondary);
+  --glass-3: var(--color-surface-card-tertiary);
 
   /* Specular highlights (top sheen) */
   --spec-1: rgba(255,255,255,0.18);
@@ -80,9 +202,67 @@
   --r-md: 8px;
   --r-lg: 12px;
   --r-xl: 16px;
+  --r-pill: 999px;
+
+  /* Spacing follows a compact 4px product rhythm. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /*
+   * Shared density and type roles.
+   * Page CSS consumes these roles instead of scaling empty space with the viewport.
+   */
+  --density: 1;
+  --type-display-hero: clamp(3.35rem, 4.4vw, 4.75rem);
+  --type-display-page: clamp(2.65rem, 3.8vw, 3.75rem);
+  --type-display-section: clamp(2.15rem, 3vw, 3.1rem);
+  --type-title-section: clamp(1.65rem, 2.2vw, 2.25rem);
+  --type-title-card: clamp(1.25rem, 1.6vw, 1.55rem);
+  --line-display: 1.1;
+  --space-page-hero: clamp(22px, 2.4vw, 34px);
+  --space-page-gap: clamp(32px, 4vw, 52px);
+  --space-section-gap: clamp(24px, 3vw, 36px);
+  --space-panel-padding: clamp(16px, 1.8vw, 22px);
+  --space-card-padding: clamp(14px, 1.5vw, 20px);
+
+  --content-wide: 1600px;
+  --content-reading: 760px;
+  --control-height: 44px;
+  --shadow-control: 0 8px 24px rgba(0, 0, 0, .18);
+  --shadow-panel: 0 1px 0 rgba(255,255,255,.035), 0 16px 42px rgba(0,0,0,.18);
+  --shadow-live: 0 0 0 1px color-mix(in srgb, var(--a1) 42%, transparent), 0 14px 34px rgba(0,0,0,.25);
+
+  --scrollbar-size: 10px;
+  --scrollbar-track: color-mix(in oklch, var(--color-surface-page) 90%, transparent);
+  --scrollbar-thumb: color-mix(in oklch, var(--green-400) 42%, var(--gray-700));
+  --scrollbar-thumb-hover: color-mix(in oklch, var(--green-300) 62%, var(--gray-600));
+
+  /* Legacy visual aliases remain here while older feature CSS is retired. */
+  --ffaa-accent: var(--accent-action);
+  --ffaa-surface: var(--color-surface-card-primary);
+  --ffaa-surface-raised: var(--color-surface-card-secondary);
+  --ffaa-surface-elevated: var(--color-surface-card-tertiary);
+  --ffaa-rule: var(--line-1);
+  --ffaa-accent-soft: color-mix(in srgb, var(--accent-action) 11%, transparent);
+  --ffaa-shadow-panel: var(--shadow-panel);
+  --ffaa-shadow-control: var(--shadow-control);
+  --ffaa-header-surface: var(--color-surface-header);
+  --ffaa-control-surface: var(--color-surface-field);
+  --ffaa-toolbar-surface: color-mix(in oklch, var(--color-surface-card-primary) 96%, transparent);
+  --ffaa-panel-background: linear-gradient(180deg, var(--color-surface-card-secondary), var(--color-surface-card-primary));
+  --ffaa-panel-background-strong: linear-gradient(180deg, var(--color-surface-card-tertiary), var(--color-surface-card-secondary));
+  --ffaa-card-background: linear-gradient(145deg, var(--color-surface-card-secondary), var(--color-surface-card-primary));
+  --ffaa-card-background-hover: linear-gradient(145deg, var(--color-surface-hover), var(--color-surface-card-secondary));
 
   /* Focus ring */
-  --focus: rgba(66, 207, 142, 0.42);
+  --focus: var(--color-focus-ring);
 
   /* --- Legacy variable aliases for compatibility --- */
   /* Surface aliases */
@@ -101,7 +281,7 @@
   --stroke2: var(--focus);
 
   /* Accent aliases */
-  --accent: var(--a1);
+  --accent: var(--a2);
   --accent2: var(--a3);
   --accent-1: var(--a1);
   --accent-2: var(--a2);
@@ -109,27 +289,25 @@
   /* Status aliases */
   --ok: var(--a1);
   --success: var(--a1);
-  --warn: #f59e0b;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --bad: #ef4444;
+  --warn: var(--color-status-warning);
+  --warning: var(--color-status-warning);
+  --danger: var(--color-status-danger);
+  --bad: var(--color-status-danger);
 
-  /* Neon aliases */
-  --neon-green: var(--a1);
-  --neon-cyan: var(--a2);
-  --neon-blue: var(--a3);
+  /* Compatibility accents use approved green roles only. */
+  --neon-green: var(--green-400);
+  --accent-bright: var(--green-300);
+  --accent-highlight: var(--green-500);
 }
 
-/* --- Force override for problematic positions --- */
+/* Position chips keep their semantic color without global class-name matching. */
 .pos-bench,
-.pos-ir,
-[class*="bench"],
-[class*="ir"] {
-  background-color: var(--pos-bench) !important;
-  border-color: var(--pos-bench) !important;
+.pos-ir {
+  background-color: var(--pos-bench);
+  border-color: var(--pos-bench);
 }
 
 .pos-bench *,
 .pos-ir * {
-  color: white !important;
+  color: white;
 }

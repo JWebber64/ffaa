@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-route
 import { ConfigProvider } from "./contexts/ConfigContext";
 import { RoleProvider } from "./contexts/RoleContext";
 import { APP_ROUTER_BASENAME } from "./lib/appBasePath";
+import { metadataForPath, useRouteMetadata } from "./lib/routeMetadata";
 
 import { AppStateScreen } from "./components/AppStateScreen";
 import { ToastProvider } from "./ui/ToastProvider";
@@ -16,20 +17,27 @@ const AnalyticsLab = lazy(() =>
 );
 const Tools = lazy(() => import("./screens/Tools"));
 const LeagueHQ = lazy(() => import("./screens/LeagueHQ"));
+const MyHQ = lazy(() => import("./screens/MyHQ"));
 const LeagueHistoryApp = lazy(() => import("./features/league-history/ui/LeagueHistoryApp"));
 const OfflineDraftV2 = lazy(() => import("./screens_v2/OfflineDraftV2"));
+const LandingV2 = lazy(() => import("./screens_v2/LandingV2"));
 const AuthenticatedApp = lazy(() => import("./routes/AuthenticatedApp"));
 
 function AppRoutes() {
   const location = useLocation();
+  useRouteMetadata(metadataForPath(location.pathname));
 
   if (
+    location.pathname === "/" ||
     location.pathname.startsWith("/stats") ||
     location.pathname.startsWith("/analytics") ||
     location.pathname.startsWith("/tools") ||
-    location.pathname.startsWith("/league")
+    location.pathname.startsWith("/league") ||
+    location.pathname.startsWith("/my-hq")
   ) {
-    const publicFallback = location.pathname.startsWith("/league")
+    const publicFallback = location.pathname === "/"
+      ? "/"
+      : location.pathname.startsWith("/league") || location.pathname.startsWith("/my-hq")
       ? "/league"
       : location.pathname.startsWith("/tools")
         ? "/tools"
@@ -40,10 +48,12 @@ function AppRoutes() {
     return (
       <Routes>
         <Route element={<AppShellV2 />}>
+          <Route index element={<LandingV2 />} />
           <Route path="/stats" element={<StatsExplorer />} />
           <Route path="/analytics" element={<AnalyticsLab />} />
           <Route path="/tools/*" element={<Tools />} />
           <Route path="/league" element={<LeagueHQ />} />
+          <Route path="/my-hq" element={<MyHQ />} />
           <Route path="/league/:leagueId/*" element={<LeagueHistoryApp />} />
         </Route>
         <Route

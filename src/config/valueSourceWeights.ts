@@ -3,6 +3,7 @@ export const VALUE_SOURCE_WEIGHTS = {
   espnSalaryCap: 0.85,
   ffTodayAuction: 0.85,
   sportsIllustratedAuction: 0.8,
+  usaTodayAuction: 0.9,
   rtSportsActualAav: 0.65,
   yafsbActualAav: 0.45,
   draftSharksPublicPreview: 0.65,

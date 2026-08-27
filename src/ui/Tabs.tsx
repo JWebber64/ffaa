@@ -22,7 +22,7 @@ export function Tabs({
             className={cn(
               "h-10 rounded-md border px-3 text-sm font-semibold transition",
               active
-                ? "border-[rgba(34,211,238,0.40)] bg-[rgba(34,211,238,0.12)] text-fg0"
+                ? "border-[var(--color-border-brand)] bg-[var(--color-surface-selected)] text-fg0"
                 : "border-stroke bg-[rgba(255,255,255,0.03)] text-fg1 hover:bg-[rgba(255,255,255,0.06)]"
             )}
           >

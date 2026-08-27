@@ -60,8 +60,8 @@ export default function LiveBidWidget({ teamId: teamIdProp }: { teamId: number |
   return (
     <Box
       border="1px dashed"
-      borderColor={isLeader ? 'blue.300' : 'gray.300'}
-      bg={isLeader ? 'blue.50' : 'white'}
+      borderColor={isLeader ? 'green.300' : 'gray.300'}
+      bg={isLeader ? 'green.50' : 'white'}
       borderRadius="md"
       p={2}
     >
@@ -79,8 +79,8 @@ export default function LiveBidWidget({ teamId: teamIdProp }: { teamId: number |
             size="xs"
             onClick={onPlusOne}
             isDisabled={!canOutbid || isLeader}
-            bg="blue.300"
-            _hover={{ bg: 'blue.400' }}
+            bg="green.300"
+            _hover={{ bg: 'green.400' }}
           >
             +$1
           </Button>

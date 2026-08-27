@@ -8,9 +8,9 @@
   gap: 12px 20px;
   align-items: center;
   padding: 16px;
-  border: 1px solid rgba(45, 212, 191, 0.18);
+  border: 1px solid var(--color-border-brand);
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(45, 212, 191, 0.075), rgba(3, 12, 9, 0.88));
+  background: linear-gradient(135deg, color-mix(in oklch, var(--green-500) 9%, var(--color-surface-card-secondary)), var(--color-surface-card-primary));
 }
 
 .stats-auction-import-copy {
@@ -19,13 +19,13 @@
 }
 
 .stats-auction-import-copy strong {
-  color: rgba(240, 253, 250, 0.94);
+  color: var(--color-text-primary);
   font-size: 0.9rem;
 }
 
 .stats-auction-import-copy span,
 .stats-auction-import-status {
-  color: rgba(203, 213, 225, 0.72);
+  color: var(--color-text-secondary);
   font-size: 0.75rem;
   line-height: 1.45;
 }
@@ -46,7 +46,7 @@
 .stats-auction-import-status {
   grid-column: 1 / -1;
   padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.065);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .stats-auction-import-status.is-error {
@@ -58,13 +58,13 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  color: rgba(94, 234, 212, 0.94);
+  color: var(--green-200);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .stats-auction-consensus {
-  color: rgba(110, 231, 183, 0.98);
+  color: var(--green-200);
   font-size: 0.86rem;
 }
 

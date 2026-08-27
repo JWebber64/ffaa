@@ -80,7 +80,7 @@ export default function LobbyHost() {
               size="lg"
             />
             <Button
-              colorScheme="blue"
+              colorScheme="green"
               size="lg"
               onClick={handleCreateRoom}
               isLoading={isCreating}
@@ -107,7 +107,7 @@ export default function LobbyHost() {
                 {participants.map((participant, index) => (
                   <HStack key={index} w="full" justify="space-between">
                     <Text>{participant.display_name}</Text>
-                    {participant.is_host && <Badge colorScheme="blue">Host</Badge>}
+                    {participant.is_host && <Badge colorScheme="green">Host</Badge>}
                   </HStack>
                 ))}
               </VStack>

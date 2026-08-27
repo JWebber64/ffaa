@@ -31,7 +31,7 @@ export const NominationQueue = ({
     switch (pos) {
       case 'QB': return 'red';
       case 'RB': return 'green';
-      case 'WR': return 'blue';
+      case 'WR': return 'green';
       case 'TE': return 'orange';
       case 'K': return 'purple';
       case 'DEF': return 'gray';
@@ -67,10 +67,10 @@ export const NominationQueue = ({
               <HStack 
                 key={`${nomination.playerId}-${index}`}
                 p={3} 
-                bg={isCurrent ? 'blue.900' : 'gray.800'}
+                bg={isCurrent ? 'green.900' : 'gray.800'}
                 borderRadius="md"
                 borderWidth={1}
-                borderColor={isCurrent ? 'blue.500' : 'gray.700'}
+                borderColor={isCurrent ? 'green.500' : 'gray.700'}
                 gap={3}
               >
                 <Box flex={1}>
@@ -91,7 +91,7 @@ export const NominationQueue = ({
                     )}
                   </HStack>
                   {isCurrent && (
-                    <Text fontSize="sm" color="blue.600" mt={1}>
+                    <Text fontSize="sm" color="green.600" mt={1}>
                       Currently on the block
                     </Text>
                   )}
@@ -101,7 +101,7 @@ export const NominationQueue = ({
                   {!isCurrent && (
                     <Button 
                       size="xs" 
-                      colorScheme="blue"
+                      colorScheme="green"
                       isDisabled={!!currentPlayerId}
                       onClick={() => onStartAuction(nomination.playerId)}
                     >

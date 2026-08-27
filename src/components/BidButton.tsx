@@ -27,8 +27,8 @@ export default function BidButton({ teamId }: BidButtonProps) {
           size="sm"
           leftIcon={<GiGavel />}
           onClick={onOpen}
-          bg="blue.300"
-          _hover={{ bg: 'blue.400' }}
+          bg="green.300"
+          _hover={{ bg: 'green.400' }}
           isDisabled={disabled}
         >
           Bid

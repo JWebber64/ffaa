@@ -57,11 +57,11 @@ export function SlotTile({
 }) {
   // Use fallback colors that match tokens.css values for universal color system
   const fallbackColors = {
-    qb: "rgba(59, 130, 246, 0.55)",
+    qb: "color-mix(in oklch, var(--green-500) 55%, transparent)",
     rb: "rgba(22, 163, 74, 0.55)", 
     wr: "rgba(16, 185, 129, 0.55)",
     te: "rgba(217, 119, 6, 0.55)",
-    flex: "rgba(8, 145, 178, 0.55)",
+    flex: "color-mix(in oklch, var(--green-500) 55%, transparent)",
     k: "rgba(190, 18, 60, 0.55)",
     dst: "rgba(194, 65, 12, 0.55)"
   };

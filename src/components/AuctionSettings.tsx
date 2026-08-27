@@ -224,7 +224,7 @@ const AuctionSettings: React.FC<AuctionSettingsProps> = ({ isOpen, onClose }) =>
           <Button variant="outline" onClick={onClose} mr={3}>
             Cancel
           </Button>
-          <Button colorScheme="blue" onClick={handleSave}>
+          <Button colorScheme="green" onClick={handleSave}>
             Save Settings
           </Button>
         </ModalFooter>

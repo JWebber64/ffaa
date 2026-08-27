@@ -1,196 +1,119 @@
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  Bot,
-  ClipboardCheck,
-  RadioTower,
-  Users,
-  WalletCards,
-} from "lucide-react";
+import { ArrowRight, BarChart3, CheckCircle2, Clock3, Gavel, History, Radio, Search, Sparkles, Trophy, Users } from "lucide-react";
 import { appUrl } from "../lib/appBasePath";
-import { Button } from "../ui/Button";
+import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
+import "./landing-v2.css";
 
-const CAPABILITIES = [
+const pillars = [
   {
-    title: "Host control",
-    text: "Keep nominations, clock state, corrections, and manager readiness in one place.",
-    icon: RadioTower,
+    id: "draft",
+    eyebrow: "Draft Night",
+    title: "Keep the room moving.",
+    text: "Auction and snake rooms put the board, clock, budgets, legal rosters, and manager readiness on one shared field.",
+    image: "images/draft-room-editorial.png",
+    imageAlt: "A prepared fantasy football draft table overlooking a stadium at night.",
+    links: [{ to: "/host/setup", label: "Start a draft" }, { to: "/offline-draft", label: "Run it offline" }],
+    icon: Gavel,
   },
   {
-    title: "Roster pressure",
-    text: "See remaining budget, open slots, and maximum bids before a decision becomes a mistake.",
-    icon: WalletCards,
+    id: "week",
+    eyebrow: "Weekly Edge",
+    title: "See the next decision.",
+    text: "Connect Sleeper once. This Week turns your real lineup, byes, injuries, opponent, standings, and league movement into a focused queue.",
+    image: "images/research-film-room.png",
+    imageAlt: "A football research room with game film, player notes, and stadium light beyond the windows.",
+    links: [{ to: "/my-hq", label: "Open This Week" }, { to: "/stats", label: "Research players" }],
+    icon: Sparkles,
   },
   {
-    title: "Manager clarity",
-    text: "Give every manager a focused view of the live board, their roster, and the next action.",
-    icon: Users,
+    id: "history",
+    eyebrow: "League Memory",
+    title: "Make every season count.",
+    text: "Import completed Sleeper seasons into one normalized archive for managers, rivalries, records, drafts, transactions, and weekly stories.",
+    image: "images/league-history-trophy-room.png",
+    imageAlt: "A fantasy football trophy room with framed league history and warm stadium light.",
+    links: [{ to: "/league", label: "Connect a league" }, { to: "/league/1385319428408774656", label: "Explore public history" }],
+    icon: History,
   },
-  {
-    title: "Solo practice",
-    text: "Fill empty seats with CPU managers and rehearse the same auction or snake workflow.",
-    icon: Bot,
-  },
-] as const;
-
-const WORKFLOW = [
-  {
-    title: "Configure",
-    text: "Choose draft type, scoring, roster slots, budgets, timers, and computer-managed seats.",
-  },
-  {
-    title: "Gather",
-    text: "Share one room code, assign teams, and confirm who is ready before the board opens.",
-  },
-  {
-    title: "Draft",
-    text: "Run nominations or picks, keep every roster legal, and carry the final results forward.",
-  },
-] as const;
-
-const COMPARISON_ROWS = [
-  { label: "Live auction controls", gamehq: "Built in", sheet: "Manual", generic: "Limited" },
-  { label: "CPU practice room", gamehq: "Included", sheet: "No", generic: "Rare" },
-  { label: "Roster and budget context", gamehq: "Live", sheet: "Manual formulas", generic: "Basic" },
-  { label: "Separate host and manager views", gamehq: "Included", sheet: "Same sheet", generic: "Mixed" },
 ] as const;
 
 export default function LandingV2() {
+  const { connections, activeLeagueId } = useSleeperLeagueConnections();
+  const activeConnection = connections.find((connection) => connection.leagueId === activeLeagueId);
+
   return (
-    <div className="home-page">
-      <section className="home-hero" aria-labelledby="home-title">
-        <div className="home-hero-copy">
-          <div className="home-overline">
-            <ClipboardCheck size={16} aria-hidden="true" />
-            Fantasy football command center
-          </div>
-          <h1 id="home-title" className="ff-display">
-            Put draft night under the lights.
+    <div className="platform-home">
+      <section className="platform-hero" aria-labelledby="platform-home-title">
+        <div className="platform-hero-copy">
+          <span className="platform-kicker"><Radio aria-hidden="true" /> The complete fantasy season</span>
+          <h1 id="platform-home-title" className="ff-display">
+            <span>Run the draft.</span>
+            <span>Read the league.</span>
+            <span>Win the week.</span>
           </h1>
-          <p>
-            Run auction or snake drafts with a live player board, clear roster pressure,
-            and every manager working from the same field.
-          </p>
-          <div className="home-actions">
-            <Link to="/host/setup">
-              <Button size="lg">
-                Host a draft
-                <ArrowRight size={18} aria-hidden="true" />
-              </Button>
-            </Link>
-            <Link to="/join">
-              <Button size="lg" variant="secondary">Join a room</Button>
-            </Link>
-            <Link className="home-text-link" to="/offline-draft">Draft offline</Link>
+          <p>Auction-first draft rooms, explainable fantasy tools, and a living history for serious leagues.</p>
+          <div className="platform-hero-actions">
+            <Link className="platform-primary-link" to="/host/setup">Start a Draft<ArrowRight aria-hidden="true" /></Link>
+            <Link className="platform-secondary-link" to="/league">Connect a Sleeper League</Link>
+            <Link className="platform-secondary-link" to="/league/1385319428408774656">Explore Demo League</Link>
           </div>
-          <div className="home-proof-strip" aria-label="Product coverage">
-            <span><strong>300</strong> ranked players</span>
-            <span><strong>2</strong> draft formats</span>
-            <span><strong>1</strong> live command board</span>
+          {activeConnection ? <Link className="platform-return-link" to="/my-hq">Continue with {activeConnection.leagueName} <ArrowRight aria-hidden="true" /></Link> : null}
+          <div className="platform-journey" aria-label="Fantasy season journey">
+            <span><b>01</b> Draft</span><i aria-hidden="true" /><span><b>02</b> Compete</span><i aria-hidden="true" /><span><b>03</b> Remember</span>
           </div>
         </div>
 
-        <div className="home-hero-media">
-          <figure className="home-hero-photo">
-            <img
-              src={appUrl("images/football-night-hero.png")}
-              alt="A football on the field beneath bright stadium lights at night."
-            />
-          </figure>
-
-          <aside className="home-brief" aria-labelledby="home-brief-title">
-            <div className="home-brief-status">
-              <span aria-hidden="true" />
-              Draft room operating model
+        <div className="platform-product-preview" aria-label="Product preview">
+          <img src={appUrl("images/football-night-hero.png")} alt="A football beneath bright stadium lights at night." />
+          <div className="platform-preview-frame">
+            <header><span><Radio aria-hidden="true" /> Product preview</span><strong>GameHQ season command</strong></header>
+            <div className="platform-preview-main">
+              <section>
+                <span>Draft room</span><h2>Board, budget, clock.</h2>
+                <div className="platform-preview-board" aria-hidden="true">
+                  <b>QB</b><b>RB</b><b>WR</b><b>TE</b><b>FLEX</b>
+                  <i /><i /><i /><i /><i /><i /><i /><i /><i /><i />
+                </div>
+              </section>
+              <aside>
+                <div><Clock3 aria-hidden="true" /><span>Live controls</span><strong>One shared state</strong></div>
+                <div><Users aria-hidden="true" /><span>Manager context</span><strong>Roster pressure</strong></div>
+                <div><Trophy aria-hidden="true" /><span>League memory</span><strong>Every season</strong></div>
+              </aside>
             </div>
-            <h2 id="home-brief-title">Every decision, on one field</h2>
-            <dl>
-              <div><dt>Draft modes</dt><dd>Auction and snake</dd></div>
-              <div><dt>Room roles</dt><dd>Host and manager</dd></div>
-              <div><dt>Practice</dt><dd>CPU-managed seats</dd></div>
-              <div><dt>Fallback</dt><dd>Complete offline draft</dd></div>
-            </dl>
-          </aside>
-        </div>
-      </section>
-
-      <section className="home-section" aria-labelledby="capabilities-title">
-        <header className="home-section-header">
-          <h2 id="capabilities-title" className="ff-display">The room stays readable.</h2>
-          <p>Each role gets the information it needs without turning the draft into a wall of controls.</p>
-        </header>
-        <div className="home-capability-list">
-          {CAPABILITIES.map((capability) => {
-            const Icon = capability.icon;
-            return (
-              <article key={capability.title}>
-                <Icon size={20} aria-hidden="true" />
-                <h3>{capability.title}</h3>
-                <p>{capability.text}</p>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="home-section home-workflow" aria-labelledby="workflow-title">
-        <header className="home-section-header">
-          <h2 id="workflow-title" className="ff-display">Set it up once. Keep moving.</h2>
-        </header>
-        <ol>
-          {WORKFLOW.map((item, index) => (
-            <li key={item.title}>
-              <span className="home-workflow-index" aria-hidden="true">0{index + 1}</span>
-              <div>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <figure className="home-playbook-photo">
-        <img
-          src={appUrl("images/draft-room-editorial.png")}
-          alt="A prepared fantasy football draft table overlooking a stadium at night."
-        />
-        <figcaption>
-          <span>Draft preparation</span>
-          <strong>Build the board before the room opens.</strong>
-        </figcaption>
-      </figure>
-
-      <section className="home-section" aria-labelledby="comparison-title">
-        <header className="home-section-header">
-          <h2 id="comparison-title" className="ff-display">Built for the room, not the spreadsheet.</h2>
-        </header>
-        <div className="home-comparison" role="table" aria-label="Fantasy Football presented by GameHQ feature comparison">
-          <div className="home-comparison-row home-comparison-head" role="row">
-            <span role="columnheader">Capability</span>
-            <span role="columnheader">Fantasy Football presented by GameHQ</span>
-            <span role="columnheader">Spreadsheet</span>
-            <span role="columnheader">Typical draft app</span>
           </div>
-          {COMPARISON_ROWS.map((row) => (
-            <div className="home-comparison-row" role="row" key={row.label}>
-              <strong role="cell">{row.label}</strong>
-              <span className="is-gamehq" role="cell">{row.gamehq}</span>
-              <span role="cell">{row.sheet}</span>
-              <span role="cell">{row.generic}</span>
-            </div>
-          ))}
         </div>
       </section>
 
-      <nav className="home-research-links" aria-label="Fantasy research tools">
+      <section className="platform-promise" aria-label="Product promise">
+        <div><CheckCircle2 aria-hidden="true" /><strong>One league context</strong><span>Your active league follows you across weekly tools and history.</span></div>
+        <div><Search aria-hidden="true" /><strong>Evidence before advice</strong><span>Recommendations identify their source and say when data is unavailable.</span></div>
+        <div><BarChart3 aria-hidden="true" /><strong>Built for decisions</strong><span>Dense data becomes the next useful action, not another dashboard wall.</span></div>
+      </section>
+
+      <section className="platform-pillars" aria-labelledby="platform-pillars-title">
+        <header><span>One product, all season</span><h2 id="platform-pillars-title" className="ff-display">A clear job for every visit.</h2></header>
         <div>
-          <strong>Research before the room opens</strong>
-          <span>Use the same public data behind GameHQ rankings and draft tools.</span>
+          {pillars.map(({ id, eyebrow, title, text, image, imageAlt, links, icon: Icon }) => (
+            <article key={id} className={`platform-pillar is-${id}`}>
+              <figure><img src={appUrl(image)} alt={imageAlt} /></figure>
+              <div className="platform-pillar-copy">
+                <span><Icon aria-hidden="true" /> {eyebrow}</span>
+                <h3 className="ff-display">{title}</h3>
+                <p>{text}</p>
+                <nav aria-label={`${eyebrow} links`}>
+                  {links.map((link, index) => <Link key={link.to} className={index === 0 ? "is-primary" : ""} to={link.to}>{link.label}<ArrowRight aria-hidden="true" /></Link>)}
+                </nav>
+              </div>
+            </article>
+          ))}
         </div>
-        <Link to="/stats">Stats Hub <ArrowRight size={16} aria-hidden="true" /></Link>
-        <Link to="/tools">Decision tools <ArrowRight size={16} aria-hidden="true" /></Link>
-      </nav>
+      </section>
+
+      <section className="platform-research-callout">
+        <div><span>Research layer</span><h2 className="ff-display">Answers when the board gets tight.</h2><p>Search the player pool, compare realistic season baselines, build an auction plan, and test roster construction with the same connected league settings.</p></div>
+        <nav aria-label="Research links"><Link to="/stats">Player research <ArrowRight aria-hidden="true" /></Link><Link to="/analytics">Analytics <ArrowRight aria-hidden="true" /></Link><Link to="/tools">All decision tools <ArrowRight aria-hidden="true" /></Link></nav>
+      </section>
     </div>
   );
 }

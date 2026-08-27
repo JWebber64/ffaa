@@ -130,12 +130,6 @@ export function AuctionTeamBuilder() {
     }),
     [picks, players],
   );
-  const starterPlayers = useMemo(
-    () => SLOT_ORDER
-      .filter((slot) => slot !== "BENCH")
-      .flatMap((slot) => cardGroups[slot].map((pick) => pick.player)),
-    [cardGroups],
-  );
 
   function selectPlayer(player: ToolPlayer) {
     setSelectedId(player.id);
@@ -236,7 +230,7 @@ export function AuctionTeamBuilder() {
         <section className="auction-team-card" aria-labelledby="auction-team-title">
           <div className="auction-card-header"><div><span>Draft ticket</span><h2 id="auction-team-title">Your team</h2></div><div className="auction-card-total"><strong>{money(spent)}</strong><small>of {money(budget)}</small></div></div>
           <div className="auction-progress"><span style={{ width: `${Math.min(100, (spent / Math.max(1, budget)) * 100)}%` }} /></div>
-          <TeamPointsSummary players={draftedPlayers} starters={starterPlayers} scoring={scoring} />
+          <TeamPointsSummary players={draftedPlayers} scoring={scoring} />
           <div className="auction-card-slots">{SLOT_ORDER.map((slot) => { const slotPicks = cardGroups[slot]; return <div className="auction-card-group" key={slot}><div className="auction-group-label"><span>{SLOT_LABELS[slot]}</span><small>{slot === "FLEX" ? "RB / WR / TE" : `${slotPicks.length}/${slots[slot]}`}</small></div>{slotPicks.map(({ player, bid: playerBid }) => <div className="auction-drafted-player" key={player.id}><span className="tool-player-badges"><TeamMark team={player.team} size="xs" /><span className={`tool-position-tag is-${player.position.toLowerCase()}`}>{player.position}</span></span><div><strong>{player.name}</strong><small>{formatTeamBye(player.team || "FA", player.byeWeek)} · {player.projectedPoints?.toFixed(1) ?? "—"} pts</small></div><b>{money(playerBid)}</b><button type="button" aria-label={`Remove ${player.name}`} onClick={() => setPicks((current) => current.filter((pick) => pick.playerId !== player.id))}><Trash2 size={14} /></button></div>)}{!slotPicks.length && slot !== "BENCH" ? <div className="auction-open-slot">Open slot</div> : null}</div>; })}</div>
         </section>
 

@@ -51,7 +51,7 @@ export default function Home() {
       <Heading mb={4}>Fantasy Football Auction App</Heading>
       <Text opacity={0.85} mb={8} maxW="2xl" mx="auto">
         Set up your league, nominate players, run the live auction with voice input,
-        and export results—dark blues & grays theme.
+        and export results—green and charcoal-gray theme.
       </Text>
 
       <Stack spacing={3} maxW="sm" mx="auto">
@@ -105,7 +105,7 @@ export default function Home() {
           <ModalBody>
             <VStack spacing={4}>
               <Button 
-                bg="blue.600" 
+                bg="green.600"
                 color="white" 
                 width="100%" 
                 size="lg"

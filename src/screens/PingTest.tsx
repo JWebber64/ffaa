@@ -68,7 +68,7 @@ export default function PingTest() {
           </Text>
           
           <Button
-            colorScheme="blue"
+            colorScheme="green"
             size="lg"
             onClick={handlePingHost}
             isLoading={isSending}

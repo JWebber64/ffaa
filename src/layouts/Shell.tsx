@@ -24,7 +24,7 @@ export default function Shell({ globalLoading = false }: ShellProps) {
       <TopNav onMenu={() => setDrawerOpen(true)} />
 
       {globalLoading && (
-        <Progress size="xs" isIndeterminate colorScheme="blue" />
+        <Progress size="xs" isIndeterminate colorScheme="green" />
       )}
 
       <Box display="grid" gridTemplateColumns={{ base: "1fr", lg: "260px 1fr" }}>

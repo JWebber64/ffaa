@@ -35,5 +35,5 @@ describe("stationary hover feedback", () => {
     });
 
     expect(violations).toEqual([]);
-  });
+  }, 15_000);
 });

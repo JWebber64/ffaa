@@ -36,7 +36,7 @@ afterEach(cleanup);
 describe("numeric input consistency", () => {
   it("documents the one shared numeric-stepper rule", () => {
     const design = readFileSync(resolve(projectRoot, "DESIGN.md"), "utf8");
-    expect(design).toContain("compact teal up/down chevron control");
+    expect(design).toContain("compact green-accented up/down chevron control");
     expect(design).toContain("Do not expose browser-native number arrows");
   });
 
@@ -45,14 +45,14 @@ describe("numeric input consistency", () => {
     const refinement = readFileSync(resolve(projectRoot, "src/styles/refinement.css"), "utf8");
     const tools = readFileSync(resolve(projectRoot, "src/screens/tools/tools.css"), "utf8");
 
-    expect(globals).toMatch(/\.ffaa-number-field > input\[type="number"\]\s*\{[^}]*background:\s*var\(--ffaa-field-surface\)\s*!important/s);
-    expect(globals).toMatch(/\.ffaa-number-stepper\s*\{[^}]*width:\s*28px[^}]*height:\s*28px[^}]*background:\s*var\(--ffaa-field-surface\)/s);
-    expect(globals).toMatch(/\.draft-bid-stepper\s*\{[^}]*width:\s*28px[^}]*height:\s*28px[^}]*background:\s*var\(--ffaa-field-surface\)/s);
-    expect(globals).toMatch(/\.ffaa-custom-select-icon\s*\{[^}]*width:\s*28px[^}]*height:\s*28px[^}]*background:\s*var\(--ffaa-field-surface\)/s);
+    expect(globals).toMatch(/\.ffaa-number-field > input\[type="number"\]\s*\{[^}]*background:\s*var\(--color-surface-field\)\s*!important/s);
+    expect(globals).toMatch(/\.ffaa-number-stepper\s*\{[^}]*width:\s*28px[^}]*height:\s*28px[^}]*background:\s*var\(--color-surface-field\)/s);
+    expect(globals).toMatch(/\.draft-bid-stepper\s*\{[^}]*width:\s*28px[^}]*height:\s*28px[^}]*background:\s*var\(--color-surface-field\)/s);
+    expect(globals).toMatch(/\.ffaa-custom-select-icon\s*\{[^}]*width:\s*28px[^}]*height:\s*28px[^}]*background:\s*var\(--color-surface-field\)/s);
     expect(globals).toMatch(/\.setup-budget-field > \.ffaa-number-stepper\s*\{[^}]*right:\s*5px[^}]*width:\s*24px[^}]*height:\s*24px/s);
     expect(readFileSync(resolve(projectRoot, "src/screens_v2/HostSetupV2.tsx"), "utf8")).toContain('shellClassName="setup-budget-field"');
-    expect(refinement).toMatch(/\.auction-budget-input,[\s\S]*?\.auction-selected-ticket label > span\s*\{[^}]*background:\s*var\(--ffaa-field-surface\)\s*!important/s);
-    expect(tools).toMatch(/\.team-slot-stepper input\s*\{[^}]*background:\s*transparent\s*!important/s);
+    expect(refinement).toMatch(/\.auction-budget-input\s*\{[^}]*background:\s*var\(--color-surface-field\)/s);
+    expect(tools).toMatch(/\.team-slot-stepper input\s*\{[^}]*background:\s*transparent/s);
   });
 
   it("increments and decrements a controlled value through accessible hit regions", () => {

@@ -26,7 +26,7 @@ export default function AdminLogin() {
       <Text fontSize="sm" color="gray.600">Admin Mode (local)</Text>
       <Button 
         size="sm" 
-        colorScheme="blue" 
+        colorScheme="green"
         onClick={enableAdminMode}
       >
         Enable Admin Mode

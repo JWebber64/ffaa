@@ -58,7 +58,6 @@ import {
   type SleeperLeagueChoice,
 } from "../features/league-hq/sleeperLeague";
 import { leagueHistoryPath, leagueRivalryPath } from "../features/league-history/ui/leagueRoutes";
-import { startLeagueHistoryImport } from "../features/league-history/automaticImport";
 import { FANTASY_SEASON } from "../config/fantasySeason";
 import "./league-hq.css";
 
@@ -83,6 +82,8 @@ type SleeperLookupState = {
   status: "idle" | "loading" | "success" | "error";
   message: string;
   choices: SleeperLeagueChoice[];
+  providerUserId?: string;
+  displayName?: string;
 };
 
 const SLEEPER_SEASONS = Array.from({ length: 6 }, (_, index) => FANTASY_SEASON - index);
@@ -302,16 +303,17 @@ export default function LeagueHQ() {
       sourceUrl: choice.sourceUrl,
       lastUsedAt: new Date(now - index).toISOString(),
       ...(choice.avatarUrl ? { avatarUrl: choice.avatarUrl } : {}),
+      ...(lookupState.providerUserId ? { managerProviderUserId: lookupState.providerUserId } : {}),
+      ...(lookupState.displayName ? { managerDisplayName: lookupState.displayName } : {}),
       auctionSettings: choice.auctionSettings,
     }));
     rememberConnections(additions);
-    for (const addition of additions) void startLeagueHistoryImport(addition.leagueId);
     chooseLeague(additions[0]!.leagueId);
     setSelectedLeagueIds([]);
     setLookupState((current) => ({
       ...current,
       status: "success",
-      message: `${additions.length} ${additions.length === 1 ? "league" : "leagues"} added. ${additions[0]!.leagueName} is now active, and League History is importing automatically.`,
+      message: `${additions.length} ${additions.length === 1 ? "league" : "leagues"} added. ${additions[0]!.leagueName} is now active.`,
     }));
   };
 
@@ -339,6 +341,8 @@ export default function LeagueHQ() {
       setSelectedLeagueIds(unsavedLeagueIds);
       setLookupState({
         status: "success",
+        ...(result.providerUserId ? { providerUserId: result.providerUserId } : {}),
+        displayName: result.displayName,
         message: unsavedLeagueIds.length
           ? `${unsavedLeagueIds.length} new ${unsavedLeagueIds.length === 1 ? "league is" : "leagues are"} selected. Review the list, then add ${unsavedLeagueIds.length === 1 ? "it" : "them"}.`
           : availableConnectionSlots
@@ -668,10 +672,7 @@ export default function LeagueHQ() {
                     loading="lazy"
                     decoding="async"
                   />
-                  <figcaption>
-                    <span>League archive</span>
-                    <strong>Every season belongs in the record.</strong>
-                  </figcaption>
+                  <figcaption><span>League archive</span><strong>Every season belongs in the record.</strong></figcaption>
                 </figure>
               </div>
             </div>

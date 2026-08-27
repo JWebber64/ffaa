@@ -133,6 +133,7 @@ export interface SleeperLeagueChoice {
 export interface SleeperLeagueLookupResult {
   lookupType: "league" | "user";
   displayName: string;
+  providerUserId?: string;
   leagues: SleeperLeagueChoice[];
 }
 
@@ -252,6 +253,7 @@ export async function findSleeperLeagues(
   return {
     lookupType: "user",
     displayName: user.display_name || user.username || normalized.value,
+    providerUserId: user.user_id,
     leagues: leagues
       .map(leagueChoice)
       .sort((left, right) => left.name.localeCompare(right.name)),
@@ -594,7 +596,7 @@ function buildStorylines(
       title: runnerUp?.teamName || "Last year's runner-up",
       detail: `${runnerUp?.managerName || "The runner-up"} returns after reaching the ${latestSeason.year} final.`,
       managerIds: [latestSeason.runnerUpManagerId],
-      tone: "blue",
+      tone: "green",
     });
   }
   if (decorated && decorated.titles > 0) {
@@ -614,7 +616,7 @@ function buildStorylines(
       title: draftStatus.replace(/_/g, " "),
       detail: "Sleeper remains the source of truth for the live draft status.",
       managerIds: [],
-      tone: "blue",
+      tone: "green",
     });
   }
   return stories.slice(0, 4);

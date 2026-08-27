@@ -12,7 +12,7 @@ export function Badge({
   const tones: Record<string, string> = {
     neutral: "bg-[rgba(255,255,255,0.07)] border-stroke text-fg1",
     accent: "bg-[rgba(16,185,129,0.16)] border-[rgba(16,185,129,0.45)] text-fg0",
-    host: "bg-[rgba(96,165,250,0.16)] border-[rgba(96,165,250,0.45)] text-fg0",
+    host: "bg-[var(--color-surface-badge-brand)] border-[var(--color-border-brand)] text-fg0",
     success: "bg-[rgba(52,211,153,0.18)] border-[rgba(52,211,153,0.45)] text-fg0",
     warning: "bg-[rgba(251,191,36,0.16)] border-[rgba(251,191,36,0.45)] text-fg0",
     danger: "bg-[rgba(251,113,133,0.16)] border-[rgba(251,113,133,0.45)] text-fg0",

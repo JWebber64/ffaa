@@ -30,6 +30,8 @@ export interface SleeperLeagueConnectionSummary {
   sourceUrl: string;
   lastUsedAt: string;
   avatarUrl?: string;
+  managerProviderUserId?: string;
+  managerDisplayName?: string;
   auctionSettings?: SleeperLeagueAuctionSettings;
 }
 
@@ -95,6 +97,12 @@ export function parseSleeperLeagueConnections(raw: string | null) {
         sourceUrl: String(entry.sourceUrl ?? `https://sleeper.com/leagues/${leagueId}`),
         lastUsedAt: String(entry.lastUsedAt ?? ""),
         ...(String(entry.avatarUrl ?? "").trim() ? { avatarUrl: String(entry.avatarUrl).trim() } : {}),
+        ...(String(entry.managerProviderUserId ?? "").trim()
+          ? { managerProviderUserId: String(entry.managerProviderUserId).trim() }
+          : {}),
+        ...(String(entry.managerDisplayName ?? "").trim()
+          ? { managerDisplayName: String(entry.managerDisplayName).trim() }
+          : {}),
         ...(auctionSettings ? { auctionSettings } : {}),
       }];
     });

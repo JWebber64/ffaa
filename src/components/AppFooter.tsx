@@ -42,7 +42,7 @@ export default function AppFooter() {
             spacing={1} 
             cursor="pointer" 
             onClick={() => setShowFullVersion(!showFullVersion)}
-            _hover={{ color: 'blue.600' }}
+            _hover={{ color: 'green.600' }}
             transition="color 0.2s"
           >
             <Icon as={Info} boxSize={3} color="gray.500" />

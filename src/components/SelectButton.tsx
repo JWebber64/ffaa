@@ -20,7 +20,7 @@ export default function SelectButton({ teamId }: SelectButtonProps) {
         onClick={onOpen}
         isDisabled={!isAdmin}
         title={isAdmin ? 'Assign a player to this team' : 'Admin only'}
-        colorScheme="blue"
+        colorScheme="green"
       >
         Select
       </Button>

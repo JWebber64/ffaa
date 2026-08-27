@@ -36,10 +36,10 @@ export default function StatusPill({
         };
       case "accent":
         return {
-          bg: "bg-[rgba(59,130,246,0.1)]",
-          border: "border-[rgba(59,130,246,0.3)]",
-          dotColor: "bg-[var(--neon-blue)]",
-          dotShadow: "shadow-[0_0_6px_var(--neon-blue)]"
+          bg: "bg-[var(--color-button-quiet-hover)]",
+          border: "border-[var(--color-border-brand)]",
+          dotColor: "bg-[var(--accent-highlight)]",
+          dotShadow: "shadow-[0_0_6px_var(--accent-highlight)]"
         };
       default:
         return {

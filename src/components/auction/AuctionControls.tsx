@@ -102,7 +102,7 @@ export const AuctionControls = ({
     return (
       <Box textAlign="center" py={8}>
         <Text mb={4} color="gray.400">No player currently up for auction</Text>
-        <Button colorScheme="blue" onClick={onStartAuction}>
+        <Button colorScheme="green" onClick={onStartAuction}>
           Start Next Auction
         </Button>
       </Box>
@@ -119,7 +119,7 @@ export const AuctionControls = ({
               <Text fontSize="xl" fontWeight="bold" color="white">{currentPlayer.name}</Text>
             </HStack>
             <HStack gap={2} alignItems="center">
-              <Badge colorScheme={currentPlayer.pos === 'QB' ? 'blue' : currentPlayer.pos === 'RB' ? 'green' : 'purple'}>
+              <Badge colorScheme={currentPlayer.pos === 'QB' ? 'green' : currentPlayer.pos === 'RB' ? 'green' : 'purple'}>
                 {currentPlayer.pos}
               </Badge>
               <Text fontSize="sm" color="gray.300">{currentPlayer.nflTeam || 'FA'}</Text>
@@ -169,7 +169,7 @@ export const AuctionControls = ({
           />
         </InputGroup>
         <Button 
-          colorScheme="blue" 
+          colorScheme="green"
           onClick={() => {
             if (currentBidder !== null && customBid) {
               handleBid(currentBidder, customBid);
@@ -185,7 +185,7 @@ export const AuctionControls = ({
       <HStack gap={4} w="100%" justify="center" mt={4}>
         <Button
           onClick={toggleListening}
-          colorScheme={isListening ? 'red' : 'blue'}
+          colorScheme={isListening ? 'red' : 'green'}
           variant={isListening ? 'solid' : 'outline'}
           aria-label={isListening ? 'Stop voice control' : 'Start voice control'}
         >
@@ -224,7 +224,7 @@ export const AuctionControls = ({
               onClick={() => handleBid(team.id, price + 1)}
               isDisabled={!canBid || isOutbid}
               variant={currentBidder === team.id ? 'solid' : 'outline'}
-              colorScheme={currentBidder === team.id ? 'blue' : 'gray'}
+              colorScheme={currentBidder === team.id ? 'green' : 'gray'}
               size="sm"
               title={!canBid ? `No available ${formatPositionForDisplay(currentPlayer.pos as any)} or FLEX spot` : `Bid $${price + 1} or more`}
             >

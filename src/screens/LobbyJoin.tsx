@@ -91,7 +91,7 @@ export default function LobbyJoin() {
               size="lg"
             />
             <Button
-              colorScheme="blue"
+              colorScheme="green"
               size="lg"
               onClick={handleJoinRoom}
               isLoading={isJoining}

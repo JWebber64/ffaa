@@ -96,7 +96,7 @@ export default function PositionPickerModal({
             Cancel
           </Button>
           <Button 
-            colorScheme="blue" 
+            colorScheme="green"
             onClick={handleConfirm} 
             isDisabled={!selectedSlotId}
             px={6}

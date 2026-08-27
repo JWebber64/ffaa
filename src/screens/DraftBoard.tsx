@@ -66,7 +66,7 @@ const BidButton = ({ team, player }: { team: Team; player: Player | null | undef
   return (
     <Button 
       size="xs" 
-      colorScheme="blue" 
+      colorScheme="green"
       mt={1} 
       w="100%"
       onClick={handleBid}
@@ -94,11 +94,11 @@ const SlotBox = ({ label, player }: SlotBoxProps) => {
     switch (pos) {
       case 'QB': return 'red';
       case 'RB': return 'green';
-      case 'WR': return 'blue';
+      case 'WR': return 'green';
       case 'TE': return 'orange';
       case 'K': return 'purple';
       case 'DEF': return 'gray';
-      case 'FLEX': return 'cyan';
+      case 'FLEX': return 'green';
       case 'BENCH': return 'gray';
       case 'IR': return 'gray';
       default: return 'gray';
@@ -513,9 +513,9 @@ export default function DraftBoard() {
               onClick={onSettingsOpen}
               variant="outline"
               size="sm"
-              colorScheme="blue"
-              _hover={{ bg: 'blue.600' }}
-              _active={{ bg: 'blue.700' }}
+              colorScheme="green"
+              _hover={{ bg: 'green.600' }}
+              _active={{ bg: 'green.700' }}
             >
               Settings
             </Button>

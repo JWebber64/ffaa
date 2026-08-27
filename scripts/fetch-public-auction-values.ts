@@ -36,6 +36,9 @@ type PlayerIdentity = {
 const OUTPUT_PATH = path.resolve("src/data/players-2026-public-auction-values.json");
 const REPORT_PATH = path.resolve("reports/public-auction-value-sources.json");
 const USER_AGENT = "FFAA public auction value importer (+https://gamehqhub.com/ff/)";
+const USA_TODAY_SYNDICATED_URL =
+  "https://sports.yahoo.com/articles/2026-fantasy-football-rankings-updated-224612057.html";
+const USA_TODAY_UPDATED_AT = "2026-08-19";
 const FETCHED_AT = new Intl.DateTimeFormat("en-CA", {
   timeZone: "Asia/Taipei",
   year: "numeric",
@@ -239,6 +242,111 @@ async function scrapeSportsIllustrated() {
   return rows;
 }
 
+async function scrapeUsaToday() {
+  const $ = cheerio.load(await fetchHtml(USA_TODAY_SYNDICATED_URL));
+  const identities = await loadPlayerIdentities();
+  const rows: AuctionRow[] = [];
+  const boards: Array<{
+    heading: string;
+    tableIndex: number;
+    pos: Position;
+    columns: Array<{ scoring: Scoring; headers: string[] }>;
+  }> = [
+    {
+      heading: "quarterback rankings",
+      tableIndex: 0,
+      pos: "QB",
+      // The article's 1-QB column applies across reception-scoring formats.
+      columns: [
+        { scoring: "standard", headers: ["1qb"] },
+        { scoring: "halfPpr", headers: ["1qb"] },
+        { scoring: "ppr", headers: ["1qb"] },
+      ],
+    },
+    {
+      heading: "running back rankings",
+      tableIndex: 1,
+      pos: "RB",
+      columns: [
+        { scoring: "standard", headers: ["std"] },
+        { scoring: "halfPpr", headers: ["half"] },
+        { scoring: "ppr", headers: ["ppr"] },
+      ],
+    },
+    {
+      heading: "wide receiver rankings",
+      tableIndex: 2,
+      pos: "WR",
+      columns: [
+        { scoring: "standard", headers: ["std"] },
+        { scoring: "halfPpr", headers: ["half"] },
+        { scoring: "ppr", headers: ["full", "ppr"] },
+      ],
+    },
+    {
+      heading: "tight end rankings",
+      tableIndex: 3,
+      pos: "TE",
+      columns: [
+        { scoring: "standard", headers: ["std"] },
+        { scoring: "halfPpr", headers: ["half"] },
+        { scoring: "ppr", headers: ["full", "ppr"] },
+      ],
+    },
+  ];
+
+  for (const board of boards) {
+    const heading = $("h2").filter((_, element) =>
+      cleanText($(element).text()).toLowerCase().includes(board.heading),
+    ).first();
+    // Yahoo wraps each syndicated table in layout containers, so the table is
+    // not a direct sibling of its heading. The four position boards are the
+    // first four tables; the fifth is the duplicate half-PPR overall list.
+    const table = $("table").eq(board.tableIndex);
+    if (!heading.length || !table.length) {
+      throw new Error(`USA TODAY ${board.pos} table was not found`);
+    }
+
+    const tableRows = table.find("tr");
+    const headers = tableRows.first().find("th,td")
+      .map((_, cell) => cleanText($(cell).text()).toLowerCase())
+      .get();
+    const rankIndex = headers.findIndex((header) => ["rk", "rank"].includes(header));
+    const playerIndex = headers.findIndex((header) => header === "player");
+    if (rankIndex < 0 || playerIndex < 0) {
+      throw new Error(`USA TODAY ${board.pos} table headers were not recognized`);
+    }
+
+    tableRows.slice(1).each((_, element) => {
+      const cells = $(element).find("th,td").map((__, cell) => cleanText($(cell).text())).get();
+      const name = cleanName(cells[playerIndex] ?? "");
+      const rank = parseRank(cells[rankIndex] ?? "");
+      const identity = identities.get(identityKey(name));
+      const team = normalizeTeam(identity?.nflTeam ?? "");
+      if (!name || !rank) return;
+
+      for (const column of board.columns) {
+        const valueIndex = headers.findIndex((header) => column.headers.includes(header));
+        const auctionValue = Number((cells[valueIndex] ?? "").replace(/[$,]/g, ""));
+        if (valueIndex < 0 || !Number.isFinite(auctionValue) || auctionValue <= 0) continue;
+        rows.push({
+          sourceId: "usa-today",
+          name,
+          pos: board.pos,
+          ...(team ? { team } : {}),
+          auctionValue,
+          rank,
+          scoring: column.scoring,
+          budget: 200,
+          updatedAt: USA_TODAY_UPDATED_AT,
+        });
+      }
+    });
+  }
+
+  return rows;
+}
+
 async function scrapeDraftSharks() {
   const $ = cheerio.load(await fetchHtml("https://www.draftsharks.com/auction-values"));
   const rows: AuctionRow[] = [];
@@ -297,7 +405,7 @@ async function scrapeFantasyNerds() {
   const url = "https://www.fantasynerds.com/nfl/auction?teams=12&budget=200&format=ppr";
   const $ = cheerio.load(await fetchHtml(url));
   const rows: AuctionRow[] = [];
-  $("#results tr").each((index, element) => {
+  $("#projections tr, #results tr").each((index, element) => {
     const cells = $(element).find("td").map((__, cell) => cleanText($(cell).text())).get();
     const auctionValue = parseDollar(cells[0] ?? "");
     const name = cleanName($(element).find("a.link").first().text() || cells[1] || "");
@@ -476,6 +584,7 @@ async function scrapeYafsb() {
 const SCRAPERS: Array<{ sourceId: string; minimumRows: number; scrape: () => Promise<AuctionRow[]> }> = [
   { sourceId: "fftoday", minimumRows: 600, scrape: scrapeFfToday },
   { sourceId: "sports-illustrated", minimumRows: 230, scrape: scrapeSportsIllustrated },
+  { sourceId: "usa-today", minimumRows: 750, scrape: scrapeUsaToday },
   { sourceId: "rtsports-aav", minimumRows: 150, scrape: scrapeRtSports },
   { sourceId: "yafsb-aav", minimumRows: 20, scrape: scrapeYafsb },
   { sourceId: "draftsharks", minimumRows: 20, scrape: scrapeDraftSharks },

@@ -224,7 +224,7 @@ describe("player value consensus", () => {
     ], 200, { scoring: "standard", calibrate: false });
 
     expect(player?.marketValue).toBeGreaterThan(1);
-    expect(player?.marketValueSourceCount).toBe(2);
+    expect(player?.marketValueSourceCount).toBe(3);
     expect(
       player?.valueSources?.find(
         (source) => source.sourceId === "fftoday" && source.includedInConsensus !== false,
@@ -235,6 +235,12 @@ describe("player value consensus", () => {
       player?.valueSources?.find((source) => source.sourceId === "sports-illustrated")
         ?.includedInConsensus,
     ).toBe(false);
+    expect(
+      player?.valueSources?.find(
+        (source) => source.sourceId === "usa-today" && source.scoring === "standard",
+      )
+        ?.includedInConsensus,
+    ).toBe(true);
     expect(
       player?.valueSources?.find((source) => source.sourceId === "sleeper-suggested")
         ?.includedInConsensus,

@@ -23,6 +23,7 @@ import { TeamMark } from "../components/player/TeamMark";
 import { formatTeamBye } from "../components/player/teamMarkUtils";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
+import { useRouteMetadata } from "../lib/routeMetadata";
 
 function formatDate(value: unknown) {
   if (!value || typeof value !== "string") return "--";
@@ -68,6 +69,15 @@ export default function ResultsV2() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState("");
+  const resultRoomCode = typeof draftInfo?.code === "string" ? draftInfo.code : "";
+  useRouteMetadata({
+    title: resultRoomCode ? `${resultRoomCode} Draft Results` : "Draft Results",
+    description: resultRoomCode
+      ? `Review the completed ${resultRoomCode} GameHQ fantasy draft board and team results.`
+      : "Review a completed GameHQ fantasy draft board and team results.",
+    path: `/results/${draftId ?? ""}`,
+    indexable: false,
+  });
 
   useEffect(() => {
     let active = true;

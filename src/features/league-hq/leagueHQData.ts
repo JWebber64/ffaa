@@ -163,7 +163,7 @@ export interface LeagueStoryline {
   title: string;
   detail: string;
   managerIds: string[];
-  tone: "emerald" | "gold" | "blue" | "rose";
+  tone: "emerald" | "gold" | "green" | "rose";
 }
 
 export interface LeagueHQData {

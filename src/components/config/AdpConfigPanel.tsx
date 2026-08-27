@@ -51,13 +51,13 @@ export const AdpConfigPanel: React.FC = () => {
           <Switch
             isChecked={config.includeTeInFlex}
             onChange={(e: ChangeEvent<HTMLInputElement>) => updateConfig({ includeTeInFlex: e.target.checked })}
-            colorScheme="blue"
+            colorScheme="green"
           />
         </FormControl>
 
         <HStack justify="space-between">
           <Button
-            colorScheme="blue"
+            colorScheme="green"
             onClick={() => {
               // Reload ADP data with new settings
               window.location.reload();

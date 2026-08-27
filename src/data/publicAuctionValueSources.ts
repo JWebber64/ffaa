@@ -62,6 +62,17 @@ export const PUBLIC_AUCTION_VALUE_SOURCES: readonly PublicAuctionValueSource[] =
     includedInConsensus: true,
   },
   {
+    id: "usa-today",
+    label: "USA TODAY rankings and auction values",
+    shortLabel: "USA Today",
+    url: "https://lufkindailynews.com/news_reuters/national/2026-fantasy-football-rankings-updated-auction-trade-values/article_3f13795e-33bf-5143-bca5-9eddb34f08e3.html",
+    access: "full-board",
+    note: "USA TODAY's August 19, 2026 syndicated 12-team, 1-QB board with standard, half-PPR, and full-PPR values.",
+    weight: VALUE_SOURCE_WEIGHTS.usaTodayAuction,
+    budget: 200,
+    includedInConsensus: true,
+  },
+  {
     id: "rtsports-aav",
     label: "RT Sports actual auction AAV",
     shortLabel: "RT AAV",

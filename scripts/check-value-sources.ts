@@ -86,6 +86,13 @@ const HTTP_SOURCES = [
     expect: "Auction",
   },
   {
+    id: "usa_today_auction",
+    label: "USA TODAY 2026 rankings and auction values",
+    kind: "public-page" as const,
+    url: "https://sports.yahoo.com/articles/2026-fantasy-football-rankings-updated-224612057.html",
+    expect: "Jahmyr Gibbs",
+  },
+  {
     id: "yafsb_auction_aav",
     label: "YAFSB actual Sleeper auction values",
     kind: "public-page" as const,

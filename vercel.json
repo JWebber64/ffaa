@@ -54,10 +54,6 @@
       "destination": "/teams/:path*"
     },
     {
-      "source": "/ff/vite.svg",
-      "destination": "/vite.svg"
-    },
-    {
       "source": "/ff/",
       "destination": "/index.html"
     },

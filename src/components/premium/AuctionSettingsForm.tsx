@@ -199,7 +199,7 @@ export default function AuctionSettingsForm({ value, onChange, teamCount }: Auct
               <Tooltip label="Fill all teams with default budget">
                 <Button
                   size="sm"
-                  colorScheme="blue"
+                  colorScheme="green"
                   variant="outline"
                   onClick={fillAllWithDefault}
                 >

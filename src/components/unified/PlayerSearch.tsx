@@ -63,12 +63,12 @@ type PlayerSearchProps = {
 };
 
 const POSITION_COLORS: Record<string, string> = {
-  QB: 'blue',
+  QB: 'green',
   RB: 'red',
   WR: 'green',
   TE: 'orange',
   K: 'yellow',
-  DEF: 'blue',
+  DEF: 'green',
   FLEX: 'purple',
   BENCH: 'var(--pos-bench)',
   IR: 'var(--pos-ir)',
@@ -217,6 +217,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
       case 'Escape':
         setQuery('');
         setFocusedIndex(-1);
+        setShowResults(false);
         break;
     }
   };
@@ -224,15 +225,15 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
   // Handle player selection
   const handleSelect = (player: Player | undefined) => {
     if (!player) return;
-    
+
+    setFocusedIndex(-1);
+    setShowResults(false);
     if (showBidButton) {
       setSelectedPlayerState(player);
       onOpen();
     } else if (onSelect) {
       onSelect(player);
       setQuery(player.name || '');
-      setFocusedIndex(-1);
-      setShowResults(false);
     }
   };
 
@@ -402,7 +403,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                     {showBidButton && (
                       <Button 
                         size="sm" 
-                        colorScheme="blue"
+                        colorScheme="green"
                         onClick={(e: ReactMouseEvent<HTMLButtonElement>) => {
                           e.stopPropagation();
                           handleSelect(player);
@@ -474,7 +475,7 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                   Cancel
                 </Button>
                 <Button
-                  colorScheme="blue"
+                  colorScheme="green"
                   onClick={handlePlaceBid}
                   isDisabled={!bidAmount || bidAmount < 1}
                 >

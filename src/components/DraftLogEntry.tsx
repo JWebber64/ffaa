@@ -26,7 +26,7 @@ function getLogIcon(type: LogEntry["type"]) {
 function getLogColor(type: LogEntry["type"]) {
   switch (type) {
     case "bid":
-      return "bg-[rgba(34,211,238,0.05)]";
+      return "bg-[var(--color-button-quiet-hover)]";
     case "sold":
       return "bg-[rgba(251,191,36,0.05)]";
     case "system":

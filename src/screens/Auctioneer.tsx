@@ -342,7 +342,7 @@ const Auctioneer: React.FC = () => {
                   <Button
                     size="sm"
                     variant={currentBidder === team.id ? 'solid' : 'outline'}
-                    colorScheme={currentBidder === team.id ? 'blue' : 'gray'}
+                    colorScheme={currentBidder === team.id ? 'green' : 'gray'}
                     onClick={() => setCurrentBidder(team.id)}
                     isDisabled={isDisabled}
                     w="100%"
@@ -353,7 +353,7 @@ const Auctioneer: React.FC = () => {
                     overflow="hidden"
                     textOverflow="ellipsis"
                     _hover={{
-                      bg: isDisabled ? 'gray.800' : currentBidder === team.id ? 'blue.500' : 'gray.700',
+                      bg: isDisabled ? 'gray.800' : currentBidder === team.id ? 'green.500' : 'gray.700',
                       boxShadow: isDisabled ? 'none' : 'md',
                     }}
                     _disabled={{
@@ -420,7 +420,7 @@ const Auctioneer: React.FC = () => {
                   <ButtonGroup size="sm" isAttached w="100%">
                     <Button
                       leftIcon={<FaGavel />}
-                      colorScheme={isOutbid ? 'green' : 'blue'}
+                      colorScheme={isOutbid ? 'green' : 'green'}
                       variant={isOutbid ? 'solid' : 'solid'}
                       onClick={(e: ReactMouseEvent<HTMLButtonElement>) => {
                         e.stopPropagation();
@@ -513,7 +513,7 @@ const Auctioneer: React.FC = () => {
 
       {/* No Player Nominated Alert */}
       {isConfigured && !currentPlayer && (
-        <Alert status="info" mb={4} borderRadius="md" bg="blue.900">
+        <Alert status="info" mb={4} borderRadius="md" bg="green.900">
           <AlertIcon />
           <Box flex={1}>
             <AlertTitle fontSize="md">
@@ -563,7 +563,7 @@ const Auctioneer: React.FC = () => {
                 isLoading={isLoadingAdp}
                 isDisabled={!playersLoaded}
                 variant={adpLoaded ? 'solid' : 'ghost'}
-                colorScheme={adpLoaded ? 'green' : 'blue'}
+                colorScheme={adpLoaded ? 'green' : 'green'}
                 title={!playersLoaded ? 'Load players first' : adpLoaded ? 'Reload ADP data' : 'Load ADP data'}
               />
             </Tooltip>
@@ -589,7 +589,7 @@ const Auctioneer: React.FC = () => {
                     {currentPlayer.name}
                   </Text>
                   {currentPlayer.pos && (
-                    <Badge ml={2} colorScheme="blue">
+                    <Badge ml={2} colorScheme="green">
                       {formatPositionForDisplay(currentPlayer.pos)}
                     </Badge>
                   )}
@@ -728,12 +728,12 @@ const Auctioneer: React.FC = () => {
               <Text color="gray.400" fontSize="lg">No player currently nominated for auction</Text>
               
               {/* Step 1: Nominate Player */}
-              <Box mt={4} p={4} bg="blue.900" borderRadius="lg" borderWidth="2px" borderColor="blue.500">
+              <Box mt={4} p={4} bg="green.900" borderRadius="lg" borderWidth="2px" borderColor="green.500">
                 <VStack spacing={3}>
                   <Text fontSize="xl" fontWeight="bold" color="white">
                     🎤 Step 1: Search & Nominate Player
                   </Text>
-                  <Text fontSize="sm" color="blue.200" textAlign="center">
+                  <Text fontSize="sm" color="green.200" textAlign="center">
                     Type a player name, then click "Nominate" to begin the auction
                   </Text>
                   <PlayerSearch
@@ -791,7 +791,7 @@ const Auctioneer: React.FC = () => {
       {/* Sound Test Button */}
       <Box position="fixed" bottom={4} right={4} zIndex={1000}>
         <VStack spacing={2}>
-          <Button size="sm" onClick={() => playSound('nomination')} colorScheme="blue">
+          <Button size="sm" onClick={() => playSound('nomination')} colorScheme="green">
             🔊 Test Nomination
           </Button>
           <Button size="sm" onClick={() => playSound('winner')} colorScheme="orange">

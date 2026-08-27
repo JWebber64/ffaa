@@ -1,43 +1,94 @@
-import { lazy, type CSSProperties } from "react";
-import { BarChart3, Bug, ChartNoAxesCombined, ClipboardList, Home, Settings2, Trophy, UserPlus, Wrench } from "lucide-react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Button } from "../ui/Button";
+import { lazy, type CSSProperties, type KeyboardEvent, type MouseEvent } from "react";
+import {
+  BarChart3, BookOpen, Bug, ChevronDown, ClipboardList, Gavel, History,
+  Home, Menu, Sparkles, Trophy, UserPlus, Users, Wrench,
+} from "lucide-react";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useDebugDrawerState } from "../hooks/useDebugDrawer";
-import { useRole } from "../contexts/roleContextState";
 import { appUrl } from "../lib/appBasePath";
+import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
+import { closeParentDisclosure } from "../ui/disclosureMenu";
+import "./app-shell.css";
 
 const DebugDrawer = lazy(() => import("../components/DebugDrawer"));
 
-const primaryNav = [
-  { to: "/", label: "Home", icon: Home, match: (path: string) => path === "/" },
-  { to: "/offline-draft", label: "Offline", icon: ClipboardList, match: (path: string) => path.startsWith("/offline-draft") },
-  { to: "/host/setup", label: "Setup", icon: Settings2, match: (path: string) => path.startsWith("/host") },
-  { to: "/stats", label: "Stats", icon: BarChart3, match: (path: string) => path.startsWith("/stats") },
-  { to: "/analytics", label: "Analytics", icon: ChartNoAxesCombined, match: (path: string) => path.startsWith("/analytics") },
-  { to: "/tools", label: "Tools", icon: Wrench, match: (path: string) => path.startsWith("/tools") },
-  { to: "/league", label: "League HQ", icon: Trophy, match: (path: string) => path.startsWith("/league") },
-  { to: "/join", label: "Join", icon: UserPlus, match: (path: string) => path.startsWith("/join") },
+type MenuLink = { to: string; label: string; detail: string; icon: typeof Home };
+
+const draftLinks: MenuLink[] = [
+  { to: "/host/setup", label: "Host a draft", detail: "Create a live room", icon: Gavel },
+  { to: "/host/setup", label: "Practice draft", detail: "Configure CPU-managed seats", icon: Sparkles },
+  { to: "/offline-draft", label: "Offline draft", detail: "Run the room on one device", icon: ClipboardList },
+  { to: "/join", label: "Join a room", detail: "Enter with a room code", icon: UserPlus },
 ];
 
+const researchLinks: MenuLink[] = [
+  { to: "/stats", label: "Rankings and stats", detail: "Rankings, values, and profiles", icon: BookOpen },
+  { to: "/stats?view=auction", label: "Auction values", detail: "League-aware market prices", icon: Gavel },
+  { to: "/analytics", label: "Analytics", detail: "Trends and scoring views", icon: BarChart3 },
+  { to: "/tools/player-compare", label: "Player compare", detail: "Side-by-side decision evidence", icon: Wrench },
+  { to: "/tools/team-rater", label: "Rate my team", detail: "Lineup and depth audit", icon: Users },
+  { to: "/tools/schedule", label: "Schedule Lab", detail: "Weekly and playoff windows", icon: BarChart3 },
+  { to: "/tools/offensive-line", label: "Offensive line", detail: "Team environment context", icon: BarChart3 },
+  { to: "/tools", label: "All tools", detail: "Every research workflow", icon: Wrench },
+];
+
+function isPathActive(pathname: string, roots: string[]) {
+  return roots.some((root) => pathname === root || pathname.startsWith(`${root}/`));
+}
+
+function toggleDisclosureFromKeyboard(event: KeyboardEvent<HTMLElement>) {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const details = event.currentTarget.parentElement;
+  if (!(details instanceof HTMLDetailsElement)) return;
+  event.preventDefault();
+  details.open = !details.open;
+}
+
+function dismissDisclosureMenu(event: MouseEvent<HTMLAnchorElement>) {
+  closeParentDisclosure(event.currentTarget);
+}
+
+export function ProductMenu({ label, links, active }: { label: string; links: MenuLink[]; active: boolean }) {
+  return (
+    <details className={`product-menu ${active ? "is-active" : ""}`}>
+      <summary onKeyDown={toggleDisclosureFromKeyboard}>
+        <span>{label}</span>
+        <ChevronDown size={14} aria-hidden="true" />
+      </summary>
+      <div className="product-menu-panel">
+        {links.map(({ to, label: itemLabel, detail, icon: Icon }) => (
+          <Link key={`${to}-${itemLabel}`} to={to} className="product-menu-link" onClick={dismissDisclosureMenu}>
+            <Icon size={17} aria-hidden="true" />
+            <span><strong>{itemLabel}</strong><small>{detail}</small></span>
+          </Link>
+        ))}
+      </div>
+    </details>
+  );
+}
+
 export default function AppShellV2() {
-  const dbg = useDebugDrawerState();
-  const role = useRole();
-  const loc = useLocation();
-  const navigate = useNavigate();
-
-  const pathIsHost = loc.pathname.startsWith("/host");
-  const pathIsOffline = loc.pathname.startsWith("/offline-draft");
-  const pathIsStats = loc.pathname.startsWith("/stats");
-  const pathIsAnalytics = loc.pathname.startsWith("/analytics");
-  const pathIsTools = loc.pathname.startsWith("/tools");
-  const pathIsLeague = loc.pathname.startsWith("/league");
-  const pathIsPublicResearch = pathIsStats || pathIsAnalytics || pathIsTools;
-  const pathIsNoAuth = pathIsPublicResearch || pathIsLeague;
-  const pathIsDraft = loc.pathname.startsWith("/draft") || pathIsOffline;
-  const realtimeLabel = pathIsLeague ? "league data" : pathIsPublicResearch ? "public data" : pathIsOffline ? "offline" : "lobby";
-  const roleLabel = pathIsLeague ? "COMMISH" : pathIsPublicResearch ? "FREE" : pathIsHost ? "HOST" : role.isAdmin ? "HOST" : "MANAGER";
-
-  const authStatus = pathIsLeague ? "Local" : pathIsPublicResearch ? "No login" : pathIsOffline ? "Local" : "Auth";
+  const debugDrawer = useDebugDrawerState();
+  const location = useLocation();
+  const { connections, activeLeagueId, setActiveLeagueId } = useSleeperLeagueConnections();
+  const activeConnection = connections.find((connection) => connection.leagueId === activeLeagueId);
+  const isDraft = isPathActive(location.pathname, ["/draft", "/offline-draft"]);
+  const isResearch = isPathActive(location.pathname, ["/stats", "/analytics", "/tools"]);
+  const isLeague = isPathActive(location.pathname, ["/league", "/my-hq"]);
+  const leagueLinks: MenuLink[] = [
+    { to: "/my-hq", label: "This Week", detail: "Your next decisions", icon: Sparkles },
+    { to: "/league", label: "League HQ", detail: "Connect and manage leagues", icon: Trophy },
+    {
+      to: activeLeagueId ? `/league/${activeLeagueId}/` : "/league",
+      label: "League history",
+      detail: activeConnection ? `Open ${activeConnection.leagueName}` : "Connect a league first",
+      icon: History,
+    },
+    { to: activeLeagueId ? `/league/${activeLeagueId}/managers` : "/league", label: "Managers", detail: "Careers and identity", icon: Users },
+    { to: activeLeagueId ? `/league/${activeLeagueId}/h2h` : "/league", label: "Rivalries", detail: "Head-to-head history", icon: Trophy },
+    { to: activeLeagueId ? `/league/${activeLeagueId}/records` : "/league", label: "Records", detail: "League-wide marks", icon: History },
+    { to: activeLeagueId ? `/league?league=${activeLeagueId}&view=rules` : "/league", label: "Commissioner tools", detail: "Rules, imports, and settings", icon: Wrench },
+  ];
   const visualAssets = {
     "--football-hero-image": `url("${appUrl("images/football-night-hero.png")}")`,
     "--football-banner-image": `url("${appUrl("images/football-playbook-banner.png")}")`,
@@ -46,78 +97,72 @@ export default function AppShellV2() {
     "--research-editorial-image": `url("${appUrl("images/research-film-room.png")}")`,
     "--league-editorial-image": `url("${appUrl("images/league-history-trophy-room.png")}")`,
   } as CSSProperties;
-  
-  const getRouteLabel = () => {
-    if (loc.pathname === "/") return "Home";
-    if (loc.pathname.startsWith("/host")) return "Host";
-    if (loc.pathname.startsWith("/offline-draft")) return "Offline Draft";
-    if (loc.pathname.startsWith("/stats")) return "Stats";
-    if (loc.pathname.startsWith("/analytics")) return "Analytics";
-    if (loc.pathname.startsWith("/tools")) return "Tools";
-    if (loc.pathname.startsWith("/league")) return "League HQ";
-    if (loc.pathname.startsWith("/join")) return "Join";
-    if (loc.pathname.startsWith("/draft")) return "Draft";
-    if (loc.pathname.startsWith("/results")) return "Results";
-    return "Fantasy Football";
-  };
 
   return (
-    <div className="ffaa-bg min-h-screen" style={visualAssets}>
-      <header className={`app-header ${pathIsDraft ? "app-header-draft" : ""}`}>
+    <div className="product-shell ffaa-bg min-h-screen" style={visualAssets}>
+      <header className={`app-header ${isDraft ? "app-header-draft" : ""}`}>
         <div className="app-header-inner">
-          <div className="app-header-left">
-            <button onClick={() => navigate("/")} className="app-brand" aria-label="Fantasy Football presented by GameHQ home">
-              <span className="app-brand-text">
-                <span className="app-brand-title ff-display">Fantasy Football</span>
-                <span className="app-brand-presenter">Presented by GameHQ</span>
-              </span>
-            </button>
-            <span className="app-route-label">{getRouteLabel()}</span>
-          </div>
+          <Link to="/" className="app-brand" aria-label="Fantasy Football presented by GameHQ home">
+            <span className="app-brand-monogram" aria-hidden="true">FF</span>
+            <span className="app-brand-text">
+              <span className="app-brand-title ff-display">Fantasy Football</span>
+              <span className="app-brand-presenter">Presented by GameHQ</span>
+            </span>
+          </Link>
 
-          <nav className="app-nav" aria-label="Primary navigation">
-            {primaryNav.map((item) => {
-              const Icon = item.icon;
-              const active = item.match(loc.pathname);
-
-              return (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={`app-nav-link ${active ? "is-active" : ""}`}
-                >
-                  <Icon size={15} aria-hidden="true" />
-                  <span>{item.label}</span>
-                </NavLink>
-              );
-            })}
+          <nav className="app-nav product-desktop-nav" aria-label="Primary navigation">
+            <NavLink to="/" end className={({ isActive }) => `product-nav-link ${isActive ? "is-active" : ""}`}>Home</NavLink>
+            <ProductMenu label="Draft" links={draftLinks} active={isDraft || isPathActive(location.pathname, ["/host", "/join", "/results"])} />
+            <ProductMenu label="Research" links={researchLinks} active={isResearch} />
+            <ProductMenu label="League" links={leagueLinks} active={isLeague} />
           </nav>
 
-          <div className="app-header-right app-header-meta">
-            <span className="app-status-label">{realtimeLabel}</span>
-            <span className="app-status-label">{authStatus}</span>
-            <span className="app-role-label">{roleLabel}</span>
-            {!pathIsNoAuth ? (
-              <Button variant="secondary" size="sm" className="app-debug-btn" onClick={dbg.toggle}>
-                <Bug size={14} aria-hidden="true" />
-                Debug
-              </Button>
+          <div className="app-header-right">
+            {connections.length ? (
+              <label className="league-context-control">
+                <span>Active league</span>
+                <select value={activeLeagueId} onChange={(event) => setActiveLeagueId(event.target.value)} aria-label="Active fantasy league">
+                  {connections.map((connection) => <option key={connection.leagueId} value={connection.leagueId}>{connection.leagueName}</option>)}
+                </select>
+              </label>
+            ) : <Link className="connect-league-link" to="/league">Connect league</Link>}
+            <Link className="shell-primary-action" to="/host/setup">Start Draft</Link>
+            {import.meta.env.DEV ? (
+              <button className="shell-debug-action" type="button" onClick={debugDrawer.toggle} aria-label="Open debug drawer"><Bug size={16} aria-hidden="true" /></button>
             ) : null}
           </div>
         </div>
       </header>
 
-      <main className={`app-main ${pathIsDraft ? "app-main-draft" : ""}`}>
-        <Outlet />
-      </main>
+      <main className={`app-main ${isDraft ? "app-main-draft" : ""}`}><Outlet /></main>
 
-      {dbg.isOpen && !pathIsNoAuth ? (
-        <DebugDrawer
-          isOpen={dbg.isOpen}
-          onClose={dbg.close}
-          realtimeLabel={realtimeLabel}
-        />
+      <nav className="product-mobile-nav" aria-label="Mobile navigation">
+        <NavLink to="/" end><Home aria-hidden="true" /><span>Home</span></NavLink>
+        <NavLink to="/host/setup"><Gavel aria-hidden="true" /><span>Draft</span></NavLink>
+        <NavLink to="/my-hq"><Sparkles aria-hidden="true" /><span>This Week</span></NavLink>
+        <NavLink to="/league"><Trophy aria-hidden="true" /><span>League</span></NavLink>
+        <details className="mobile-more-menu">
+          <summary onKeyDown={toggleDisclosureFromKeyboard}><Menu aria-hidden="true" /><span>More</span></summary>
+          <div className="mobile-more-panel">
+            <strong>Explore Fantasy Football</strong>
+            {[...researchLinks, ...draftLinks.slice(2), { to: "/host/setup", label: "Draft settings", detail: "Configure a room", icon: Gavel }].map(({ to, label, icon: Icon }) => (
+              <Link key={`${to}-${label}`} to={to} onClick={dismissDisclosureMenu}><Icon aria-hidden="true" /><span>{label}</span></Link>
+            ))}
+            {connections.length ? (
+              <label><span>Active league</span><select value={activeLeagueId} onChange={(event) => {
+                setActiveLeagueId(event.target.value);
+                closeParentDisclosure(event.currentTarget);
+              }}>
+                {connections.map((connection) => <option key={connection.leagueId} value={connection.leagueId}>{connection.leagueName}</option>)}
+              </select></label>
+            ) : null}
+          </div>
+        </details>
+      </nav>
+
+      {debugDrawer.isOpen && import.meta.env.DEV ? (
+        <DebugDrawer isOpen={debugDrawer.isOpen} onClose={debugDrawer.close} realtimeLabel="development" />
       ) : null}
-      </div>
+    </div>
   );
 }

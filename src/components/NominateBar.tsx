@@ -85,8 +85,8 @@ export default function NominateBar() {
           <Button
             onClick={onNominate}
             isDisabled={!isNominatorsTurn || auctionLive || !selectedPlayer || (startingBid ?? 0) < 1}
-            bg="blue.300"
-            _hover={{ bg: 'blue.400' }}
+            bg="green.300"
+            _hover={{ bg: 'green.400' }}
             width={{ base: '100%', md: 'auto' }}
           >
             Nominate

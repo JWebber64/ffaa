@@ -73,7 +73,7 @@ export default function SnakeSettingsForm({ value, onChange }: SnakeSettingsForm
             <Switch
               isChecked={value.autopick}
               onChange={(e: ChangeEvent<HTMLInputElement>) => updateSetting('autopick', e.target.checked)}
-              colorScheme="blue"
+              colorScheme="green"
             />
           </HStack>
 
@@ -89,7 +89,7 @@ export default function SnakeSettingsForm({ value, onChange }: SnakeSettingsForm
             <Switch
               isChecked={value.pauseBetweenRounds}
               onChange={(e: ChangeEvent<HTMLInputElement>) => updateSetting('pauseBetweenRounds', e.target.checked)}
-              colorScheme="blue"
+              colorScheme="green"
             />
           </HStack>
         </VStack>

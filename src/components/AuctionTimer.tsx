@@ -123,7 +123,7 @@ export default function AuctionTimer() {
           value={pct} 
           flex="1" 
           size="sm" 
-          colorScheme={isInAntiSnipeWindow ? 'orange' : 'blue'}
+          colorScheme={isInAntiSnipeWindow ? 'orange' : 'green'}
           hasStripe={isInAntiSnipeWindow}
           isAnimated={isInAntiSnipeWindow}
         />

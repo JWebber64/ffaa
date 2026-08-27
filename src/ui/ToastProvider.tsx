@@ -46,7 +46,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             key={t.id}
             className={cn(
               "rounded-lg border border-[rgba(124,58,237,0.35)]",
-              "bg-[rgba(10,14,24,0.9)] backdrop-blur p-3",
+              "bg-[var(--color-surface-overlay)] backdrop-blur p-3",
               "shadow-s2 text-sm text-fg0",
               "animate-[fadeIn_200ms_ease]"
             )}

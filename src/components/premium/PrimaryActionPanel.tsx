@@ -48,7 +48,7 @@ export default function PrimaryActionPanel({
             <Button
               onClick={onCreateRoom}
               disabled={!displayName.trim() || isCreating}
-              className="px-8 py-3 text-lg font-semibold bg-gradient-to-r from-[var(--neon-blue)] to-[var(--accent)] hover:from-[var(--neon-cyan)] hover:to-[var(--neon-blue)] transition-all duration-300 shadow-lg hover:shadow-xl focus-ring"
+              className="px-8 py-3 text-lg font-semibold bg-gradient-to-r from-[var(--accent-highlight)] to-[var(--accent)] hover:from-[var(--accent-bright)] hover:to-[var(--accent-highlight)] transition-all duration-300 shadow-lg hover:shadow-xl focus-ring"
             >
               {isCreating ? "Creating..." : "Create Room"}
             </Button>
@@ -71,7 +71,7 @@ export default function PrimaryActionPanel({
               disabled={!canStartDraft || isStarting}
               className={`px-8 py-3 text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl focus-ring ${
                 canStartDraft
-                  ? "bg-gradient-to-r from-[var(--neon-green)] to-[var(--success)] hover:from-[var(--neon-cyan)] hover:to-[var(--neon-green)] glow-ready"
+                  ? "bg-gradient-to-r from-[var(--neon-green)] to-[var(--success)] hover:from-[var(--accent-bright)] hover:to-[var(--neon-green)] glow-ready"
                   : "bg-[var(--bg2)] text-[var(--fg2)] cursor-not-allowed"
               }`}
             >

@@ -7,16 +7,6 @@ export interface TeamPointCoverage {
   coveredPlayers: number;
 }
 
-export interface TeamCareerPointCoverage extends TeamPointCoverage {
-  pointsPerGame: number;
-  pointsPerGameCoveredPlayers: number;
-}
-
-export interface TeamCareerPointCoverages {
-  fullTeam: TeamCareerPointCoverage;
-  starters: TeamCareerPointCoverage;
-}
-
 export function sumAvailablePlayerPoints(
   players: ToolPlayer[],
   selectPoints: (player: ToolPlayer) => number | null,
@@ -40,47 +30,11 @@ export function careerFantasyPoints(seasons: PlayerCareerSeason[], position: Too
   }, 0);
 }
 
-export function careerFantasyPointsPerGame(
-  seasons: PlayerCareerSeason[],
-  position: ToolPlayer["position"],
-) {
-  const games = seasons.reduce((total, season) => total + season.games, 0);
-  return games > 0 ? careerFantasyPoints(seasons, position) / games : null;
-}
-
-function emptyCareerCoverage(): TeamCareerPointCoverage {
-  return {
-    total: 0,
-    coveredPlayers: 0,
-    pointsPerGame: 0,
-    pointsPerGameCoveredPlayers: 0,
-  };
-}
-
-function addPlayerCareerCoverage(
-  result: TeamCareerPointCoverage,
-  seasons: PlayerCareerSeason[],
-  position: ToolPlayer["position"],
-) {
-  result.total += careerFantasyPoints(seasons, position);
-  result.coveredPlayers += 1;
-  const pointsPerGame = careerFantasyPointsPerGame(seasons, position);
-  if (pointsPerGame !== null) {
-    result.pointsPerGame += pointsPerGame;
-    result.pointsPerGameCoveredPlayers += 1;
-  }
-}
-
-export async function loadTeamCareerPointCoverages(
+export async function loadTeamCareerPointCoverage(
   players: ToolPlayer[],
-  starters: ToolPlayer[],
   scoring: ToolScoring,
-): Promise<TeamCareerPointCoverages> {
-  const result: TeamCareerPointCoverages = {
-    fullTeam: emptyCareerCoverage(),
-    starters: emptyCareerCoverage(),
-  };
-  const starterIds = new Set(starters.map((player) => player.id));
+): Promise<TeamPointCoverage> {
+  const result: TeamPointCoverage = { total: 0, coveredPlayers: 0 };
 
   // Load sequentially so the bundled career archive is fetched once, then read
   // from its in-memory cache for the rest of the roster.
@@ -97,10 +51,8 @@ export async function loadTeamCareerPointCoverages(
       scoring,
     });
     if (!history.seasons.length) continue;
-    addPlayerCareerCoverage(result.fullTeam, history.seasons, player.position);
-    if (starterIds.has(player.id)) {
-      addPlayerCareerCoverage(result.starters, history.seasons, player.position);
-    }
+    result.total += careerFantasyPoints(history.seasons, player.position);
+    result.coveredPlayers += 1;
   }
 
   return result;

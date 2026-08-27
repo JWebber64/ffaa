@@ -13,6 +13,7 @@ The value engine can use these sources:
 - ESPN salary-cap values
 - FFToday PPR, half-PPR, and standard auction boards
 - Sports Illustrated position auction boards
+- USA TODAY 12-team, one-QB standard, half-PPR, and full-PPR rankings/auction values
 - RT Sports completed-auction AAV
 - YAFSB actual Sleeper auction prices
 - Draft Sharks public top-25 preview
@@ -36,9 +37,9 @@ The value engine can use these sources:
 - Rank/ADP-derived fallback values
 
 `src/data/publicAuctionValueSources.ts` is the public-source registry. It
-catalogs all 22 researched public auction-value surfaces, including public
+catalogs all 23 researched public auction-value surfaces, including public
 dynamic calculators and workbooks that do not expose a stable board. The live
-importer currently populates eight of those sources without accounts, cookies,
+importer currently populates nine of those sources without accounts, cookies,
 or subscription access. Preview sources stop at the rows shown to a signed-out
 visitor. Derived aggregates such as SportsBrackets, ElBoberto, and CSG are
 cataloged or displayed, but do not receive independent consensus weight when
@@ -178,6 +179,7 @@ It checks:
 - WinWithOdds CSV availability and row count
 - Local 2026 player pool, ESPN salary-cap values, and WinWithOdds projection cache
 - FantasyPros, RotoWire, Draft Sharks, and Yahoo public page availability
+- USA TODAY's syndicated 2026 standard, half-PPR, and PPR value board
 - Sharp, 4for4, Fantasy Football Calculator, RotoBaller, Fantasy Footballers, FantasyNerds, FFToolbox, and BeatADP public page availability
 - Sleeper NFL state and trending add/drop endpoints
 - Local import files for every manual source and Sleeper

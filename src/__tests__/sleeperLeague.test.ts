@@ -101,6 +101,7 @@ describe("Sleeper League HQ import", () => {
 
     expect(result.lookupType).toBe("user");
     expect(result.displayName).toBe("Test Manager");
+    expect(result.providerUserId).toBe("user-123");
     expect(result.leagues.map((league) => league.name)).toEqual(["Alpha League", "Zeta League"]);
     expect(result.leagues[0]).toMatchObject({ leagueId: "111111111111", totalRosters: 10 });
     expect(result.leagues[0]?.auctionSettings).toMatchObject({
@@ -128,6 +129,7 @@ describe("Sleeper League HQ import", () => {
       displayName: "Direct League",
       leagues: [{ leagueId: "333333333333", name: "Direct League" }],
     });
+    expect(result.providerUserId).toBeUndefined();
   });
 
   it("maps documented league data into stable managers, records, titles, and rivalries", async () => {

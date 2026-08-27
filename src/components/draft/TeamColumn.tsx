@@ -59,7 +59,7 @@ export function TeamColumn({
       className={cn(
         "rounded-xl border border-stroke bg-[rgba(255,255,255,0.02)]",
         "overflow-hidden",
-        isNominator ? "ring-1 ring-[rgba(34,211,238,0.35)]" : "",
+        isNominator ? "ring-1 ring-[var(--color-focus-ring)]" : "",
         isMe ? "shadow-[0_0_0_1px_rgba(124,58,237,0.25)_inset]" : "",
         className
       )}

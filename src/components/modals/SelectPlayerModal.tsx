@@ -67,7 +67,7 @@ export default function SelectPlayerModal({ teamId, isOpen, onClose }: SelectPla
           <Button
             onClick={handleAssign}
             isDisabled={!isAdmin || !selectedPlayer}
-            colorScheme="blue"
+            colorScheme="green"
           >
             Assign to Team
           </Button>

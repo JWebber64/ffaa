@@ -78,7 +78,7 @@ body {
 .stage-gradient {
   background: linear-gradient(
     135deg,
-    rgba(20,184,166,0.02) 0%,
+    color-mix(in oklch, var(--green-400) 2%, transparent) 0%,
     rgba(16,185,129,0.02) 50%,
     rgba(7,13,9,0.02) 100%
   );
@@ -105,10 +105,10 @@ body {
 /* Pulse animation for room codes */
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 10px color-mix(in oklch, var(--green-500) 50%, transparent);
   }
   50% {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+    box-shadow: 0 0 20px color-mix(in oklch, var(--green-500) 80%, transparent);
   }
 }
 
@@ -125,7 +125,7 @@ body {
 .btn-primary:hover:not(:disabled) {
   transform: scale(1.015);
   filter: brightness(1.06);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 16px color-mix(in oklch, var(--green-500) 30%, transparent);
 }
 
 .btn-primary:active:not(:disabled) {

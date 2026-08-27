@@ -61,6 +61,7 @@ export const AUCTION_VALUE_SOURCE_COLUMNS = [
   { id: "espn", label: "ESPN", shortLabel: "ESPN" },
   { id: "fftoday", label: "FFToday", shortLabel: "FFToday" },
   { id: "sports-illustrated", label: "Sports Illustrated", shortLabel: "SI" },
+  { id: "usa-today", label: "USA TODAY", shortLabel: "USA Today" },
   { id: "rtsports-aav", label: "RT Sports AAV", shortLabel: "RT AAV" },
   { id: "yafsb-aav", label: "YAFSB Half-PPR AAV", shortLabel: "YAFSB .5" },
   { id: "fantasypros", label: "FantasyPros", shortLabel: "FPros" },
@@ -208,6 +209,7 @@ const SOURCE_DEFINITIONS: SourceDefinition[] = [
     .filter((source) => [
       "fftoday",
       "sports-illustrated",
+      "usa-today",
       "rtsports-aav",
       "yafsb-aav",
       "draftsharks",

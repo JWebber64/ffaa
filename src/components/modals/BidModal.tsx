@@ -105,8 +105,8 @@ export default function BidModal({ teamId, isOpen, onClose }: BidModalProps) {
                 <Button
                   onClick={onPlusOne}
                   isDisabled={!canBid}
-                  bg="blue.300"
-                  _hover={{ bg: 'blue.400' }}
+                  bg="green.300"
+                  _hover={{ bg: 'green.400' }}
                 >
                   +$1
                 </Button>
@@ -139,8 +139,8 @@ export default function BidModal({ teamId, isOpen, onClose }: BidModalProps) {
           <Button
             onClick={onSubmit}
             isDisabled={!canBid}
-            bg="blue.300"
-            _hover={{ bg: 'blue.400' }}
+            bg="green.300"
+            _hover={{ bg: 'green.400' }}
           >
             Place Bid
           </Button>

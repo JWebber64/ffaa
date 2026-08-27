@@ -94,7 +94,7 @@ export function DeviceModal({
               "relative",
               "h-full w-full",
               "overflow-hidden",
-              "bg-[rgba(8,10,14,0.95)]",
+              "bg-[var(--color-surface-modal)]",
               "border border-[rgba(255,255,255,0.10)]",
               "shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
             )}

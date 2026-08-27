@@ -98,7 +98,7 @@ export default function AuctionSettingsPanel() {
 
       <Button 
         onClick={save} 
-        colorScheme="blue" 
+        colorScheme="green"
         size="sm"
         width="100%"
       >

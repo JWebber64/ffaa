@@ -68,6 +68,21 @@ describe("Sleeper league connections", () => {
     expect(merged.map((item) => item.leagueName)).toEqual(["New Alpha", "Beta"]);
   });
 
+  it("preserves the permanent Sleeper manager identity used by This Week", () => {
+    const saved = {
+      ...connection("111111111111", "Alpha", "2026-08-10T00:00:00.000Z"),
+      managerProviderUserId: "user-123",
+      managerDisplayName: "Test Manager",
+    };
+    const parsed = parseSleeperLeagueConnections(JSON.stringify([saved]));
+
+    expect(parsed[0]).toMatchObject({
+      leagueId: "111111111111",
+      managerProviderUserId: "user-123",
+      managerDisplayName: "Test Manager",
+    });
+  });
+
   it("adds several leagues atomically and keeps the most recent twelve", () => {
     const additions = Array.from({ length: MAX_SLEEPER_LEAGUE_CONNECTIONS + 2 }, (_, index) => (
       connection(
