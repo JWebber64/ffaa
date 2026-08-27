@@ -2,6 +2,7 @@ import { CheckCircle2, LockKeyhole, ShieldCheck, Volume2, VolumeX } from "lucide
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AppStateScreen } from "../../components/AppStateScreen";
+import { appUrl } from "../../lib/appBasePath";
 import { useSleeperLeagueConnections } from "../league-hq/sleeperConnections";
 import { Button } from "../../ui/Button";
 import {
@@ -302,8 +303,11 @@ export default function DraftOrderShowdown() {
   return (
     <div className="draft-order-page">
       <header className="draft-order-hero">
-        <div><span className="draft-order-eyebrow">GameHQ presents</span><h1 className="ff-display">Draft Order Showdown</h1><p>Let football decide your draft order.</p><div className="draft-order-trust"><ShieldCheck aria-hidden="true" /><span><strong>Verifiable before kickoff.</strong> Secure seed. Locked result. Animation-only reveal.</span></div></div>
-        <div className="draft-order-scorebug"><span>SHOWDOWN</span><strong>{state.draw ? `DRAW ${state.draw.rerollIndex + 1}` : `${state.participants.length || 0} MANAGERS`}</strong><button type="button" onClick={() => setMuted(!muted)} aria-label={muted ? "Enable showdown sound" : "Mute showdown sound"}>{muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}<span>{muted ? "Sound off" : "Sound on"}</span></button></div>
+        <div className="draft-order-hero-copy"><span className="draft-order-eyebrow">GameHQ presents</span><h1 className="ff-display">Draft Order Showdown</h1><p>Let football decide your draft order.</p><div className="draft-order-trust"><ShieldCheck aria-hidden="true" /><span><strong>Verifiable before kickoff.</strong> Secure seed. Locked result. Animation-only reveal.</span></div></div>
+        <div className="draft-order-hero-side">
+          <img src={appUrl("images/draft-room-editorial.png")} alt="A fantasy football draft board prepared under stadium lights." width="1672" height="941" />
+          <div className="draft-order-scorebug"><span>SHOWDOWN</span><strong>{state.draw ? `DRAW ${state.draw.rerollIndex + 1}` : `${state.participants.length || 0} MANAGERS`}</strong><button type="button" onClick={() => setMuted(!muted)} aria-label={muted ? "Enable showdown sound" : "Mute showdown sound"}>{muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}<span>{muted ? "Sound off" : "Sound on"}</span></button></div>
+        </div>
       </header>
 
       <nav className="showdown-progress" aria-label="Draft order progress">
