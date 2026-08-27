@@ -1,7 +1,9 @@
 import {
   DEFAULT_ROSTER_SLOTS,
+  normalizeOfficialDraftOrder,
   type DraftTypeV2,
   type NominationOrderModeV2,
+  type OfficialDraftOrderConfig,
   type RosterSlot,
 } from "../types/draftConfig";
 import {
@@ -79,6 +81,7 @@ export type RuntimeDraftSettings = {
   rosterSlots: RuntimeRosterSlot[];
   snakeAutopick: boolean;
   snakePauseBetweenRounds: boolean;
+  draftOrder?: OfficialDraftOrderConfig;
 };
 
 export type DraftSnapshotState = {
@@ -310,6 +313,7 @@ export function normalizeRuntimeSettings(
     computerManagers
   );
   const rosterSlots = normalizeRosterSlots(rawSettings.rosterSlots);
+  const draftOrder = normalizeOfficialDraftOrder(rawSettings.draftOrder ?? base.draftOrder);
 
   if (isRecord(rawSettings.auctionSettings) || isRecord(rawSettings.snakeSettings)) {
     const auctionSettings = isRecord(rawSettings.auctionSettings)
@@ -345,7 +349,8 @@ export function normalizeRuntimeSettings(
         snakePauseBetweenRounds:
           typeof snakeSettings.pauseBetweenRounds === "boolean"
             ? snakeSettings.pauseBetweenRounds
-            : base.snakePauseBetweenRounds,
+              : base.snakePauseBetweenRounds,
+        ...(draftOrder ? { draftOrder } : {}),
       };
     }
 
@@ -376,6 +381,7 @@ export function normalizeRuntimeSettings(
         base.nominationOrderMode
       ),
       rosterSlots,
+      ...(draftOrder ? { draftOrder } : {}),
     };
   }
 
@@ -415,7 +421,8 @@ export function normalizeRuntimeSettings(
     snakePauseBetweenRounds:
       typeof rawSettings.snakePauseBetweenRounds === "boolean"
         ? rawSettings.snakePauseBetweenRounds
-        : base.snakePauseBetweenRounds,
+          : base.snakePauseBetweenRounds,
+    ...(draftOrder ? { draftOrder } : {}),
   };
 }
 

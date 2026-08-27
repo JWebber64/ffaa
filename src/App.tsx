@@ -18,6 +18,7 @@ const AnalyticsLab = lazy(() =>
 const Tools = lazy(() => import("./screens/Tools"));
 const LeagueHQ = lazy(() => import("./screens/LeagueHQ"));
 const MyHQ = lazy(() => import("./screens/MyHQ"));
+const DraftOrderShowdown = lazy(() => import("./features/draft-order/DraftOrderShowdown"));
 const LeagueHistoryApp = lazy(() => import("./features/league-history/ui/LeagueHistoryApp"));
 const OfflineDraftV2 = lazy(() => import("./screens_v2/OfflineDraftV2"));
 const LandingV2 = lazy(() => import("./screens_v2/LandingV2"));
@@ -33,12 +34,15 @@ function AppRoutes() {
     location.pathname.startsWith("/analytics") ||
     location.pathname.startsWith("/tools") ||
     location.pathname.startsWith("/league") ||
-    location.pathname.startsWith("/my-hq")
+    location.pathname.startsWith("/my-hq") ||
+    location.pathname.startsWith("/draft-order")
   ) {
     const publicFallback = location.pathname === "/"
       ? "/"
       : location.pathname.startsWith("/league") || location.pathname.startsWith("/my-hq")
       ? "/league"
+      : location.pathname.startsWith("/draft-order")
+        ? "/draft-order"
       : location.pathname.startsWith("/tools")
         ? "/tools"
         : location.pathname.startsWith("/analytics")
@@ -54,6 +58,7 @@ function AppRoutes() {
           <Route path="/tools/*" element={<Tools />} />
           <Route path="/league" element={<LeagueHQ />} />
           <Route path="/my-hq" element={<MyHQ />} />
+          <Route path="/draft-order" element={<DraftOrderShowdown />} />
           <Route path="/league/:leagueId/*" element={<LeagueHistoryApp />} />
         </Route>
         <Route

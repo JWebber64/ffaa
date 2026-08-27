@@ -1,6 +1,6 @@
 import { lazy, type CSSProperties, type KeyboardEvent, type MouseEvent } from "react";
 import {
-  BarChart3, BookOpen, Bug, ChevronDown, ClipboardList, Gavel, History,
+  BarChart3, BookOpen, Bug, ChevronDown, ClipboardList, Dices, Gavel, History,
   Home, Menu, Sparkles, Trophy, UserPlus, Users, Wrench,
 } from "lucide-react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
@@ -17,6 +17,7 @@ type MenuLink = { to: string; label: string; detail: string; icon: typeof Home }
 const draftLinks: MenuLink[] = [
   { to: "/host/setup", label: "Host a draft", detail: "Create a live room", icon: Gavel },
   { to: "/host/setup", label: "Practice draft", detail: "Configure CPU-managed seats", icon: Sparkles },
+  { to: "/draft-order", label: "Draft Order Showdown", detail: "Five verifiable football reveals", icon: Dices },
   { to: "/offline-draft", label: "Offline draft", detail: "Run the room on one device", icon: ClipboardList },
   { to: "/join", label: "Join a room", detail: "Enter with a room code", icon: UserPlus },
 ];
@@ -72,7 +73,7 @@ export default function AppShellV2() {
   const location = useLocation();
   const { connections, activeLeagueId, setActiveLeagueId } = useSleeperLeagueConnections();
   const activeConnection = connections.find((connection) => connection.leagueId === activeLeagueId);
-  const isDraft = isPathActive(location.pathname, ["/draft", "/offline-draft"]);
+  const isDraft = isPathActive(location.pathname, ["/draft", "/offline-draft", "/draft-order"]);
   const isResearch = isPathActive(location.pathname, ["/stats", "/analytics", "/tools"]);
   const isLeague = isPathActive(location.pathname, ["/league", "/my-hq"]);
   const leagueLinks: MenuLink[] = [
