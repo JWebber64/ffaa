@@ -23,7 +23,7 @@ const draftLinks: MenuLink[] = [
 
 const researchLinks: MenuLink[] = [
   { to: "/stats", label: "Rankings and stats", detail: "Rankings, values, and profiles", icon: BookOpen },
-  { to: "/stats?view=auction", label: "Auction values", detail: "League-aware market prices", icon: Gavel },
+  { to: "/auction-values", label: "Auction Values", detail: "Compare and print public salary-cap sheets", icon: Gavel },
   { to: "/analytics", label: "Analytics", detail: "Trends and scoring views", icon: BarChart3 },
   { to: "/tools/player-compare", label: "Player compare", detail: "Side-by-side decision evidence", icon: Wrench },
   { to: "/tools/team-rater", label: "Rate my team", detail: "Lineup and depth audit", icon: Users },
@@ -73,7 +73,7 @@ export default function AppShellV2() {
   const { connections, activeLeagueId, setActiveLeagueId } = useSleeperLeagueConnections();
   const activeConnection = connections.find((connection) => connection.leagueId === activeLeagueId);
   const isDraft = isPathActive(location.pathname, ["/draft", "/offline-draft"]);
-  const isResearch = isPathActive(location.pathname, ["/stats", "/analytics", "/tools"]);
+  const isResearch = isPathActive(location.pathname, ["/stats", "/auction-values", "/analytics", "/tools"]);
   const isLeague = isPathActive(location.pathname, ["/league", "/my-hq"]);
   const leagueLinks: MenuLink[] = [
     { to: "/my-hq", label: "This Week", detail: "Your next decisions", icon: Sparkles },
