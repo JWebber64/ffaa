@@ -47,6 +47,14 @@ describe("tool player projection scoring", () => {
     expect(ppr - standard).toBe(90);
   });
 
+  it("prefers the scoring-aware public consensus already attached to the player", () => {
+    const row = projectionRow();
+    row.player.projectedPoints = 300;
+
+    expect(projectedPointsForScoring(row, "standard")).toBe(300);
+    expect(projectedPointsForScoring(row, "ppr")).toBe(300);
+  });
+
   it("normalizes common fantasy position aliases", () => {
     expect(normalizeToolPosition("D/ST")).toBe("DEF");
     expect(normalizeToolPosition("PK")).toBe("K");

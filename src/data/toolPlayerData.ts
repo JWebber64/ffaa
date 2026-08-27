@@ -22,6 +22,10 @@ export interface ToolPlayer {
   marketValue: number | null;
   projectedPoints: number | null;
   projectedPointsPerGame: number | null;
+  projectionSourceCount?: number;
+  projectionLow?: number | null;
+  projectionHigh?: number | null;
+  projectionUpdatedAt?: string;
   valueConfidence: number | null;
   valueSources: PlayerValueSource[];
   status: string;
@@ -94,11 +98,12 @@ export function toolPlayerKey(name: string, position: unknown) {
 }
 
 /**
- * Re-scores ESPN Clay's stat-line projection for the selected reception format.
- * K/DST rows use the provider's projected fantasy points because their full
- * scoring inputs are not present in the projection snapshot.
+ * Uses the scoring-aware public projection consensus when the player pool has
+ * already been valued. ESPN Clay remains a fallback for isolated stat rows.
  */
 export function projectedPointsForScoring(row: PlayerStatRow, scoring: ToolScoring) {
+  const consensus = numberValue(row.player.projectedPoints);
+  if (consensus !== null) return consensus;
   const clay = row.espnClay;
   const position = normalizeToolPosition(row.player.pos);
   if (!clay) {
@@ -178,6 +183,10 @@ export function buildToolPlayers(
       marketValue: numberValue(row.player.marketValue),
       projectedPoints,
       projectedPointsPerGame: projectedPoints === null ? null : projectedPoints / projectedGames,
+      projectionSourceCount: Math.max(0, numberValue(row.player.projectionSourceCount) ?? 0),
+      projectionLow: numberValue(row.player.projectionLow),
+      projectionHigh: numberValue(row.player.projectionHigh),
+      projectionUpdatedAt: String(row.player.projectionUpdatedAt ?? ""),
       valueConfidence: numberValue(row.player.valueConfidence),
       valueSources: row.player.valueSources ?? [],
       status: String(row.sleeper?.status ?? ""),

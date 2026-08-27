@@ -303,6 +303,15 @@ export default function HostLobbyV2() {
                 </div>
                 <div className="host-code">{roomCode}</div>
                 <Button
+                  onClick={() => navigate(`/draft-order?draft=${draftId}`)}
+                  disabled={starting || cancelling}
+                  size="lg"
+                  variant="secondary"
+                  className="host-action"
+                >
+                  Run Draft Order Showdown
+                </Button>
+                <Button
                   onClick={startDraft}
                   disabled={!canStart || starting}
                   isLoading={starting}

@@ -9,6 +9,9 @@ import espnRows from "./players-2026-espn.json";
 import sleeperSuggestedRows from "./players-2026-sleeper-values.json";
 import publicAuctionRows from "./players-2026-public-auction-values.json";
 import { PUBLIC_AUCTION_VALUE_SOURCES } from "./publicAuctionValueSources";
+import espnClayRows from "./players-2026-espn-clay-projections.json";
+import sleeperProjectionRows from "./players-2026-sleeper-projections.json";
+import publicProjectionRows from "./players-2026-public-projections.json";
 import winWithOddsRows from "./players-2026-winwithodds.json";
 import fantasyProsValueRows from "./players-2026-fantasypros-values.json";
 import rotoWireRows from "./players-2026-rotowire.json";
@@ -250,13 +253,57 @@ const SOURCE_DEFINITIONS: SourceDefinition[] = [
     consensusScoring: "halfPpr",
   },
   {
+    sourceId: "espn-clay",
+    source: "ESPN Mike Clay projections",
+    sourceUrl: "https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf",
+    rows: espnClayRows,
+    kind: "projection",
+    weight: 1,
+    projectionFields: ["projectedPoints"],
+    projectionScoring: "ppr",
+    rescoreStatLine: true,
+  },
+  {
+    sourceId: "sleeper-season",
+    source: "Sleeper season projections",
+    sourceUrl: "https://sleeper.com/leagues/1385319428408774656/players",
+    rows: sleeperProjectionRows,
+    kind: "projection",
+    weight: 1,
+    projectionFields: ["projectedPoints"],
+    projectionScoring: "ppr",
+  },
+  {
+    sourceId: "winwithodds",
     source: "WinWithOdds Vegas projections",
+    sourceUrl: "https://www.winwithodds.com/season_long_full_stats",
     rows: winWithOddsRows,
     kind: "projection",
     weight: VALUE_SOURCE_WEIGHTS.winWithOddsProjection,
     projectionFields: ["projectedPoints", "Projections", "projection", "points"],
     projectionScoring: "ppr",
+    rescoreStatLine: true,
     updatedAt: VALUE_UPDATED_AT,
+  },
+  {
+    sourceId: "fftoday-projections",
+    source: "FFToday projections",
+    sourceUrl: "https://www.fftoday.com/rankings/playerproj.php?Season=2026",
+    rows: publicProjectionRows.filter((row) => row.sourceId === "fftoday-projections"),
+    kind: "projection",
+    weight: 1,
+    projectionFields: ["projectedPoints"],
+    projectionScoring: "halfPpr",
+  },
+  {
+    sourceId: "cbs-projections",
+    source: "CBS Sports projections",
+    sourceUrl: "https://www.cbssports.com/fantasy/football/stats/",
+    rows: publicProjectionRows.filter((row) => row.sourceId === "cbs-projections"),
+    kind: "projection",
+    weight: 1,
+    projectionFields: ["projectedPoints"],
+    projectionScoring: "standard",
   },
   {
     sourceId: "fantasypros",
@@ -372,6 +419,7 @@ type SourceDefinition = {
   updatedAt?: string;
   consensusScoring?: AuctionScoring;
   projectionScoring?: AuctionScoring;
+  rescoreStatLine?: boolean;
   displayOnly?: boolean;
 };
 
@@ -380,7 +428,11 @@ type ParsedProjectionRow = {
   projectedPoints: number;
   pos: NormalizedPosition;
   source: string;
+  sourceId?: string;
+  sourceUrl?: string;
   weight: number;
+  includedInConsensus: boolean;
+  scoring: AuctionScoring;
   updatedAt?: string;
 };
 
@@ -454,6 +506,13 @@ function cleanNumber(value: unknown): number | null {
   return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : null;
 }
 
+function finiteNumber(value: unknown): number | null {
+  if (value === undefined || value === null || value === "") return null;
+  const numberValue =
+    typeof value === "string" ? Number(value.replace(/[$,%\s,]/g, "")) : Number(value);
+  return Number.isFinite(numberValue) ? numberValue : null;
+}
+
 function readString(row: ExternalValueRow, fields: string[]) {
   for (const field of fields) {
     const value = row[field];
@@ -465,6 +524,14 @@ function readString(row: ExternalValueRow, fields: string[]) {
 function readNumber(row: ExternalValueRow, fields: string[]) {
   for (const field of fields) {
     const value = cleanNumber(row[field]);
+    if (value !== null) return value;
+  }
+  return null;
+}
+
+function readFiniteNumber(row: ExternalValueRow, fields: string[]) {
+  for (const field of fields) {
+    const value = finiteNumber(row[field]);
     if (value !== null) return value;
   }
   return null;
@@ -629,12 +696,16 @@ function projectionDollarCandidates(
 
     const candidate: SourceCandidate = {
       source: row.source,
+      ...(row.sourceId ? { sourceId: row.sourceId } : {}),
+      ...(row.sourceUrl ? { sourceUrl: row.sourceUrl } : {}),
       kind: "projection",
       value: row.projectedPoints,
       normalizedValue,
       projectedPoints: row.projectedPoints,
       weight: row.weight,
       direct: true,
+      includedInConsensus: row.includedInConsensus,
+      scoring: row.scoring,
       ...(row.updatedAt ? { updatedAt: row.updatedAt } : {}),
     };
 
@@ -664,6 +735,43 @@ function compatibleScoring(
   return !sourceScoring || sourceScoring === targetScoring;
 }
 
+function receptionPointValue(scoring: AuctionScoring) {
+  return scoring === "ppr" ? 1 : scoring === "halfPpr" ? 0.5 : 0;
+}
+
+function statLineProjectedPoints(row: ExternalValueRow, scoring: AuctionScoring) {
+  const passYards = readFiniteNumber(row, ["passYards", "passingYards"]);
+  const passTds = readFiniteNumber(row, ["passTds", "passingTouchdowns"]);
+  const interceptions = readFiniteNumber(row, ["interceptions", "ints"]);
+  const rushYards = readFiniteNumber(row, ["rushYards", "rushingYards"]);
+  const rushTds = readFiniteNumber(row, ["rushTds", "rushingTouchdowns"]);
+  const receptions = readFiniteNumber(row, ["receptions", "recs", "rec"]);
+  const recYards = readFiniteNumber(row, ["recYards", "receivingYards"]);
+  const recTds = readFiniteNumber(row, ["recTds", "receivingTouchdowns"]);
+  const hasStatLine = [
+    passYards,
+    passTds,
+    interceptions,
+    rushYards,
+    rushTds,
+    receptions,
+    recYards,
+    recTds,
+  ].some((value) => value !== null);
+  if (!hasStatLine) return null;
+
+  return (
+    (passYards ?? 0) / 25 +
+    (passTds ?? 0) * 4 -
+    (interceptions ?? 0) * 2 +
+    (rushYards ?? 0) / 10 +
+    (rushTds ?? 0) * 6 +
+    (recYards ?? 0) / 10 +
+    (recTds ?? 0) * 6 +
+    (receptions ?? 0) * receptionPointValue(scoring)
+  );
+}
+
 function buildProjectionRows(source: SourceDefinition, scoring: AuctionScoring) {
   if (!source.projectionFields?.length) return [];
 
@@ -673,11 +781,15 @@ function buildProjectionRows(source: SourceDefinition, scoring: AuctionScoring) 
 
     if (!identity || baseProjectedPoints === null) return [];
 
-    const projectionScoring = normalizeAuctionScoring(row.scoring) ?? source.projectionScoring;
-    const receptions = readNumber(row, ["receptions", "recs", "rec"]);
-    const projectedPoints = projectionScoring === "ppr" && receptions !== null
-      ? baseProjectedPoints - receptions * (scoring === "standard" ? 1 : scoring === "halfPpr" ? 0.5 : 0)
-      : baseProjectedPoints;
+    const projectionScoring = normalizeAuctionScoring(
+      row.scoring ?? row.format ?? row.scoringType ?? row["scoring type"],
+    ) ?? source.projectionScoring ?? scoring;
+    const receptions = readFiniteNumber(row, ["receptions", "recs", "rec"]);
+    const rescoredPoints = source.rescoreStatLine ? statLineProjectedPoints(row, scoring) : null;
+    const projectedPoints = rescoredPoints ?? (
+      baseProjectedPoints +
+      (receptions ?? 0) * (receptionPointValue(scoring) - receptionPointValue(projectionScoring))
+    );
 
     return [
       {
@@ -685,7 +797,11 @@ function buildProjectionRows(source: SourceDefinition, scoring: AuctionScoring) 
         projectedPoints,
         pos: identity.pos,
         source: source.source,
+        ...(source.sourceId ? { sourceId: source.sourceId } : {}),
+        ...(source.sourceUrl ? { sourceUrl: source.sourceUrl } : {}),
         weight: source.weight,
+        includedInConsensus: !source.displayOnly,
+        scoring,
         ...(rowUpdatedAt(row, source) ? { updatedAt: rowUpdatedAt(row, source) } : {}),
       },
     ];
@@ -919,27 +1035,55 @@ function confidenceForSources(sources: SourceCandidate[]) {
   );
 }
 
-function latestSourceUpdate(sources: SourceCandidate[]) {
+function latestSourceUpdate(sources: readonly { updatedAt?: string }[]) {
   return sources
     .map((source) => source.updatedAt)
     .filter((value): value is string => Boolean(value))
     .sort((left, right) => right.localeCompare(left))[0];
 }
 
-function weightedProjectedPoints(sources: SourceCandidate[]) {
-  const projectionSources = sources.filter(
-    (source) => source.kind === "projection" && typeof source.projectedPoints === "number"
-  );
-  const weightTotal = projectionSources.reduce((sum, source) => sum + source.weight, 0);
-  if (weightTotal <= 0) return null;
+export type ProjectionConsensusSummary = {
+  points: number;
+  sourceCount: number;
+  low: number;
+  high: number;
+  updatedAt?: string;
+};
 
-  const points =
-    projectionSources.reduce(
-      (sum, source) => sum + (source.projectedPoints ?? 0) * source.weight,
-      0
-    ) / weightTotal;
+export function projectionConsensusSummary(
+  sources: readonly PlayerValueSource[],
+): ProjectionConsensusSummary | null {
+  const byPublisher = new Map<string, PlayerValueSource>();
+  for (const source of sources) {
+    if (
+      source.kind !== "projection" ||
+      source.includedInConsensus === false ||
+      typeof source.projectedPoints !== "number" ||
+      !Number.isFinite(source.projectedPoints)
+    ) continue;
+    const publisher = source.sourceId ?? source.source;
+    if (!byPublisher.has(publisher)) byPublisher.set(publisher, source);
+  }
 
-  return Math.round(points * 100) / 100;
+  const projectionSources = [...byPublisher.values()];
+  const values = projectionSources
+    .map((source) => source.projectedPoints!)
+    .sort((left, right) => left - right);
+  if (!values.length) return null;
+
+  const middle = Math.floor(values.length / 2);
+  const median = values.length % 2 === 1
+    ? values[middle]!
+    : (values[middle - 1]! + values[middle]!) / 2;
+  const updatedAt = latestSourceUpdate(projectionSources);
+
+  return {
+    points: Math.round(median * 100) / 100,
+    sourceCount: values.length,
+    low: Math.round(values[0]! * 100) / 100,
+    high: Math.round(values.at(-1)! * 100) / 100,
+    ...(updatedAt ? { updatedAt } : {}),
+  };
 }
 
 function toPlayerValueSource(source: SourceCandidate): PlayerValueSource {
@@ -975,6 +1119,10 @@ type PreliminaryPlayerValue = {
   marketValueSourceCount: number;
   marketValueUpdatedAt?: string;
   projectedPoints: number | null;
+  projectionSourceCount: number;
+  projectionLow?: number;
+  projectionHigh?: number;
+  projectionUpdatedAt?: string;
 };
 
 function calibrationUniverse(
@@ -1105,7 +1253,7 @@ export function applyConsensusAuctionValues(
 
     if (preliminaryValue === null) return [];
 
-    const projectedPoints = weightedProjectedPoints(sources);
+    const projectionSummary = projectionConsensusSummary(sources);
     const auctionSources = includedAuctionSources(sources);
     const marketValue = medianValue(auctionSources);
     const marketValueUpdatedAt = latestSourceUpdate(auctionSources);
@@ -1117,7 +1265,13 @@ export function applyConsensusAuctionValues(
       marketValue,
       marketValueSourceCount: auctionSources.length,
       ...(marketValueUpdatedAt ? { marketValueUpdatedAt } : {}),
-      projectedPoints,
+      projectedPoints: projectionSummary?.points ?? null,
+      projectionSourceCount: projectionSummary?.sourceCount ?? 0,
+      ...(projectionSummary ? { projectionLow: projectionSummary.low } : {}),
+      ...(projectionSummary ? { projectionHigh: projectionSummary.high } : {}),
+      ...(projectionSummary?.updatedAt
+        ? { projectionUpdatedAt: projectionSummary.updatedAt }
+        : {}),
     }];
   });
 
@@ -1140,6 +1294,12 @@ export function applyConsensusAuctionValues(
         ? { marketValueUpdatedAt: entry.marketValueUpdatedAt }
         : {}),
       ...(entry.projectedPoints !== null ? { projectedPoints: entry.projectedPoints } : {}),
+      projectionSourceCount: entry.projectionSourceCount,
+      ...(entry.projectionLow !== undefined ? { projectionLow: entry.projectionLow } : {}),
+      ...(entry.projectionHigh !== undefined ? { projectionHigh: entry.projectionHigh } : {}),
+      ...(entry.projectionUpdatedAt
+        ? { projectionUpdatedAt: entry.projectionUpdatedAt }
+        : {}),
       valueSources: entry.sources.map(toPlayerValueSource),
       valueConfidence: confidenceForSources(entry.sources),
       valueUpdatedAt: VALUE_UPDATED_AT,

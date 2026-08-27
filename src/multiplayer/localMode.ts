@@ -22,7 +22,11 @@ import {
 } from "./draftSnapshot";
 import { getBidSubmittedAtMs, wasBidSubmittedBeforeDeadline } from "./auctionClock";
 import { getBidValidation, getTeamMaxBidForSnapshot } from "./bidRules";
-import { normalizeDraftConfigV2, type DraftConfigV2 } from "../types/draftConfig";
+import {
+  normalizeDraftConfigV2,
+  orderByOfficialDraftOrder,
+  type DraftConfigV2,
+} from "../types/draftConfig";
 import { resolveCpuManagerProfileSelection } from "../types/cpuManager";
 
 const LOCAL_DRAFTS_KEY = "ffaa.localMultiplayer.drafts.v1";
@@ -254,7 +258,11 @@ function syncDraftRecord(record: LocalDraftRecord): LocalDraftRecord {
   });
   const snapshot = hydrateDraftSnapshot(record.snapshot, record.settings, record.draft_type, record.team_count);
   const previousTeams = new Map((snapshot.teams ?? []).map((team) => [team.teamId, team]));
-  const participants = sortParticipants(record.participants);
+  const participants = orderByOfficialDraftOrder(
+    sortParticipants(record.participants),
+    settings.draftOrder,
+    (participant) => participant.user_id,
+  );
   const humanSeatCount = Math.max(1, settings.teamCount - settings.computerManagers);
 
   const teams: DraftTeam[] = Array.from({ length: settings.teamCount }, (_, index) => {
@@ -288,6 +296,11 @@ function syncDraftRecord(record: LocalDraftRecord): LocalDraftRecord {
       roster: previous?.roster ?? [],
     };
   });
+  const orderedTeams = orderByOfficialDraftOrder(
+    teams,
+    settings.draftOrder,
+    (team) => team.userId,
+  );
 
   return {
     ...record,
@@ -299,7 +312,7 @@ function syncDraftRecord(record: LocalDraftRecord): LocalDraftRecord {
       settings,
       draft_type: settings.draftType,
       team_count: settings.teamCount,
-      teams,
+      teams: orderedTeams,
       engine: {
         ...snapshot.engine,
         host_user_id: record.host_user_id,

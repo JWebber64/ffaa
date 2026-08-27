@@ -733,6 +733,10 @@
 .auction-table tbody tr:hover, .auction-table tbody tr.is-selected { background: color-mix(in oklch, var(--green-300) 6%, transparent); }
 .auction-table tbody th { color: var(--text-0); font-weight: 800; }
 .auction-table tbody th small { display: block; margin-top: 2px; color: var(--text-3); font-size: .6rem; font-weight: 500; }
+.auction-table td { font-variant-numeric: tabular-nums; }
+.auction-projection-cell > span, .auction-projection-cell > small { display: block; white-space: nowrap; }
+.auction-projection-cell > span { color: var(--text-0); font-weight: 760; }
+.auction-projection-cell > small { margin-top: 2px; color: var(--text-3); font-size: .56rem; font-weight: 600; }
 .auction-table td strong { color: var(--tools-amber); }
 .auction-row-draft { padding: 5px 8px; border: 1px solid rgba(52,211,153,.2); border-radius: 6px; color: var(--tools-green); background: rgba(52,211,153,.06); font: inherit; font-size: .62rem; font-weight: 800; cursor: pointer; }
 

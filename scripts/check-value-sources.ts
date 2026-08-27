@@ -79,6 +79,20 @@ const HTTP_SOURCES = [
     expect: "Max Bid",
   },
   {
+    id: "fftoday_projections",
+    label: "FFToday 2026 season projections",
+    kind: "public-page" as const,
+    url: "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    expect: "Puka Nacua",
+  },
+  {
+    id: "cbs_projections",
+    label: "CBS Sports 2026 season projections",
+    kind: "public-page" as const,
+    url: "https://www.cbssports.com/fantasy/football/stats/WR/2026/season/projections/nonppr/",
+    expect: "Puka Nacua",
+  },
+  {
     id: "sports_illustrated_auction",
     label: "Sports Illustrated 2026 auction values",
     kind: "public-page" as const,
@@ -238,6 +252,21 @@ const LOCAL_IMPORTS = [
     id: "winwithodds_local",
     label: "WinWithOdds 2026 projection cache",
     file: "src/data/players-2026-winwithodds.json",
+  },
+  {
+    id: "espn_clay_projection_local",
+    label: "ESPN Mike Clay 2026 projection cache",
+    file: "src/data/players-2026-espn-clay-projections.json",
+  },
+  {
+    id: "public_projection_local",
+    label: "FFToday and CBS 2026 projection caches",
+    file: "src/data/players-2026-public-projections.json",
+  },
+  {
+    id: "sleeper_projection_local",
+    label: "Sleeper rendered 2026 season projection cache",
+    file: "src/data/players-2026-sleeper-projections.json",
   },
   {
     id: "fantasypros_import",

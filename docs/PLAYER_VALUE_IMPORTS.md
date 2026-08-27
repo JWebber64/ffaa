@@ -7,6 +7,10 @@ The app exposes two different dollar concepts:
 - `marketValue`: the median of compatible imported published auction-dollar
   sources before FFAA projection and roster-demand adjustments.
 
+The Auction Builder's `Proj` number is a separate scoring-aware median of
+independent public season-projection publishers. Each publisher receives one
+vote. The row also shows the vote count and low-to-high range.
+
 The value engine can use these sources:
 
 - Sleeper suggested auction values supplied for import
@@ -22,6 +26,10 @@ The value engine can use these sources:
 - SportsBrackets printable consensus board (display-only)
 - LeagueLogs Market Index (free API, attribution required)
 - WinWithOdds Vegas projections
+- ESPN Mike Clay season projections
+- Sleeper 2026 Season projections read from the public league Players table
+- FFToday public season projections
+- CBS Sports public season projections
 - FantasyPros auction/projection exports
 - Draft Sharks projection exports
 - RotoWire value/projection exports
@@ -65,6 +73,14 @@ Published auction values are combined with a median. Projection, ADP, rank, and
 market-index signals can adjust fair value but never count as additional auction
 boards. Confidence is therefore capped at 55% when only one compatible
 auction-dollar source is present.
+
+Season projections are normalized to the selected Standard, Half PPR, or PPR
+format before the median is calculated. ESPN Clay and WinWithOdds are rescored
+from their stat lines; Sleeper, FFToday, and CBS are normalized by their
+published reception totals. FantasyPros is cataloged but is not another vote
+because its current consensus is built from ESPN, CBS, and FFToday. Razzball is
+also cataloged, but its Cloudflare challenge currently prevents a dependable
+unattended refresh, so it is never represented as a populated source.
 
 LeagueLogs is a market-index signal rather than a published auction price. It
 has limited supporting influence on the model and is displayed as an FFAA
@@ -112,6 +128,24 @@ This writes:
 The refresh fails when a required public scraper errors and warns when a page
 returns fewer rows than its public contract. A reachable page is not treated as
 a populated import.
+
+Refresh the independent public projection pages and Vegas cache:
+
+```powershell
+npm run projections:pull
+```
+
+This writes:
+
+- `src/data/players-2026-espn-clay-projections.json`
+- `src/data/players-2026-winwithodds.json`
+- `src/data/players-2026-public-projections.json`
+- `reports/public-projection-sources.json`
+
+Sleeper is captured from the rendered website rather than an undocumented
+projection endpoint. Its current public 2026 Season/PPR capture is stored in
+`src/data/players-2026-sleeper-projections.json`, with the source URL, scoring,
+stat line, and capture date on every row.
 
 Dry-run an import:
 
@@ -177,7 +211,9 @@ reports/value-source-pulse.json
 It checks:
 
 - WinWithOdds CSV availability and row count
-- Local 2026 player pool, ESPN salary-cap values, and WinWithOdds projection cache
+- FFToday and CBS season-projection page availability
+- Local ESPN Clay, Sleeper season, public projection, and WinWithOdds caches
+- Local 2026 player pool and ESPN salary-cap values
 - FantasyPros, RotoWire, Draft Sharks, and Yahoo public page availability
 - USA TODAY's syndicated 2026 standard, half-PPR, and PPR value board
 - Sharp, 4for4, Fantasy Football Calculator, RotoBaller, Fantasy Footballers, FantasyNerds, FFToolbox, and BeatADP public page availability
@@ -197,11 +233,16 @@ written permission from Sleeper. A board explicitly supplied by the user can be
 imported as a distinct suggested-value source; it remains separate from actual
 winning bids imported from a completed Sleeper draft.
 
+Sleeper season projections are a different source from suggested auction
+values. They are visible under `Players > Projection > 2026 > Season` and are
+included as one independent projection vote after scoring normalization.
+
 ## No Commercial API Workflow
 
 We are not integrating paid/commercial or account-backed fantasy-data APIs. The workflow is:
 
-- Keep WinWithOdds automated for Vegas projections.
+- Keep WinWithOdds, FFToday, and CBS automated for projection refreshes.
+- Refresh Sleeper season projections from the rendered public league page.
 - Pull the ESPN 2026 salary-cap PDF with `npm run espn:pull`.
 - Build the active 2026 player pool with `npm run players:pull`. If FantasyPros does not expose a parsable table, this falls back to the current ESPN sheet and refuses to write an empty pool.
 - Use Sleeper public data for player IDs, league/draft metadata, and trend signals.
