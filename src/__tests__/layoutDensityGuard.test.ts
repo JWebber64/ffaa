@@ -34,7 +34,7 @@ describe("shared layout density contract", () => {
 
   it("keeps representative page families on the shared compact roles", () => {
     const consumers: Record<string, string[]> = {
-      "src/screens_v2/landing-v2.css": ["var(--type-display-hero)", "var(--space-page-gap)", "aspect-ratio: 16 / 10"],
+      "src/screens_v2/landing-v2.css": ["var(--type-display-hero)", "var(--space-section-gap)", "aspect-ratio: 16 / 8"],
       "src/screens/tools/tools.css": ["var(--type-display-page)", "var(--space-page-hero)", "min-height: 0"],
       "src/screens/league-hq.css": ["var(--type-display-page)", ".league-content { min-height: 0; }", "var(--space-panel-padding)"],
       "src/screens/my-hq.css": ["var(--type-display-page)", "min-height: 0", "var(--space-panel-padding)"],
@@ -62,6 +62,20 @@ describe("shared layout density contract", () => {
 
     const maximums = [...clampMaximums(landing), ...clampMaximums(tools), ...clampMaximums(league), ...clampMaximums(myHq)];
     expect(Math.max(...maximums)).toBeLessThanOrEqual(4.75);
+  });
+
+  it("keeps the homepage image-led instead of covering photography with mock interface cards", () => {
+    const landing = readProjectFile("src/screens_v2/LandingV2.tsx");
+    const styles = readProjectFile("src/screens_v2/landing-v2.css");
+
+    expect(landing).not.toContain("platform-preview-frame");
+    expect(landing).not.toContain("Product preview");
+    expect(landing).not.toContain("platform-promise");
+    expect(landing).not.toContain("Explore Demo League");
+    expect(styles).not.toContain(".platform-product-preview::after");
+    expect(styles).not.toContain(".platform-preview-frame");
+    expect(styles).toContain("aspect-ratio: 16 / 8");
+    expect(styles).toContain(".platform-pillar.is-week figure");
   });
 
   it("documents why ordinary cards and heroes stay natural-height", () => {
