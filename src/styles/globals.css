@@ -11900,6 +11900,30 @@ body,
   min-width: 0;
 }
 
+.stats-hub-table-scroll-stack {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.stats-hub-table-top-scrollbar {
+  max-width: 100%;
+  height: calc(var(--scrollbar-size) + 4px);
+  margin-bottom: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-inline: 1px solid transparent;
+  scrollbar-color: rgba(45,212,191,0.32) rgba(255,255,255,0.025);
+}
+
+.stats-hub-table-top-scrollbar:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.stats-hub-table-top-scrollbar-spacer {
+  height: 1px;
+}
+
 .stats-hub-table-shell {
   position: relative;
   max-width: 100%;
