@@ -1,4 +1,5 @@
 export type ScoringFormat = "standard" | "half_ppr" | "ppr";
+
 export type AuctionSourceType =
   | "expert_projection"
   | "market_aav"
@@ -70,6 +71,21 @@ export type AuctionPlayerValue = {
 };
 
 export type AuctionValueMode = "raw" | "normalized";
+
+export type AuctionSortKey =
+  | "player"
+  | "position"
+  | "team"
+  | "average"
+  | "median"
+  | "minimum"
+  | "maximum"
+  | "spread"
+  | "count"
+  | "expert"
+  | "market"
+  | "difference"
+  | `source:${string}`;
 
 export type SourceCompatibility = {
   compatible: boolean;

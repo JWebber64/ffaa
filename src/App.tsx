@@ -12,6 +12,7 @@ import { ToastProvider } from "./ui/ToastProvider";
 import AppShellV2 from "./layouts/AppShellV2";
 
 const StatsExplorer = lazy(() => import("./screens/StatsExplorer"));
+const AuctionValuesPage = lazy(() => import("./features/auction-values/AuctionValuesPage"));
 const AnalyticsLab = lazy(() =>
   import("./screens/AnalyticsLab").then((module) => ({ default: module.AnalyticsLab })),
 );
@@ -30,6 +31,7 @@ function AppRoutes() {
   if (
     location.pathname === "/" ||
     location.pathname.startsWith("/stats") ||
+    location.pathname.startsWith("/auction-values") ||
     location.pathname.startsWith("/analytics") ||
     location.pathname.startsWith("/tools") ||
     location.pathname.startsWith("/league") ||
@@ -41,6 +43,8 @@ function AppRoutes() {
       ? "/league"
       : location.pathname.startsWith("/tools")
         ? "/tools"
+        : location.pathname.startsWith("/auction-values")
+          ? "/auction-values"
         : location.pathname.startsWith("/analytics")
           ? "/analytics"
           : "/stats";
@@ -50,6 +54,9 @@ function AppRoutes() {
         <Route element={<AppShellV2 />}>
           <Route index element={<LandingV2 />} />
           <Route path="/stats" element={<StatsExplorer />} />
+          <Route path="/auction-values" element={<AuctionValuesPage />} />
+          <Route path="/auction-values/source/:sourceId" element={<AuctionValuesPage />} />
+          <Route path="/auction-values/print" element={<AuctionValuesPage />} />
           <Route path="/analytics" element={<AnalyticsLab />} />
           <Route path="/tools/*" element={<Tools />} />
           <Route path="/league" element={<LeagueHQ />} />
