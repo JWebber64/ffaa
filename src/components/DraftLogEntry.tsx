@@ -34,7 +34,7 @@ function getLogColor(type: LogEntry["type"]) {
     case "nominate":
       return "bg-[rgba(74,222,128,0.05)]";
     default:
-      return "bg-[rgba(148,163,184,0.05)]";
+      return "bg-[rgba(163,163,163,0.05)]";
   }
 }
 

@@ -39,7 +39,7 @@ function prohibitedInterfaceColors(path: string) {
       const green = match[1] ? Number.parseInt(match[1].slice(2, 4), 16) : Number(match[3]);
       const blue = match[1] ? Number.parseInt(match[1].slice(4, 6), 16) : Number(match[4]);
       const { hue, saturation } = hueAndSaturation(red, green, blue);
-      return hue >= 165 && hue <= 260 && saturation >= 0.35 ? [match[0]] : [];
+      return hue >= 165 && hue <= 260 && saturation >= 0.12 ? [match[0]] : [];
     });
 }
 
