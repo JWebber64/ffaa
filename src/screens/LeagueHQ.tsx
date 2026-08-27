@@ -827,7 +827,7 @@ export default function LeagueHQ() {
         {activeView === "draft" ? (
           <section>
             <SectionHeading eyebrow="Draft Central" title="Order, countdown & live room" detail="Set the date or visible order in Commissioner Studio, then launch GameHQ draft tools." />
-            <div className="league-draft-hero"><CalendarClock aria-hidden="true" /><span>Draft countdown</span><strong>{countdown.label}</strong><p>{countdown.detail}</p><div><Link className="league-link-button" to="/host/setup">Configure live draft</Link><Link className="league-link-button is-secondary" to="/offline-draft">Open offline draft</Link></div></div>
+            <div className="league-draft-hero"><CalendarClock aria-hidden="true" /><span>Draft countdown</span><strong>{countdown.label}</strong><p>{countdown.detail}</p><div><Link className="league-link-button" to="/host/setup">Configure live draft</Link><Link className="league-link-button is-secondary" to={`/draft-order${data.sleeper?.leagueId ? `?league=${data.sleeper.leagueId}` : ""}`}>Run Draft Order Showdown</Link><Link className="league-link-button is-secondary" to="/offline-draft">Open offline draft</Link></div></div>
             <div className="league-draft-order">
               <header><div><span>Commissioner board</span><h3>Draft order</h3></div><Button variant="secondary" size="sm" onClick={() => setWorkspaceOpen(true)}>Edit date & order</Button></header>
               {!draftManagers.some((manager) => manager.draftSlot != null) ? <p className="league-draft-note">Sleeper has not published an order. For an auction league, leave it open or add a ceremony order for draft night.</p> : null}
