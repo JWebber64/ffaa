@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarRange, ChartNoAxesCombined, Gavel, Scale, ShieldCheck, Sparkles, UsersRound } from "lucide-react";
+import { ArrowRight, CalendarRange, ChartNoAxesCombined, Dices, Gavel, Scale, ShieldCheck, Sparkles, UsersRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSleeperLeagueConnections } from "../../features/league-hq/sleeperConnections";
 import { appUrl } from "../../lib/appBasePath";
@@ -6,6 +6,7 @@ import { appUrl } from "../../lib/appBasePath";
 const tools = [
   { to: "/tools/auction-builder", title: "Build a Team", description: "Construct a legal, budgeted roster against current auction values and the active league profile.", detail: "Auction plan", icon: Gavel, group: "prepare", weight: "featured", image: "images/tool-auction-room.jpg" },
   { to: "/tools/team-rater", title: "Rate My Team", description: "Audit starters, replacement value, depth, bye collisions, and availability with a transparent grade.", detail: "Roster audit", icon: UsersRound, group: "prepare", weight: "standard", image: "images/tool-team-rater.jpg" },
+  { to: "/draft-order", title: "Draft Order Showdown", description: "Randomize draft or nomination order through five verifiable football reveal games, then replay and share the exact draw.", detail: "Draft-night ceremony", icon: Dices, group: "prepare", weight: "wide", image: "images/draft-room-editorial.png" },
   { to: "/tools/player-compare", title: "Player Compare", description: "Put up to four players side by side across projections, usage, consistency, ADP, and value sources.", detail: "Start / sit research", icon: Scale, group: "weekly", weight: "featured", image: "images/tool-player-compare.jpg" },
   { to: "/tools/schedule", title: "Schedule Lab", description: "Explore every opponent by position, week range, playoff window, heatmap, and regressed DvP.", detail: "Matchup planning", icon: CalendarRange, group: "weekly", weight: "standard", image: "images/tool-schedule-lab.jpg" },
   { to: "/tools/offensive-line", title: "OL Environment", description: "Compare pass and run environments through transparent team outcomes rather than proprietary grades.", detail: "Team context", icon: ChartNoAxesCombined, group: "understand", weight: "wide", image: "images/tool-offensive-line.jpg" },

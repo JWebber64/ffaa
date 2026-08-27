@@ -32,6 +32,7 @@ import {
   getComputerManagerThinkDelayMultiplier,
 } from "./autoManager";
 import { resolveCpuManagerProfileSelection } from "../types/cpuManager";
+import { orderByOfficialDraftOrder } from "../types/draftConfig";
 
 type DraftActionRow = {
   action_id: string;
@@ -959,11 +960,16 @@ async function buildLobbyTeams(
     return snapshot;
   }
 
-  const participants = (await listFirebaseParticipants(draftId)).sort(
+  const participantsBySeat = (await listFirebaseParticipants(draftId)).sort(
     (left, right) => left.team_number - right.team_number
   );
 
   const settings = snapshot.settings;
+  const participants = orderByOfficialDraftOrder(
+    participantsBySeat,
+    settings?.draftOrder,
+    (participant) => participant.user_id,
+  );
   const teamCount = settings?.teamCount ?? snapshot.team_count ?? 12;
   const computerManagers = Math.max(
     0,

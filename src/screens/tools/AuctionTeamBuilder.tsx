@@ -250,7 +250,48 @@ export function AuctionTeamBuilder() {
             />
           </div>
           <div className="auction-selected-ticket">{selected ? <><div><span>Selected player</span><strong>{selected.name}</strong><small>{selected.position} · {formatTeamBye(selected.team || "FA", selected.byeWeek)} · fair {money(selected.auctionValue ?? 0)} · market {selected.marketValue === null ? "—" : money(selected.marketValue)} · recommended {money(recommendedBid)}</small></div><label>Bid <span><b>$</b><NumericInput aria-label="Player bid" min="1" max={Math.max(1, maxBid)} value={bid} onChange={(event) => setBid(Number(event.target.value))} /></span></label><button type="button" className="tool-button is-primary" onClick={draftSelected} disabled={!maxBid}><Gavel size={15} /> Draft</button></> : <span>Select a player to add them to your card.</span>}</div>
-          <div className="auction-table-wrap"><table className="auction-table"><thead><tr><th>Pos</th>{(["name", "rank", "projection", "value"] as SortKey[]).map((key) => <th key={key}><button type="button" onClick={() => changeSort(key)}>{key === "name" ? "Player" : key === "rank" ? "Rank" : key === "projection" ? "Proj" : "Fair"} {sortIcon(key)}</button></th>)}<th>Market</th><th aria-label="Draft action" /></tr></thead><tbody>{board.map((player) => <tr className={selectedId === player.id ? "is-selected" : ""} key={player.id} onClick={() => selectPlayer(player)}><td><span className={`tool-position-tag is-${player.position.toLowerCase()}`}>{player.position}</span></td><th><span className="auction-player-identity"><TeamMark team={player.team} size="xs" /><span>{player.name}<small>{formatTeamBye(player.team || "FA", player.byeWeek)}</small></span></span></th><td>{player.rank ?? "—"}</td><td>{player.projectedPoints?.toFixed(1) ?? "—"}</td><td><strong>{money(player.auctionValue ?? 0)}</strong></td><td>{player.marketValue === null ? "—" : money(player.marketValue)}</td><td><button type="button" className="auction-row-draft" onClick={(event) => { event.stopPropagation(); draftPlayer(player); }}>Draft</button></td></tr>)}</tbody></table></div>
+          <div className="auction-table-wrap">
+            <table className="auction-table">
+              <thead>
+                <tr>
+                  <th>Pos</th>
+                  {(["name", "rank", "projection", "value"] as SortKey[]).map((key) => (
+                    <th key={key} title={key === "projection" ? "Median of independent public season projections for the selected scoring" : undefined}>
+                      <button type="button" onClick={() => changeSort(key)}>
+                        {key === "name" ? "Player" : key === "rank" ? "Rank" : key === "projection" ? "Proj" : "Fair"} {sortIcon(key)}
+                      </button>
+                    </th>
+                  ))}
+                  <th>Market</th>
+                  <th aria-label="Draft action" />
+                </tr>
+              </thead>
+              <tbody>
+                {board.map((player) => {
+                  const sourceCount = player.projectionSourceCount ?? 0;
+                  const hasRange = sourceCount > 1
+                    && player.projectionLow !== null
+                    && player.projectionLow !== undefined
+                    && player.projectionHigh !== null
+                    && player.projectionHigh !== undefined;
+                  return (
+                    <tr className={selectedId === player.id ? "is-selected" : ""} key={player.id} onClick={() => selectPlayer(player)}>
+                      <td><span className={`tool-position-tag is-${player.position.toLowerCase()}`}>{player.position}</span></td>
+                      <th><span className="auction-player-identity"><TeamMark team={player.team} size="xs" /><span>{player.name}<small>{formatTeamBye(player.team || "FA", player.byeWeek)}</small></span></span></th>
+                      <td>{player.rank ?? "—"}</td>
+                      <td className="auction-projection-cell" title={hasRange ? `${sourceCount} independent sources: ${player.projectionLow!.toFixed(1)}–${player.projectionHigh!.toFixed(1)} points` : undefined}>
+                        <span>{player.projectedPoints?.toFixed(1) ?? "—"}</span>
+                        {hasRange ? <small>{sourceCount} src · {player.projectionLow!.toFixed(0)}–{player.projectionHigh!.toFixed(0)}</small> : null}
+                      </td>
+                      <td><strong>{money(player.auctionValue ?? 0)}</strong></td>
+                      <td>{player.marketValue === null ? "—" : money(player.marketValue)}</td>
+                      <td><button type="button" className="auction-row-draft" onClick={(event) => { event.stopPropagation(); draftPlayer(player); }}>Draft</button></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </section>
       </div>
     </ToolLayout>

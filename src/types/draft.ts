@@ -115,6 +115,11 @@ export interface Player {
   marketValueUpdatedAt?: string;
   projectedValue?: number;
   projectedPoints?: number;
+  /** Independent public projection publishers included in the median. */
+  projectionSourceCount?: number;
+  projectionLow?: number;
+  projectionHigh?: number;
+  projectionUpdatedAt?: string;
   valueSources?: PlayerValueSource[];
   valueConfidence?: number;
   valueUpdatedAt?: string;

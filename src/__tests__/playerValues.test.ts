@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { VALUE_SOURCE_WEIGHTS } from "../config/valueSourceWeights";
-import { applyConsensusAuctionValues, rankToAuctionValue } from "../data/playerValues";
-import type { Player } from "../types/draft";
+import {
+  applyConsensusAuctionValues,
+  projectionConsensusSummary,
+  rankToAuctionValue,
+} from "../data/playerValues";
+import type { Player, PlayerValueSource } from "../types/draft";
 
 function makePlayer(overrides: Partial<Player>): Player {
   return {
@@ -56,6 +60,12 @@ describe("player value consensus", () => {
     ).toBe(false);
     expect(player?.valueSources?.some((source) => source.source.includes("ESPN"))).toBe(true);
     expect(player?.valueSources?.some((source) => source.source.includes("WinWithOdds"))).toBe(true);
+    expect(player?.valueSources?.some((source) => source.sourceId === "sleeper-season")).toBe(true);
+    expect(player?.valueSources?.some((source) => source.sourceId === "fftoday-projections")).toBe(true);
+    expect(player?.valueSources?.some((source) => source.sourceId === "cbs-projections")).toBe(true);
+    expect(player?.projectionSourceCount).toBe(5);
+    expect(player?.projectionLow).toBeLessThan(player?.projectedPoints ?? 0);
+    expect(player?.projectionHigh).toBeGreaterThan(player?.projectedPoints ?? 0);
     expect(
       player?.valueSources?.find((source) => source.source.includes("WinWithOdds"))?.weight
     ).toBe(VALUE_SOURCE_WEIGHTS.winWithOddsProjection);
@@ -132,6 +142,45 @@ describe("player value consensus", () => {
     });
 
     expect(valued.reduce((sum, player) => sum + (player.auctionValue ?? 0), 0)).toBe(1200);
+  });
+
+  it("uses one robust median vote per independent projection publisher", () => {
+    const projection = (sourceId: string, projectedPoints: number): PlayerValueSource => ({
+      source: sourceId,
+      sourceId,
+      kind: "projection",
+      value: projectedPoints,
+      normalizedValue: projectedPoints,
+      weight: 1,
+      includedInConsensus: true,
+      projectedPoints,
+    });
+    const summary = projectionConsensusSummary([
+      projection("source-a", 250),
+      projection("source-b", 260),
+      projection("source-c", 270),
+      projection("outlier", 1_000),
+      projection("source-a", 999),
+    ]);
+
+    expect(summary).toEqual({ points: 265, sourceCount: 4, low: 250, high: 1_000 });
+  });
+
+  it("keeps Sleeper's Bijan row distinct from the abbreviated Brian Robinson row", () => {
+    const [bijan] = applyConsensusAuctionValues([
+      makePlayer({
+        id: "2026-RB-bijan-robinson",
+        name: "Bijan Robinson",
+        pos: "RB",
+        nflTeam: "ATL",
+        rank: 2,
+      }),
+    ], 200, { scoring: "ppr", calibrate: false });
+    const sleeper = bijan?.valueSources?.find((source) => source.sourceId === "sleeper-season");
+
+    expect(sleeper?.projectedPoints).toBe(325);
+    expect(bijan?.projectionSourceCount).toBe(5);
+    expect(bijan?.projectionLow).toBeGreaterThan(300);
   });
 
   it("raises premium tiers when a league drafts fewer players", () => {

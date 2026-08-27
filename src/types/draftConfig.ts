@@ -64,6 +64,15 @@ export interface SnakeSettings {
   pauseBetweenRounds: boolean;
 }
 
+export interface OfficialDraftOrderConfig {
+  participantUserIds: string[];
+  drawId: string;
+  verificationHash: string;
+  algorithmVersion: string;
+  mode: string;
+  appliedAt: string;
+}
+
 // Main Draft Config
 export interface DraftConfigV2 {
   leagueType: LeagueType;
@@ -75,6 +84,42 @@ export interface DraftConfigV2 {
   rosterSlots: RosterSlot[];
   auctionSettings?: AuctionSettingsV2;
   snakeSettings?: SnakeSettings;
+  draftOrder?: OfficialDraftOrderConfig;
+}
+
+export function normalizeOfficialDraftOrder(value: unknown): OfficialDraftOrderConfig | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const record = value as Record<string, unknown>;
+  if (!Array.isArray(record.participantUserIds)) return undefined;
+  const participantUserIds = record.participantUserIds
+    .filter((entry): entry is string => typeof entry === "string" && Boolean(entry.trim()))
+    .map((entry) => entry.trim());
+  if (!participantUserIds.length || new Set(participantUserIds).size !== participantUserIds.length) return undefined;
+  const drawId = typeof record.drawId === "string" ? record.drawId.trim() : "";
+  const verificationHash = typeof record.verificationHash === "string" ? record.verificationHash.trim() : "";
+  const algorithmVersion = typeof record.algorithmVersion === "string" ? record.algorithmVersion.trim() : "";
+  const mode = typeof record.mode === "string" ? record.mode.trim() : "";
+  const appliedAt = typeof record.appliedAt === "string" ? record.appliedAt.trim() : "";
+  if (!drawId || !verificationHash || !algorithmVersion || !mode || !appliedAt) return undefined;
+  return { participantUserIds, drawId, verificationHash, algorithmVersion, mode, appliedAt };
+}
+
+export function orderByOfficialDraftOrder<T>(
+  values: T[],
+  order: OfficialDraftOrderConfig | undefined,
+  getParticipantUserId: (value: T) => string | null | undefined,
+) {
+  if (!order?.participantUserIds.length) return [...values];
+  const ranks = new Map(order.participantUserIds.map((id, index) => [id, index]));
+  return values
+    .map((value, originalIndex) => ({ value, originalIndex, rank: ranks.get(getParticipantUserId(value) ?? "") }))
+    .sort((left, right) => {
+      if (left.rank !== undefined && right.rank !== undefined) return left.rank - right.rank;
+      if (left.rank !== undefined) return -1;
+      if (right.rank !== undefined) return 1;
+      return left.originalIndex - right.originalIndex;
+    })
+    .map(({ value }) => value);
 }
 
 // Helper function to create default budgets
@@ -87,6 +132,7 @@ export function normalizeDraftConfigV2(draftConfig: DraftConfigV2): DraftConfigV
     0,
     Math.min(draftConfig.teamCount - 1, Number(draftConfig.computerManagers ?? 0) || 0)
   );
+  const draftOrder = normalizeOfficialDraftOrder(draftConfig.draftOrder);
   let nextConfig: DraftConfigV2 = {
     ...draftConfig,
     computerManagers,
@@ -94,6 +140,7 @@ export function normalizeDraftConfigV2(draftConfig: DraftConfigV2): DraftConfigV
       draftConfig.computerManagerProfiles,
       computerManagers
     ),
+    ...(draftOrder ? { draftOrder } : {}),
   };
 
   if (
