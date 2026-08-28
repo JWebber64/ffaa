@@ -2,6 +2,11 @@ import { useDeferredValue, useMemo, useState } from "react";
 import { Columns3, Info, LayoutList, Printer, Rows3, TriangleAlert } from "lucide-react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
+import {
+  PROJECTION_CONSENSUS_PUBLISHERS,
+  fairValuePublisherForSourceId,
+} from "@/data/valuePublisherSources";
+import { useSleeperLeagueConnections } from "@/features/league-hq/sleeperConnections";
 import { AuctionValueControls } from "./AuctionValueControls";
 import {
   AUCTION_VALUE_SOURCES,
@@ -9,6 +14,7 @@ import {
   buildAuctionComparison,
   formatLabel,
   sortAuctionComparisonRows,
+  sourceCompatibility,
   sourceFreshness,
   sourceSheetValues,
 } from "./auctionValueData";
@@ -20,6 +26,8 @@ import { SourceSheet } from "./SourceSheet";
 import { useAuctionValueState } from "./useAuctionValueState";
 import "./auction-values.css";
 
+const EMPTY_ROSTER_SLOTS = [] as const;
+
 function currentPrintHref(searchParams: URLSearchParams) {
   const query = new URLSearchParams(searchParams);
   return `/auction-values/print${query.size ? `?${query.toString()}` : ""}`;
@@ -27,6 +35,12 @@ function currentPrintHref(searchParams: URLSearchParams) {
 
 export default function AuctionValuesPage() {
   const state = useAuctionValueState();
+  const { connections, activeLeagueId } = useSleeperLeagueConnections();
+  const activeConnection = connections.find((connection) => connection.leagueId === activeLeagueId)
+    ?? connections[0];
+  const activeAuctionSettings = activeConnection?.auctionSettings;
+  const fairRosterSize = activeAuctionSettings?.rosterSize ?? 15;
+  const fairRosterSlots = activeAuctionSettings?.rosterSlots ?? EMPTY_ROSTER_SLOTS;
   const location = useLocation();
   const params = useParams<{ sourceId?: string }>();
   const isPrintRoute = location.pathname.endsWith("/print");
@@ -48,7 +62,9 @@ export default function AuctionValuesPage() {
     selectedBudget: state.budget,
     valueMode: state.valueMode,
     includeMarketInConsensus: state.includeMarketInConsensus,
-  }), [state.budget, state.includeMarketInConsensus, state.leagueSize, state.scoringFormat, state.selectedSourceIds, state.valueMode]);
+    rosterSize: fairRosterSize,
+    rosterSlots: fairRosterSlots,
+  }), [fairRosterSize, fairRosterSlots, state.budget, state.includeMarketInConsensus, state.leagueSize, state.scoringFormat, state.selectedSourceIds, state.valueMode]);
 
   const filteredComparisonRows = useMemo(() => {
     const filtered = comparisonRows.filter((row) => {
@@ -90,6 +106,16 @@ export default function AuctionValuesPage() {
   })() : printHref;
   const generatedDate = new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date());
   const compatibleForFormat = AUCTION_VALUE_SOURCES.filter((source) => source.comparisonReady && source.formats.includes(state.scoringFormat));
+  const publishedConsensusSources = AUCTION_VALUE_SOURCES.filter(
+    (source) => source.defaultSelected && sourceCompatibility(source, state.scoringFormat, state.leagueSize).compatible,
+  );
+  const fairValuePublisherIds = new Set([
+    ...PROJECTION_CONSENSUS_PUBLISHERS.map((publisher) => publisher.id),
+    ...publishedConsensusSources.flatMap((source) => {
+      const publisher = fairValuePublisherForSourceId(source.id);
+      return publisher ? [publisher.id] : [];
+    }),
+  ]);
 
   return (
     <div className={`auction-values-page ${isPrintRoute ? "is-print-route" : ""} ${state.inkFriendly ? "is-ink-friendly" : ""}`}>
@@ -110,6 +136,31 @@ export default function AuctionValuesPage() {
           <button type="button" onClick={() => setPrintSettingsOpen((open) => !open)}><Printer size={16} aria-hidden="true" /> Print</button>
         </div>
       </header>
+
+      {!isPrintRoute ? (
+        <section className="auction-source-model" aria-label="Fair Value source model">
+          <div>
+            <span>Projection inputs</span>
+            <strong>{PROJECTION_CONSENSUS_PUBLISHERS.length} publishers</strong>
+            <small>{PROJECTION_CONSENSUS_PUBLISHERS.map((publisher) => publisher.label).join(" · ")}</small>
+          </div>
+          <div>
+            <span>Published value inputs</span>
+            <strong>{publishedConsensusSources.length} compatible boards</strong>
+            <small>{publishedConsensusSources.map((source) => source.shortName).join(" · ") || "No complete board matches these settings"}</small>
+          </div>
+          <div>
+            <span>GameHQ Fair Value</span>
+            <strong>{fairValuePublisherIds.size} publisher votes</strong>
+            <small>Multiple products from the same publisher collapse into one vote.</small>
+          </div>
+          <div>
+            <span>Roster depth</span>
+            <strong>{fairRosterSize} players per team</strong>
+            <small>{activeAuctionSettings ? `Using ${activeConnection?.leagueName ?? "the active Sleeper league"}` : "Using the default roster profile"}</small>
+          </div>
+        </section>
+      ) : null}
 
       {!isPrintRoute ? (
         <AuctionValueControls
@@ -204,7 +255,7 @@ export default function AuctionValuesPage() {
               />
             ) : null}
 
-            <div className="auction-consensus-note"><Info size={16} aria-hidden="true" /><span>Expert sources drive consensus by default. Market AAV stays separate unless explicitly enabled. Non-comparable sources may be displayed but do not enter aggregates.</span></div>
+            <div className="auction-consensus-note"><Info size={16} aria-hidden="true" /><span>GameHQ Fair Value includes Sleeper and Vegas projections. The selected columns compare published dollar boards; partial and non-comparable sources remain visible without entering the default consensus.</span></div>
             <ComparisonTable
               rows={filteredComparisonRows}
               sources={visibleSources}
@@ -222,11 +273,11 @@ export default function AuctionValuesPage() {
           {!isPrintRoute ? (
             <>
               <details className="auction-methodology">
-                <summary><strong>How these values work</strong><span>Fair value, market price, and consensus stay separate.</span></summary>
+                <summary><strong>How these values work</strong><span>GameHQ Fair Value, published values, and market prices stay separate.</span></summary>
                 <div className="auction-definition-strip" aria-label="Auction value definitions">
-                  <div><strong>Fair value</strong><span>Projection-based estimate of what a player should cost.</span></div>
-                  <div><strong>Market price</strong><span>What comparable auction rooms are actually paying.</span></div>
-                  <div><strong>Consensus</strong><span>Aggregate of compatible selected expert sources by default.</span></div>
+                  <div><strong>GameHQ Fair Value</strong><span>League-adjusted median with one vote per publisher.</span></div>
+                  <div><strong>Published Value</strong><span>Suggested auction dollars from complete comparable boards.</span></div>
+                  <div><strong>Market Price</strong><span>Completed-auction prices stay separate from projections.</span></div>
                 </div>
               </details>
 

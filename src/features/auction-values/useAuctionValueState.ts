@@ -1,10 +1,16 @@
 import { useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
+import { AUCTION_VALUE_SOURCES, sourceCompatibility } from "./auctionValueData";
 import type { AuctionSortKey, AuctionSourceType, AuctionValueMode, ScoringFormat } from "./auctionValueTypes";
 
 const STORAGE_KEY = "ffaa.auctionValues.preferences.v1";
-const DEFAULT_SOURCE_IDS = ["fftoday", "usa-today"];
+
+function defaultSourceIds(scoringFormat: ScoringFormat, leagueSize: number) {
+  return AUCTION_VALUE_SOURCES
+    .filter((source) => source.defaultSelected && sourceCompatibility(source, scoringFormat, leagueSize).compatible)
+    .map((source) => source.id);
+}
 
 type PersistedPreferences = {
   scoringFormat: ScoringFormat;
@@ -45,7 +51,9 @@ export function useAuctionValueState() {
   const scoringFormat = scoringParam(searchParams.get("format"), preferences.scoringFormat);
   const budget = numberParam(searchParams.get("budget"), preferences.budget, 50, 1000);
   const leagueSize = numberParam(searchParams.get("teams"), preferences.leagueSize, 4, 32);
-  const selectedSourceIds = searchParams.has("sources") ? listParam(searchParams.get("sources")) : DEFAULT_SOURCE_IDS;
+  const selectedSourceIds = searchParams.has("sources")
+    ? listParam(searchParams.get("sources"))
+    : defaultSourceIds(scoringFormat, leagueSize);
   const hiddenSourceIds = listParam(searchParams.get("hidden"));
   const position = (searchParams.get("position") ?? "ALL").toUpperCase();
   const query = searchParams.get("q") ?? "";

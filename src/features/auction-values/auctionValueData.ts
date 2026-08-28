@@ -1,6 +1,10 @@
 import espnRowsJson from "@/data/players-2026-espn.json";
 import playerPoolJson from "@/data/player-pool-2026.json";
 import publicRowsJson from "@/data/players-2026-public-auction-values.json";
+import sleeperRowsJson from "@/data/players-2026-sleeper-values.json";
+import { applyConsensusAuctionValues } from "@/data/playerValues";
+import type { AuctionValueRosterSlot } from "@/data/playerValues";
+import type { Player } from "@/types/draft";
 
 import { AUCTION_VALUE_SOURCE_REGISTRY } from "./sourceRegistry";
 import type {
@@ -43,9 +47,18 @@ type CanonicalPlayer = {
   pos?: string;
   nflTeam?: string;
   byeWeek?: number;
+  rank?: number;
+  posRank?: number;
+  adp?: number;
 };
 
-const publicRows = publicRowsJson as PublicAuctionRow[];
+const publicRows = [
+  ...(publicRowsJson as PublicAuctionRow[]),
+  ...(sleeperRowsJson as PublicAuctionRow[]).map((row) => ({
+    ...row,
+    sourceId: "sleeper-suggested",
+  })),
+];
 const espnRows = espnRowsJson as EspnAuctionRow[];
 const canonicalPlayers = playerPoolJson as CanonicalPlayer[];
 
@@ -284,6 +297,51 @@ export const AUCTION_VALUE_SOURCES: readonly AuctionValueSource[] = AUCTION_VALU
 
 export const AUCTION_VALUE_SOURCE_MAP = new Map(AUCTION_VALUE_SOURCES.map((entry) => [entry.id, entry]));
 
+const VALUE_POSITIONS = new Set<Player["pos"]>(["QB", "RB", "WR", "TE", "K", "DEF"]);
+const canonicalValuePlayers = canonicalPlayers.flatMap((player): Player[] => {
+  const position = normalizePosition(player.pos) as Player["pos"];
+  if (!player.id || !player.name || !VALUE_POSITIONS.has(position)) return [];
+  return [{
+    id: player.id,
+    name: player.name,
+    pos: position,
+    ...(player.nflTeam ? { nflTeam: normalizeTeam(player.nflTeam) } : {}),
+    ...(player.byeWeek ? { byeWeek: player.byeWeek } : {}),
+    ...(player.rank ? { rank: player.rank } : {}),
+    ...(player.posRank ? { posRank: player.posRank } : {}),
+    ...(player.adp ? { adp: player.adp } : {}),
+  }];
+});
+const fairValueCache = new Map<string, Map<string, Player>>();
+
+function valueScoring(format: ScoringFormat) {
+  if (format === "half_ppr") return "halfPpr" as const;
+  return format;
+}
+
+function fairValuePlayers(options: BuildComparisonOptions) {
+  const rosterSlots = options.rosterSlots ?? [];
+  const cacheKey = [
+    options.scoringFormat,
+    options.leagueSize,
+    options.selectedBudget,
+    options.rosterSize ?? 15,
+    rosterSlots.map((slot) => `${String(slot.slot)}:${String(slot.count)}`).join(","),
+  ].join("|");
+  const cached = fairValueCache.get(cacheKey);
+  if (cached) return cached;
+
+  const valued = applyConsensusAuctionValues(canonicalValuePlayers, options.selectedBudget, {
+    scoring: valueScoring(options.scoringFormat),
+    teamCount: options.leagueSize,
+    rosterSize: options.rosterSize ?? 15,
+    rosterSlots,
+  });
+  const playerMap = new Map(valued.map((player) => [player.id, player]));
+  fairValueCache.set(cacheKey, playerMap);
+  return playerMap;
+}
+
 export function normalizeAuctionValue(rawValue: number, sourceBudget: number, selectedBudget: number) {
   if (!Number.isFinite(rawValue) || !Number.isFinite(sourceBudget) || sourceBudget <= 0 || !Number.isFinite(selectedBudget)) {
     return null;
@@ -345,6 +403,8 @@ export type BuildComparisonOptions = {
   selectedBudget: number;
   valueMode: AuctionValueMode;
   includeMarketInConsensus?: boolean;
+  rosterSize?: number;
+  rosterSlots?: readonly AuctionValueRosterSlot[];
 };
 
 export function buildAuctionComparison(options: BuildComparisonOptions): AuctionComparisonRow[] {
@@ -354,6 +414,7 @@ export function buildAuctionComparison(options: BuildComparisonOptions): Auction
     return source ? [source] : [];
   });
   const sourceMap = new Map(sources.map((entry) => [entry.id, entry]));
+  const fairPlayers = fairValuePlayers(options);
   const rowsByPlayer = new Map<string, AuctionComparisonRow>();
 
   for (const value of AUCTION_PLAYER_VALUES) {
@@ -367,6 +428,7 @@ export function buildAuctionComparison(options: BuildComparisonOptions): Auction
       source.sourceType === "expert_projection" ||
       (options.includeMarketInConsensus && source.sourceType === "market_aav")
     );
+    const fairPlayer = fairPlayers.get(value.playerId);
     const current = rowsByPlayer.get(value.playerId) ?? {
       playerId: value.playerId,
       playerName: value.playerName,
@@ -383,6 +445,11 @@ export function buildAuctionComparison(options: BuildComparisonOptions): Auction
       expertFairValue: null,
       marketAav: null,
       fairMarketDifference: null,
+      gamehqFairValue: fairPlayer?.auctionValue ?? null,
+      fairValuePublisherCount: fairPlayer?.fairValuePublisherCount ?? 0,
+      fairValuePublishers: fairPlayer?.fairValuePublishers ?? [],
+      projectionSourceCount: fairPlayer?.projectionSourceCount ?? 0,
+      publishedValueSourceCount: fairPlayer?.marketValueSourceCount ?? 0,
     };
     current.sourceValues[value.sourceId] = {
       sourceId: value.sourceId,
@@ -414,8 +481,8 @@ export function buildAuctionComparison(options: BuildComparisonOptions): Auction
   }
 
   return [...rowsByPlayer.values()].sort((left, right) => {
-    const leftValue = left.median ?? left.expertFairValue ?? left.marketAav ?? -1;
-    const rightValue = right.median ?? right.expertFairValue ?? right.marketAav ?? -1;
+    const leftValue = left.gamehqFairValue ?? left.median ?? left.expertFairValue ?? left.marketAav ?? -1;
+    const rightValue = right.gamehqFairValue ?? right.median ?? right.expertFairValue ?? right.marketAav ?? -1;
     return rightValue - leftValue || left.playerName.localeCompare(right.playerName);
   });
 }
@@ -433,6 +500,7 @@ function sortableValue(row: AuctionComparisonRow, key: AuctionSortKey) {
   if (key === "count") return row.contributingSourceCount;
   if (key === "expert") return row.expertFairValue;
   if (key === "market") return row.marketAav;
+  if (key === "gamehqFair") return row.gamehqFairValue;
   return row.fairMarketDifference;
 }
 

@@ -7,7 +7,7 @@ import type { AuctionSourceType, AuctionValueSource, ScoringFormat } from "./auc
 
 function typeLabel(source: AuctionValueSource) {
   const labels: Record<AuctionValueSource["sourceType"], string> = {
-    expert_projection: "Expert Value",
+    expert_projection: "Published Value",
     market_aav: "Market AAV",
     custom_calculator: "Calculator",
     community_sheet: "Community Sheet",
@@ -68,7 +68,7 @@ export function SourceDirectory(props: Props) {
             <span>Source type</span>
             <select aria-label="Source type" className="ffaa-control" value={props.sourceType} onChange={(event) => props.onSourceTypeChange(event.target.value as AuctionSourceType | "all")}>
               <option value="all">All source types</option>
-              <option value="expert_projection">Expert fair value</option>
+              <option value="expert_projection">Published value</option>
               <option value="market_aav">Market AAV</option>
               <option value="custom_calculator">Calculator</option>
               <option value="community_sheet">Community sheet</option>

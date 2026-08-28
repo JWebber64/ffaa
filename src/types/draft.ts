@@ -120,6 +120,9 @@ export interface Player {
   projectionLow?: number;
   projectionHigh?: number;
   projectionUpdatedAt?: string;
+  /** Independent publishers contributing to the league-adjusted Fair Value. */
+  fairValuePublisherCount?: number;
+  fairValuePublishers?: string[];
   valueSources?: PlayerValueSource[];
   valueConfidence?: number;
   valueUpdatedAt?: string;
@@ -131,6 +134,7 @@ export type PlayerValueSourceKind = 'auction' | 'projection' | 'rank-derived' | 
 export interface PlayerValueSource {
   source: string;
   sourceId?: string;
+  publisherId?: string;
   sourceUrl?: string;
   kind: PlayerValueSourceKind;
   value: number;

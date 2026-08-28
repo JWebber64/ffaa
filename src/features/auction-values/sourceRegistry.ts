@@ -7,7 +7,7 @@ import type {
   SourceVerificationStatus,
 } from "./auctionValueTypes";
 
-const VERIFIED_AT = "2026-08-27";
+const VERIFIED_AT = "2026-08-28";
 
 type SourceInput = {
   id: string;
@@ -24,6 +24,7 @@ type SourceInput = {
   qbFormat?: AuctionValueSource["qbFormat"];
   access?: AuctionSourceAccess;
   comparisonReady?: boolean;
+  defaultSelected?: boolean;
   printableInsideFFAA?: boolean;
   externalOnly?: boolean;
   sourceUpdatedAt?: string;
@@ -52,6 +53,7 @@ function source(input: SourceInput): AuctionValueSource {
     qbFormat: input.qbFormat ?? "unknown",
     access,
     comparisonReady,
+    defaultSelected: input.defaultSelected ?? false,
     printableInsideFFAA,
     externalOnly: input.externalOnly ?? !printableInsideFFAA,
     ...(access === "registration_required" ? { requiresRegistration: true } : {}),
@@ -67,6 +69,25 @@ function source(input: SourceInput): AuctionValueSource {
 
 const currentValueSources: AuctionValueSource[] = [
   source({
+    id: "sleeper-suggested",
+    name: "Sleeper Suggested Auction Values",
+    shortName: "Sleeper",
+    sourceType: "expert_projection",
+    category: "current_values",
+    sourceUrl: "https://sleeper.com/leagues/1385319428408774656/players",
+    notes: "Sleeper's public 2026 suggested auction-dollar board, imported separately from its season fantasy-point projections.",
+    formats: ["ppr"],
+    leagueSizes: [12],
+    defaultLeagueSize: 12,
+    budget: 200,
+    qbFormat: "one_qb",
+    comparisonReady: true,
+    defaultSelected: true,
+    sourceUpdatedAt: "2026-08-11",
+    importedAt: "2026-08-11",
+    rosterAssumptions: "12 teams, one QB, Full PPR, $200 budget.",
+  }),
+  source({
     id: "espn",
     name: "ESPN Cheat Sheet Central",
     shortName: "ESPN",
@@ -80,6 +101,7 @@ const currentValueSources: AuctionValueSource[] = [
     budget: 200,
     qbFormat: "one_qb",
     comparisonReady: true,
+    defaultSelected: true,
     sourceUpdatedAt: "2026-08-10",
     importedAt: "2026-08-10",
     rosterAssumptions: "10 teams, $200 salary cap; PPR draft-kit assumptions.",
@@ -112,6 +134,7 @@ const currentValueSources: AuctionValueSource[] = [
     budget: 200,
     qbFormat: "one_qb",
     comparisonReady: true,
+    defaultSelected: true,
     sourceUpdatedAt: "2026-08-19",
     importedAt: "2026-08-25T14:16:50.648Z",
     rosterAssumptions: "12 teams, one QB, $200 budget.",
@@ -238,6 +261,7 @@ const currentValueSources: AuctionValueSource[] = [
     budget: 200,
     qbFormat: "one_qb",
     comparisonReady: true,
+    defaultSelected: true,
     sourceUpdatedAt: "2026-08-20",
     importedAt: "2026-08-25T14:16:50.648Z",
     rosterAssumptions: "12 teams, $200, 18 roster spots; 1 QB, 2 RB, 3 WR, 1 TE, K and DEF.",

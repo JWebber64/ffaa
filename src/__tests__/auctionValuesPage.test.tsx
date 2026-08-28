@@ -33,6 +33,18 @@ describe("Auction Values page", () => {
   afterEach(cleanup);
   beforeEach(() => window.localStorage.clear());
 
+  it("defaults 12-team PPR to Sleeper, FFToday, and USA Today while naming Vegas projection coverage", () => {
+    renderRoute("/auction-values");
+    const selected = screen.getByLabelText("Selected comparison sources");
+    expect(selected).toHaveTextContent("3");
+    expect(selected).toHaveTextContent("Sleeper");
+    expect(selected).toHaveTextContent("FFToday");
+    expect(selected).toHaveTextContent("USA Today");
+    expect(screen.getByLabelText("Fair Value source model")).toHaveTextContent("5 publishers");
+    expect(screen.getByLabelText("Fair Value source model")).toHaveTextContent("Vegas (WinWithOdds)");
+    expect(screen.getByLabelText("Fair Value source model")).toHaveTextContent("6 publisher votes");
+  }, 15_000);
+
   it("restores scoring, budget, league size, source selection, search, and position from the URL", () => {
     renderRoute("/auction-values?format=half_ppr&budget=250&teams=12&sources=fftoday,usa-today&q=Jahmyr&position=RB&freshness=archive");
     expect(screen.getByRole("tab", { name: "Half PPR" })).toHaveAttribute("aria-selected", "true");

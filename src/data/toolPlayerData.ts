@@ -26,6 +26,8 @@ export interface ToolPlayer {
   projectionLow?: number | null;
   projectionHigh?: number | null;
   projectionUpdatedAt?: string;
+  fairValuePublisherCount?: number;
+  fairValuePublishers?: string[];
   valueConfidence: number | null;
   valueSources: PlayerValueSource[];
   status: string;
@@ -187,6 +189,8 @@ export function buildToolPlayers(
       projectionLow: numberValue(row.player.projectionLow),
       projectionHigh: numberValue(row.player.projectionHigh),
       projectionUpdatedAt: String(row.player.projectionUpdatedAt ?? ""),
+      fairValuePublisherCount: Math.max(0, numberValue(row.player.fairValuePublisherCount) ?? 0),
+      fairValuePublishers: row.player.fairValuePublishers ?? [],
       valueConfidence: numberValue(row.player.valueConfidence),
       valueSources: row.player.valueSources ?? [],
       status: String(row.sleeper?.status ?? ""),

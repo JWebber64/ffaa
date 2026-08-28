@@ -2,8 +2,9 @@
 
 The app exposes two different dollar concepts:
 
-- `auctionValue`: FFAA fair value, recalculated for the active scoring, team
-  count, drafted roster size, and budget.
+- `auctionValue`: GameHQ Fair Value, built from one median vote per independent
+  publisher and recalculated for the active scoring, team count, drafted roster
+  size, and budget.
 - `marketValue`: the median of compatible imported published auction-dollar
   sources before FFAA projection and roster-demand adjustments.
 
@@ -69,10 +70,18 @@ recently connected league by default and display the active assumptions. When
 Sleeper does not publish an auction budget, GameHQ labels and uses the standard
 $200 fallback.
 
-Published auction values are combined with a median. Projection, ADP, rank, and
-market-index signals can adjust fair value but never count as additional auction
-boards. Confidence is therefore capped at 55% when only one compatible
-auction-dollar source is present.
+Every included season projection is first converted to the active league's
+auction-dollar scale. Complete compatible published boards are already in that
+scale. Products from the same publisher are collapsed before the final median,
+so Sleeper Season plus Sleeper Suggested still receive one Sleeper vote, and
+FFToday's projection plus auction board still receive one FFToday vote. The
+current publisher set is ESPN, Sleeper, WinWithOdds Vegas, FFToday, CBS, and USA
+TODAY. Rank and ADP remain fallbacks when no publisher source matches a player.
+
+The separate published-value median uses Sleeper Suggested, FFToday, and USA
+TODAY for 12-team Full PPR. Standard and Half PPR use the compatible FFToday and
+USA TODAY boards. Public previews and boards without confirmed league-size
+assumptions remain inspectable but do not silently enter this default median.
 
 Season projections are normalized to the selected Standard, Half PPR, or PPR
 format before the median is calculated. ESPN Clay and WinWithOdds are rescored
@@ -82,10 +91,9 @@ because its current consensus is built from ESPN, CBS, and FFToday. Razzball is
 also cataloged, but its Cloudflare challenge currently prevents a dependable
 unattended refresh, so it is never represented as a populated source.
 
-LeagueLogs is a market-index signal rather than a published auction price. It
-has limited supporting influence on the model and is displayed as an FFAA
-market-derived dollar column, with visible `Powered by LeagueLogs API`
-attribution. Direct published auction dollars remain the primary inputs.
+LeagueLogs and completed-auction AAV are market signals rather than publisher
+Fair Value votes. They remain separately attributable and available for market
+context without being blended into the default projection consensus.
 
 Use `npm run values:import` to normalize CSV or JSON exports into the source files consumed by `src/data/playerValues.ts`.
 

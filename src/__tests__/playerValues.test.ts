@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { VALUE_SOURCE_WEIGHTS } from "../config/valueSourceWeights";
 import {
   applyConsensusAuctionValues,
+  publisherFairValueSummary,
   projectionConsensusSummary,
   rankToAuctionValue,
 } from "../data/playerValues";
@@ -46,7 +47,12 @@ describe("player value consensus", () => {
     expect(player?.valueConfidence).toBeGreaterThan(0.55);
     expect(player?.valueConfidence).toBeLessThanOrEqual(0.98);
     expect(player?.marketValue).toBeGreaterThan(1);
-    expect(player?.marketValueSourceCount).toBeGreaterThanOrEqual(7);
+    expect(player?.marketValueSourceCount).toBe(3);
+    expect(player?.fairValuePublisherCount).toBe(6);
+    expect(player?.fairValuePublishers).toEqual(expect.arrayContaining([
+      "Sleeper",
+      "Vegas (WinWithOdds)",
+    ]));
     expect(
       player?.valueSources?.find((source) => source.sourceId === "sleeper-suggested")
         ?.normalizedValue,
@@ -166,6 +172,36 @@ describe("player value consensus", () => {
     expect(summary).toEqual({ points: 265, sourceCount: 4, low: 250, high: 1_000 });
   });
 
+  it("collapses Sleeper products before the publisher-level Fair Value median", () => {
+    const source = (
+      sourceId: string,
+      publisherId: string,
+      kind: PlayerValueSource["kind"],
+      normalizedValue: number,
+    ): PlayerValueSource => ({
+      source: sourceId,
+      sourceId,
+      publisherId,
+      kind,
+      value: normalizedValue,
+      normalizedValue,
+      weight: 1,
+      includedInConsensus: true,
+    });
+    const summary = publisherFairValueSummary([
+      source("sleeper-season", "sleeper", "projection", 40),
+      source("sleeper-suggested", "sleeper", "auction", 60),
+      source("winwithodds", "vegas", "projection", 70),
+      source("usa-today", "usa-today", "auction", 90),
+    ]);
+
+    expect(summary).toMatchObject({
+      value: 70,
+      publisherCount: 3,
+      publisherIds: ["sleeper", "vegas", "usa-today"],
+    });
+  });
+
   it("keeps Sleeper's Bijan row distinct from the abbreviated Brian Robinson row", () => {
     const [bijan] = applyConsensusAuctionValues([
       makePlayer({
@@ -273,7 +309,7 @@ describe("player value consensus", () => {
     ], 200, { scoring: "standard", calibrate: false });
 
     expect(player?.marketValue).toBeGreaterThan(1);
-    expect(player?.marketValueSourceCount).toBe(3);
+    expect(player?.marketValueSourceCount).toBe(2);
     expect(
       player?.valueSources?.find(
         (source) => source.sourceId === "fftoday" && source.includedInConsensus !== false,

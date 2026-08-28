@@ -39,6 +39,7 @@ export type AuctionValueSource = {
   qbFormat: "one_qb" | "superflex" | "both" | "unknown";
   access: AuctionSourceAccess;
   comparisonReady: boolean;
+  defaultSelected: boolean;
   printableInsideFFAA: boolean;
   externalOnly: boolean;
   requiresRegistration?: boolean;
@@ -85,6 +86,7 @@ export type AuctionSortKey =
   | "expert"
   | "market"
   | "difference"
+  | "gamehqFair"
   | `source:${string}`;
 
 export type SourceCompatibility = {
@@ -116,6 +118,11 @@ export type AuctionComparisonRow = {
   expertFairValue: number | null;
   marketAav: number | null;
   fairMarketDifference: number | null;
+  gamehqFairValue: number | null;
+  fairValuePublisherCount: number;
+  fairValuePublishers: string[];
+  projectionSourceCount: number;
+  publishedValueSourceCount: number;
 };
 
 export type PlayerMatchWarning = {

@@ -13,6 +13,11 @@ import espnClayRows from "./players-2026-espn-clay-projections.json";
 import sleeperProjectionRows from "./players-2026-sleeper-projections.json";
 import publicProjectionRows from "./players-2026-public-projections.json";
 import winWithOddsRows from "./players-2026-winwithodds.json";
+import {
+  FAIR_VALUE_PUBLISHERS,
+  FAIR_VALUE_PUBLISHED_SOURCE_IDS,
+  fairValuePublisherForSourceId,
+} from "./valuePublisherSources";
 import fantasyProsValueRows from "./players-2026-fantasypros-values.json";
 import rotoWireRows from "./players-2026-rotowire.json";
 import yahooRows from "./players-2026-yahoo-values.json";
@@ -57,6 +62,13 @@ const DEFAULT_AUCTION_ROSTER_SLOTS: AuctionValueRosterSlot[] = [
 ];
 const MINIMUM_BID_SHARE = 0.15;
 const PREMIUM_CURVE_EXPONENT = 1.05;
+
+const PUBLISHED_SOURCE_TEAM_COUNTS: Readonly<Record<string, readonly number[]>> = {
+  "sleeper-suggested": [12],
+  espn: [10],
+  fftoday: [12],
+  "usa-today": [12],
+};
 
 export const AUCTION_VALUE_SOURCE_COLUMNS = [
   { id: "sleeper-paid", label: "Sleeper Paid", shortLabel: "SL Paid" },
@@ -195,6 +207,7 @@ const SOURCE_DEFINITIONS: SourceDefinition[] = [
     weight: VALUE_SOURCE_WEIGHTS.sleeperSuggested,
     sourceBudget: 200,
     consensusScoring: "ppr",
+    consensusTeamCounts: PUBLISHED_SOURCE_TEAM_COUNTS["sleeper-suggested"]!,
     valueFields: ["auctionValue", "value"],
   },
   {
@@ -206,6 +219,7 @@ const SOURCE_DEFINITIONS: SourceDefinition[] = [
     weight: VALUE_SOURCE_WEIGHTS.espnSalaryCap,
     sourceBudget: 200,
     consensusScoring: "ppr",
+    consensusTeamCounts: PUBLISHED_SOURCE_TEAM_COUNTS.espn!,
     valueFields: ["value", "auctionValue", "projectedValue"],
   },
   ...PUBLIC_AUCTION_VALUE_SOURCES
@@ -230,7 +244,12 @@ const SOURCE_DEFINITIONS: SourceDefinition[] = [
       sourceBudget: source.budget ?? 200,
       valueFields: ["auctionValue", "value"],
       ...(source.scoring ? { consensusScoring: source.scoring } : {}),
-      displayOnly: !source.includedInConsensus,
+      ...(PUBLISHED_SOURCE_TEAM_COUNTS[source.id]
+        ? { consensusTeamCounts: PUBLISHED_SOURCE_TEAM_COUNTS[source.id] }
+        : {}),
+      displayOnly:
+        !source.includedInConsensus ||
+        !FAIR_VALUE_PUBLISHED_SOURCE_IDS.has(source.id),
     })),
   {
     sourceId: "leaguelogs-ppr",
@@ -418,6 +437,7 @@ type SourceDefinition = {
   rankFields?: string[];
   updatedAt?: string;
   consensusScoring?: AuctionScoring;
+  consensusTeamCounts?: readonly number[];
   projectionScoring?: AuctionScoring;
   rescoreStatLine?: boolean;
   displayOnly?: boolean;
@@ -697,6 +717,9 @@ function projectionDollarCandidates(
     const candidate: SourceCandidate = {
       source: row.source,
       ...(row.sourceId ? { sourceId: row.sourceId } : {}),
+      ...(fairValuePublisherForSourceId(row.sourceId)
+        ? { publisherId: fairValuePublisherForSourceId(row.sourceId)!.id }
+        : {}),
       ...(row.sourceUrl ? { sourceUrl: row.sourceUrl } : {}),
       kind: "projection",
       value: row.projectedPoints,
@@ -733,6 +756,10 @@ function compatibleScoring(
   );
   const sourceScoring = rowScoring ?? source.consensusScoring;
   return !sourceScoring || sourceScoring === targetScoring;
+}
+
+function compatibleTeamCount(source: SourceDefinition, targetTeamCount: number) {
+  return !source.consensusTeamCounts?.length || source.consensusTeamCounts.includes(targetTeamCount);
 }
 
 function receptionPointValue(scoring: AuctionScoring) {
@@ -831,13 +858,19 @@ function buildExternalValueMap(
       const candidate: SourceCandidate = {
         source: source.source,
         ...(source.sourceId ? { sourceId: source.sourceId } : {}),
+        ...(fairValuePublisherForSourceId(source.sourceId)
+          ? { publisherId: fairValuePublisherForSourceId(source.sourceId)!.id }
+          : {}),
         ...(source.sourceUrl ? { sourceUrl: source.sourceUrl } : {}),
         kind: "auction",
         value,
         normalizedValue,
         weight: source.weight,
         direct: true,
-        includedInConsensus: !source.displayOnly && compatibleScoring(row, source, scoring),
+        includedInConsensus:
+          !source.displayOnly &&
+          compatibleScoring(row, source, scoring) &&
+          compatibleTeamCount(source, teamCount),
         ...(normalizeAuctionScoring(row.scoring) ?? source.consensusScoring
           ? { scoring: (normalizeAuctionScoring(row.scoring) ?? source.consensusScoring)! }
           : {}),
@@ -988,6 +1021,61 @@ function medianValue(sources: SourceCandidate[]) {
   return Math.max(1, Math.round(value * 100) / 100);
 }
 
+function medianNumber(values: readonly number[]) {
+  if (!values.length) return null;
+  const sorted = [...values].sort((left, right) => left - right);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 1
+    ? sorted[middle]!
+    : (sorted[middle - 1]! + sorted[middle]!) / 2;
+}
+
+export type PublisherFairValueSummary = {
+  value: number;
+  publisherCount: number;
+  publisherIds: string[];
+  publisherLabels: string[];
+};
+
+/**
+ * Convert every included projection or published-dollar product to the active
+ * league's dollar scale, collapse sibling products from the same publisher,
+ * then take one robust median vote per publisher.
+ */
+export function publisherFairValueSummary(
+  sources: readonly PlayerValueSource[],
+): PublisherFairValueSummary | null {
+  const valuesByPublisher = new Map<string, number[]>();
+  for (const source of sources) {
+    if (
+      (source.kind !== "auction" && source.kind !== "projection") ||
+      source.includedInConsensus === false ||
+      !Number.isFinite(source.normalizedValue)
+    ) continue;
+    const publisherId = source.publisherId ?? fairValuePublisherForSourceId(source.sourceId)?.id;
+    if (!publisherId) continue;
+    const values = valuesByPublisher.get(publisherId) ?? [];
+    values.push(source.normalizedValue);
+    valuesByPublisher.set(publisherId, values);
+  }
+
+  const publisherVotes = [...valuesByPublisher.entries()].flatMap(([publisherId, values]) => {
+    const value = medianNumber(values);
+    return value === null ? [] : [{ publisherId, value }];
+  });
+  const consensus = medianNumber(publisherVotes.map((entry) => entry.value));
+  if (consensus === null) return null;
+
+  const publisherIds = publisherVotes.map((entry) => entry.publisherId);
+  const labels = new Map(FAIR_VALUE_PUBLISHERS.map((publisher) => [publisher.id, publisher.label]));
+  return {
+    value: Math.max(1, Math.round(consensus * 100) / 100),
+    publisherCount: publisherVotes.length,
+    publisherIds,
+    publisherLabels: publisherIds.map((publisherId) => labels.get(publisherId) ?? publisherId),
+  };
+}
+
 function includedAuctionSources(sources: SourceCandidate[]) {
   return sources.filter(
     (source) => source.kind === "auction" && source.includedInConsensus !== false,
@@ -996,18 +1084,7 @@ function includedAuctionSources(sources: SourceCandidate[]) {
 
 function preliminaryAuctionValue(sources: SourceCandidate[]) {
   const included = sources.filter((source) => source.includedInConsensus !== false);
-  const directAuction = includedAuctionSources(included);
-  if (!directAuction.length) return weightedAverage(included);
-
-  // Published dollar boards are combined with a robust median so one high or
-  // low board cannot pull the entire consensus away from the market.
-  const directValue = medianValue(directAuction);
-  const supportingValue = weightedAverage(included.filter((source) => source.kind !== "auction"));
-  if (directValue === null || supportingValue === null) return directValue;
-
-  // Direct published auction dollars remain the anchor. Projection, ADP, rank,
-  // and market signals can move the order without receiving another full vote.
-  return directValue * 0.88 + supportingValue * 0.12;
+  return publisherFairValueSummary(included)?.value ?? weightedAverage(included);
 }
 
 function confidenceForSources(sources: SourceCandidate[]) {
@@ -1061,7 +1138,10 @@ export function projectionConsensusSummary(
       typeof source.projectedPoints !== "number" ||
       !Number.isFinite(source.projectedPoints)
     ) continue;
-    const publisher = source.sourceId ?? source.source;
+    const publisher = source.publisherId
+      ?? fairValuePublisherForSourceId(source.sourceId)?.id
+      ?? source.sourceId
+      ?? source.source;
     if (!byPublisher.has(publisher)) byPublisher.set(publisher, source);
   }
 
@@ -1090,6 +1170,7 @@ function toPlayerValueSource(source: SourceCandidate): PlayerValueSource {
   const valueSource: PlayerValueSource = {
     source: source.source,
     ...(source.sourceId ? { sourceId: source.sourceId } : {}),
+    ...(source.publisherId ? { publisherId: source.publisherId } : {}),
     ...(source.sourceUrl ? { sourceUrl: source.sourceUrl } : {}),
     kind: source.kind as PlayerValueSourceKind,
     value: source.value,
@@ -1123,6 +1204,8 @@ type PreliminaryPlayerValue = {
   projectionLow?: number;
   projectionHigh?: number;
   projectionUpdatedAt?: string;
+  fairValuePublisherCount: number;
+  fairValuePublishers: string[];
 };
 
 function calibrationUniverse(
@@ -1254,6 +1337,7 @@ export function applyConsensusAuctionValues(
     if (preliminaryValue === null) return [];
 
     const projectionSummary = projectionConsensusSummary(sources);
+    const fairValueSummary = publisherFairValueSummary(sources);
     const auctionSources = includedAuctionSources(sources);
     const marketValue = medianValue(auctionSources);
     const marketValueUpdatedAt = latestSourceUpdate(auctionSources);
@@ -1272,6 +1356,8 @@ export function applyConsensusAuctionValues(
       ...(projectionSummary?.updatedAt
         ? { projectionUpdatedAt: projectionSummary.updatedAt }
         : {}),
+      fairValuePublisherCount: fairValueSummary?.publisherCount ?? 0,
+      fairValuePublishers: fairValueSummary?.publisherLabels ?? [],
     }];
   });
 
@@ -1300,6 +1386,8 @@ export function applyConsensusAuctionValues(
       ...(entry.projectionUpdatedAt
         ? { projectionUpdatedAt: entry.projectionUpdatedAt }
         : {}),
+      fairValuePublisherCount: entry.fairValuePublisherCount,
+      fairValuePublishers: entry.fairValuePublishers,
       valueSources: entry.sources.map(toPlayerValueSource),
       valueConfidence: confidenceForSources(entry.sources),
       valueUpdatedAt: VALUE_UPDATED_AT,

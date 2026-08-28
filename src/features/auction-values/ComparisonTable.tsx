@@ -83,7 +83,7 @@ export function ComparisonTable(props: Props) {
     <>
       <div className={`auction-table-region density-${props.density} mobile-${props.mobileView}`} role="region" aria-label="Auction value comparison table" tabIndex={0}>
         <table className="auction-comparison-table">
-          <caption className="sr-only">Player auction values by selected source with expert, market, and consensus aggregates.</caption>
+          <caption className="sr-only">Player auction values by selected published source with GameHQ Fair Value and market aggregates.</caption>
           <thead>
             <tr>
               <th className="auction-rank-column" scope="col">#</th>
@@ -91,6 +91,7 @@ export function ComparisonTable(props: Props) {
               <SortHeader label="Pos" sortKey="position" activeKey={props.sortKey} direction={props.sortDirection} onSort={props.onSort} />
               <SortHeader label="NFL" sortKey="team" activeKey={props.sortKey} direction={props.sortDirection} onSort={props.onSort} />
               <th scope="col">Bye</th>
+              <SortHeader label="GameHQ Fair" sortKey="gamehqFair" activeKey={props.sortKey} direction={props.sortDirection} onSort={props.onSort} title="League-adjusted Fair Value. Each independent publisher receives one vote; Sleeper and FFToday products are collapsed within their publisher." className="auction-gamehq-fair-column" />
               {props.sources.map((source) => (
                 <SortHeader
                   key={source.id}
@@ -110,7 +111,7 @@ export function ComparisonTable(props: Props) {
                 <SortHeader label="Max" sortKey="maximum" activeKey={props.sortKey} direction={props.sortDirection} onSort={props.onSort} />
                 <SortHeader label="Spread" sortKey="spread" activeKey={props.sortKey} direction={props.sortDirection} onSort={props.onSort} />
                 <SortHeader label="N" sortKey="count" activeKey={props.sortKey} direction={props.sortDirection} onSort={props.onSort} title="Number of sources contributing to consensus." />
-                <SortHeader label="Expert" sortKey="expert" activeKey={props.sortKey} direction={props.sortDirection} onSort={props.onSort} title="Median compatible expert fair value." />
+                <SortHeader label="Published" sortKey="expert" activeKey={props.sortKey} direction={props.sortDirection} onSort={props.onSort} title="Median compatible published auction value." />
                 <SortHeader label="Market" sortKey="market" activeKey={props.sortKey} direction={props.sortDirection} onSort={props.onSort} title="Median compatible market AAV." />
                 <SortHeader label="Fair − Market" sortKey="difference" activeKey={props.sortKey} direction={props.sortDirection} onSort={props.onSort} />
               </> : null}
@@ -127,6 +128,10 @@ export function ComparisonTable(props: Props) {
                   <td><span className={`auction-position-chip pos-${row.position.toLowerCase()}`}>{row.position}</span></td>
                   <td>{row.nflTeam ?? "—"}</td>
                   <td>{row.byeWeek ?? "—"}</td>
+                  <td className="auction-gamehq-fair-value" title={row.fairValuePublishers.length ? `Publishers: ${row.fairValuePublishers.join(", ")}` : undefined}>
+                    <strong>{money(row.gamehqFairValue)}</strong>
+                    <small>{row.fairValuePublisherCount || "—"} pub · {row.projectionSourceCount || "—"} proj · {row.publishedValueSourceCount || "—"} boards</small>
+                  </td>
                   {props.sources.map((source) => {
                     const value = row.sourceValues[source.id];
                     const high = extremes.highest === source.id;
@@ -161,10 +166,12 @@ export function ComparisonTable(props: Props) {
       <div className={`auction-mobile-stack ${props.mobileView === "stacked" ? "is-active" : ""}`}>
         {props.rows.map((row, index) => (
           <article className="auction-mobile-player" key={row.playerId}>
-            <header><span>{index + 1}</span><div><strong>{row.playerName}</strong><small>{row.position} · {row.nflTeam ?? "FA"} · Bye {row.byeWeek ?? "—"}</small></div><b>{money(row.median)}</b></header>
+            <header><span>{index + 1}</span><div><strong>{row.playerName}</strong><small>{row.position} · {row.nflTeam ?? "FA"} · Bye {row.byeWeek ?? "—"}</small></div><b>{money(row.gamehqFairValue)}</b></header>
             <dl>
+              <div><dt>GameHQ Fair</dt><dd>{money(row.gamehqFairValue)}</dd></div>
+              <div><dt>Inputs</dt><dd>{row.fairValuePublisherCount} pub · {row.projectionSourceCount} proj · {row.publishedValueSourceCount} boards</dd></div>
               {props.sources.map((source) => <div key={source.id}><dt>{source.shortName}</dt><dd>{money(row.sourceValues[source.id]?.displayValue)}</dd></div>)}
-              <div><dt>Expert fair value</dt><dd>{money(row.expertFairValue)}</dd></div>
+              <div><dt>Published value</dt><dd>{money(row.expertFairValue)}</dd></div>
               <div><dt>Market AAV</dt><dd>{money(row.marketAav)}</dd></div>
               <div><dt>Spread</dt><dd>{money(row.spread)}</dd></div>
             </dl>
