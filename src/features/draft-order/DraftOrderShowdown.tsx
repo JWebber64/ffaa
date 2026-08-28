@@ -68,14 +68,13 @@ export default function DraftOrderShowdown() {
   const [actionStatus, setActionStatus] = useState("");
   const [verification, setVerification] = useState<DraftOrderVerification | null>(null);
   const [announcement, setAnnouncement] = useState("");
-  const [resultsOpen, setResultsOpen] = useState(() => state.phase === "results");
+  const [resultsOpen, setResultsOpen] = useState(false);
   const autoRoomLoaded = useRef(false);
   const viewOrderRef = useRef<HTMLButtonElement | null>(null);
   const { muted, setMuted, play } = useShowdownAudio();
   const selectedLeagueId = state.leagueId || searchParams.get("league")?.trim() || activeLeagueId;
   const isEventPhase = state.phase === "countdown" || state.phase === "running" || state.phase === "results";
   const eventObscured = state.phase === "results" && resultsOpen;
-  const completedDrawId = state.phase === "results" ? state.draw?.id ?? "" : "";
 
   useEffect(() => {
     if (state.draw && !state.readOnly) persistActiveShowdownState(state);
@@ -147,10 +146,6 @@ export default function DraftOrderShowdown() {
   }, [isEventPhase]);
 
   useEffect(() => {
-    if (completedDrawId) setResultsOpen(true);
-  }, [completedDrawId]);
-
-  useEffect(() => {
     if (state.phase === "locked") dispatch({ type: "begin-countdown" });
   }, [state.phase]);
 
@@ -201,6 +196,7 @@ export default function DraftOrderShowdown() {
         ...(state.roomContext?.draftId ? { draftId: state.roomContext.draftId } : {}),
       });
       const animationPlan = await createDraftOrderAnimationPlan(draw);
+      setResultsOpen(false);
       dispatch({ type: "lock", draw, animationPlan });
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "The showdown could not be started.");
@@ -217,12 +213,18 @@ export default function DraftOrderShowdown() {
 
   const handleComplete = useCallback(() => {
     dispatch({ type: "finish" });
+    setAnnouncement("Showdown complete. The official order is ready to view.");
     play("finish");
   }, [play]);
 
   const handleSkip = useCallback(() => {
     setAnnouncement("Animation skipped. Complete draft order is now available.");
     dispatch({ type: "finish" });
+  }, []);
+
+  const handleReplay = useCallback(() => {
+    setResultsOpen(false);
+    dispatch({ type: "replay" });
   }, []);
 
   const handleCloseResults = useCallback(() => {
@@ -304,6 +306,7 @@ export default function DraftOrderShowdown() {
         ...(state.draw.draftId ? { draftId: state.draw.draftId } : {}),
       });
       const animationPlan = await createDraftOrderAnimationPlan(draw);
+      setResultsOpen(false);
       dispatch({ type: "lock", draw, animationPlan });
       setActionStatus("");
     } finally {
@@ -317,6 +320,7 @@ export default function DraftOrderShowdown() {
     try {
       const draw = await changeDraftOrderRevealMode(state.draw, mode);
       const animationPlan = await createDraftOrderAnimationPlan(draw, mode);
+      setResultsOpen(false);
       dispatch({ type: "reveal-with", draw, animationPlan });
     } finally {
       setBusy(false);
@@ -329,6 +333,7 @@ export default function DraftOrderShowdown() {
 
     clearActiveShowdownState();
     autoRoomLoaded.current = false;
+    setResultsOpen(false);
     dispatch({ type: "reset" });
     setNotice("");
     setActionStatus("");
@@ -344,7 +349,7 @@ export default function DraftOrderShowdown() {
       {state.phase === "setup" || state.phase === "choose-game" ? (
         <>
           <header className="draft-order-hero">
-            <div><span className="draft-order-eyebrow">GameHQ presents</span><h1 className="ff-display">Draft Order Showdown</h1><p>Let football decide your draft order.</p><div className="draft-order-trust"><Trophy aria-hidden="true" /><span><strong>Built for draft night.</strong> Three football games. One league-wide showdown.</span></div></div>
+            <div><span className="draft-order-eyebrow">Draft-night tool</span><h1 className="ff-display">Draft Order Showdown</h1><p>Bring in the league, choose a game, and reveal the order together.</p></div>
             <div className="draft-order-utility"><strong>{state.draw ? `Draw ${state.draw.rerollIndex + 1}` : `${state.participants.length || 0} managers`}</strong><button type="button" onClick={handleReset} disabled={busy}><RotateCcw aria-hidden="true" /><span>Reset</span></button><button type="button" onClick={() => setMuted(!muted)} aria-label={muted ? "Enable showdown sound" : "Mute showdown sound"}>{muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}<span>{muted ? "Sound off" : "Sound on"}</span></button></div>
           </header>
           <nav className="showdown-progress-compact" aria-label="Draft order progress">
@@ -369,7 +374,7 @@ export default function DraftOrderShowdown() {
               <button className="showdown-sound-button" type="button" onClick={() => setMuted(!muted)} aria-label={muted ? "Enable showdown sound" : "Mute showdown sound"}>{muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}<span>{muted ? "Sound off" : "Sound on"}</span></button>
               <Button size="sm" variant="secondary" onClick={handleReset}><RotateCcw size={16} aria-hidden="true" /> Reset</Button>
               {state.phase === "running" ? <Button size="sm" variant="secondary" onClick={handleSkip}>Skip</Button> : null}
-              {state.phase === "results" && !resultsOpen ? <Button ref={viewOrderRef} size="sm" onClick={() => setResultsOpen(true)}><ListOrdered size={16} aria-hidden="true" /> View order</Button> : null}
+              {state.phase === "results" && !resultsOpen ? <Button ref={viewOrderRef} size="sm" onClick={() => setResultsOpen(true)}><ListOrdered size={16} aria-hidden="true" /> View official order</Button> : null}
             </div>
           </header>
           {state.phase === "countdown" ? <div className="showdown-countdown" role="status" aria-live="assertive" aria-label="Showdown countdown"><strong key={state.countdown}>{state.countdown || "GO"}</strong></div> : null}
@@ -380,7 +385,7 @@ export default function DraftOrderShowdown() {
           ) : null}
           {state.phase === "results" && resultsOpen ? (
             <ResultDialog onClose={handleCloseResults}>
-              <ResultPanel draw={state.draw} roomContext={state.roomContext} accepted={state.accepted} readOnly={state.readOnly} verification={verification} actionStatus={actionStatus} onApply={handleApply} onSave={handleSave} onCopy={handleCopy} onShare={handleShare} onReplay={() => dispatch({ type: "replay" })} onReroll={handleReroll} onReset={handleReset} onChangeMode={handleChangeMode} onVerify={handleVerify} onCopyHash={handleCopyHash} />
+              <ResultPanel draw={state.draw} roomContext={state.roomContext} accepted={state.accepted} readOnly={state.readOnly} verification={verification} actionStatus={actionStatus} onApply={handleApply} onSave={handleSave} onCopy={handleCopy} onShare={handleShare} onReplay={handleReplay} onReroll={handleReroll} onReset={handleReset} onChangeMode={handleChangeMode} onVerify={handleVerify} onCopyHash={handleCopyHash} />
             </ResultDialog>
           ) : null}
         </section>

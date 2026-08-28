@@ -31,7 +31,7 @@ afterEach(() => {
 });
 
 describe("Football Plinko reveal", () => {
-  it("builds lateral peg routes and a stadium landing slot for every locked result", async () => {
+  it("builds circular puck routes through a tall peg field and a slot for every locked result", async () => {
     const draw = await createDraftOrderDraw({
       participants: participants(),
       mode: "football-plinko",
@@ -42,18 +42,21 @@ describe("Football Plinko reveal", () => {
       <FootballPlinkoRenderer draw={draw} plan={plan} onReveal={vi.fn()} onComplete={vi.fn()} />,
     );
 
-    expect(screen.getByText("Ball drop")).toBeInTheDocument();
+    expect(screen.getByText("All pucks released")).toBeInTheDocument();
     expect(screen.getAllByText((_, element) => element?.tagName === "SPAN" && /^Pick \d+$/.test(element.textContent ?? ""))).toHaveLength(12);
 
     const tokens = [...container.querySelectorAll<HTMLElement>(".plinko-token")];
     expect(tokens).toHaveLength(12);
     expect(tokens.every((token) => token.style.getPropertyValue("--plinko-x1").endsWith("cqw"))).toBe(true);
-    expect(tokens.every((token) => new Set(token.dataset.path?.split(",")).size > 4)).toBe(true);
+    expect(tokens.every((token) => token.style.getPropertyValue("--plinko-x11").endsWith("cqw"))).toBe(true);
+    expect(tokens.every((token) => new Set(token.dataset.path?.split(",")).size > 5)).toBe(true);
     expect(new Set(tokens.map((token) => token.dataset.path)).size).toBeGreaterThan(5);
     expect(container.querySelector<HTMLElement>(".plinko-board")?.style.getPropertyValue("--plinko-slot-count")).toBe("12");
+    expect(container.querySelectorAll(".plinko-peg-row")).toHaveLength(11);
+    expect(container.querySelector(".plinko-ball-laces")).not.toBeInTheDocument();
   });
 
-  it("uses a deterministic launch sequence that is separate from pick rank", async () => {
+  it("releases every puck simultaneously while keeping deterministic motion", async () => {
     const draw = await createDraftOrderDraw({
       participants: participants(),
       mode: "football-plinko",
@@ -63,10 +66,7 @@ describe("Football Plinko reveal", () => {
     const replay = await createDraftOrderAnimationPlan(draw);
 
     expect(replay).toEqual(first);
-    const launchRanks = [...first.cues]
-      .sort((a, b) => a.delayMs - b.delayMs)
-      .map((cue) => cue.rank);
-    expect(launchRanks).not.toEqual(draw.finalParticipantIds.map((_, index) => index));
-    expect(new Set(first.cues.map((cue) => cue.delayMs)).size).toBe(draw.participants.length);
+    expect(first.cues.every((cue) => cue.delayMs === 0)).toBe(true);
+    expect(new Set(first.cues.map((cue) => cue.durationMs)).size).toBeGreaterThan(1);
   });
 });

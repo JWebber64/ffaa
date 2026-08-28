@@ -261,10 +261,12 @@ function modeTiming(
         durationMs: 6_900 + rank * 150 + (jitter % 80),
       };
     case "football-plinko": {
-      const launchGap = Math.max(620, 860 - total * 20);
       return {
-        delayMs: 420 + sequenceIndex * launchGap,
-        durationMs: 2_550 + jitter,
+        // Every puck leaves the rack on the same frame. Seeded duration
+        // variation keeps the landing beats organic without changing which
+        // slot belongs to each participant.
+        delayMs: 0,
+        durationMs: 4_200 + jitter * 5 + (sequenceIndex % 3) * 70,
       };
     }
     case "punt-bounce": {

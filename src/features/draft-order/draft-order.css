@@ -238,7 +238,7 @@
 .showdown-game-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--color-border-subtle); }
 .showdown-game-header h2 { margin: 2px 0 0; font-size: var(--type-title-card); }
 .showdown-game-header > strong { color: var(--color-text-muted); font-size: .76rem; }
-.showdown-participant-mark { display: grid; width: 42px; height: 42px; flex: none; place-items: center; overflow: hidden; border: 2px solid var(--participant-color, var(--green-300)); border-radius: 50% 50% 44% 44%; background: color-mix(in oklch, var(--participant-color, var(--green-300)) 22%, var(--gray-900)); color: var(--color-text-primary); font-size: .68rem; font-weight: 900; box-shadow: 0 4px 12px color-mix(in oklch, var(--participant-color, var(--green-300)) 18%, transparent); }
+.showdown-participant-mark { display: grid; width: 42px; height: 42px; flex: none; place-items: center; overflow: hidden; border: 2px solid var(--participant-color, var(--green-300)); border-radius: 50%; background: color-mix(in oklch, var(--participant-color, var(--green-300)) 22%, var(--gray-900)); color: var(--color-text-primary); font-size: .68rem; font-weight: 900; box-shadow: 0 4px 12px color-mix(in oklch, var(--participant-color, var(--green-300)) 18%, transparent); }
 .showdown-participant-mark.is-compact { width: 30px; height: 30px; font-size: .58rem; }
 .showdown-participant-mark img { width: 100%; height: 100%; object-fit: cover; }
 .showdown-live-order { display: grid; grid-template-columns: repeat(auto-fit, minmax(138px, 1fr)); gap: 4px; margin: 0; padding: 10px; border-top: 1px solid var(--color-border-subtle); list-style: none; }
@@ -359,7 +359,7 @@
 .plinko-board {
   container-type: inline-size;
   position: relative;
-  min-height: 540px;
+  min-height: 640px;
   isolation: isolate;
   overflow: hidden;
   border-bottom: 1px solid color-mix(in oklch, var(--football-chalk) 18%, transparent);
@@ -380,41 +380,30 @@
     linear-gradient(180deg, color-mix(in oklch, var(--green-800) 34%, transparent), transparent 42%);
   content: "";
 }
-.plinko-crowd { position: absolute; z-index: -2; inset: 72px 0 auto; height: 94px; overflow: hidden; opacity: .68; }
+.plinko-crowd { position: absolute; z-index: -2; inset: 44px 0 auto; height: 94px; overflow: hidden; opacity: .48; }
 .plinko-crowd i { position: absolute; inset-inline: 0; height: 24px; background: radial-gradient(circle, color-mix(in oklch, var(--football-chalk) 38%, transparent) 0 1px, transparent 1.6px) 0 0 / 12px 8px; transform: skewY(var(--crowd-skew, 0deg)); }
 .plinko-crowd i:nth-child(1) { top: 3px; --crowd-skew: -2deg; }
 .plinko-crowd i:nth-child(2) { top: 29px; opacity: .72; --crowd-skew: 1.5deg; }
 .plinko-crowd i:nth-child(3) { top: 55px; opacity: .45; --crowd-skew: -1deg; }
-.plinko-broadcast { position: absolute; z-index: 6; inset: 12px 14px auto; display: grid; grid-template-columns: minmax(110px, auto) minmax(0, 1fr) auto; min-height: 48px; align-items: center; border: 1px solid color-mix(in oklch, var(--football-chalk) 20%, transparent); background: color-mix(in oklch, var(--gray-950) 94%, transparent); box-shadow: 0 10px 30px color-mix(in oklch, black 36%, transparent); }
-.plinko-broadcast > * { min-width: 0; padding: 8px 12px; }
-.plinko-broadcast span { display: flex; align-items: center; gap: 7px; color: var(--football-chalk-muted); font-size: .62rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
-.plinko-broadcast span i { width: 7px; height: 7px; border-radius: 50%; background: var(--green-300); box-shadow: 0 0 12px var(--green-300); animation: plinko-live-light 900ms linear infinite alternate; }
-.plinko-broadcast strong { overflow: hidden; border-inline: 1px solid color-mix(in oklch, var(--football-chalk) 14%, transparent); color: var(--football-chalk); font-family: var(--font-display); font-size: clamp(1rem, 2.4vw, 1.5rem); line-height: 1; letter-spacing: .025em; text-align: center; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
-.plinko-broadcast em { color: var(--football-chalk-muted); font-size: .64rem; font-style: normal; font-weight: 800; text-align: right; text-transform: uppercase; }
-.plinko-release-gate { position: absolute; z-index: 4; top: 74px; left: 50%; display: grid; width: 100px; height: 46px; justify-items: center; transform: translateX(-50%); }
-.plinko-release-gate span { position: relative; z-index: 1; align-self: start; width: 100%; padding: 5px 7px; border: 1px solid color-mix(in oklch, var(--green-100) 42%, transparent); background: var(--green-900); color: var(--green-100); font-size: .52rem; font-weight: 950; letter-spacing: .12em; text-align: center; text-transform: uppercase; }
-.plinko-release-gate i,
-.plinko-release-gate b { position: absolute; top: 24px; width: 4px; height: 22px; background: var(--color-status-warning); box-shadow: 0 0 10px color-mix(in oklch, var(--color-status-warning) 34%, transparent); }
-.plinko-release-gate i { left: 31px; transform: rotate(9deg); }
-.plinko-release-gate b { right: 31px; transform: rotate(-9deg); }
-.plinko-stadium-lights { position: absolute; z-index: 2; top: 76px; left: 50%; display: flex; width: min(720px, 86%); justify-content: space-between; transform: translateX(-50%); }
+.plinko-status { position: absolute; z-index: 7; top: 10px; left: 12px; display: flex; min-height: 30px; align-items: center; gap: 12px; padding: 5px 9px; border: 1px solid color-mix(in oklch, var(--football-chalk) 18%, transparent); border-radius: var(--r-sm); background: color-mix(in oklch, var(--gray-950) 92%, transparent); color: var(--football-chalk-muted); font-size: .6rem; font-weight: 850; text-transform: uppercase; }
+.plinko-status span { display: flex; align-items: center; gap: 6px; }
+.plinko-status span i { width: 6px; height: 6px; border-radius: 50%; background: var(--green-300); animation: plinko-live-light 900ms linear infinite alternate; }
+.plinko-status strong { padding-left: 10px; border-left: 1px solid color-mix(in oklch, var(--football-chalk) 14%, transparent); color: var(--football-chalk); font-size: inherit; font-variant-numeric: tabular-nums; }
+.plinko-status.is-complete span i { animation: none; }
+.plinko-release-rack { position: absolute; z-index: 4; top: 52px; right: 3%; left: 3%; height: 20px; border-top: 2px solid color-mix(in oklch, var(--football-chalk) 58%, transparent); border-bottom: 1px solid color-mix(in oklch, var(--football-chalk) 18%, transparent); background: color-mix(in oklch, var(--gray-950) 72%, transparent); box-shadow: 0 7px 16px color-mix(in oklch, black 38%, transparent); }
+.plinko-release-rack span { position: absolute; top: 2px; left: 50%; padding: 1px 7px; background: var(--gray-950); color: var(--football-chalk-muted); font-size: .46rem; font-weight: 900; text-transform: uppercase; transform: translateX(-50%); }
+.plinko-stadium-lights { position: absolute; z-index: 2; top: 56px; left: 50%; display: flex; width: min(720px, 86%); justify-content: space-between; transform: translateX(-50%); }
 .plinko-stadium-lights i { width: 6px; height: 6px; border-radius: 50%; background: var(--football-chalk); box-shadow: 0 0 8px 3px color-mix(in oklch, var(--football-chalk) 32%, transparent), 0 0 30px 8px color-mix(in oklch, var(--green-200) 12%, transparent); }
-.plinko-pegs { position: absolute; z-index: 1; inset: 126px max(5%, 28px) 108px; display: grid; align-content: space-between; }
-.plinko-peg-row { display: grid; grid-template-columns: repeat(8, 1fr); align-items: center; }
-.plinko-peg-row:nth-child(even) { grid-template-columns: repeat(7, 1fr); margin-inline: 6.25%; }
+.plinko-pegs { position: absolute; z-index: 1; inset: 96px max(3%, 18px) 110px; display: grid; align-content: space-between; }
+.plinko-peg-row { display: grid; grid-template-columns: repeat(var(--plinko-peg-columns), 1fr); align-items: center; }
+.plinko-peg-row:nth-child(even) { grid-template-columns: repeat(var(--plinko-peg-columns-offset), 1fr); margin-inline: calc(50% / var(--plinko-peg-columns)); }
 .plinko-peg-row i { position: relative; width: 12px; height: 12px; justify-self: center; border: 2px solid color-mix(in oklch, var(--football-chalk) 72%, transparent); border-radius: 50%; background: color-mix(in oklch, var(--green-950) 72%, var(--gray-950)); box-shadow: 0 2px 0 color-mix(in oklch, black 45%, transparent), 0 0 0 4px color-mix(in oklch, var(--green-200) 5%, transparent); }
 .plinko-peg-row i::after { position: absolute; inset: 2px; border-radius: inherit; background: color-mix(in oklch, var(--football-chalk) 62%, transparent); content: ""; }
-.plinko-token-stage { container-type: inline-size; position: absolute; z-index: 5; inset: 0; pointer-events: none; }
-.plinko-token { position: absolute; bottom: 70px; left: calc(var(--plinko-final-percent) * 1%); display: grid; width: 46px; height: 46px; place-items: center; opacity: 0; transform: translate3d(var(--plinko-x0), -405px, 0) translateX(-50%) rotate(-8deg) scale(.92); will-change: transform, opacity; animation: plinko-flight var(--plinko-duration) var(--ease-in-out, cubic-bezier(.77,0,.175,1)) var(--plinko-delay) both; }
-.plinko-flight-mark { position: relative; display: grid; width: 46px; height: 46px; place-items: center; filter: drop-shadow(0 7px 7px color-mix(in oklch, black 48%, transparent)); }
-.plinko-flight-mark::before { position: absolute; z-index: -1; inset: -5px; border: 1px solid color-mix(in oklch, var(--participant-color, var(--green-300)) 72%, white 8%); border-radius: 58% 42% 58% 42%; background: color-mix(in oklch, var(--football-leather) 76%, var(--participant-color, var(--green-300))); content: ""; transform: rotate(-18deg); box-shadow: inset 0 -7px 12px color-mix(in oklch, black 28%, transparent), 0 0 18px color-mix(in oklch, var(--participant-color, var(--green-300)) 28%, transparent); }
-.plinko-flight-mark::after { position: absolute; z-index: -2; top: 41px; left: 50%; width: 2px; height: 38px; background: linear-gradient(180deg, color-mix(in oklch, var(--participant-color, var(--green-300)) 54%, transparent), transparent); content: ""; opacity: .66; transform: translateX(-50%); }
-.plinko-flight-mark .showdown-participant-mark { width: 34px; height: 34px; border-width: 1px; box-shadow: none; }
-.plinko-ball-laces { position: absolute; top: 4px; left: 50%; width: 13px; height: 2px; border-radius: 2px; background: var(--football-chalk); opacity: .9; transform: translateX(-50%) rotate(-16deg); }
-.plinko-ball-laces::before,
-.plinko-ball-laces::after { position: absolute; top: -2px; width: 2px; height: 6px; background: var(--football-chalk); content: ""; }
-.plinko-ball-laces::before { left: 3px; }
-.plinko-ball-laces::after { right: 3px; }
+.plinko-token-stage { container-type: size; position: absolute; z-index: 5; inset: 0; pointer-events: none; }
+.plinko-token { position: absolute; bottom: 70px; left: calc(var(--plinko-final-percent) * 1%); display: grid; width: 46px; height: 46px; place-items: center; opacity: 0; transform: translate3d(var(--plinko-x0), calc(-100cqh + 136px), 0) translateX(-50%); animation: plinko-flight var(--plinko-duration) linear var(--plinko-delay) both; }
+.plinko-token:not(.is-landed) { will-change: transform, opacity; }
+.plinko-flight-mark { position: relative; display: grid; width: 46px; height: 46px; place-items: center; border-radius: 50%; background: var(--gray-950); filter: drop-shadow(0 7px 7px color-mix(in oklch, black 48%, transparent)); box-shadow: 0 0 0 2px color-mix(in oklch, var(--participant-color, var(--green-300)) 56%, white 8%); }
+.plinko-flight-mark .showdown-participant-mark { width: 42px; height: 42px; border-width: 2px; box-shadow: inset 0 -4px 8px color-mix(in oklch, black 22%, transparent); }
 .plinko-landing-rail { position: absolute; z-index: 1; inset: auto 12px 65px; height: 5px; background: linear-gradient(90deg, var(--color-status-warning), var(--football-chalk), var(--color-status-warning)); box-shadow: 0 3px 0 color-mix(in oklch, black 44%, transparent), 0 0 14px color-mix(in oklch, var(--color-status-warning) 20%, transparent); }
 .plinko-slots { position: absolute; z-index: 3; inset: auto 10px 8px; display: grid; grid-template-columns: repeat(var(--plinko-slot-count), minmax(0, 1fr)); gap: 3px; margin: 0; padding: 0; list-style: none; }
 .plinko-slots li { position: relative; display: grid; min-width: 0; min-height: 54px; grid-template-rows: auto 1fr; place-items: center; overflow: hidden; border: 1px solid color-mix(in oklch, var(--football-chalk) 22%, transparent); border-radius: 3px; background: color-mix(in oklch, var(--gray-950) 91%, var(--green-900)); color: var(--football-chalk-muted); }
@@ -425,16 +414,6 @@
 .plinko-slots li.is-claimed { border-color: color-mix(in oklch, var(--green-200) 72%, transparent); color: var(--green-100); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--green-300) 18%, transparent), 0 0 16px color-mix(in oklch, var(--green-300) 18%, transparent); animation: plinko-slot-hit 260ms var(--ease-out, cubic-bezier(.23,1,.32,1)) both; }
 .plinko-slots li.is-claimed::before { opacity: 1; transform: translateY(0); transition: opacity 180ms var(--ease-out, cubic-bezier(.23,1,.32,1)), transform 260ms var(--ease-out, cubic-bezier(.23,1,.32,1)); }
 .plinko-slots li.is-first.is-claimed { border-color: var(--color-status-warning); background: color-mix(in oklch, var(--color-status-warning) 16%, var(--gray-950)); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--color-status-warning) 44%, transparent), 0 0 26px color-mix(in oklch, var(--color-status-warning) 36%, transparent); }
-.plinko-pick-one-burst { position: absolute; z-index: 2; left: calc(var(--plinko-first-percent) * 1%); bottom: 62px; display: none; width: 1px; height: 1px; pointer-events: none; }
-.plinko-board.has-first-pick .plinko-pick-one-burst { display: block; }
-.plinko-pick-one-burst i { position: absolute; left: 0; bottom: 0; width: 2px; height: 112px; background: linear-gradient(0deg, var(--color-status-warning), transparent); transform: rotate(calc((var(--burst-index, 0) - 2.5) * 14deg)); transform-origin: bottom; animation: plinko-burst 520ms var(--ease-out, cubic-bezier(.23,1,.32,1)) both; }
-.plinko-pick-one-burst i:nth-child(1) { --burst-index: 0; }
-.plinko-pick-one-burst i:nth-child(2) { --burst-index: 1; }
-.plinko-pick-one-burst i:nth-child(3) { --burst-index: 2; }
-.plinko-pick-one-burst i:nth-child(4) { --burst-index: 3; }
-.plinko-pick-one-burst i:nth-child(5) { --burst-index: 4; }
-.plinko-pick-one-burst i:nth-child(6) { --burst-index: 5; }
-
 .showdown-punt {
   --punt-amber: #f5b94c;
   --punt-field-deep: #0b2c18;
@@ -595,25 +574,22 @@
 @keyframes countdown-hit { from { opacity: 0; transform: scale(.92); } 55% { opacity: 1; transform: scale(1); } to { opacity: .88; transform: scale(.98); } }
 @keyframes dash-run { 0% { transform: translate3d(0, 0, 0); } 38% { transform: translate3d(36%, var(--runner-drift), 0); } 65% { transform: translate3d(61%, calc(var(--runner-drift) * -.4), 0); } 82% { transform: translate3d(78%, calc(var(--runner-drift) * .2), 0); } 100% { transform: translate3d(100%, 0, 0); } }
 @keyframes plinko-flight {
-  0% { opacity: 0; transform: translate3d(var(--plinko-x0), -405px, 0) translateX(-50%) rotate(-12deg) scale(.92); }
-  5% { opacity: 1; transform: translate3d(var(--plinko-x0), -382px, 0) translateX(-50%) rotate(4deg) scale(1.04); }
-  15% { transform: translate3d(var(--plinko-x1), -330px, 0) translateX(-50%) rotate(-16deg) scale(1); }
-  19% { transform: translate3d(var(--plinko-x1), -315px, 0) translateX(-50%) rotate(15deg) scale(.94, 1.07); }
-  29% { transform: translate3d(var(--plinko-x2), -278px, 0) translateX(-50%) rotate(24deg) scale(1); }
-  33% { transform: translate3d(var(--plinko-x2), -264px, 0) translateX(-50%) rotate(-19deg) scale(.94, 1.07); }
-  43% { transform: translate3d(var(--plinko-x3), -226px, 0) translateX(-50%) rotate(-25deg) scale(1); }
-  47% { transform: translate3d(var(--plinko-x3), -212px, 0) translateX(-50%) rotate(18deg) scale(.94, 1.07); }
-  57% { transform: translate3d(var(--plinko-x4), -174px, 0) translateX(-50%) rotate(23deg) scale(1); }
-  61% { transform: translate3d(var(--plinko-x4), -160px, 0) translateX(-50%) rotate(-16deg) scale(.95, 1.06); }
-  71% { transform: translate3d(var(--plinko-x5), -123px, 0) translateX(-50%) rotate(-20deg) scale(1); }
-  75% { transform: translate3d(var(--plinko-x5), -109px, 0) translateX(-50%) rotate(14deg) scale(.96, 1.05); }
-  84% { transform: translate3d(var(--plinko-x6), -75px, 0) translateX(-50%) rotate(17deg) scale(1); }
-  88% { transform: translate3d(var(--plinko-x7), -55px, 0) translateX(-50%) rotate(-10deg) scale(.97, 1.04); }
-  96% { opacity: 1; transform: translate3d(0, -8px, 0) translateX(-50%) rotate(5deg) scale(1); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0) translateX(-50%) rotate(0) scale(1.08, .9); }
+  0% { opacity: 1; transform: translate3d(var(--plinko-x0), calc(-100cqh + 136px), 0) translateX(-50%) rotate(0) scale(1); }
+  12% { transform: translate3d(var(--plinko-x1), calc(-100cqh + 194px), 0) translateX(-50%) rotate(var(--plinko-tilt-a)) scale(.97, 1.03); }
+  20% { transform: translate3d(var(--plinko-x2), calc(-90cqh + 172px), 0) translateX(-50%) rotate(var(--plinko-tilt-b)) scale(1); }
+  27% { transform: translate3d(var(--plinko-x3), calc(-80cqh + 150px), 0) translateX(-50%) rotate(var(--plinko-tilt-a)) scale(.97, 1.03); }
+  34% { transform: translate3d(var(--plinko-x4), calc(-70cqh + 129px), 0) translateX(-50%) rotate(var(--plinko-tilt-b)) scale(1); }
+  41% { transform: translate3d(var(--plinko-x5), calc(-60cqh + 107px), 0) translateX(-50%) rotate(var(--plinko-tilt-a)) scale(.97, 1.03); }
+  48% { transform: translate3d(var(--plinko-x6), calc(-50cqh + 85px), 0) translateX(-50%) rotate(var(--plinko-tilt-b)) scale(1); }
+  55% { transform: translate3d(var(--plinko-x7), calc(-40cqh + 63px), 0) translateX(-50%) rotate(var(--plinko-tilt-a)) scale(.97, 1.03); }
+  62% { transform: translate3d(var(--plinko-x8), calc(-30cqh + 41px), 0) translateX(-50%) rotate(var(--plinko-tilt-b)) scale(1); }
+  69% { transform: translate3d(var(--plinko-x9), calc(-20cqh + 20px), 0) translateX(-50%) rotate(var(--plinko-tilt-a)) scale(.97, 1.03); }
+  76% { transform: translate3d(var(--plinko-x10), calc(-10cqh - 2px), 0) translateX(-50%) rotate(var(--plinko-tilt-b)) scale(1); }
+  83% { transform: translate3d(var(--plinko-x11), -24px, 0) translateX(-50%) rotate(var(--plinko-tilt-a)) scale(.97, 1.03); }
+  92% { opacity: 1; transform: translate3d(0, -10px, 0) translateX(-50%) rotate(var(--plinko-tilt-b)) scale(1); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) translateX(-50%) rotate(0) scale(1.05, .95); }
 }
 @keyframes plinko-slot-hit { from { transform: translate3d(0, 5px, 0) scale(.94); } 60% { transform: translate3d(0, -2px, 0) scale(1.03); } to { transform: translate3d(0, 0, 0) scale(1); } }
-@keyframes plinko-burst { from { opacity: 0; transform: rotate(calc((var(--burst-index, 0) - 2.5) * 14deg)) scaleY(.1); } 45% { opacity: 1; } to { opacity: 0; transform: rotate(calc((var(--burst-index, 0) - 2.5) * 14deg)) scaleY(1); } }
 @keyframes plinko-live-light { from { opacity: .45; transform: scale(.82); } to { opacity: 1; transform: scale(1); } }
 @keyframes punt-forward {
   from { transform: translate3d(0, 0, 0); }
@@ -729,15 +705,13 @@
   .showdown-running-controls { align-items: stretch; flex-direction: column; }
   .showdown-game-header { align-items: flex-start; flex-direction: column; }
   .showdown-live-order { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .plinko-board { min-height: 500px; }
-  .plinko-broadcast { grid-template-columns: 96px minmax(0, 1fr); }
-  .plinko-broadcast em { display: none; }
-  .plinko-broadcast strong { border-right: 0; font-size: 1rem; }
+  .plinko-board { min-height: 580px; }
+  .plinko-status { right: 7px; left: 7px; justify-content: space-between; }
   .plinko-pegs { inset-inline: 16px; }
   .plinko-peg-row i { width: 9px; height: 9px; border-width: 1px; }
   .plinko-token { bottom: 69px; width: 38px; height: 38px; }
   .plinko-flight-mark { width: 38px; height: 38px; }
-  .plinko-flight-mark .showdown-participant-mark { width: 28px; height: 28px; }
+  .plinko-flight-mark .showdown-participant-mark { width: 34px; height: 34px; }
   .plinko-slots { inset-inline: 4px; gap: 2px; }
   .plinko-slots li { min-height: 54px; }
   .plinko-slots li span { letter-spacing: 0; }
@@ -771,12 +745,11 @@
   .showdown-live-order li { grid-template-columns: 20px 24px minmax(0, 1fr); padding-inline: 4px; }
   .showdown-live-order .showdown-participant-mark { width: 24px; height: 24px; }
   .results-actions .ui-button { flex-basis: 100%; }
-  .plinko-board { min-height: 470px; }
-  .plinko-broadcast { inset-inline: 7px; }
-  .plinko-broadcast > * { padding-inline: 7px; }
-  .plinko-broadcast span { font-size: .52rem; }
-  .plinko-release-gate { top: 71px; }
-  .plinko-pegs { top: 122px; bottom: 108px; }
+  .plinko-board { min-height: 540px; }
+  .plinko-status { gap: 6px; font-size: .52rem; }
+  .plinko-status strong { padding-left: 6px; }
+  .plinko-release-rack { top: 50px; }
+  .plinko-pegs { top: 90px; bottom: 108px; }
   .plinko-slots li span { font-size: .42rem; }
   .plinko-slots li span small { display: none; }
   .plinko-slots li strong { font-size: .64rem; }
@@ -805,8 +778,7 @@
   .punt-kick-flash,
   .punt-impact-mark b,
   .dash-finish-rank { animation-duration: 1ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; }
-  .plinko-broadcast span i,
-  .plinko-pick-one-burst i { animation: none !important; }
+  .plinko-status span i { animation: none !important; }
   .mode-card { transition-duration: 1ms; }
 }
 
@@ -1002,6 +974,7 @@ html.showdown-reveal-active { overflow: hidden; }
 .dash-finish-line.is-hit { animation: finish-line-hit 320ms var(--ease-out, cubic-bezier(.23,1,.32,1)); }
 .dash-lane.is-finished { animation: dash-lane-finish 420ms var(--ease-out, cubic-bezier(.23,1,.32,1)); }
 
+.showdown-focus-overlay .showdown-plinko { grid-template-rows: minmax(0, 1fr); }
 .showdown-focus-overlay .showdown-plinko .plinko-board { min-height: 0; height: 100%; }
 .showdown-focus-overlay .showdown-punt .punt-stadium { display: grid; min-height: 0; grid-template-rows: auto minmax(0, 1fr); padding: 6px; }
 .showdown-focus-overlay .showdown-punt .punt-scoreboard { min-height: 46px; margin-bottom: 5px; }

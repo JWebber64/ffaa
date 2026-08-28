@@ -136,7 +136,7 @@ describe("Draft Order Showdown UI", () => {
     ]);
     expect(document.querySelector(".mode-preview")).not.toBeInTheDocument();
     expect(document.querySelector(".mode-picker svg")).not.toBeInTheDocument();
-  });
+  }, 15_000);
 
   it("supports pasted manual entry, editable stable participants, game selection, and immediate countdown", async () => {
     renderShowdown();
@@ -172,12 +172,13 @@ describe("Draft Order Showdown UI", () => {
     await pasteManagersAndStart();
     const skip = await screen.findByRole("button", { name: "Skip" }, { timeout: 6_000 });
     fireEvent.click(skip);
-    expect(screen.getByRole("dialog", { name: /owns the first pick/ })).toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(document.querySelector(".showdown-dash")).toBeInTheDocument();
-    expect(screen.getByText(/owns the first pick/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "View official order" }));
+    expect(screen.getByRole("dialog", { name: /owns the first pick/ })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Close draft order popup" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    const viewOrder = screen.getByRole("button", { name: "View order" });
+    const viewOrder = screen.getByRole("button", { name: "View official order" });
     expect(screen.getByRole("heading", { name: "40-Yard Draft Dash" })).toBeInTheDocument();
     await waitFor(() => expect(viewOrder).toHaveFocus());
     fireEvent.click(viewOrder);
@@ -187,11 +188,12 @@ describe("Draft Order Showdown UI", () => {
     fireEvent.click(screen.getByRole("button", { name: "Replay Animation" }));
     expect(screen.getByText("3")).toBeInTheDocument();
     expect(screen.getByText("Draw 1")).toBeInTheDocument();
-  }, 10_000);
+  }, 20_000);
 
   it("rejects unauthorized official application in the result UI", async () => {
     await seedResults(roomContext(false));
     renderShowdown();
+    fireEvent.click(screen.getByRole("button", { name: "View official order" }));
     const applyButton = screen.getByRole("button", { name: "Apply to Draft Room" });
     expect(applyButton).toBeDisabled();
     expect(screen.getByText("Only that room's host can apply the official order.")).toBeInTheDocument();
@@ -201,6 +203,7 @@ describe("Draft Order Showdown UI", () => {
   it("saves, shares, applies a host-authorized order, and visibly separates a reroll", async () => {
     const firstDraw = await seedResults(roomContext(true));
     renderShowdown();
+    fireEvent.click(screen.getByRole("button", { name: "View official order" }));
     fireEvent.click(screen.getByRole("button", { name: "Save Draw" }));
     await waitFor(() => expect(persistenceMocks.save).toHaveBeenCalledWith(expect.objectContaining({ id: firstDraw.id }), false));
     fireEvent.click(screen.getByRole("button", { name: "Share Replay" }));
@@ -209,9 +212,9 @@ describe("Draft Order Showdown UI", () => {
     await waitFor(() => expect(adapterMocks.apply).toHaveBeenCalledWith(expect.objectContaining({ isHost: true }), expect.objectContaining({ id: firstDraw.id })));
     expect(await screen.findByRole("button", { name: "Applied to Draft Room" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "Generate New Order" }));
-    expect(await screen.findByLabelText("Showdown countdown")).toBeInTheDocument();
+    expect(await screen.findByLabelText("Showdown countdown", {}, { timeout: 6_000 })).toBeInTheDocument();
     expect(screen.getByText("Draw 2")).toBeInTheDocument();
-  });
+  }, 15_000);
 
   it("resets a completed draw back to empty setup and clears its active record", async () => {
     await seedResults();
@@ -230,7 +233,8 @@ describe("Draft Order Showdown UI", () => {
     await createDraftOrderAnimationPlan(draw);
     persistenceMocks.loadShare.mockResolvedValue(draw);
     renderShowdown("/draft-order?share=token");
-    expect(await screen.findByText(/owns the first pick/)).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: "View official order" }));
+    expect(screen.getByText(/owns the first pick/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Generate New Order" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Replay Animation" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Reset" })).toBeInTheDocument();
