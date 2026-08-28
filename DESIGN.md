@@ -135,6 +135,14 @@ Compound fields must read as one control. Prefixes, suffixes, and values share o
 
 Editable numeric fields use one shared stepper: a compact green-accented up/down chevron control inset at the right edge of the shared field surface, with separate accessible increment and decrement hit regions.
 
+## No AI slop
+
+This is a binding product rule. Do not use generic AI-looking imagery or templated AI interface treatments anywhere in FFAA. Prohibited treatments include hand-drawn decorative SVG scenes, cartoon or clip-art sports diagrams, fake dashboard mockups, repetitive equal-card grids, generic proof tiles, decorative pills, invented metrics, slogan-heavy filler copy, and decorative highlighted sides or accent rails on cards.
+
+Use purposeful, route-specific editorial photography, approved brand or team artwork, and real product content. Preserve approved imagery unless the user explicitly asks to replace it. If no suitable asset exists, leave a clearly identified asset requirement instead of fabricating placeholder art.
+
+Selection, activity, status, position, and emphasis must never be shown with a highlighted side of a card. Style the full perimeter, full surface, text, or icon instead. Before reconciling concurrent branches or promoting a release, compare visual-asset paths and selected-state CSS with the approved version so stale placeholder art and one-sided accents cannot overwrite it.
+
 ## Density and typography
 
 This is an information-dense product, not a poster. Layouts must maximize useful information without crowding controls or reducing ordinary body copy below 16px.
@@ -163,12 +171,14 @@ Repeated editable data belongs in one compact list or table shell. On desktop, u
 - Do keep page heroes and ordinary cards at natural height.
 - Do verify the first useful follow-up content appears in a 900px-tall desktop viewport.
 - Do use one compact list or table shell for repeated editable records on desktop.
+- Do preserve approved route imagery through branch reconciliation and release promotion.
 - Do communicate clickability through clear labels, hierarchy, borders, underlines, and hover or focus states.
 - Do not use blue, cyan, teal, or navy-blue for any interface element.
 - Do not sample an official team or editorial-image color into interface chrome.
 - Do not create an orange or page-local primary-action color.
 - Do not hard-code a new gray or green when an existing ramp step or semantic role fits.
 - Do not use decorative left-edge stripes, left-only borders, inset left bars, or left-edge pseudo-elements to indicate selection, activity, status, position, or emphasis.
+- Do not replace approved imagery with generic AI-looking, hand-drawn, decorative, or placeholder artwork.
 - Do not give a nested input its own fill when the parent already owns the field surface.
 - Do not expose browser-native number arrows or omit the shared stepper from an editable number field.
 - Do not use oversized viewport-relative headings as the primary source of hierarchy.

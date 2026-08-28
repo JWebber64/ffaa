@@ -20,6 +20,20 @@ describe("app-wide one-sided accent guard", () => {
 
     expect(design).toContain("Do not use decorative left-edge stripes");
     expect(design).toContain("nested inputs stay transparent");
+    expect(design).toContain("## No AI slop");
+    expect(design).toContain("must never be shown with a highlighted side of a card");
+  });
+
+  it("keeps the approved draft-order photography instead of placeholder SVG art", () => {
+    const artwork = readFileSync(
+      resolve(projectRoot, "src/features/draft-order/ModeArtwork.tsx"),
+      "utf8",
+    );
+
+    expect(artwork).toContain("images/draft-order/draft-dash.jpg");
+    expect(artwork).toContain("images/draft-order/football-plinko.jpg");
+    expect(artwork).toContain("images/draft-order/punt-bounce.jpg");
+    expect(artwork).not.toContain("<svg");
   });
 
   it("rejects decorative left-edge accent signatures", () => {
