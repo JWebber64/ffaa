@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { VALUE_SOURCE_WEIGHTS } from "../config/valueSourceWeights";
+import { loadPlayerPool } from "../data/loadPlayerPool";
 import {
   applyConsensusAuctionValues,
   publisherFairValueSummary,
@@ -130,6 +131,44 @@ describe("player value consensus", () => {
 
     expect(valued.reduce((sum, player) => sum + (player.auctionValue ?? 0), 0)).toBe(2400);
     expect(valued.every((player) => (player.auctionValue ?? 0) >= 1)).toBe(true);
+  });
+
+  it("does not compound a shallow league's elite values far beyond source support", () => {
+    const rosterSlots = [
+      { slot: "QB", count: 1 },
+      { slot: "RB", count: 2 },
+      { slot: "WR", count: 2 },
+      { slot: "TE", count: 1 },
+      { slot: "FLEX", count: 1 },
+      { slot: "BENCH", count: 4 },
+    ] as const;
+    const options = {
+      scoring: "ppr" as const,
+      teamCount: 12,
+      rosterSize: 11,
+      rosterSlots,
+      budget: 200,
+    };
+    const calibrated = loadPlayerPool(options);
+    const uncalibrated = new Map(
+      loadPlayerPool({ ...options, calibrate: false })
+        .map((player) => [player.id, player.auctionValue ?? 1]),
+    );
+    const modeledDraftPool = [...calibrated]
+      .sort((left, right) => (right.auctionValue ?? 0) - (left.auctionValue ?? 0))
+      .slice(0, options.teamCount * options.rosterSize);
+    const elite = modeledDraftPool.slice(0, 5);
+
+    expect(elite[0]?.auctionValue).toBeLessThanOrEqual(80);
+    for (const player of elite) {
+      expect(player.auctionValue ?? 0).toBeLessThanOrEqual(
+        (uncalibrated.get(player.id) ?? 1) + 12,
+      );
+    }
+    expect(modeledDraftPool.reduce(
+      (sum, player) => sum + (player.auctionValue ?? 0),
+      0,
+    )).toBe(2400);
   });
 
   it("scales the conserved pool for a custom per-team budget", () => {
