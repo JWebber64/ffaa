@@ -250,7 +250,7 @@ const VIEW_COPY: Record<StatsView, { title: string; description: string }> = {
 };
 
 const DEFAULT_SORTS: Record<StatsView, StatsSortState> = {
-  leaders: { columnId: "fantasyPointsPerGame", direction: "desc" },
+  leaders: { columnId: "fantasyPoints", direction: "desc" },
   draft: { columnId: "adp", direction: "asc" },
   auction: { columnId: "auctionValue", direction: "desc" },
   opportunity: { columnId: "opportunitiesPerGame", direction: "desc" },
@@ -1631,7 +1631,7 @@ export default function StatsExplorer() {
         vegas,
       }];
     });
-    return withPositionRanks(rows, (row) => row.fantasyPointsPerGame);
+    return withPositionRanks(rows, (row) => row.fantasyPoints);
   }, [addsMap, adpMap, dropsMap, projectionMap, scoring, weeklyData]);
 
   const draftPlayerRows = useMemo(() => {
