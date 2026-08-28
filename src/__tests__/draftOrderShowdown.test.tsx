@@ -145,7 +145,7 @@ describe("Draft Order Showdown UI", () => {
     fireEvent.click(screen.getByRole("button", { name: "Add names" }));
     fireEvent.click(screen.getByRole("button", { name: "Choose game" }));
     expect(screen.getByRole("button", { name: "Reset" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /100-Yard Draft Dash/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /40-Yard Draft Dash/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Football Plinko/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Punt Bounce/ })).toBeInTheDocument();
     expect(screen.queryByText("Helmet Shuffle")).not.toBeInTheDocument();
@@ -178,7 +178,7 @@ describe("Draft Order Showdown UI", () => {
     fireEvent.click(screen.getByRole("button", { name: "Close draft order popup" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     const viewOrder = screen.getByRole("button", { name: "View order" });
-    expect(screen.getByRole("heading", { name: "100-Yard Draft Dash" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "40-Yard Draft Dash" })).toBeInTheDocument();
     await waitFor(() => expect(viewOrder).toHaveFocus());
     fireEvent.click(viewOrder);
     expect(screen.getByRole("dialog", { name: /owns the first pick/ })).toBeInTheDocument();

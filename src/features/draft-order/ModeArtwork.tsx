@@ -4,7 +4,7 @@ import { appUrl } from "../../lib/appBasePath";
 const MODE_ART: Record<DraftOrderMode, { src: string; alt: string; width: number; height: number }> = {
   "draft-dash": {
     src: "images/draft-order/draft-dash.jpg",
-    alt: "Five leather footballs racing across field lanes toward a lit finish line.",
+    alt: "Five team runners racing through field lanes toward a lit 40-yard finish line.",
     width: 1672,
     height: 941,
   },

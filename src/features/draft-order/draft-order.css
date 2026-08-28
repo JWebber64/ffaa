@@ -248,20 +248,113 @@
 .showdown-live-order li.is-revealed { color: var(--color-text-primary); }
 .showdown-live-board.is-order-only { grid-template-columns: 1fr; }
 
-.dash-field { position: relative; padding: 32px 52px 12px 82px; overflow: hidden; background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), color-mix(in oklch, var(--football-chalk) 22%, transparent) calc(10% - 1px) 10%), linear-gradient(180deg, var(--football-field), color-mix(in oklch, var(--green-900) 74%, var(--gray-950))); }
-.dash-yard-labels { position: absolute; inset: 9px 52px auto 82px; display: grid; grid-template-columns: repeat(9, 1fr); color: color-mix(in oklch, var(--football-chalk) 62%, transparent); font-size: .56rem; text-align: center; }
-.dash-endzone { position: absolute; inset-block: 0; left: 0; display: grid; width: 62px; place-items: center; background: color-mix(in oklch, var(--green-950) 74%, var(--gray-950)); }
-.dash-endzone span { writing-mode: vertical-rl; transform: rotate(180deg); color: var(--football-chalk-muted); font-family: var(--font-display); font-size: 1.2rem; line-height: 1.1; letter-spacing: .1em; }
-.dash-finish-line { position: absolute; inset-block: 0; right: 15px; display: grid; width: 28px; align-items: center; background: repeating-conic-gradient(var(--football-chalk) 0 25%, var(--gray-950) 0 50%) 50% / 12px 12px; }
-.dash-finish-line span { padding: 4px 2px; background: var(--gray-950); color: var(--football-chalk); font-size: .5rem; font-weight: 900; writing-mode: vertical-rl; }
-.dash-lane { position: relative; display: grid; grid-template-columns: 160px minmax(0, 1fr) 28px; align-items: center; min-height: clamp(27px, 3vw, 38px); border-bottom: 1px solid color-mix(in oklch, var(--football-chalk) 12%, transparent); }
-.dash-team { display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; gap: 8px; min-width: 0; height: 100%; padding: 4px 10px; border-right: 1px solid color-mix(in oklch, var(--football-chalk) 15%, transparent); background: color-mix(in oklch, var(--green-950) 86%, transparent); color: var(--football-chalk); }
+.dash-field {
+  --dash-team-rail: clamp(148px, 16vw, 226px);
+  --dash-camera-x: 0px;
+  --dash-camera-start: 0%;
+  position: relative;
+  display: grid;
+  min-height: 0;
+  grid-template-rows: 44px minmax(0, 1fr) 28px;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 72% -16%, color-mix(in oklch, var(--green-200) 12%, transparent), transparent 34%),
+    linear-gradient(180deg, color-mix(in oklch, var(--green-900) 62%, var(--gray-950)), var(--football-field));
+}
+
+.dash-race-scorebug {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  border-bottom: 1px solid color-mix(in oklch, var(--football-chalk) 18%, transparent);
+  background: color-mix(in oklch, var(--gray-950) 94%, transparent);
+  box-shadow: 0 10px 28px color-mix(in oklch, black 26%, transparent);
+}
+.dash-race-scorebug > * { min-width: 0; padding: 8px 12px; }
+.dash-race-scorebug span { display: flex; align-items: center; gap: 7px; color: var(--green-200); font-size: .62rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.dash-race-scorebug span i { width: 7px; height: 7px; border-radius: 50%; background: var(--green-300); box-shadow: 0 0 12px color-mix(in oklch, var(--green-300) 72%, transparent); animation: dash-live-pulse 1.4s ease-in-out infinite; }
+.dash-race-scorebug strong { overflow: hidden; border-inline: 1px solid color-mix(in oklch, var(--football-chalk) 14%, transparent); color: var(--football-chalk); font-family: var(--font-display); font-size: clamp(.95rem, 1.8vw, 1.3rem); letter-spacing: .025em; text-align: center; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.dash-race-scorebug em { color: var(--football-chalk-muted); font-size: .62rem; font-style: normal; font-weight: 900; letter-spacing: .06em; text-align: right; text-transform: uppercase; white-space: nowrap; }
+
+.dash-course { position: absolute; z-index: 0; inset: 44px 30px 28px var(--dash-team-rail); overflow: hidden; }
+.dash-course-world {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 166.667%;
+  border-block: 3px solid color-mix(in oklch, var(--football-chalk) 78%, transparent);
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(25% - 2px), color-mix(in oklch, var(--football-chalk) 52%, transparent) calc(25% - 2px) 25%),
+    repeating-linear-gradient(90deg, color-mix(in oklch, var(--green-900) 18%, transparent) 0 12.5%, color-mix(in oklch, var(--green-950) 28%, transparent) 12.5% 25%),
+    linear-gradient(180deg, color-mix(in oklch, var(--green-700) 30%, var(--football-field)), var(--football-field));
+  box-shadow: inset 0 22px 52px color-mix(in oklch, white 4%, transparent), inset 0 -34px 64px color-mix(in oklch, black 26%, transparent);
+  transform: translate3d(var(--dash-camera-x), 0, 0);
+  will-change: transform;
+}
+.dash-course-world::before {
+  position: absolute;
+  inset: 24% 0;
+  border-block: 1px dashed color-mix(in oklch, var(--football-chalk) 34%, transparent);
+  background: repeating-linear-gradient(90deg, transparent 0 calc(2.5% - 1px), color-mix(in oklch, var(--football-chalk) 32%, transparent) calc(2.5% - 1px) 2.5%);
+  content: "";
+}
+.dash-course-world::after { position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in oklch, white 4%, transparent), transparent 22% 76%, color-mix(in oklch, black 18%, transparent)); content: ""; pointer-events: none; }
+.dash-yard-labels { position: absolute; z-index: 1; inset: 5px 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); color: color-mix(in oklch, var(--football-chalk) 76%, transparent); font-family: var(--font-display); font-size: clamp(.78rem, 1.3vw, 1.15rem); line-height: 1; text-shadow: 0 2px 5px color-mix(in oklch, black 58%, transparent); }
+.dash-yard-labels span { justify-self: end; transform: translateX(50%); }
+.dash-yard-labels span:last-child { transform: translateX(-24px); }
+.dash-start-line { position: absolute; z-index: 2; inset-block: 0; left: 0; width: 5px; background: var(--football-chalk); box-shadow: 3px 0 0 color-mix(in oklch, black 20%, transparent); }
+.dash-start-line b { position: absolute; top: 50%; left: 7px; padding: 5px 3px; background: color-mix(in oklch, var(--gray-950) 90%, transparent); color: var(--football-chalk); font-size: .48rem; letter-spacing: .08em; text-transform: uppercase; transform: translateY(-50%); writing-mode: vertical-rl; }
+.dash-finish-line { position: absolute; z-index: 4; inset-block: -3px; right: 0; display: grid; width: 22px; place-items: center; background: repeating-conic-gradient(var(--football-chalk) 0 25%, var(--gray-950) 0 50%) 50% / 10px 10px; box-shadow: -4px 0 18px color-mix(in oklch, black 32%, transparent); }
+.dash-finish-line span { padding: 5px 2px; background: var(--gray-950); color: var(--football-chalk); font-family: var(--font-display); font-size: .72rem; line-height: 1; writing-mode: vertical-rl; }
+.dash-finish-line i { position: absolute; right: -2px; width: 9px; height: 9px; border-radius: 2px; background: var(--color-status-warning); box-shadow: 0 0 12px color-mix(in oklch, var(--color-status-warning) 34%, transparent); }
+.dash-finish-line i:first-child { top: 2px; }
+.dash-finish-line i:last-child { bottom: 2px; }
+
+.dash-lanes { position: relative; z-index: 2; display: grid; min-height: 0; grid-row: 2; grid-template-rows: repeat(var(--dash-count), minmax(34px, 1fr)); overflow-y: auto; overscroll-behavior: contain; scrollbar-color: color-mix(in oklch, var(--green-300) 35%, transparent) transparent; scrollbar-width: thin; }
+.dash-lane { position: relative; display: grid; min-height: 0; grid-template-columns: var(--dash-team-rail) minmax(0, 1fr) 30px; align-items: center; overflow: hidden; border-bottom: 1px solid color-mix(in oklch, var(--football-chalk) 15%, transparent); transition: background-color 160ms ease, box-shadow 160ms ease; }
+.dash-lane.is-leader { z-index: 3; background: color-mix(in oklch, var(--participant-color, var(--green-300)) 11%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--participant-color, var(--green-300)) 62%, transparent); }
+.dash-team { display: grid; min-width: 0; height: 100%; grid-template-columns: 34px minmax(0, 1fr); align-items: center; gap: 9px; box-sizing: border-box; padding: 3px 11px; border-right: 1px solid color-mix(in oklch, var(--football-chalk) 18%, transparent); background: color-mix(in oklch, var(--gray-950) 90%, transparent); color: var(--football-chalk); }
 .dash-team > span:last-child { display: grid; min-width: 0; gap: 1px; }
-.dash-team small { color: color-mix(in oklch, var(--football-chalk) 48%, transparent); font-size: .48rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
-.dash-team strong { overflow: hidden; font-size: .64rem; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
+.dash-team .showdown-participant-mark { width: 32px; height: 32px; }
+.dash-team small { color: color-mix(in oklch, var(--football-chalk) 52%, transparent); font-size: .48rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.dash-team strong { overflow: hidden; font-size: clamp(.62rem, .72vw, .74rem); line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
 .dash-track { position: relative; display: block; width: 100%; height: 100%; min-height: inherit; overflow: hidden; }
-.dash-runner { display: flex; width: calc(100% - 30px); align-items: center; animation: dash-run var(--runner-duration) var(--ease-in-out, cubic-bezier(.77,0,.175,1)) var(--runner-delay) both; }
-.dash-finish-rank { color: var(--football-chalk); font-size: .68rem; animation: reveal-pop 180ms var(--ease-out, cubic-bezier(.23,1,.32,1)) both; }
+.dash-runner-rail { position: absolute; inset-block: 0; left: 0; display: block; width: calc(166.667% - 48px); transform: translate3d(var(--dash-camera-x), 0, 0); will-change: transform; }
+.dash-runner { display: flex; width: 100%; height: 100%; align-items: center; gap: 7px; animation: dash-run var(--runner-duration) linear var(--runner-delay) both; will-change: transform; }
+.dash-runner-token { position: relative; display: grid; width: 42px; height: 42px; flex: none; place-items: center; filter: drop-shadow(0 5px 5px color-mix(in oklch, black 44%, transparent)); }
+.dash-runner-token .showdown-participant-mark { width: 40px; height: 40px; border-width: 2px; box-shadow: 0 0 0 2px color-mix(in oklch, var(--participant-color) 38%, transparent), 0 7px 14px color-mix(in oklch, black 34%, transparent); }
+.dash-runner-token > b { position: absolute; right: -2px; bottom: -1px; display: grid; min-width: 15px; height: 15px; place-items: center; padding-inline: 2px; border: 1px solid color-mix(in oklch, var(--football-chalk) 40%, transparent); border-radius: 3px; background: var(--gray-950); color: var(--football-chalk); font-size: .48rem; line-height: 1; }
+.dash-runner-label { max-width: 138px; padding: 4px 7px; overflow: hidden; border: 1px solid color-mix(in oklch, var(--participant-color) 54%, transparent); border-radius: 3px; background: color-mix(in oklch, var(--gray-950) 91%, transparent); color: var(--football-chalk); font-size: .56rem; font-weight: 900; opacity: 0; text-overflow: ellipsis; text-transform: uppercase; transform: translateX(-5px); transition: opacity 160ms ease, transform 160ms ease; white-space: nowrap; }
+.dash-lane.is-leader .dash-runner-label,
+.dash-lane.is-finished .dash-runner-label { opacity: 1; transform: translateX(0); }
+.dash-finish-rank { justify-self: center; color: var(--football-chalk); font-family: var(--font-display); font-size: .82rem; animation: reveal-pop 180ms var(--ease-out, cubic-bezier(.23,1,.32,1)) both; }
+
+.dash-field-map { position: relative; z-index: 5; display: grid; min-width: 0; grid-row: 3; grid-template-columns: var(--dash-team-rail) minmax(0, 1fr); padding-right: 30px; border-top: 1px solid color-mix(in oklch, var(--football-chalk) 18%, transparent); background: color-mix(in oklch, var(--gray-950) 94%, transparent); }
+.dash-field-map > span { display: flex; align-items: center; padding-inline: 11px; border-right: 1px solid color-mix(in oklch, var(--football-chalk) 16%, transparent); color: var(--football-chalk-muted); font-size: .5rem; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
+.dash-field-map > div { position: relative; min-width: 0; margin: 5px 7px; overflow: hidden; border: 1px solid color-mix(in oklch, var(--football-chalk) 28%, transparent); background: color-mix(in oklch, var(--green-900) 44%, var(--gray-950)); }
+.dash-field-map > div > b { position: absolute; z-index: 1; inset-block: 0; width: 1px; background: color-mix(in oklch, var(--football-chalk) 26%, transparent); }
+.dash-map-camera { position: absolute; z-index: 1; inset-block: 0; left: var(--dash-camera-start); width: var(--dash-camera-window); border: 1px solid color-mix(in oklch, var(--green-200) 72%, transparent); background: color-mix(in oklch, var(--green-300) 9%, transparent); box-sizing: border-box; }
+.dash-map-runner-rail { position: absolute; z-index: 2; top: var(--mini-y); left: 0; display: block; width: calc(100% - 4px); height: 2px; animation: dash-mini-run var(--runner-duration) linear var(--runner-delay) both; }
+.dash-map-runner-rail > i { display: block; width: 4px; height: 2px; background: var(--participant-color); box-shadow: 0 0 4px var(--participant-color); }
+
+.dash-live-board { display: grid; min-width: 0; min-height: 56px; grid-template-columns: minmax(170px, auto) minmax(0, 1fr); align-items: center; gap: 10px; padding: 7px 9px; border-top: 1px solid var(--color-border-subtle); background: var(--color-surface-card-primary); }
+.dash-live-board > header { display: flex; min-width: 0; align-items: center; justify-content: space-between; gap: 12px; }
+.dash-live-board > header > div { display: grid; min-width: 0; gap: 1px; }
+.dash-live-board > header span { color: var(--color-text-muted); font-size: .58rem; font-weight: 850; letter-spacing: .07em; text-transform: uppercase; }
+.dash-live-board > header strong { overflow: hidden; font-size: .74rem; text-overflow: ellipsis; white-space: nowrap; }
+.dash-live-board > header b { color: var(--color-text-muted); font-size: .62rem; white-space: nowrap; }
+.dash-live-board ol { display: grid; min-width: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin: 0; padding: 0; list-style: none; }
+.dash-live-board li { display: grid; min-width: 0; min-height: 38px; grid-template-columns: 22px 28px minmax(0, 1fr) auto; align-items: center; gap: 6px; padding: 3px 7px; border: 1px solid var(--color-border-subtle); border-radius: var(--r-sm); background: var(--color-surface-card-secondary); color: var(--color-text-secondary); }
+.dash-live-board li.is-leader { border-color: var(--color-border-brand); background: var(--color-surface-selected); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--green-300) 16%, transparent); }
+.dash-live-board li.is-locked { color: var(--color-text-primary); }
+.dash-live-board li > span { color: var(--football-chalk); font-family: var(--font-display); font-size: .9rem; }
+.dash-live-board li .showdown-participant-mark { width: 26px; height: 26px; }
+.dash-live-board li strong { overflow: hidden; font-size: .66rem; text-overflow: ellipsis; white-space: nowrap; }
+.dash-live-board li small { color: var(--color-text-muted); font-size: .52rem; font-weight: 850; text-transform: uppercase; white-space: nowrap; }
 
 .plinko-board {
   container-type: inline-size;
@@ -635,12 +728,6 @@
   .order-locked-panel dl { gap: 12px; }
   .showdown-running-controls { align-items: stretch; flex-direction: column; }
   .showdown-game-header { align-items: flex-start; flex-direction: column; }
-  .dash-field { padding: 28px 42px 8px 58px; }
-  .dash-yard-labels { inset-inline: 58px 42px; }
-  .dash-endzone { width: 42px; }
-  .dash-lane { grid-template-columns: 50px minmax(0, 1fr) 24px; min-height: 27px; }
-  .dash-lane-name { font-size: .5rem; }
-  .dash-lane .showdown-participant-mark { width: 23px; height: 23px; }
   .showdown-live-order { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .plinko-board { min-height: 500px; }
   .plinko-broadcast { grid-template-columns: 96px minmax(0, 1fr); }
@@ -909,68 +996,9 @@ html.showdown-reveal-active { overflow: hidden; }
 
 .showdown-dash { grid-template-rows: auto minmax(0, 1fr) auto; }
 .showdown-focus-overlay .dash-field {
-  --dash-team-rail: clamp(122px, 13vw, 202px);
-  display: block;
   min-height: 0;
-  box-sizing: border-box;
-  padding: 24px 38px 5px 0;
-}
-.showdown-focus-overlay .dash-lanes {
-  display: grid;
   height: 100%;
-  min-height: 0;
-  grid-template-rows: repeat(var(--dash-count), minmax(30px, 1fr));
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-color: color-mix(in oklch, var(--green-300) 35%, transparent) transparent;
-  scrollbar-width: thin;
 }
-.showdown-focus-overlay .dash-yard-labels { inset: 6px 38px auto calc(var(--dash-team-rail) + 30px); }
-.showdown-focus-overlay .dash-endzone { left: var(--dash-team-rail); width: 30px; }
-.showdown-focus-overlay .dash-endzone span { font-size: clamp(.72rem, 1.3vw, 1rem); }
-.showdown-focus-overlay .dash-lane {
-  grid-template-columns: var(--dash-team-rail) minmax(0, 1fr) 26px;
-  min-height: 0;
-  overflow: hidden;
-  isolation: isolate;
-}
-.showdown-focus-overlay .dash-lane::before {
-  position: absolute;
-  z-index: 3;
-  inset: 17% auto 17% 0;
-  width: 3px;
-  border-radius: 0 2px 2px 0;
-  background: var(--participant-color, transparent);
-  content: "";
-  opacity: .8;
-}
-.showdown-focus-overlay .dash-team {
-  container-type: size;
-  grid-template-columns: clamp(18px, 68cqh, 32px) minmax(0, 1fr);
-  gap: clamp(5px, 1vw, 9px);
-  box-sizing: border-box;
-  padding: 2px clamp(6px, 1vw, 11px);
-}
-.showdown-focus-overlay .dash-team .showdown-participant-mark {
-  width: clamp(18px, 68cqh, 32px);
-  height: clamp(18px, 68cqh, 32px);
-}
-.showdown-focus-overlay .dash-team small { font-size: clamp(.42rem, .5vw, .48rem); }
-.showdown-focus-overlay .dash-team strong { font-size: clamp(.6rem, .7vw, .72rem); }
-.showdown-focus-overlay .dash-track {
-  container-type: size;
-  box-sizing: border-box;
-  padding-left: 34px;
-}
-.showdown-focus-overlay .dash-runner .showdown-participant-mark {
-  width: clamp(16px, 62cqh, 28px);
-  height: clamp(16px, 62cqh, 28px);
-}
-.dash-runner {
-  will-change: transform;
-  animation-timing-function: linear;
-}
-.dash-finish-line { right: 8px; width: 18px; background-size: 8px 8px; }
 .dash-finish-line.is-hit { animation: finish-line-hit 320ms var(--ease-out, cubic-bezier(.23,1,.32,1)); }
 .dash-lane.is-finished { animation: dash-lane-finish 420ms var(--ease-out, cubic-bezier(.23,1,.32,1)); }
 
@@ -1116,6 +1144,15 @@ html.showdown-reveal-active { overflow: hidden; }
   80% { transform: translate3d(var(--dash-x-4), calc(var(--runner-drift) * -.12), 0); }
   100% { transform: translate3d(100%, 0, 0); }
 }
+@keyframes dash-mini-run {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(var(--dash-x-1), 0, 0); }
+  40% { transform: translate3d(var(--dash-x-2), 0, 0); }
+  60% { transform: translate3d(var(--dash-x-3), 0, 0); }
+  80% { transform: translate3d(var(--dash-x-4), 0, 0); }
+  100% { transform: translate3d(100%, 0, 0); }
+}
+@keyframes dash-live-pulse { 0%, 100% { opacity: .55; transform: scale(.82); } 50% { opacity: 1; transform: scale(1.08); } }
 @keyframes dash-lane-finish { from { background-color: color-mix(in oklch, var(--green-300) 18%, transparent); } to { background-color: transparent; } }
 @keyframes finish-line-hit { 0% { opacity: .6; transform: scaleX(.8); } 55% { opacity: 1; transform: scaleX(1.18); } 100% { opacity: 1; transform: scaleX(1); } }
 
@@ -1134,6 +1171,26 @@ html.showdown-reveal-active { overflow: hidden; }
   .mode-picker-option { gap: 6px; }
   .showdown-focus-toolbar .showdown-sound-button span { display: none; }
   .showdown-focus-overlay .showdown-punt .punt-field { --punt-field-right: 16px; }
+  .dash-field { --dash-team-rail: 92px; grid-template-rows: 40px minmax(0, 1fr) 24px; }
+  .dash-course { inset: 40px 28px 24px var(--dash-team-rail); }
+  .dash-race-scorebug > * { padding: 7px 8px; }
+  .dash-race-scorebug span,
+  .dash-race-scorebug em { font-size: .52rem; }
+  .dash-race-scorebug strong { font-size: .88rem; }
+  .dash-team { grid-template-columns: 26px minmax(0, 1fr); gap: 6px; padding-inline: 6px; }
+  .dash-team .showdown-participant-mark { width: 25px; height: 25px; }
+  .dash-team strong { font-size: .54rem; }
+  .dash-team small { display: none; }
+  .dash-runner-token { width: 34px; height: 34px; }
+  .dash-runner-token .showdown-participant-mark { width: 32px; height: 32px; }
+  .dash-runner-label { max-width: 86px; padding-inline: 5px; font-size: .48rem; }
+  .dash-field-map { padding-right: 28px; }
+  .dash-field-map > span { padding-inline: 6px; font-size: .44rem; }
+  .dash-live-board { grid-template-columns: 1fr; gap: 5px; }
+  .dash-live-board ol { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .dash-live-board li { grid-template-columns: 18px 24px minmax(0, 1fr); gap: 4px; padding-inline: 5px; }
+  .dash-live-board li .showdown-participant-mark { width: 22px; height: 22px; }
+  .dash-live-board li small { display: none; }
   .showdown-live-board { grid-template-columns: 1fr; gap: 5px; }
   .showdown-live-order { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .results-actions .ui-button { flex: 1 1 auto; }
@@ -1142,6 +1199,21 @@ html.showdown-reveal-active { overflow: hidden; }
   .showdown-result-dialog .results-hero { grid-template-columns: 44px minmax(0, 1fr); }
   .showdown-result-dialog .results-trophy { width: 40px; height: 40px; font-size: 1.3rem; }
   .showdown-result-dialog .results-hero > strong { grid-column: 2; justify-self: start; }
+}
+
+@media (max-width: 420px) {
+  .dash-field { --dash-team-rail: 62px; }
+  .dash-race-scorebug { grid-template-columns: auto minmax(0, 1fr); }
+  .dash-race-scorebug em { display: none; }
+  .dash-team { grid-template-columns: 1fr; justify-items: center; padding-inline: 3px; }
+  .dash-team > span:last-child { display: none; }
+  .dash-runner-token { width: 30px; height: 30px; }
+  .dash-runner-token .showdown-participant-mark { width: 28px; height: 28px; }
+  .dash-runner-label { display: none; }
+  .dash-live-board > header { display: none; }
+  .dash-live-board li { grid-template-columns: 16px 22px minmax(0, 1fr); }
+  .dash-live-board li > span { font-size: .74rem; }
+  .dash-live-board li strong { font-size: .54rem; }
 }
 
 @media (max-width: 390px) {
@@ -1164,9 +1236,13 @@ html.showdown-reveal-active { overflow: hidden; }
   .showdown-live-board > header span { display: none; }
   .showdown-live-order li { min-height: 32px; }
   .showdown-live-order .showdown-participant-mark { width: 24px; height: 24px; }
-  .showdown-focus-overlay .dash-field { padding-block: 17px 3px; }
-  .showdown-focus-overlay .dash-yard-labels { top: 3px; }
-  .showdown-focus-overlay .dash-lane .showdown-participant-mark { width: clamp(16px, calc((100dvh - 132px) / var(--dash-count)), 26px); height: clamp(16px, calc((100dvh - 132px) / var(--dash-count)), 26px); }
+  .dash-field { grid-template-rows: 34px minmax(0, 1fr) 20px; }
+  .dash-course { inset-block: 34px 20px; }
+  .dash-race-scorebug > * { padding-block: 4px; }
+  .dash-field-map > div { margin-block: 3px; }
+  .dash-runner-token { width: clamp(24px, calc((100dvh - 126px) / var(--dash-count)), 32px); height: clamp(24px, calc((100dvh - 126px) / var(--dash-count)), 32px); }
+  .dash-runner-token .showdown-participant-mark { width: calc(100% - 2px); height: calc(100% - 2px); }
+  .dash-live-board { min-height: 42px; padding-block: 3px; }
   .showdown-focus-overlay .plinko-board { min-height: 0; }
   .showdown-focus-overlay .punt-scoreboard > span { padding-block: 4px; }
   .showdown-focus-overlay .showdown-punt .punt-team > span:nth-child(2) small,
@@ -1177,5 +1253,6 @@ html.showdown-reveal-active { overflow: hidden; }
   .dash-lane.is-finished,
   .dash-finish-line.is-hit,
   .showdown-result-backdrop,
-  .showdown-result-dialog { animation: none !important; }
+  .showdown-result-dialog,
+  .dash-race-scorebug span i { animation: none !important; }
 }

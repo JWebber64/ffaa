@@ -52,12 +52,17 @@ afterEach(() => {
 });
 
 describe("draft order field identity rails", () => {
-  it("keeps every Dash team avatar in a fixed left rail and a separate clipped race track", async () => {
+  it("renders the Dash as a tracked 40-yard broadcast with fixed identities and live field context", async () => {
     const { container } = render(<DraftDashRenderer {...await fieldProps("draft-dash")} />);
 
     expect(container.querySelectorAll(".dash-team")).toHaveLength(12);
     expect(container.querySelectorAll(".dash-team .showdown-participant-mark")).toHaveLength(12);
     expect(container.querySelectorAll(".dash-track")).toHaveLength(12);
+    expect(container.querySelectorAll(".dash-runner-token")).toHaveLength(12);
+    expect(container.querySelectorAll(".dash-map-runner-rail")).toHaveLength(12);
+    expect(container.querySelectorAll(".dash-yard-labels span")).toHaveLength(4);
+    expect(container.querySelector(".dash-race-scorebug")).toBeInTheDocument();
+    expect(container.querySelector(".dash-live-board")).toBeInTheDocument();
     expect(container.querySelectorAll(".dash-lane.is-finished")).toHaveLength(12);
   });
 

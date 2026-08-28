@@ -113,13 +113,13 @@ export interface DraftRoomOrderContext {
 }
 
 export const MODE_LABELS: Record<DraftOrderMode, string> = {
-  "draft-dash": "100-Yard Draft Dash",
+  "draft-dash": "40-Yard Draft Dash",
   "football-plinko": "Football Plinko",
   "punt-bounce": "Punt Bounce",
 };
 
 export const MODE_DESCRIPTIONS: Record<DraftOrderMode, string> = {
-  "draft-dash": "Every manager races the full field. First across the line gets the first pick.",
+  "draft-dash": "Every manager explodes through 40 yards. First across the line gets the first pick.",
   "football-plinko": "Team footballs ricochet through stadium pegs, with every landing claiming a draft slot.",
   "punt-bounce": "The farthest punt wins the first pick while every bounce builds the suspense.",
 };
