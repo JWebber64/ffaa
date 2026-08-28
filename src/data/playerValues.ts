@@ -61,7 +61,13 @@ const DEFAULT_AUCTION_ROSTER_SLOTS: AuctionValueRosterSlot[] = [
   { slot: "BENCH", count: 6 },
 ];
 const MINIMUM_BID_SHARE = 0.15;
-const PREMIUM_CURVE_EXPONENT = 1.05;
+// Published dollar boards are already top-heavy. Completing the active
+// league's budget with another exponent above 1 compounds that shape and can
+// turn a supported $60-$70 elite value into a $90+ recommendation. A
+// sublinear completion curve preserves the source order and full league
+// budget while distributing otherwise-unassigned dollars through the starter
+// tiers instead of concentrating them on the first few players again.
+const BUDGET_COMPLETION_EXPONENT = 0.8;
 
 const PUBLISHED_SOURCE_TEAM_COUNTS: Readonly<Record<string, readonly number[]>> = {
   "sleeper-suggested": [12],
@@ -1282,15 +1288,14 @@ function calibratedDollarMap(
       entry.player.id,
       minimumBidIds.has(entry.player.id)
         ? 0
-        : Math.pow(Math.max(0, entry.preliminaryValue - 1), PREMIUM_CURVE_EXPONENT),
+        : Math.pow(Math.max(0, entry.preliminaryValue - 1), BUDGET_COMPLETION_EXPONENT),
     ]),
   );
   const premiumWeightTotal = [...premiumWeights.values()].reduce((sum, value) => sum + value, 0);
   if (premiumWeightTotal <= 0) return null;
 
-  // Auction rooms concentrate their budget on starters and leave a real $1
-  // replacement tier. Shape only the premiums, preserve every minimum bid,
-  // and continue to conserve the complete league budget exactly.
+  // Preserve the replacement tier and complete the league budget without
+  // applying a second top-heavy curve to already top-heavy source dollars.
   const scaled = universe.map((entry) => {
     const weight = premiumWeights.get(entry.player.id) ?? 0;
     const exact = 1 + premiumPool * weight / premiumWeightTotal;
