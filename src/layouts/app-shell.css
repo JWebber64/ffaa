@@ -2,8 +2,8 @@
   position: sticky;
   z-index: 60;
   top: 0;
-  border-bottom: 1px solid var(--line-0);
-  background: color-mix(in srgb, var(--surface-canvas) 94%, transparent);
+  border-bottom: 1px solid var(--line-1);
+  background: color-mix(in srgb, var(--color-surface-header) 98%, transparent);
   box-shadow: 0 10px 32px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(18px);
 }

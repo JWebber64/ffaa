@@ -27,7 +27,7 @@ colors:
   gray-900: "oklch(0.21 0.009 160)"
   gray-950: "oklch(0.16 0.008 160)"
   color-surface-page: "{colors.gray-950}"
-  color-surface-header: "oklch(0.177 0.013 155)"
+  color-surface-header: "{colors.gray-800}"
   color-surface-card-primary: "{colors.gray-900}"
   color-surface-card-secondary: "{colors.gray-800}"
   color-surface-card-tertiary: "oklch(0.288 0.011 160)"

@@ -33,7 +33,7 @@
 
   /* Named surfaces: every page maps cards and controls to these roles. */
   --color-surface-page: var(--gray-950);
-  --color-surface-header: color-mix(in oklch, var(--gray-950) 72%, var(--green-950));
+  --color-surface-header: var(--gray-800);
   --color-surface-card-primary: var(--gray-900);
   --color-surface-card-secondary: var(--gray-800);
   --color-surface-card-tertiary: color-mix(in oklch, var(--gray-800) 78%, var(--gray-700));

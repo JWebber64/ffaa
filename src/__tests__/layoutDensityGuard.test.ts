@@ -82,15 +82,21 @@ describe("shared layout density contract", () => {
     expect(styles).toContain(".platform-chapters article > figure");
   });
 
-  it("keeps the homepage canvas visible and its secondary action fully shaped", () => {
+  it("keeps the homepage canvas quiet and the content card-led", () => {
+    const landing = readProjectFile("src/screens_v2/LandingV2.tsx");
     const styles = readProjectFile("src/screens_v2/landing-v2.css");
 
-    expect(styles).toContain("--platform-home-canvas:");
-    expect(styles).toContain("var(--gray-800) 72%");
-    expect(styles).toContain(".platform-home::before");
+    expect(styles).not.toContain("--platform-home-canvas:");
+    expect(styles).not.toContain(".platform-home::before");
+    expect(styles).toMatch(/\.platform-hero \{[\s\S]*?background: var\(--color-surface-card-primary\)/);
+    expect(styles).toMatch(/\.platform-feature-index \{[\s\S]*?background: var\(--color-surface-card-secondary\)/);
+    expect(styles).toMatch(/\.platform-chapters \{[\s\S]*?background: var\(--color-surface-card-primary\)/);
+    expect(styles).toContain("white-space: nowrap");
     expect(styles).toContain(".platform-hero-actions .platform-secondary-link");
     expect(styles).toContain("border-radius: var(--r-md)");
     expect(styles).toContain("padding: 0 var(--space-4)");
+    expect(landing).not.toContain("platform-feature-card");
+    expect(landing).not.toContain("platform-chapter-card");
   });
 
   it("documents why ordinary cards and heroes stay natural-height", () => {

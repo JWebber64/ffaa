@@ -48,6 +48,7 @@ describe("shared green and gray visual system", () => {
     const tokens = readProjectFile("src/styles/tokens.css");
     const roles = [
       "--color-surface-page",
+      "--color-surface-header",
       "--color-surface-card-primary",
       "--color-surface-card-secondary",
       "--color-surface-card-tertiary",
@@ -79,6 +80,17 @@ describe("shared green and gray visual system", () => {
     expect(tokens).toContain("--green-950:");
     expect(tokens).toContain("--gray-50:");
     expect(tokens).toContain("--gray-950:");
+  });
+
+  it("keeps the shared product header lighter than the page canvas", () => {
+    const tokens = readProjectFile("src/styles/tokens.css");
+    const shell = readProjectFile("src/layouts/app-shell.css");
+    const design = readProjectFile("DESIGN.md");
+
+    expect(tokens).toContain("--color-surface-header: var(--gray-800)");
+    expect(shell).toContain("var(--color-surface-header) 98%");
+    expect(shell).not.toContain("var(--surface-canvas) 94%");
+    expect(design).toContain('color-surface-header: "{colors.gray-800}"');
   });
 
   it("preserves the established semantic color for each football position", () => {

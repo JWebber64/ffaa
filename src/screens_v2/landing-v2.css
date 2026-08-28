@@ -1,23 +1,7 @@
 .platform-home {
-  --platform-home-canvas: color-mix(in oklch, var(--gray-800) 72%, var(--green-900));
-  --platform-home-secondary-action: color-mix(in oklch, var(--green-800) 24%, var(--gray-800));
-  --platform-home-secondary-action-hover: color-mix(in oklch, var(--green-700) 30%, var(--gray-700));
-
-  position: relative;
   display: grid;
-  isolation: isolate;
+  gap: var(--space-3);
   color: var(--text-primary);
-}
-
-.platform-home::before {
-  position: absolute;
-  z-index: -1;
-  inset-block: 0;
-  left: 50%;
-  width: 100vw;
-  background: var(--platform-home-canvas);
-  content: "";
-  transform: translateX(-50%);
 }
 
 .platform-kicker {
@@ -39,26 +23,32 @@
 .platform-hero {
   display: grid;
   grid-template-columns: minmax(440px, 0.9fr) minmax(560px, 1.1fr);
-  align-items: center;
-  gap: clamp(36px, 5vw, 80px);
-  padding: var(--space-page-hero) 0 clamp(34px, 4vw, 48px);
-  border-bottom: 1px solid var(--line-1);
+  align-items: stretch;
+  gap: clamp(28px, 3.5vw, 52px);
+  padding: var(--space-page-hero);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-xl);
+  background: var(--color-surface-card-primary);
+  box-shadow: var(--shadow-panel);
 }
 
 .platform-hero-copy {
+  display: grid;
   min-width: 0;
+  align-content: center;
 }
 
 .platform-hero-copy h1 {
-  max-width: 13ch;
+  max-width: none;
   margin: var(--space-4) 0 var(--space-4);
-  font-size: min(var(--type-display-hero), 3.65rem);
+  font-size: min(var(--type-display-hero), 3.4rem);
   line-height: 0.96;
   text-wrap: balance;
 }
 
 .platform-hero-copy h1 span {
   display: block;
+  white-space: nowrap;
 }
 
 .platform-hero-copy > p {
@@ -83,7 +73,7 @@
   display: inline-flex;
   min-height: var(--control-height);
   align-items: center;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 850;
   text-decoration: none;
 }
@@ -104,17 +94,17 @@
 .platform-hero-actions .platform-secondary-link {
   padding: 0 var(--space-4);
   justify-content: center;
-  border: 1px solid color-mix(in oklch, var(--green-200) 42%, var(--gray-600));
+  border: 1px solid var(--color-border-brand);
   border-radius: var(--r-md);
-  background: var(--platform-home-secondary-action);
+  background: var(--color-button-secondary);
   box-shadow: inset 0 1px 0 var(--spec-2);
-  color: var(--green-100);
+  color: var(--color-button-secondary-text);
 }
 
 .platform-hero-actions .platform-secondary-link:hover {
-  border-color: var(--green-300);
-  background: var(--platform-home-secondary-action-hover);
-  color: var(--gray-50);
+  border-color: var(--color-border-brand);
+  background: var(--color-button-secondary-hover);
+  color: var(--color-button-secondary-text);
 }
 
 .platform-hero-actions .platform-secondary-link:focus-visible {
@@ -124,12 +114,17 @@
 
 .platform-feature-index {
   min-width: 0;
-  border-top: 1px solid var(--line-1);
+  align-self: stretch;
+  overflow: hidden;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--r-lg);
+  background: var(--color-surface-card-secondary);
 }
 
 .platform-feature-index > header {
   display: flex;
   min-height: 54px;
+  padding: 0 var(--space-4);
   justify-content: space-between;
   align-items: center;
   gap: var(--space-4);
@@ -145,8 +140,8 @@
 }
 
 .platform-feature-index > header span {
-  color: var(--text-muted);
-  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
 }
 
 .platform-feature-index nav {
@@ -156,8 +151,8 @@
 .platform-feature-index nav a {
   display: grid;
   grid-template-columns: 38px 1fr;
-  min-height: 76px;
-  padding: var(--space-3) 0;
+  min-height: 72px;
+  padding: var(--space-3) var(--space-4);
   align-items: center;
   gap: var(--space-3);
   border-bottom: 1px solid var(--line-1);
@@ -165,8 +160,15 @@
   text-decoration: none;
 }
 
-.platform-feature-index nav a:hover {
-  color: var(--color-text-link-hover);
+.platform-feature-index nav a:hover,
+.platform-feature-index nav a:focus-visible {
+  background: var(--color-surface-hover);
+  color: var(--text-primary);
+}
+
+.platform-feature-index nav a:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -3px;
 }
 
 .platform-feature-index nav a > b {
@@ -179,7 +181,7 @@
 
 .platform-feature-index nav a > span {
   display: grid;
-  grid-template-columns: minmax(165px, 0.72fr) 1fr;
+  grid-template-columns: minmax(180px, 0.72fr) 1fr;
   align-items: center;
   gap: var(--space-4);
 }
@@ -192,8 +194,8 @@
 }
 
 .platform-feature-index nav small {
-  color: var(--text-muted);
-  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
   line-height: 1.45;
 }
 
@@ -204,7 +206,6 @@
   margin: 0;
   align-items: center;
   gap: var(--space-4);
-  border-bottom: 1px solid var(--line-1);
 }
 
 .platform-feature-index figure img {
@@ -214,7 +215,6 @@
   object-fit: cover;
   object-position: center 58%;
   border-right: 1px solid var(--line-1);
-  border-left: 1px solid var(--line-1);
 }
 
 .platform-feature-index figcaption {
@@ -224,18 +224,22 @@
 }
 
 .platform-feature-index figcaption strong {
-  font-size: 0.76rem;
+  font-size: 0.875rem;
 }
 
 .platform-feature-index figcaption span {
   max-width: 42ch;
-  color: var(--text-muted);
-  font-size: 0.68rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
   line-height: 1.45;
 }
 
 .platform-chapters {
-  padding-top: clamp(30px, 3vw, 42px);
+  padding: var(--space-panel-padding);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--r-xl);
+  background: var(--color-surface-card-primary);
+  box-shadow: var(--shadow-panel);
 }
 
 .platform-chapters > header {
@@ -305,7 +309,7 @@
   max-width: 68ch;
   margin: 0;
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.58;
   text-wrap: pretty;
 }
@@ -324,7 +328,7 @@
   align-items: center;
   border-bottom: 1px solid var(--color-border-default);
   color: var(--color-text-link);
-  font-size: 0.76rem;
+  font-size: 0.875rem;
   font-weight: 800;
   text-decoration: none;
 }
@@ -358,6 +362,7 @@
 
   .platform-hero-copy,
   .platform-feature-index {
+    width: 100%;
     max-width: 780px;
   }
 }
@@ -380,14 +385,17 @@
 
 @media (max-width: 700px) {
   .platform-hero {
-    padding-top: var(--space-2);
-    padding-bottom: var(--space-8);
+    padding: var(--space-5);
     gap: var(--space-6);
   }
 
   .platform-hero-copy h1 {
-    max-width: 12ch;
+    max-width: 13ch;
     font-size: clamp(2.55rem, 11vw, 3rem);
+  }
+
+  .platform-hero-copy h1 span {
+    white-space: normal;
   }
 
   .platform-hero-actions {
@@ -404,7 +412,7 @@
   .platform-feature-index > header {
     align-items: flex-start;
     flex-direction: column;
-    padding: var(--space-3) 0;
+    padding: var(--space-3) var(--space-4);
   }
 
   .platform-feature-index nav a > span {
@@ -422,6 +430,10 @@
 
   .platform-chapters > header h2 {
     font-size: 2.2rem;
+  }
+
+  .platform-chapters {
+    padding: var(--space-5);
   }
 
   .platform-chapters article {
