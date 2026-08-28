@@ -29,4 +29,17 @@ describe("draft order state machine", () => {
     const one = draftOrderShowdownReducer(INITIAL_SHOWDOWN_STATE, { type: "set-participants", participants: participants.slice(0, 1) });
     expect(draftOrderShowdownReducer(one, { type: "choose-game" }).phase).toBe("setup");
   });
+
+  it("resets every active field back to a clean setup", () => {
+    const activeState = {
+      ...INITIAL_SHOWDOWN_STATE,
+      phase: "results" as const,
+      participants,
+      leagueId: "league-123",
+      readOnly: true,
+      accepted: true,
+    };
+
+    expect(draftOrderShowdownReducer(activeState, { type: "reset" })).toEqual(INITIAL_SHOWDOWN_STATE);
+  });
 });

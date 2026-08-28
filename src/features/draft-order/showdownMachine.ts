@@ -49,7 +49,8 @@ export type DraftOrderShowdownAction =
   | { type: "reveal-with"; draw: DraftOrderDrawRecord; animationPlan: DraftOrderAnimationPlan }
   | { type: "accept" }
   | { type: "load-shared"; draw: DraftOrderDrawRecord; animationPlan: DraftOrderAnimationPlan }
-  | { type: "restore"; state: DraftOrderShowdownState };
+  | { type: "restore"; state: DraftOrderShowdownState }
+  | { type: "reset" };
 
 function editingLocked(state: DraftOrderShowdownState) {
   return state.phase !== "setup" && state.phase !== "choose-game";
@@ -132,6 +133,8 @@ export function draftOrderShowdownReducer(
         : restored.phase;
       return { ...restored, phase: safePhase, countdown: 3 };
     }
+    case "reset":
+      return { ...INITIAL_SHOWDOWN_STATE };
   }
 }
 
@@ -153,4 +156,9 @@ export function loadActiveShowdownState() {
 export function persistActiveShowdownState(state: DraftOrderShowdownState) {
   if (typeof window === "undefined" || !state.draw) return;
   window.localStorage.setItem(ACTIVE_DRAW_KEY, JSON.stringify(state));
+}
+
+export function clearActiveShowdownState() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(ACTIVE_DRAW_KEY);
 }

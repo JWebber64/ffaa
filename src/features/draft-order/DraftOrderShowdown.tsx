@@ -1,4 +1,4 @@
-import { CheckCircle2, LockKeyhole, ShieldCheck, Volume2, VolumeX } from "lucide-react";
+import { CheckCircle2, LockKeyhole, RotateCcw, ShieldCheck, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AppStateScreen } from "../../components/AppStateScreen";
@@ -28,6 +28,7 @@ import { ParticipantSetup } from "./ParticipantSetup";
 import { ResultPanel } from "./ResultPanel";
 import { ShowdownRenderer } from "./ShowdownRenderer";
 import {
+  clearActiveShowdownState,
   draftOrderShowdownReducer,
   INITIAL_SHOWDOWN_STATE,
   loadActiveShowdownState,
@@ -58,7 +59,7 @@ function initialState(searchParams: URLSearchParams) {
 }
 
 export default function DraftOrderShowdown() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [state, dispatch] = useReducer(draftOrderShowdownReducer, searchParams, initialState);
   const { connections, activeLeagueId } = useSleeperLeagueConnections();
   const [busy, setBusy] = useState(false);
@@ -70,6 +71,7 @@ export default function DraftOrderShowdown() {
   const autoRoomLoaded = useRef(false);
   const { muted, setMuted, play } = useShowdownAudio();
   const selectedLeagueId = state.leagueId || searchParams.get("league")?.trim() || activeLeagueId;
+  const canStartOver = state.phase !== "setup" || state.participants.length > 0 || Boolean(state.roomContext) || Boolean(state.leagueId);
 
   useEffect(() => {
     if (state.draw && !state.readOnly) persistActiveShowdownState(state);
@@ -286,6 +288,22 @@ export default function DraftOrderShowdown() {
     }
   }, [state.accepted, state.draw, state.participants]);
 
+  const handleStartOver = useCallback(() => {
+    if (busy) return;
+    const confirmed = window.confirm(
+      "Start over and clear this active Showdown setup? Saved draws and any order already applied to a draft room will stay intact.",
+    );
+    if (!confirmed) return;
+    clearActiveShowdownState();
+    autoRoomLoaded.current = true;
+    setSearchParams({}, { replace: true });
+    dispatch({ type: "reset" });
+    setNotice("");
+    setActionStatus("");
+    setVerification(null);
+    setAnnouncement("Showdown reset. Participant setup is ready.");
+  }, [busy, setSearchParams]);
+
   const handleChangeMode = useCallback(async (mode: DraftOrderMode) => {
     if (!state.draw) return;
     setBusy(true);
@@ -310,12 +328,20 @@ export default function DraftOrderShowdown() {
         </div>
       </header>
 
-      <nav className="showdown-progress" aria-label="Draft order progress">
-        {["Setup", "Choose Game", "Order Locked", "Reveal", "Results"].map((label, index) => {
-          const phaseIndex = state.phase === "setup" ? 0 : state.phase === "choose-game" ? 1 : state.phase === "locked" ? 2 : state.phase === "countdown" || state.phase === "running" ? 3 : 4;
-          return <span className={phaseIndex === index ? "is-current" : phaseIndex > index ? "is-complete" : ""} aria-current={phaseIndex === index ? "step" : undefined} key={label}>{phaseIndex > index ? <CheckCircle2 aria-hidden="true" /> : <i>{index + 1}</i>}{label}</span>;
-        })}
-      </nav>
+      <div className="showdown-progress-shell">
+        <nav className="showdown-progress" aria-label="Draft order progress">
+          {["Setup", "Choose Game", "Order Locked", "Reveal", "Results"].map((label, index) => {
+            const phaseIndex = state.phase === "setup" ? 0 : state.phase === "choose-game" ? 1 : state.phase === "locked" ? 2 : state.phase === "countdown" || state.phase === "running" ? 3 : 4;
+            return <span className={phaseIndex === index ? "is-current" : phaseIndex > index ? "is-complete" : ""} aria-current={phaseIndex === index ? "step" : undefined} key={label}>{phaseIndex > index ? <CheckCircle2 aria-hidden="true" /> : <i>{index + 1}</i>}{label}</span>;
+          })}
+        </nav>
+        {canStartOver ? (
+          <div className="showdown-start-over">
+            <span>Clear this active setup and return to participant entry. Saved draws stay saved.</span>
+            <Button size="sm" variant="secondary" onClick={handleStartOver} disabled={busy}><RotateCcw aria-hidden="true" /> Start Over</Button>
+          </div>
+        ) : null}
+      </div>
 
       {notice ? <div className="showdown-notice" role="status">{notice}</div> : null}
 
