@@ -14,7 +14,7 @@ const PATH_SWING = [7, 9, 9, 8, 7, 5, 2.5] as const;
 
 export default function FootballPlinkoRenderer(props: ShowdownRendererProps) {
   const { draw, plan } = props;
-  const { revealed, reducedMotion } = useRevealSequence(props);
+  const { revealed, staticReveal } = useRevealSequence(props);
   const participants = new Map(draw.participants.map((participant) => [participant.id, participant]));
   const cues = new Map(plan.cues.map((cue) => [cue.participantId, cue]));
   const launchOrder = [...plan.cues].sort((a, b) => a.delayMs - b.delayMs);
@@ -62,8 +62,8 @@ export default function FootballPlinkoRenderer(props: ShowdownRendererProps) {
                 data-path={path.map((point) => point.toFixed(1)).join(",")}
                 key={participant.id}
                 style={{
-                  "--plinko-delay": `${reducedMotion ? 0 : cue.delayMs}ms`,
-                  "--plinko-duration": `${reducedMotion ? 1 : cue.durationMs}ms`,
+                  "--plinko-delay": `${staticReveal ? 0 : cue.delayMs}ms`,
+                  "--plinko-duration": `${staticReveal ? 1 : cue.durationMs}ms`,
                   "--participant-color": participant.color,
                   "--plinko-final-percent": finalPercent,
                   "--plinko-x0": `${50 - finalPercent}cqw`,
@@ -103,6 +103,7 @@ export default function FootballPlinkoRenderer(props: ShowdownRendererProps) {
     </section>
   );
 }
+
 function createPlinkoPath(finalPercent: number, variant: number) {
   const directions = PATH_DIRECTIONS[variant % PATH_DIRECTIONS.length] ?? PATH_DIRECTIONS[0];
   return PATH_PROGRESS.map((progress, index) => {

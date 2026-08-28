@@ -11,6 +11,7 @@ export interface ShowdownRendererProps {
   plan: DraftOrderAnimationPlan;
   onReveal: (position: number, participant: DraftOrderParticipantSnapshot) => void;
   onComplete: () => void;
+  complete?: boolean;
 }
 
 export function usePrefersReducedMotion() {
@@ -34,6 +35,7 @@ export function useRevealSequence({
   plan,
   onReveal,
   onComplete,
+  complete = false,
   revealAt,
 }: ShowdownRendererProps & {
   revealAt?: (participantId: string) => number;
@@ -46,6 +48,7 @@ export function useRevealSequence({
   );
 
   useEffect(() => {
+    if (complete) return undefined;
     const timers: number[] = [];
     const times = draw.finalParticipantIds.map((participantId, position) => {
       const cue = plan.cues.find((entry) => entry.participantId === participantId);
@@ -61,9 +64,14 @@ export function useRevealSequence({
     const completionAt = (times.length ? Math.max(...times) : 0) + (reducedMotion ? 180 : 520);
     timers.push(window.setTimeout(onComplete, completionAt));
     return () => timers.forEach((timer) => window.clearTimeout(timer));
-  }, [draw.finalParticipantIds, onComplete, onReveal, participants, plan.cues, reducedMotion, revealAt]);
+  }, [complete, draw.finalParticipantIds, onComplete, onReveal, participants, plan.cues, reducedMotion, revealAt]);
 
-  return { revealed, reducedMotion };
+  const visibleRevealed = useMemo(
+    () => complete ? new Set(draw.finalParticipantIds) : revealed,
+    [complete, draw.finalParticipantIds, revealed],
+  );
+
+  return { revealed: visibleRevealed, reducedMotion, staticReveal: reducedMotion || complete };
 }
 
 export function participantInitials(participant: DraftOrderParticipantSnapshot) {
@@ -93,20 +101,21 @@ export function ParticipantMark({ participant, compact = false }: {
   );
 }
 
-export function LockedResultList({ draw, revealed, leaderId }: {
+export function LockedResultList({ draw, revealed, leaderId, orderOnly = false }: {
   draw: DraftOrderDrawRecord;
   revealed?: Set<string>;
   leaderId?: string | null;
+  orderOnly?: boolean;
 }) {
   const participants = new Map(draw.participants.map((participant) => [participant.id, participant]));
   const finishedCount = revealed?.size ?? draw.finalParticipantIds.length;
   const leader = leaderId ? participants.get(leaderId) : null;
   return (
-    <section className="showdown-live-board" aria-label="Live finish board">
-      <header>
+    <section className={`showdown-live-board ${orderOnly ? "is-order-only" : ""}`} aria-label="Live finish board">
+      {!orderOnly ? <header>
         <div><span>{finishedCount ? "Latest standings" : "Current leader"}</span><strong>{leader?.teamName ?? (finishedCount ? `${finishedCount} finished` : "Race underway")}</strong></div>
         <b>{finishedCount}/{draw.finalParticipantIds.length} finished</b>
-      </header>
+      </header> : null}
       <ol className="showdown-live-order">
         {draw.finalParticipantIds.slice(0, 3).map((id, index) => {
           const participant = participants.get(id)!;

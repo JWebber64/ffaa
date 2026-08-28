@@ -150,25 +150,22 @@ describe("Draft Order Showdown UI", () => {
     await pasteManagersAndStart();
     const skip = await screen.findByRole("button", { name: "Skip" }, { timeout: 6_000 });
     fireEvent.click(skip);
+    expect(screen.getByRole("dialog", { name: /owns the first pick/ })).toBeInTheDocument();
+    expect(document.querySelector(".showdown-dash")).toBeInTheDocument();
     expect(screen.getByText(/owns the first pick/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Close draft order popup" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    const viewOrder = screen.getByRole("button", { name: "View order" });
+    expect(screen.getByRole("heading", { name: "100-Yard Draft Dash" })).toBeInTheDocument();
+    await waitFor(() => expect(viewOrder).toHaveFocus());
+    fireEvent.click(viewOrder);
+    expect(screen.getByRole("dialog", { name: /owns the first pick/ })).toBeInTheDocument();
     await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Copy Order" })); await Promise.resolve(); });
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(expect.stringContaining("GameHQ Draft Order"));
     fireEvent.click(screen.getByRole("button", { name: "Replay Animation" }));
     expect(screen.getByText("3")).toBeInTheDocument();
     expect(screen.getByText("Draw 1")).toBeInTheDocument();
   }, 10_000);
-
-  it("resets a completed draw back to empty setup and clears its active record", async () => {
-    await seedResults();
-    renderShowdown();
-
-    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
-
-    expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining("Reset Draft Order Showdown"));
-    expect(screen.getByLabelText("Manager or team names")).toHaveValue("");
-    expect(screen.queryByText(/owns the first pick/)).not.toBeInTheDocument();
-    expect(window.localStorage.getItem("ffaa.draftOrder.active.v1")).toBeNull();
-  });
 
   it("rejects unauthorized official application in the result UI", async () => {
     await seedResults(roomContext(false));
@@ -192,6 +189,18 @@ describe("Draft Order Showdown UI", () => {
     fireEvent.click(screen.getByRole("button", { name: "Generate New Order" }));
     expect(await screen.findByLabelText("Showdown countdown")).toBeInTheDocument();
     expect(screen.getByText("Draw 2")).toBeInTheDocument();
+  });
+
+  it("resets a completed draw back to empty setup and clears its active record", async () => {
+    await seedResults();
+    renderShowdown();
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+
+    expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining("Reset Draft Order Showdown"));
+    expect(screen.getByLabelText("Manager or team names")).toHaveValue("");
+    expect(screen.queryByText(/owns the first pick/)).not.toBeInTheDocument();
+    expect(window.localStorage.getItem("ffaa.draftOrder.active.v1")).toBeNull();
   });
 
   it("loads a shared replay as the exact read-only result without offering a reroll", async () => {

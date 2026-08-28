@@ -1,4 +1,4 @@
-import { RotateCcw, Trophy, Volume2, VolumeX } from "lucide-react";
+import { ListOrdered, RotateCcw, Trophy, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AppStateScreen } from "../../components/AppStateScreen";
@@ -25,6 +25,7 @@ import {
 import { ModeSelector } from "./ModeSelector";
 import { ParticipantSetup } from "./ParticipantSetup";
 import { ResultPanel } from "./ResultPanel";
+import { ResultDialog } from "./ResultDialog";
 import { ShowdownRenderer } from "./ShowdownRenderer";
 import {
   draftOrderShowdownReducer,
@@ -67,10 +68,14 @@ export default function DraftOrderShowdown() {
   const [actionStatus, setActionStatus] = useState("");
   const [verification, setVerification] = useState<DraftOrderVerification | null>(null);
   const [announcement, setAnnouncement] = useState("");
+  const [resultsOpen, setResultsOpen] = useState(() => state.phase === "results");
   const autoRoomLoaded = useRef(false);
+  const viewOrderRef = useRef<HTMLButtonElement | null>(null);
   const { muted, setMuted, play } = useShowdownAudio();
   const selectedLeagueId = state.leagueId || searchParams.get("league")?.trim() || activeLeagueId;
-  const isRevealPhase = state.phase === "countdown" || state.phase === "running";
+  const isEventPhase = state.phase === "countdown" || state.phase === "running" || state.phase === "results";
+  const eventObscured = state.phase === "results" && resultsOpen;
+  const completedDrawId = state.phase === "results" ? state.draw?.id ?? "" : "";
 
   useEffect(() => {
     if (state.draw && !state.readOnly) persistActiveShowdownState(state);
@@ -136,10 +141,14 @@ export default function DraftOrderShowdown() {
   }, [state.phase]);
 
   useEffect(() => {
-    if (!isRevealPhase) return undefined;
+    if (!isEventPhase) return undefined;
     document.documentElement.classList.add("showdown-reveal-active");
     return () => document.documentElement.classList.remove("showdown-reveal-active");
-  }, [isRevealPhase]);
+  }, [isEventPhase]);
+
+  useEffect(() => {
+    if (completedDrawId) setResultsOpen(true);
+  }, [completedDrawId]);
 
   useEffect(() => {
     if (state.phase === "locked") dispatch({ type: "begin-countdown" });
@@ -214,6 +223,11 @@ export default function DraftOrderShowdown() {
   const handleSkip = useCallback(() => {
     setAnnouncement("Animation skipped. Complete draft order is now available.");
     dispatch({ type: "finish" });
+  }, []);
+
+  const handleCloseResults = useCallback(() => {
+    setResultsOpen(false);
+    window.setTimeout(() => viewOrderRef.current?.focus(), 0);
   }, []);
 
   const handleVerify = useCallback(async () => {
@@ -326,7 +340,7 @@ export default function DraftOrderShowdown() {
   if (loadingShare) return <AppStateScreen title="Loading Shared Draw" message="Opening the exact saved result and verification record." />;
 
   return (
-    <div className={`draft-order-page ${isRevealPhase ? "is-reveal-focus" : ""}`}>
+    <div className={`draft-order-page ${isEventPhase ? "is-reveal-focus" : ""}`}>
       {state.phase === "setup" || state.phase === "choose-game" ? (
         <>
           <header className="draft-order-hero">
@@ -341,32 +355,36 @@ export default function DraftOrderShowdown() {
         </>
       ) : null}
 
-      {notice && !isRevealPhase ? <div className="showdown-notice" role="status">{notice}</div> : null}
+      {notice && !isEventPhase ? <div className="showdown-notice" role="status">{notice}</div> : null}
 
       {state.phase === "setup" ? <ParticipantSetup participants={state.participants} onChange={(participants) => dispatch({ type: "set-participants", participants })} connections={connections} selectedLeagueId={selectedLeagueId} onLeagueSelect={(leagueId) => dispatch({ type: "set-league", leagueId })} onImportLeague={handleImportLeague} onImportRoom={handleImportRoom} roomContext={state.roomContext} busy={busy} onContinue={() => dispatch({ type: "choose-game" })} /> : null}
 
       {state.phase === "choose-game" ? <ModeSelector selectedMode={state.selectedMode} onSelect={(mode) => dispatch({ type: "select-mode", mode })} onBack={() => dispatch({ type: "back-to-setup" })} onLock={handleLock} busy={busy} /> : null}
 
-      {isRevealPhase && state.draw ? (
+      {isEventPhase && state.draw ? (
         <section className="showdown-focus-overlay" aria-label={`${MODE_LABELS[state.draw.mode]} showdown`}>
-          <header className="showdown-focus-toolbar">
+          <header className="showdown-focus-toolbar" aria-hidden={eventObscured || undefined} inert={eventObscured || undefined}>
             <div><Trophy aria-hidden="true" /><span>{MODE_LABELS[state.draw.mode]}</span><strong>Draw {state.draw.rerollIndex + 1}</strong></div>
             <div>
               <button className="showdown-sound-button" type="button" onClick={() => setMuted(!muted)} aria-label={muted ? "Enable showdown sound" : "Mute showdown sound"}>{muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}<span>{muted ? "Sound off" : "Sound on"}</span></button>
               <Button size="sm" variant="secondary" onClick={handleReset}><RotateCcw size={16} aria-hidden="true" /> Reset</Button>
               {state.phase === "running" ? <Button size="sm" variant="secondary" onClick={handleSkip}>Skip</Button> : null}
+              {state.phase === "results" && !resultsOpen ? <Button ref={viewOrderRef} size="sm" onClick={() => setResultsOpen(true)}><ListOrdered size={16} aria-hidden="true" /> View order</Button> : null}
             </div>
           </header>
           {state.phase === "countdown" ? <div className="showdown-countdown" role="status" aria-live="assertive" aria-label="Showdown countdown"><strong key={state.countdown}>{state.countdown || "GO"}</strong></div> : null}
-          {state.phase === "running" && state.animationPlan ? (
-            <div className="showdown-running-shell">
-              <ShowdownRenderer draw={state.draw} plan={state.animationPlan} onReveal={handleReveal} onComplete={handleComplete} />
+          {(state.phase === "running" || state.phase === "results") && state.animationPlan ? (
+            <div className="showdown-running-shell" aria-hidden={eventObscured || undefined} inert={eventObscured || undefined}>
+              <ShowdownRenderer draw={state.draw} plan={state.animationPlan} onReveal={handleReveal} onComplete={handleComplete} complete={state.phase === "results"} />
             </div>
+          ) : null}
+          {state.phase === "results" && resultsOpen ? (
+            <ResultDialog onClose={handleCloseResults}>
+              <ResultPanel draw={state.draw} roomContext={state.roomContext} accepted={state.accepted} readOnly={state.readOnly} verification={verification} actionStatus={actionStatus} onApply={handleApply} onSave={handleSave} onCopy={handleCopy} onShare={handleShare} onReplay={() => dispatch({ type: "replay" })} onReroll={handleReroll} onReset={handleReset} onChangeMode={handleChangeMode} onVerify={handleVerify} onCopyHash={handleCopyHash} />
+            </ResultDialog>
           ) : null}
         </section>
       ) : null}
-
-      {state.phase === "results" && state.draw ? <ResultPanel draw={state.draw} roomContext={state.roomContext} accepted={state.accepted} readOnly={state.readOnly} verification={verification} actionStatus={actionStatus} onApply={handleApply} onSave={handleSave} onCopy={handleCopy} onShare={handleShare} onReplay={() => dispatch({ type: "replay" })} onReroll={handleReroll} onReset={handleReset} onChangeMode={handleChangeMode} onVerify={handleVerify} onCopyHash={handleCopyHash} /> : null}
 
       <div className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</div>
     </div>

@@ -34,7 +34,7 @@ function BroadcastFootball({ participant }: { participant: DraftOrderParticipant
 
 export default function PuntBounceRenderer(props: ShowdownRendererProps) {
   const { draw, plan } = props;
-  const { revealed, reducedMotion } = useRevealSequence(props);
+  const { revealed, reducedMotion, staticReveal } = useRevealSequence(props);
   const participants = new Map(draw.participants.map((participant) => [participant.id, participant]));
   const cues = new Map(plan.cues.map((cue) => [cue.participantId, cue]));
   const leaderCue = plan.cues.reduce<(typeof plan.cues)[number] | undefined>((leader, cue) => {
@@ -48,7 +48,7 @@ export default function PuntBounceRenderer(props: ShowdownRendererProps) {
     <section className="showdown-game showdown-punt" aria-labelledby="punt-title">
       <header className="showdown-game-header punt-game-header">
         <div><span>Saturday night field test</span><h2 id="punt-title">Punt Bounce</h2></div>
-        <strong>{reducedMotion ? "Static distance reveal" : "Continuous flight and bounce"}</strong>
+        <strong>{props.complete ? "Final distances" : reducedMotion ? "Static distance reveal" : "Continuous flight and bounce"}</strong>
       </header>
 
       <div className="punt-stadium">
@@ -68,8 +68,8 @@ export default function PuntBounceRenderer(props: ShowdownRendererProps) {
               const cue = cues.get(participant.id)!;
               const resting = revealed.has(participant.id);
               const style = {
-                "--punt-delay": `${reducedMotion ? 0 : cue.delayMs}ms`,
-                "--punt-duration": `${reducedMotion ? 1 : cue.durationMs}ms`,
+                "--punt-delay": `${staticReveal ? 0 : cue.delayMs}ms`,
+                "--punt-duration": `${staticReveal ? 1 : cue.durationMs}ms`,
                 "--punt-finish": cue.finalPercent / 100,
                 "--punt-bounce": `${cue.bounce}px`,
                 "--punt-wobble": `${cue.drift / 3}deg`,
@@ -80,6 +80,7 @@ export default function PuntBounceRenderer(props: ShowdownRendererProps) {
                   <span className="punt-team">
                     <ParticipantMark participant={participant} compact />
                     <span><small>Punt {String(index + 1).padStart(2, "0")}</small><strong>{participant.teamName}</strong></span>
+                    {resting ? <em className="punt-team-result"><strong>#{cue.rank + 1}</strong><small>{cue.finalPercent.toFixed(1)} yd</small></em> : null}
                   </span>
                   <span className="punt-flight-path" aria-hidden="true">
                     <i className="punt-kick-spot" />
@@ -87,12 +88,6 @@ export default function PuntBounceRenderer(props: ShowdownRendererProps) {
                     <i className="punt-ball-shadow"><b /></i>
                     <i className="punt-impact-mark"><b /><b /><b /></i>
                     <span className="punt-ball"><span className="punt-ball-height"><span className="punt-ball-spin"><BroadcastFootball participant={participant} /></span></span></span>
-                    {resting ? (
-                      <em className="punt-result-badge">
-                        <small>{cue.rank === 0 ? "Longest punt" : `Pick ${cue.rank + 1}`}</small>
-                        <strong>{cue.finalPercent.toFixed(1)} yd</strong>
-                      </em>
-                    ) : null}
                   </span>
                 </div>
               );
@@ -103,7 +98,7 @@ export default function PuntBounceRenderer(props: ShowdownRendererProps) {
         </div>
       </div>
 
-      <LockedResultList draw={draw} revealed={revealed} />
+      <LockedResultList draw={draw} revealed={revealed} orderOnly />
     </section>
   );
 }
