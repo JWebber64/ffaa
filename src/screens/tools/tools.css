@@ -23,10 +23,10 @@
   border: 1px solid var(--color-border-default);
   border-radius: var(--r-xl);
   background:
-    linear-gradient(90deg, color-mix(in oklch, var(--color-surface-page) 96%, transparent), color-mix(in oklch, var(--green-950) 74%, transparent) 54%, color-mix(in oklch, var(--color-surface-page) 28%, transparent)),
+    linear-gradient(90deg, color-mix(in oklch, var(--gray-950) 94%, transparent), color-mix(in oklch, var(--gray-950) 66%, transparent) 54%, color-mix(in oklch, var(--gray-950) 18%, transparent)),
     var(--research-editorial-image) center / cover;
-  background-color: var(--green-950);
-  background-blend-mode: normal, luminosity;
+  background-color: var(--gray-950);
+  background-blend-mode: normal, normal;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 20px 60px rgba(0,0,0,0.18);
 }
 
@@ -292,14 +292,6 @@
   background: var(--color-surface-card-secondary);
 }
 
-.tools-card-media::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, color-mix(in oklch, var(--green-950) 28%, transparent), transparent 55%);
-  pointer-events: none;
-}
-
 .tools-card-media img {
   position: absolute;
   inset: 0;
@@ -308,7 +300,6 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  filter: grayscale(.18) sepia(.18) hue-rotate(72deg) saturate(.72) brightness(.82);
 }
 
 .tools-card::after {

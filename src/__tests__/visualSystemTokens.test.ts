@@ -144,4 +144,31 @@ describe("shared green and gray visual system", () => {
     expect(refinement).toContain("var(--league-editorial-image)");
     expect(myHq).toContain("var(--league-editorial-image)");
   });
+
+  it("keeps editorial photography in its natural color", () => {
+    const directPhotoStyles = [
+      "src/screens_v2/landing-v2.css",
+      "src/screens/tools/tools.css",
+      "src/screens/league-hq.css",
+    ];
+    const editorialBackgroundStyles = [
+      "src/styles/refinement.css",
+      "src/screens/tools/tools.css",
+      "src/screens/league-hq.css",
+      "src/screens/my-hq.css",
+      "src/features/league-history/ui/league-history.css",
+    ];
+
+    for (const path of directPhotoStyles) {
+      expect(readProjectFile(path), `${path} should not color-grade photography`).not.toMatch(
+        /filter:\s*[^;]*(?:grayscale|sepia|hue-rotate|saturate|brightness)\b/i,
+      );
+    }
+
+    for (const path of editorialBackgroundStyles) {
+      expect(readProjectFile(path), `${path} should not use luminosity blending on photography`).not.toContain(
+        "luminosity",
+      );
+    }
+  });
 });

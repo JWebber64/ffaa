@@ -16,8 +16,8 @@
   background:
     linear-gradient(90deg, color-mix(in oklch, var(--gray-950) 96%, transparent), color-mix(in oklch, var(--gray-950) 84%, transparent) 56%, color-mix(in oklch, var(--gray-950) 48%, transparent)),
     var(--league-editorial-image);
-  background-color: var(--green-950);
-  background-blend-mode: normal, luminosity;
+  background-color: var(--gray-950);
+  background-blend-mode: normal, normal;
   background-position: center 46%;
   background-size: cover;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.25);

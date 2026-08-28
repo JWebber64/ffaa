@@ -2974,7 +2974,7 @@ dd,
   overflow: hidden;
   border-color: rgba(217, 235, 226, 0.17);
   background-image:
-    linear-gradient(90deg, rgba(3, 9, 7, 0.92), rgba(3, 9, 7, 0.68)),
+    linear-gradient(90deg, color-mix(in oklch, var(--gray-950) 92%, transparent), color-mix(in oklch, var(--gray-950) 58%, transparent)),
     var(--football-banner-image);
   background-position: center;
   background-size: cover;
@@ -2994,8 +2994,8 @@ dd,
   overflow: hidden;
   border-color: rgba(217, 235, 226, 0.2);
   background-image:
-    linear-gradient(90deg, rgba(3, 9, 7, 0.96), rgba(3, 12, 8, 0.83) 48%, rgba(3, 9, 7, 0.5)),
-    linear-gradient(0deg, rgba(3, 9, 7, 0.72), transparent),
+    linear-gradient(90deg, color-mix(in oklch, var(--gray-950) 95%, transparent), color-mix(in oklch, var(--gray-950) 70%, transparent) 48%, color-mix(in oklch, var(--gray-950) 22%, transparent)),
+    linear-gradient(0deg, color-mix(in oklch, var(--gray-950) 46%, transparent), transparent),
     var(--football-banner-image);
   background-position: center;
   background-size: cover;
@@ -3152,7 +3152,7 @@ dd,
   padding: 18px;
   border-bottom: 1px solid rgba(217, 235, 226, 0.14);
   background-image:
-    linear-gradient(90deg, rgba(3, 9, 7, 0.96), rgba(3, 10, 7, 0.78) 62%, rgba(3, 9, 7, 0.48)),
+    linear-gradient(90deg, color-mix(in oklch, var(--gray-950) 94%, transparent), color-mix(in oklch, var(--gray-950) 68%, transparent) 62%, color-mix(in oklch, var(--gray-950) 18%, transparent)),
     var(--football-banner-image);
   background-position: 24% center;
   background-size: cover;
@@ -3766,7 +3766,7 @@ body,
 .home-research-links {
   border-color: var(--color-border-default);
   background-image:
-    linear-gradient(90deg, color-mix(in oklch, var(--color-surface-page) 92%, transparent), color-mix(in oklch, var(--green-950) 54%, transparent)),
+    linear-gradient(90deg, color-mix(in oklch, var(--gray-950) 92%, transparent), color-mix(in oklch, var(--gray-950) 46%, transparent)),
     var(--football-banner-image);
 }
 
@@ -3774,25 +3774,25 @@ body,
 .host-hero,
 .join-hero {
   border-color: var(--color-border-default);
-  background-color: var(--green-950);
+  background-color: var(--gray-950);
   background-image:
-    linear-gradient(90deg, color-mix(in oklch, var(--color-surface-page) 95%, transparent), color-mix(in oklch, var(--green-950) 76%, transparent) 48%, color-mix(in oklch, var(--color-surface-page) 32%, transparent)),
-    linear-gradient(0deg, color-mix(in oklch, var(--color-surface-page) 58%, transparent), transparent),
+    linear-gradient(90deg, color-mix(in oklch, var(--gray-950) 95%, transparent), color-mix(in oklch, var(--gray-950) 70%, transparent) 48%, color-mix(in oklch, var(--gray-950) 22%, transparent)),
+    linear-gradient(0deg, color-mix(in oklch, var(--gray-950) 46%, transparent), transparent),
     var(--draft-editorial-image);
-  background-blend-mode: normal, normal, luminosity;
+  background-blend-mode: normal, normal, normal;
 }
 
 .results-hero {
   border-color: var(--color-border-default);
-  background-color: var(--green-950);
+  background-color: var(--gray-950);
   background-image:
-    linear-gradient(90deg, color-mix(in oklch, var(--color-surface-page) 96%, transparent), color-mix(in oklch, var(--green-950) 74%, transparent) 52%, color-mix(in oklch, var(--color-surface-page) 30%, transparent)),
-    linear-gradient(0deg, color-mix(in oklch, var(--color-surface-page) 58%, transparent), transparent),
+    linear-gradient(90deg, color-mix(in oklch, var(--gray-950) 96%, transparent), color-mix(in oklch, var(--gray-950) 68%, transparent) 52%, color-mix(in oklch, var(--gray-950) 18%, transparent)),
+    linear-gradient(0deg, color-mix(in oklch, var(--gray-950) 44%, transparent), transparent),
     var(--results-editorial-image);
   background-position: center, center, right center;
   background-repeat: no-repeat;
   background-size: auto, auto, auto 100%;
-  background-blend-mode: normal, normal, luminosity;
+  background-blend-mode: normal, normal, normal;
 }
 
 .stats-hub .stats-hero,
@@ -3800,22 +3800,22 @@ body,
 .tools-hero,
 .tools-page-hero {
   border-color: var(--color-border-default);
-  background-color: var(--green-950);
+  background-color: var(--gray-950);
   background-image:
-    linear-gradient(90deg, color-mix(in oklch, var(--color-surface-page) 95%, transparent), color-mix(in oklch, var(--green-950) 74%, transparent) 48%, color-mix(in oklch, var(--color-surface-page) 30%, transparent)),
-    linear-gradient(0deg, color-mix(in oklch, var(--color-surface-page) 58%, transparent), transparent),
+    linear-gradient(90deg, color-mix(in oklch, var(--gray-950) 95%, transparent), color-mix(in oklch, var(--gray-950) 68%, transparent) 48%, color-mix(in oklch, var(--gray-950) 18%, transparent)),
+    linear-gradient(0deg, color-mix(in oklch, var(--gray-950) 44%, transparent), transparent),
     var(--research-editorial-image);
-  background-blend-mode: normal, normal, luminosity;
+  background-blend-mode: normal, normal, normal;
 }
 
 .league-hero {
   border-color: var(--color-border-default);
-  background-color: var(--green-950);
+  background-color: var(--gray-950);
   background-image:
-    linear-gradient(90deg, color-mix(in oklch, var(--color-surface-page) 95%, transparent), color-mix(in oklch, var(--green-950) 72%, transparent) 48%, color-mix(in oklch, var(--color-surface-page) 28%, transparent)),
-    linear-gradient(0deg, color-mix(in oklch, var(--color-surface-page) 56%, transparent), transparent),
+    linear-gradient(90deg, color-mix(in oklch, var(--gray-950) 95%, transparent), color-mix(in oklch, var(--gray-950) 66%, transparent) 48%, color-mix(in oklch, var(--gray-950) 18%, transparent)),
+    linear-gradient(0deg, color-mix(in oklch, var(--gray-950) 42%, transparent), transparent),
     var(--league-editorial-image);
-  background-blend-mode: normal, normal, luminosity;
+  background-blend-mode: normal, normal, normal;
 }
 
 .auction-budget-input {
