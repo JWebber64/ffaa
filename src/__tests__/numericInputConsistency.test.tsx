@@ -66,6 +66,13 @@ describe("numeric input consistency", () => {
     expect(input.value).toBe("200");
   });
 
+  it("reserves enough room to show the auction bid beside its stepper", () => {
+    const tools = readFileSync(resolve(projectRoot, "src/screens/tools/tools.css"), "utf8");
+    const width = tools.match(/\.auction-selected-ticket label > span\s*\{[^}]*width:\s*(\d+)px/s)?.[1];
+
+    expect(Number(width)).toBeGreaterThanOrEqual(112);
+  });
+
   it("keeps direct native number inputs limited to the established draft stepper implementation", () => {
     const violations = collectTsxFiles(resolve(projectRoot, "src")).flatMap((path) => {
       if (path.endsWith("NumericInput.tsx")) return [];

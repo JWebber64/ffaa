@@ -714,7 +714,7 @@
 .auction-selected-ticket small { margin-top: 2px; color: var(--text-3); font-size: .64rem; }
 .auction-selected-ticket > span { color: var(--text-3); font-size: .72rem; }
 .auction-selected-ticket label { display: grid; gap: 3px; color: var(--text-3); font-size: .62rem; }
-.auction-selected-ticket label > span { width: 72px; height: 32px; }
+.auction-selected-ticket label > span { width: 120px; height: 32px; }
 .auction-table-wrap { overflow: auto; max-height: 560px; border: 1px solid rgba(255,255,255,.06); border-radius: 9px; }
 .auction-table { width: 100%; min-width: 560px; border-collapse: collapse; }
 .auction-table th, .auction-table td { padding: 8px 9px; border-bottom: 1px solid rgba(255,255,255,.055); color: var(--text-2); font-size: .7rem; text-align: left; }
