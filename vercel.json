@@ -22,6 +22,10 @@
   ],
   "rewrites": [
     {
+      "source": "/ff/sw.js",
+      "destination": "/sw.js"
+    },
+    {
       "source": "/ff/api/league-history/import",
       "destination": "/api/league-history/import"
     },
