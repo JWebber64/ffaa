@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react";
 import {
   Clock3,
-  ChevronsUpDown,
   Gavel,
   LogOut,
   Search,
@@ -13,6 +12,7 @@ import {
 import { Badge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
 import { Input } from "@/ui/Input";
+import { NumericInput } from "@/ui/NumericInput";
 import { PositionToggle } from "@/ui/PositionToggle";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 import { cn } from "@/ui/cn";
@@ -185,7 +185,6 @@ export function MobileManagerDraftView({
   const actionLabel = draftType === "snake" ? "Pick" : "Nominate";
   const nominationLocked = !isMyTurnToAct;
   const nominationActionLocked = nominationLocked || (isAuction && !nominationBidValid);
-  const nominationBidValue = Number(nominationBid);
   const customBidAmount = Number(customBid);
   const hasCustomBid = customBid.trim().length > 0;
   const customBidValue = Number.isFinite(customBidAmount) ? Math.round(customBidAmount) : null;
@@ -214,17 +213,6 @@ export function MobileManagerDraftView({
   ]
     .filter(Boolean)
     .join(" | ");
-
-  function stepNominationBid(direction: 1 | -1) {
-    if (nominationLocked || nominationBidMax < 1) return;
-
-    const currentValue =
-      Number.isFinite(nominationBidValue) && nominationBidValue >= 1
-        ? nominationBidValue
-        : 1;
-    const nextValue = Math.min(nominationBidMax, Math.max(1, Math.round(currentValue) + direction));
-    onNominationBidChange(String(nextValue));
-  }
 
   return (
     <div className="draft-mobile-manager" aria-label="Manager draft controls">
@@ -378,37 +366,17 @@ export function MobileManagerDraftView({
             <div className="mobile-opening-bid">
               <label>
                 <span>Opening bid</span>
-                <div className="draft-bid-custom-field mobile-opening-bid-field">
-                  <input
-                    className="ui-input-field mobile-opening-bid-input"
-                    type="number"
-                    min={1}
-                    max={nominationBidMax}
-                    step={1}
-                    value={nominationBid}
-                    onChange={(event) => onNominationBidChange(event.target.value)}
-                    disabled={nominationLocked}
-                  />
-                  <div className="draft-bid-stepper mobile-opening-bid-stepper">
-                    <span className="draft-bid-stepper-visual" aria-hidden="true">
-                      <ChevronsUpDown size={14} strokeWidth={2.4} />
-                    </span>
-                    <button
-                      className="draft-bid-stepper-hit draft-bid-stepper-hit-up"
-                      type="button"
-                      aria-label="Increase opening bid"
-                      disabled={nominationLocked || nominationBidMax < 1}
-                      onClick={() => stepNominationBid(1)}
-                    />
-                    <button
-                      className="draft-bid-stepper-hit draft-bid-stepper-hit-down"
-                      type="button"
-                      aria-label="Decrease opening bid"
-                      disabled={nominationLocked || nominationBidMax < 1}
-                      onClick={() => stepNominationBid(-1)}
-                    />
-                  </div>
-                </div>
+                <NumericInput
+                  aria-label="Opening bid"
+                  className="ui-input-field mobile-opening-bid-input"
+                  disabled={nominationLocked}
+                  max={nominationBidMax}
+                  min={1}
+                  onChange={(event) => onNominationBidChange(event.target.value)}
+                  shellClassName="draft-bid-custom-field mobile-opening-bid-field"
+                  step={1}
+                  value={nominationBid}
+                />
               </label>
               <div className="mobile-opening-bid-meta">
                 <strong>Max {money(nominationBidMax)}</strong>

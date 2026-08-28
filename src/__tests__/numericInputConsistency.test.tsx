@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { readFileSync, readdirSync } from "node:fs";
-import { dirname, extname, resolve } from "node:path";
+import { dirname, extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import { useState } from "react";
@@ -47,16 +47,18 @@ describe("numeric input consistency", () => {
 
     expect(globals).toMatch(/\.ffaa-number-field > input\[type="number"\]\s*\{[^}]*padding-right:\s*46px[^}]*appearance:\s*textfield/s);
     expect(globals).toMatch(/\.ffaa-number-stepper\s*\{[^}]*width:\s*32px[^}]*height:\s*32px[^}]*border-radius:\s*10px[^}]*--green-300/s);
-    expect(globals).toMatch(/\.draft-bid-stepper\s*\{[^}]*width:\s*32px[^}]*height:\s*32px[^}]*border-radius:\s*10px[^}]*--green-300/s);
-    expect(globals).toMatch(/\.ffaa-custom-select-icon\s*\{[^}]*width:\s*28px[^}]*height:\s*28px[^}]*background:\s*var\(--color-surface-field\)/s);
+    expect(globals).not.toMatch(/\.draft-bid-stepper\s*\{/s);
+    expect(globals).toMatch(/\.ffaa-custom-select-icon\s*\{[^}]*place-items:\s*center[^}]*width:\s*24px[^}]*height:\s*24px/s);
     expect(globals).not.toMatch(/\.setup-budget-field > \.ffaa-number-stepper\s*\{/s);
     expect(refinement).toMatch(/\.auction-budget-input\s*\{[^}]*background:\s*var\(--color-surface-field\)/s);
     expect(tools).toMatch(/\.team-slot-stepper input\s*\{[^}]*background:\s*transparent/s);
   });
 
   it("increments and decrements a controlled value through accessible hit regions", () => {
-    render(<ControlledBudget />);
+    const { container } = render(<ControlledBudget />);
     const input = screen.getByRole("spinbutton", { name: "Auction budget" }) as HTMLInputElement;
+
+    expect(container.querySelector(".ffaa-number-stepper-visual > svg.ffaa-control-chevron")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Increase Auction budget" }));
     expect(input.value).toBe("201");
@@ -73,14 +75,12 @@ describe("numeric input consistency", () => {
     expect(Number(width)).toBeGreaterThanOrEqual(112);
   });
 
-  it("keeps direct native number inputs limited to the established draft stepper implementation", () => {
+  it("routes every editable native number field through NumericInput", () => {
     const violations = collectTsxFiles(resolve(projectRoot, "src")).flatMap((path) => {
-      if (path.endsWith("NumericInput.tsx")) return [];
+      if (path.endsWith("NumericInput.tsx") || path.includes(`${sep}__tests__${sep}`)) return [];
       const source = readFileSync(path, "utf8");
       const hasNativeNumberInput = /<input[\s\S]{0,220}?type="number"/.test(source);
-      return hasNativeNumberInput && !source.includes("draft-bid-stepper")
-        ? [path.replace(`${projectRoot}\\`, "")]
-        : [];
+      return hasNativeNumberInput ? [path.replace(`${projectRoot}${sep}`, "")] : [];
     });
 
     expect(violations).toEqual([]);

@@ -1,7 +1,7 @@
 import React, { useMemo, useRef } from "react";
-import { ChevronsUpDown } from "lucide-react";
 
 import { cn } from "./cn";
+import { ControlChevron } from "./ControlChevron";
 
 export type NumericInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> & {
   shellClassName?: string;
@@ -90,13 +90,13 @@ export const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps
         min={min}
         readOnly={readOnly}
         step={step}
-        style={{ ...style, width: "100%", paddingRight: "42px" }}
+        style={{ ...style, width: "100%", paddingRight: "46px" }}
         type="number"
         value={value}
       />
       <span className="ffaa-number-stepper">
         <span className="ffaa-number-stepper-visual" aria-hidden="true">
-          <ChevronsUpDown size={14} strokeWidth={2.4} />
+          <ControlChevron kind="stepper" />
         </span>
         <button
           aria-label={`Increase ${label}`}

@@ -1,6 +1,7 @@
 import { Plus, RotateCcw, Trash2, Upload, Users } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../../ui/Button";
+import { UniversalSelect } from "../../ui/UniversalSelect";
 import type { SleeperLeagueConnectionSummary } from "../league-hq/sleeperConnections";
 import type { DraftOrderParticipant, DraftRoomOrderContext } from "./types";
 
@@ -66,7 +67,7 @@ export function ParticipantSetup({
       <div className="participant-import-grid">
         <article className="is-primary">
           <div><Users aria-hidden="true" /><span><strong>Active Sleeper league</strong><small>Bring in current teams, managers, and avatars.</small></span></div>
-          <label><span>League</span><select value={selectedLeagueId} onChange={(event) => onLeagueSelect(event.target.value)} disabled={!connections.length || busy}><option value="">Choose connected league</option>{connections.map((connection) => <option value={connection.leagueId} key={connection.leagueId}>{connection.leagueName}</option>)}</select></label>
+          <label><span>League</span><UniversalSelect aria-label="Draft order league" className="participant-league-select" value={selectedLeagueId} onValueChange={onLeagueSelect} disabled={!connections.length || busy}><option value="">Choose connected league</option>{connections.map((connection) => <option value={connection.leagueId} key={connection.leagueId}>{connection.leagueName}</option>)}</UniversalSelect></label>
           <Button size="sm" variant="secondary" onClick={onImportLeague} disabled={!selectedLeagueId || busy}><Upload size={15} aria-hidden="true" /> Import league managers</Button>
         </article>
         <article className="is-secondary">

@@ -24,6 +24,7 @@ import { SelectedSourcesBar } from "./SelectedSourcesBar";
 import { SourceDirectory } from "./SourceDirectory";
 import { SourceSheet } from "./SourceSheet";
 import { useAuctionValueState } from "./useAuctionValueState";
+import { UniversalSelect } from "@/ui/UniversalSelect";
 import "./auction-values.css";
 
 const EMPTY_ROSTER_SLOTS = [] as const;
@@ -235,7 +236,7 @@ export default function AuctionValuesPage() {
                 <p>{formatLabel(state.scoringFormat)} · {state.leagueSize} teams · ${state.budget} budget · {state.valueMode === "normalized" ? "Normalized values" : "Raw source values"}</p>
               </div>
               <div className="auction-table-tools">
-                <label><span>Rows</span><select className="ffaa-control" value={state.rowLimit} onChange={(event) => state.setRowLimit(event.target.value === "all" ? "all" : Number(event.target.value))}><option value="50">50</option><option value="100">100</option><option value="150">150</option><option value="200">200</option><option value="all">All</option></select></label>
+                <label><span>Rows</span><UniversalSelect aria-label="Comparison rows" className="ffaa-control" value={state.rowLimit} onValueChange={(value) => state.setRowLimit(value === "all" ? "all" : Number(value))}><option value="50">50</option><option value="100">100</option><option value="150">150</option><option value="200">200</option><option value="all">All</option></UniversalSelect></label>
                 <button aria-pressed={state.density === "comfortable"} type="button" onClick={() => state.setDensity(state.density === "compact" ? "comfortable" : "compact")}><Rows3 size={15} aria-hidden="true" /> {state.density === "compact" ? "Comfortable" : "Compact"}</button>
                 <button className="auction-mobile-view-toggle" aria-pressed={state.mobileView === "stacked"} type="button" onClick={() => state.setMobileView(state.mobileView === "table" ? "stacked" : "table")}>{state.mobileView === "table" ? <LayoutList size={15} aria-hidden="true" /> : <Columns3 size={15} aria-hidden="true" />}{state.mobileView === "table" ? "Stacked" : "Table"}</button>
                 <button type="button" onClick={() => setPrintSettingsOpen(true)}><Printer size={15} aria-hidden="true" /> Print</button>

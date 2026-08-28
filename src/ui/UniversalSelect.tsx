@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "./cn";
+import { ControlChevron } from "./ControlChevron";
 
 type SelectOption = {
   value: string;
@@ -343,7 +344,9 @@ export const UniversalSelect = React.forwardRef<HTMLSelectElement, UniversalSele
               {selectedOption?.label || "Select"}
             </span>
           </span>
-          <span className="ffaa-custom-select-icon" aria-hidden="true" />
+          <span className="ffaa-custom-select-icon" aria-hidden="true">
+            <ControlChevron kind="select" />
+          </span>
         </button>
 
         {menu}

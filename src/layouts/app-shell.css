@@ -106,11 +106,13 @@
 
 .product-shell .app-header-right { display: flex; align-items: center; justify-content: flex-end; min-width: 0; gap: var(--space-3); }
 .league-context-control { display: grid; gap: 2px; }
-.league-context-control span { color: var(--text-muted); font-size: .75rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
-.league-context-control select,
-.mobile-more-panel select { max-width: 180px; min-height: 30px; border: 0; background: transparent; color: var(--text-primary); font: inherit; font-size: .75rem; font-weight: 700; }
-.league-context-control option,
-.mobile-more-panel option { color: var(--gray-950); }
+.league-context-control > span { color: var(--text-muted); font-size: .75rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.league-context-control .ffaa-custom-select,
+.mobile-more-league .ffaa-custom-select { max-width: 180px; }
+.league-context-select,
+.mobile-more-league-select { min-height: 30px; padding: 2px 4px 2px 9px; border: 0; background: transparent; color: var(--text-primary); font: inherit; font-size: .75rem; font-weight: 700; }
+.league-context-select .ffaa-custom-select-icon,
+.mobile-more-league-select .ffaa-custom-select-icon { width: 24px; height: 24px; }
 .connect-league-link { color: var(--text-secondary); font-size: .75rem; font-weight: 700; }
 .shell-primary-action { display: inline-flex; min-height: 40px; padding: 0 var(--space-4); align-items: center; border: 1px solid var(--color-border-brand); border-radius: var(--r-md); background: var(--color-button-primary); color: var(--color-button-primary-text); font-size: .77rem; font-weight: 850; }
 .shell-primary-action:hover { background: var(--color-button-primary-hover); color: var(--color-button-primary-text); }
@@ -149,8 +151,8 @@
   .mobile-more-panel > strong { padding: var(--space-2); color: var(--text-muted); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
   .mobile-more-panel > a { display: flex; min-height: 44px; align-items: center; gap: var(--space-3); border-radius: var(--r-md); color: var(--text-primary); font-size: .82rem; }
   .mobile-more-panel > a svg { color: var(--accent-action); }
-  .mobile-more-panel label { display: grid; padding: var(--space-2); gap: var(--space-1); border-top: 1px solid var(--line-0); color: var(--text-muted); font-size: .75rem; }
-  .mobile-more-panel select { max-width: 100%; }
+  .mobile-more-panel .mobile-more-league { display: grid; padding: var(--space-2); gap: var(--space-1); border-top: 1px solid var(--line-0); color: var(--text-muted); font-size: .75rem; }
+  .mobile-more-league .ffaa-custom-select { max-width: 100%; }
 }
 
 @media (max-width: 420px) {

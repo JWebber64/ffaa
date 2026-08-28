@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ExternalLink, FileText, Plus, Search, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { UniversalSelect } from "@/ui/UniversalSelect";
 
 import { sourceCompatibility, sourceFreshness } from "./auctionValueData";
 import type { AuctionSourceType, AuctionValueSource, ScoringFormat } from "./auctionValueTypes";
@@ -66,7 +67,7 @@ export function SourceDirectory(props: Props) {
           </label>
           <label>
             <span>Source type</span>
-            <select aria-label="Source type" className="ffaa-control" value={props.sourceType} onChange={(event) => props.onSourceTypeChange(event.target.value as AuctionSourceType | "all")}>
+            <UniversalSelect aria-label="Source type" className="ffaa-control" value={props.sourceType} onValueChange={(value) => props.onSourceTypeChange(value as AuctionSourceType | "all")}>
               <option value="all">All source types</option>
               <option value="expert_projection">Published value</option>
               <option value="market_aav">Market AAV</option>
@@ -74,17 +75,17 @@ export function SourceDirectory(props: Props) {
               <option value="community_sheet">Community sheet</option>
               <option value="external_sheet">External sheet</option>
               <option value="archive">Archive</option>
-            </select>
+            </UniversalSelect>
           </label>
           <label>
             <span>Freshness</span>
-            <select aria-label="Data freshness" className="ffaa-control" value={props.freshness} onChange={(event) => props.onFreshnessChange(event.target.value)}>
+            <UniversalSelect aria-label="Data freshness" className="ffaa-control" value={props.freshness} onValueChange={props.onFreshnessChange}>
               <option value="current">Current season</option>
               <option value="fresh">Updated within 14 days</option>
               <option value="stale">Stale only</option>
               <option value="archive">Archive</option>
               <option value="all">All dates</option>
-            </select>
+            </UniversalSelect>
           </label>
         </div>
       </div>

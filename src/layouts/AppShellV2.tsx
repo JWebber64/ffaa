@@ -1,4 +1,4 @@
-import { lazy, type CSSProperties, type KeyboardEvent, type MouseEvent } from "react";
+import { lazy, useRef, type CSSProperties, type KeyboardEvent, type MouseEvent } from "react";
 import {
   BarChart3, BookOpen, Bug, ChevronDown, ClipboardList, Dices, Gavel, History,
   Home, Menu, Sparkles, Trophy, UserPlus, Users, Wrench,
@@ -8,6 +8,7 @@ import { useDebugDrawerState } from "../hooks/useDebugDrawer";
 import { appUrl } from "../lib/appBasePath";
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import { closeParentDisclosure } from "../ui/disclosureMenu";
+import { UniversalSelect } from "../ui/UniversalSelect";
 import "./app-shell.css";
 
 const DebugDrawer = lazy(() => import("../components/DebugDrawer"));
@@ -95,6 +96,7 @@ export function ProductMenu({ label, links, active }: { label: string; links: Me
 export default function AppShellV2() {
   const debugDrawer = useDebugDrawerState();
   const location = useLocation();
+  const mobileMoreMenuRef = useRef<HTMLDetailsElement>(null);
   const { connections, activeLeagueId, setActiveLeagueId } = useSleeperLeagueConnections();
   const activeConnection = connections.find((connection) => connection.leagueId === activeLeagueId);
   const isDraft = isPathActive(location.pathname, ["/draft", "/offline-draft", "/draft-order"]);
@@ -150,12 +152,17 @@ export default function AppShellV2() {
 
           <div className="app-header-right">
             {connections.length ? (
-              <label className="league-context-control">
+              <div className="league-context-control">
                 <span>Active league</span>
-                <select value={activeLeagueId} onChange={(event) => setActiveLeagueId(event.target.value)} aria-label="Active fantasy league">
+                <UniversalSelect
+                  aria-label="Active fantasy league"
+                  className="league-context-select"
+                  onValueChange={setActiveLeagueId}
+                  value={activeLeagueId}
+                >
                   {connections.map((connection) => <option key={connection.leagueId} value={connection.leagueId}>{connection.leagueName}</option>)}
-                </select>
-              </label>
+                </UniversalSelect>
+              </div>
             ) : <Link className="connect-league-link" to="/league">Connect league</Link>}
             <Link className="shell-primary-action" to="/host/setup">Start Draft</Link>
             {import.meta.env.DEV ? (
@@ -172,7 +179,7 @@ export default function AppShellV2() {
         <NavLink to="/host/setup"><Gavel aria-hidden="true" /><span>Draft</span></NavLink>
         <NavLink to="/my-hq"><Sparkles aria-hidden="true" /><span>This Week</span></NavLink>
         <NavLink to="/league"><Trophy aria-hidden="true" /><span>League</span></NavLink>
-        <details className="mobile-more-menu">
+        <details className="mobile-more-menu" ref={mobileMoreMenuRef}>
           <summary onKeyDown={toggleDisclosureFromKeyboard}><Menu aria-hidden="true" /><span>More</span></summary>
           <div className="mobile-more-panel">
             <strong>Explore Fantasy Football</strong>
@@ -180,12 +187,20 @@ export default function AppShellV2() {
               <Link key={`${to}-${label}`} to={to} onClick={dismissDisclosureMenu}><Icon aria-hidden="true" /><span>{label}</span></Link>
             ))}
             {connections.length ? (
-              <label><span>Active league</span><select value={activeLeagueId} onChange={(event) => {
-                setActiveLeagueId(event.target.value);
-                closeParentDisclosure(event.currentTarget);
-              }}>
-                {connections.map((connection) => <option key={connection.leagueId} value={connection.leagueId}>{connection.leagueName}</option>)}
-              </select></label>
+              <div className="mobile-more-league">
+                <span>Active league</span>
+                <UniversalSelect
+                  aria-label="Active fantasy league"
+                  className="mobile-more-league-select"
+                  onValueChange={(value) => {
+                    setActiveLeagueId(value);
+                    if (mobileMoreMenuRef.current) mobileMoreMenuRef.current.open = false;
+                  }}
+                  value={activeLeagueId}
+                >
+                  {connections.map((connection) => <option key={connection.leagueId} value={connection.leagueId}>{connection.leagueName}</option>)}
+                </UniversalSelect>
+              </div>
             ) : null}
           </div>
         </details>

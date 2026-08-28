@@ -146,7 +146,7 @@
 .participant-import-grid label,
 .participant-editor-list label { display: grid; gap: 5px; min-width: 0; color: var(--color-text-muted); font-size: .68rem; font-weight: 750; letter-spacing: .04em; }
 
-.participant-import-grid select,
+.participant-league-select,
 .participant-import-grid input,
 .participant-import-grid textarea {
   width: 100%;
@@ -161,7 +161,8 @@
 }
 
 .participant-import-grid textarea { min-height: 94px; resize: vertical; line-height: 1.4; }
-.participant-import-grid :is(select, input, textarea):focus-visible,
+.participant-league-select:focus-visible,
+.participant-import-grid :is(input, textarea):focus-visible,
 .participant-editor-list input:focus-visible { border-color: var(--color-field-focus); box-shadow: 0 0 0 2px var(--color-focus-ring); }
 .room-context-note { color: var(--green-200) !important; }
 

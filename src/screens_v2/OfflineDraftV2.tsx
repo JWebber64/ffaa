@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronsUpDown, Plus, RotateCcw, Save, Search, Trash2, Undo2, Users } from "lucide-react";
+import { Plus, RotateCcw, Save, Search, Trash2, Undo2, Users } from "lucide-react";
 import { loadPlayerPool } from "../data/loadPlayerPool";
 import { draftedRosterSize, normalizeAuctionValueScoring } from "../data/auctionValueSettings";
 import TeamBoard from "../components/draft/TeamBoard";
@@ -23,9 +23,11 @@ import {
 import type { Player } from "../types/draft";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
+import { NumericInput } from "../ui/NumericInput";
 import { PositionToggle } from "../ui/PositionToggle";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "../ui/positionToggleOptions";
 import { SelectItem, SelectWrapper } from "../ui/SelectWrapper";
+import { UniversalSelect } from "../ui/UniversalSelect";
 import { cn } from "../ui/cn";
 import { matchesPositionFilter } from "../utils/positionFilter";
 import { compareOfflineDraftPlayers, suggestedPrice } from "./offlineDraftPlayerOrder";
@@ -385,11 +387,6 @@ function positionSelectToken(position: ManualPosition) {
   return position === "DEF" ? "DST" : position;
 }
 
-function stepMoneyValue(value: string, direction: 1 | -1, min = 0) {
-  const current = clampWholeDollar(value) ?? min;
-  return String(Math.max(min, current + direction));
-}
-
 function MoneyStepper({
   label,
   value,
@@ -402,39 +399,19 @@ function MoneyStepper({
   min?: number;
 }) {
   const stringValue = String(value);
-  const canStepDown = (clampWholeDollar(stringValue) ?? min) > min;
 
   return (
     <label className="offline-money-stepper draft-bid-custom draft-bid-custom-input ui-input">
       <div className="ui-input-label">{label}</div>
-      <div className="draft-bid-custom-field offline-money-field">
-        <input
-          className="ui-input-field offline-input"
-          type="number"
-          min={min}
-          step={1}
-          value={stringValue}
-          onChange={(event) => onChange(event.target.value)}
-        />
-        <div className="draft-bid-stepper offline-money-stepper-control">
-          <span className="draft-bid-stepper-visual" aria-hidden="true">
-            <ChevronsUpDown size={14} strokeWidth={2.4} />
-          </span>
-          <button
-            className="draft-bid-stepper-hit draft-bid-stepper-hit-up"
-            type="button"
-            aria-label={`Increase ${label}`}
-            onClick={() => onChange(stepMoneyValue(stringValue, 1, min))}
-          />
-          <button
-            className="draft-bid-stepper-hit draft-bid-stepper-hit-down"
-            type="button"
-            aria-label={`Decrease ${label}`}
-            disabled={!canStepDown}
-            onClick={() => onChange(stepMoneyValue(stringValue, -1, min))}
-          />
-        </div>
-      </div>
+      <NumericInput
+        aria-label={label}
+        className="ui-input-field offline-input"
+        min={min}
+        onChange={(event) => onChange(event.target.value)}
+        shellClassName="draft-bid-custom-field offline-money-field"
+        step={1}
+        value={stringValue}
+      />
     </label>
   );
 }
@@ -1093,15 +1070,15 @@ export default function OfflineDraftV2() {
                     </div>
                     <div className="offline-roster-actions">
                       {canMove && currentSlot ? (
-                        <label className="offline-roster-slot-control">
-                          <span className="sr-only">Lineup slot for {player.name}</span>
-                          <select
-                            data-slot="offline-roster-slot"
-                            value={currentSlot.key}
+                        <div className="offline-roster-slot-control">
+                          <UniversalSelect
                             aria-label={`Lineup slot for ${player.name}`}
-                            onChange={(event) =>
-                              movePlayer(selectedTeam.teamId, player.playerId, event.target.value)
+                            className="offline-roster-slot-select"
+                            data-slot="offline-roster-slot"
+                            onValueChange={(value) =>
+                              movePlayer(selectedTeam.teamId, player.playerId, value)
                             }
+                            value={currentSlot.key}
                           >
                             {selectTargets.map((target) => (
                               <option key={target.key} value={target.key}>
@@ -1113,9 +1090,8 @@ export default function OfflineDraftV2() {
                                     : " - open"}
                               </option>
                             ))}
-                          </select>
-                          <ChevronsUpDown size={13} aria-hidden="true" />
-                        </label>
+                          </UniversalSelect>
+                        </div>
                       ) : (
                         <span className="offline-roster-slot-static">{currentSlot?.label ?? "Roster"}</span>
                       )}

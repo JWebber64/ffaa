@@ -135,6 +135,8 @@ Compound fields must read as one control. Prefixes, suffixes, and values share o
 
 Editable numeric fields use one shared stepper: a compact green-accented up/down chevron control inset at the right edge of the shared field surface, with separate accessible increment and decrement hit regions.
 
+Select fields use the shared custom select trigger and its single down chevron; do not expose browser-native select arrows or recreate chevrons with page-local CSS. Numeric and select chevrons use the shared control glyph, sit inside a square inset icon well, and are centered on both axes. Compact roster controls may reduce the well size, but they keep the same glyph, centering, field surface, and accessible label.
+
 ## No AI slop
 
 This is a binding product rule. Do not use generic AI-looking imagery or templated AI interface treatments anywhere in FFAA. Prohibited treatments include hand-drawn decorative SVG scenes, cartoon or clip-art sports diagrams, fake dashboard mockups, repetitive equal-card grids, generic proof tiles, decorative pills, invented metrics, slogan-heavy filler copy, and decorative highlighted sides or accent rails on cards.
@@ -169,6 +171,7 @@ Repeated editable data belongs in one compact list or table shell. On desktop, u
 - Do keep football-position identity inside the approved green and gray ramps.
 - Do keep every field fill, border, and focus treatment clipped to one control shell.
 - Do use the shared numeric stepper for every editable number field.
+- Do use the shared custom select trigger and centered control glyph for every visible select field.
 - Do use the named display, page, section, panel, and card density roles.
 - Do keep page heroes and ordinary cards at natural height.
 - Do verify the first useful follow-up content appears in a 900px-tall desktop viewport.
@@ -183,6 +186,7 @@ Repeated editable data belongs in one compact list or table shell. On desktop, u
 - Do not replace approved imagery with generic AI-looking, hand-drawn, decorative, or placeholder artwork.
 - Do not give a nested input its own fill when the parent already owns the field surface.
 - Do not expose browser-native number arrows or omit the shared stepper from an editable number field.
+- Do not expose browser-native select arrows, draw page-local CSS chevrons, or offset a field glyph by eye.
 - Do not use oversized viewport-relative headings as the primary source of hierarchy.
 - Do not add empty height, padding, or spacer elements to make a page feel more important.
 - Do not wrap every repeated data row in its own padded card or repeat identical desktop field labels row after row.

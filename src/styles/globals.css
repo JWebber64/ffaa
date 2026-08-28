@@ -389,20 +389,6 @@ html, body, #root {
     rgba(5,12,8,0.78);
 }
 
-.custom-select-trigger,
-.cui-select {
-  appearance: none;
-  -webkit-appearance: none;
-  background-image:
-    linear-gradient(45deg, transparent 50%, rgba(230,255,247,0.82) 50%),
-    linear-gradient(135deg, rgba(230,255,247,0.82) 50%, transparent 50%);
-  background-position:
-    calc(100% - 18px) 50%,
-    calc(100% - 12px) 50%;
-  background-size: 6px 6px, 6px 6px;
-  background-repeat: no-repeat;
-}
-
 .ffaa-dropdown-trigger:focus-visible,
 .select-trigger:focus-visible,
 .cui-select:focus,
@@ -608,31 +594,32 @@ html, body, #root {
   position: relative;
   z-index: 1;
   flex: 0 0 auto;
-  width: 28px;
-  height: 28px;
-  overflow: hidden;
-  border: 1px solid var(--color-border-default);
-  border-radius: 8px;
-  background: var(--color-surface-field);
-  box-shadow: none;
+  align-self: center;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid color-mix(in oklch, var(--green-300) 22%, transparent);
+  color: rgba(204,251,241,0.9);
+  line-height: 0;
 }
 
-.ffaa-custom-select-icon::before {
-  content: "";
-  position: absolute;
-  left: 9px;
-  top: 8px;
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid rgba(220,252,231,0.9);
-  border-bottom: 2px solid rgba(220,252,231,0.9);
-  transform: rotate(45deg);
-  transition: transform 160ms ease, top 160ms ease;
+.ffaa-control-chevron {
+  display: block;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 0;
 }
 
-.ffaa-custom-select-trigger[aria-expanded="true"] .ffaa-custom-select-icon::before {
-  top: 10px;
-  transform: rotate(225deg);
+.ffaa-custom-select-icon > .ffaa-control-chevron {
+  transform: rotate(0deg);
+  transform-origin: center;
+  transition: transform 160ms ease;
+}
+
+.ffaa-custom-select-trigger[aria-expanded="true"] .ffaa-custom-select-icon > .ffaa-control-chevron {
+  transform: rotate(180deg);
 }
 
 .ffaa-custom-select-popover {
@@ -3114,16 +3101,6 @@ p {
   font-size: 0.88rem;
 }
 
-.draft-bid-header-controls .draft-bid-stepper {
-  top: 50%;
-  right: 6px;
-  bottom: auto;
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  transform: translateY(-50%);
-}
-
 @media (max-width: 1320px) {
   .draft-command-stage {
     grid-template-columns: minmax(0, 1fr);
@@ -3271,91 +3248,6 @@ p {
   -moz-appearance: textfield;
 }
 
-.draft-bid-stepper {
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  bottom: auto;
-  z-index: 1;
-  display: block;
-  width: 32px;
-  height: 32px;
-  overflow: hidden;
-  border: 1px solid color-mix(in oklch, var(--green-300) 24%, transparent);
-  border-radius: 10px;
-  background:
-    linear-gradient(180deg, color-mix(in oklch, var(--green-300) 18%, transparent), color-mix(in oklch, var(--green-300) 6%, transparent)),
-    rgba(7,18,14,0.86);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 0 16px color-mix(in oklch, var(--green-300) 14%, transparent);
-  transform: translateY(-50%);
-}
-
-.draft-bid-stepper::before {
-  content: none;
-}
-
-.draft-bid-stepper-visual {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  color: color-mix(in oklch, var(--green-200) 96%, transparent);
-  line-height: 0;
-  pointer-events: none;
-}
-
-.draft-bid-stepper-visual svg {
-  display: block;
-  width: 16px;
-  height: 16px;
-}
-
-.draft-bid-header-controls .draft-bid-stepper-visual svg {
-  width: 16px;
-  height: 16px;
-}
-
-.draft-bid-stepper:has(button:disabled) .draft-bid-stepper-visual {
-  color: rgba(255,255,255,0.22);
-}
-
-.draft-bid-stepper button {
-  position: absolute;
-  left: 0;
-  z-index: 2;
-  min-width: 0;
-  width: 100%;
-  height: 50%;
-  min-height: 0;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.draft-bid-stepper-hit-up {
-  top: 0;
-}
-
-.draft-bid-stepper-hit-down {
-  bottom: 0;
-}
-
-.draft-bid-stepper button + button {
-  border-top: 0;
-}
-
-.draft-bid-stepper button:hover:not(:disabled) {
-  background: color-mix(in oklch, var(--green-300) 14%, transparent);
-  color: white;
-}
-
-.draft-bid-stepper button:disabled {
-  cursor: not-allowed;
-  color: rgba(255,255,255,0.22);
-}
-
 /* Canonical numeric-field stepper. Keep this identical across app surfaces. */
 .ffaa-number-field {
   position: relative;
@@ -3387,6 +3279,7 @@ p {
   width: 32px;
   height: 32px;
   overflow: hidden;
+  box-sizing: border-box;
   border: 1px solid color-mix(in oklch, var(--green-300) 24%, transparent);
   border-radius: 10px;
   background:
@@ -3407,10 +3300,11 @@ p {
   pointer-events: none;
 }
 
-.ffaa-number-stepper-visual svg {
-  display: block;
-  width: 16px;
-  height: 16px;
+.ffaa-number-stepper-visual .ffaa-control-chevron {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .ffaa-number-stepper button {
@@ -5886,13 +5780,6 @@ p {
   padding-right: 44px;
 }
 
-.mobile-opening-bid-stepper {
-  right: 6px;
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
-}
-
 .mobile-opening-bid input:focus {
   border-color: color-mix(in oklch, var(--green-400) 42%, transparent);
   box-shadow:
@@ -7245,12 +7132,6 @@ p {
   font-variant-numeric: tabular-nums;
 }
 
-.offline-money-stepper-control {
-  right: 6px;
-  width: 30px;
-  height: 30px;
-}
-
 .offline-select-trigger {
   min-height: 42px;
 }
@@ -7514,29 +7395,42 @@ p {
   box-shadow: 0 0 0 2px rgba(47,201,148,0.15);
 }
 
-.offline-roster-slot-control select {
+.offline-roster-slot-control .ffaa-custom-select {
   width: 100%;
   height: 100%;
-  appearance: none;
+}
+
+.offline-roster-slot-select {
+  min-height: 0;
+  height: 100%;
   border: 0;
   border-radius: inherit;
-  padding: 0 28px 0 10px;
+  padding: 0 4px 0 10px;
   background: transparent;
   color: inherit;
   font: inherit;
   cursor: pointer;
   outline: none;
+  box-shadow: none;
 }
 
-.offline-roster-slot-control option {
-  color: var(--text-0);
-  background: var(--bg-2);
+.offline-roster-slot-select:hover:not(:disabled),
+.offline-roster-slot-select[aria-expanded="true"] {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  filter: none;
 }
 
-.offline-roster-slot-control svg {
-  position: absolute;
-  right: 8px;
-  pointer-events: none;
+.offline-roster-slot-select .ffaa-custom-select-value {
+  gap: 4px;
+  font: inherit;
+}
+
+.offline-roster-slot-select .ffaa-custom-select-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
 }
 
 .offline-roster-slot-static {

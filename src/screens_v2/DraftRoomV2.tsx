@@ -3,7 +3,6 @@ import {
   ArrowDown,
   ArrowUp,
   ChevronDown,
-  ChevronsUpDown,
   LogOut,
   Plus,
   Trash2,
@@ -19,6 +18,7 @@ import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { SectionTitle } from "../ui/SectionTitle";
 import { Input } from "../ui/Input";
+import { NumericInput } from "../ui/NumericInput";
 import { cn } from "../ui/cn";
 import { useToast } from "../ui/toastContext";
 import { DropdownMenu, DropdownMenuItem } from "../ui/DropdownMenu";
@@ -683,28 +683,6 @@ export default function DraftRoomV2() {
     }
   }
 
-  function stepCustomBid(direction: 1 | -1) {
-    if (!canBid || bidPending) return;
-
-    const currentValue =
-      Number.isFinite(customBidAmount) && customBidAmount >= nextMinimumBid
-        ? customBidAmount
-        : nextMinimumBid;
-    const nextValue = Math.min(myMaxBid, Math.max(nextMinimumBid, Math.round(currentValue) + direction));
-    setCustomBid(String(nextValue));
-  }
-
-  function stepNominationBid(direction: 1 | -1) {
-    if (!isMyTurnToAct || draftType !== "auction" || nominationBidMax < 1) return;
-
-    const currentValue =
-      nominationBidValue !== null && nominationBidValue >= 1
-        ? nominationBidValue
-        : 1;
-    const nextValue = Math.min(nominationBidMax, Math.max(1, Math.round(currentValue) + direction));
-    setNominationBid(String(nextValue));
-  }
-
   function toggleAudioMuted() {
     setAuctionAudioMuted(!audioMuted);
   }
@@ -1206,38 +1184,18 @@ export default function DraftRoomV2() {
 
                   <label className="draft-bid-custom draft-bid-custom-input ui-input">
                     <div className="ui-input-label">Custom</div>
-                    <div className="draft-bid-custom-field">
-                      <input
-                        className="ui-input-field"
-                        type="number"
-                        min={nextMinimumBid}
-                        max={myMaxBid}
-                        step={1}
-                        placeholder={money(nextMinimumBid)}
-                        value={customBid}
-                        onChange={(event) => setCustomBid(event.target.value)}
-                        disabled={!canBid || bidPending}
-                      />
-                      <div className="draft-bid-stepper">
-                        <span className="draft-bid-stepper-visual" aria-hidden="true">
-                          <ChevronsUpDown size={14} strokeWidth={2.4} />
-                        </span>
-                        <button
-                          className="draft-bid-stepper-hit draft-bid-stepper-hit-up"
-                          type="button"
-                          aria-label="Increase custom bid"
-                          disabled={!canBid || bidPending || myMaxBid < nextMinimumBid}
-                          onClick={() => stepCustomBid(1)}
-                        />
-                        <button
-                          className="draft-bid-stepper-hit draft-bid-stepper-hit-down"
-                          type="button"
-                          aria-label="Decrease custom bid"
-                          disabled={!canBid || bidPending || myMaxBid < nextMinimumBid}
-                          onClick={() => stepCustomBid(-1)}
-                        />
-                      </div>
-                    </div>
+                    <NumericInput
+                      aria-label="Custom bid"
+                      className="ui-input-field"
+                      disabled={!canBid || bidPending}
+                      max={myMaxBid}
+                      min={nextMinimumBid}
+                      onChange={(event) => setCustomBid(event.target.value)}
+                      placeholder={money(nextMinimumBid)}
+                      shellClassName="draft-bid-custom-field"
+                      step={1}
+                      value={customBid}
+                    />
                   </label>
 
                   <div className="draft-bid-quick-row">
@@ -1501,38 +1459,18 @@ export default function DraftRoomV2() {
                         )}
                       >
                         <div className="ui-input-label">Opening bid</div>
-                        <div className="draft-bid-custom-field draft-opening-bid-field">
-                          <input
-                            ref={openingBidInputRef}
-                            className="ui-input-field draft-opening-bid-input"
-                            type="number"
-                            min={1}
-                            max={nominationBidMax}
-                            step={1}
-                            value={nominationBid}
-                            onChange={(event) => setNominationBid(event.target.value)}
-                            disabled={!isMyTurnToAct}
-                          />
-                          <div className="draft-bid-stepper draft-opening-bid-stepper">
-                            <span className="draft-bid-stepper-visual" aria-hidden="true">
-                              <ChevronsUpDown size={14} strokeWidth={2.4} />
-                            </span>
-                            <button
-                              className="draft-bid-stepper-hit draft-bid-stepper-hit-up"
-                              type="button"
-                              aria-label="Increase opening bid"
-                              disabled={!isMyTurnToAct || nominationBidMax < 1}
-                              onClick={() => stepNominationBid(1)}
-                            />
-                            <button
-                              className="draft-bid-stepper-hit draft-bid-stepper-hit-down"
-                              type="button"
-                              aria-label="Decrease opening bid"
-                              disabled={!isMyTurnToAct || nominationBidMax < 1}
-                              onClick={() => stepNominationBid(-1)}
-                            />
-                          </div>
-                        </div>
+                        <NumericInput
+                          aria-label="Opening bid"
+                          className="ui-input-field draft-opening-bid-input"
+                          disabled={!isMyTurnToAct}
+                          max={nominationBidMax}
+                          min={1}
+                          onChange={(event) => setNominationBid(event.target.value)}
+                          ref={openingBidInputRef}
+                          shellClassName="draft-bid-custom-field draft-opening-bid-field"
+                          step={1}
+                          value={nominationBid}
+                        />
                         {nominationBidError ? (
                           <div className="draft-opening-bid-error">{nominationBidError}</div>
                         ) : null}

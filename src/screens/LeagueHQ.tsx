@@ -31,6 +31,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { appUrl } from "../lib/appBasePath";
 import { useDraftStore } from "../store/draftStore";
 import { Button } from "../ui/Button";
+import { UniversalSelect } from "../ui/UniversalSelect";
 import {
   createStarterLeagueHQ,
   getChampionshipSeasons,
@@ -423,7 +424,12 @@ export default function LeagueHQ() {
         </div>
         <label className="league-sync-switch">
           <span>Active league</span>
-          <select value={activeLeagueId} onChange={(event) => chooseLeague(event.target.value)}>
+          <UniversalSelect
+            aria-label="Active league"
+            className="league-sync-select"
+            onValueChange={chooseLeague}
+            value={activeLeagueId}
+          >
             {!activeLeagueId ? <option value="">Choose a league</option> : null}
             {activeLeagueId && !connections.some((connection) => connection.leagueId === activeLeagueId) ? (
               <option value={activeLeagueId}>Current league</option>
@@ -433,7 +439,7 @@ export default function LeagueHQ() {
                 {connection.leagueName} · {connection.season} · {connection.totalRosters || "—"} teams
               </option>
             ))}
-          </select>
+          </UniversalSelect>
         </label>
         {data.sleeper ? (
           <a href={data.sleeper.sourceUrl} target="_blank" rel="noreferrer">Open in Sleeper</a>
@@ -479,9 +485,14 @@ export default function LeagueHQ() {
             </label>
             <label>
               <span>Season</span>
-              <select value={lookupSeason} onChange={(event) => setLookupSeason(Number(event.target.value))}>
+              <UniversalSelect
+                aria-label="Sleeper league season"
+                className="league-season-select"
+                onValueChange={(value) => setLookupSeason(Number(value))}
+                value={lookupSeason}
+              >
                 {SLEEPER_SEASONS.map((season) => <option value={season} key={season}>{season}</option>)}
-              </select>
+              </UniversalSelect>
             </label>
             <Button type="submit" isLoading={lookupState.status === "loading"}>Find leagues</Button>
           </form>
@@ -724,10 +735,16 @@ export default function LeagueHQ() {
           <section>
             <SectionHeading eyebrow="Record book" title="All-time manager standings" detail="Sort the full league table by any career category." />
             <div className="league-sorter">
-              <label htmlFor="record-sort">Sort by</label>
-              <select id="record-sort" value={recordSort} onChange={(event) => setRecordSort(event.target.value as RecordSort)}>
+              <span>Sort by</span>
+              <UniversalSelect
+                aria-label="Sort records by"
+                className="league-record-sort-select"
+                id="record-sort"
+                onValueChange={(value) => setRecordSort(value as RecordSort)}
+                value={recordSort}
+              >
                 <option value="titles">Championships</option><option value="winPct">Win percentage</option><option value="playoffs">Playoff wins</option><option value="ppg">Points per game</option><option value="record">Wins</option><option value="seasons">Seasons</option><option value="manager">Manager name</option>
-              </select>
+              </UniversalSelect>
             </div>
             <div className="league-table-wrap league-record-table">
               <table className="league-table">
@@ -856,8 +873,8 @@ export default function LeagueHQ() {
             </div>
             <section className="league-ballot">
               <ClipboardCheck aria-hidden="true" /><div><span>Your preseason ballot</span><h3>Call the season before it happens</h3><p>Picks are private to this browser.</p></div>
-              <label>Champion<select value={ballot.championManagerId} onChange={(event) => setBallot((current) => ({ ...current, championManagerId: event.target.value }))}><option value="">Choose a manager</option>{draftManagers.map((manager) => <option key={manager.id} value={manager.id}>{manager.managerName}</option>)}</select></label>
-              <label>Last place<select value={ballot.lastPlaceManagerId} onChange={(event) => setBallot((current) => ({ ...current, lastPlaceManagerId: event.target.value }))}><option value="">Choose a manager</option>{draftManagers.map((manager) => <option key={manager.id} value={manager.id}>{manager.managerName}</option>)}</select></label>
+              <label>Champion<UniversalSelect aria-label="Champion" className="league-ballot-select" value={ballot.championManagerId} onValueChange={(value) => setBallot((current) => ({ ...current, championManagerId: value }))}><option value="">Choose a manager</option>{draftManagers.map((manager) => <option key={manager.id} value={manager.id}>{manager.managerName}</option>)}</UniversalSelect></label>
+              <label>Last place<UniversalSelect aria-label="Last place" className="league-ballot-select" value={ballot.lastPlaceManagerId} onValueChange={(value) => setBallot((current) => ({ ...current, lastPlaceManagerId: value }))}><option value="">Choose a manager</option>{draftManagers.map((manager) => <option key={manager.id} value={manager.id}>{manager.managerName}</option>)}</UniversalSelect></label>
               <Button size="sm" onClick={() => setBallot((current) => ({ ...current, savedAt: new Date().toISOString() }))}>Save ballot</Button>
               {ballot.savedAt ? <small role="status">Saved {new Date(ballot.savedAt).toLocaleString()}</small> : null}
             </section>
