@@ -6,9 +6,16 @@ import { Sparkles } from "lucide-react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import { ProductMenu } from "../layouts/AppShellV2";
+import { getPrimaryDraftAction } from "../layouts/draftAction";
 import { closeParentDisclosure } from "../ui/disclosureMenu";
 
 describe("app shell navigation menus", () => {
+  it("offers the offline workflow instead of a self-link from host setup", () => {
+    expect(getPrimaryDraftAction("/host/setup")).toEqual({ to: "/offline-draft", label: "Offline Draft" });
+    expect(getPrimaryDraftAction("/host/setup/")).toEqual({ to: "/offline-draft", label: "Offline Draft" });
+    expect(getPrimaryDraftAction("/stats")).toEqual({ to: "/host/setup", label: "Start Draft" });
+  });
+
   it("keeps only one desktop product menu open at a time", () => {
     render(
       <MemoryRouter>

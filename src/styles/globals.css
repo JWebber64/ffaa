@@ -2150,8 +2150,6 @@ p {
 }
 
 .setup-summary {
-  position: sticky;
-  top: 18px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -2481,10 +2479,16 @@ p {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  position: sticky;
-  top: 120px;
   align-self: start;
   min-width: 0;
+}
+
+/* Pin the setup rail as one unit only when both cards fit below the header. */
+@media (min-width: 1025px) and (min-height: 940px) {
+  .setup-aside {
+    position: sticky;
+    top: 88px;
+  }
 }
 
 /* ------------------------------ Host Lobby ------------------------------ */

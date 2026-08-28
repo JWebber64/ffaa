@@ -9,6 +9,7 @@ import { appUrl } from "../lib/appBasePath";
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import { closeParentDisclosure } from "../ui/disclosureMenu";
 import { UniversalSelect } from "../ui/UniversalSelect";
+import { getPrimaryDraftAction } from "./draftAction";
 import "./app-shell.css";
 
 const DebugDrawer = lazy(() => import("../components/DebugDrawer"));
@@ -102,6 +103,7 @@ export default function AppShellV2() {
   const isDraft = isPathActive(location.pathname, ["/draft", "/offline-draft", "/draft-order"]);
   const isResearch = isPathActive(location.pathname, ["/stats", "/auction-values", "/analytics", "/tools"]);
   const isLeague = isPathActive(location.pathname, ["/league", "/my-hq"]);
+  const primaryDraftAction = getPrimaryDraftAction(location.pathname);
   const leagueLinks: MenuLink[] = [
     { to: "/my-hq", label: "This Week", detail: "Your next decisions", icon: Sparkles },
     { to: "/league", label: "League HQ", detail: "Connect and manage leagues", icon: Trophy },
@@ -164,7 +166,7 @@ export default function AppShellV2() {
                 </UniversalSelect>
               </div>
             ) : <Link className="connect-league-link" to="/league">Connect league</Link>}
-            <Link className="shell-primary-action" to="/host/setup">Start Draft</Link>
+            <Link className="shell-primary-action" to={primaryDraftAction.to}>{primaryDraftAction.label}</Link>
             {import.meta.env.DEV ? (
               <button className="shell-debug-action" type="button" onClick={debugDrawer.toggle} aria-label="Open debug drawer"><Bug size={16} aria-hidden="true" /></button>
             ) : null}

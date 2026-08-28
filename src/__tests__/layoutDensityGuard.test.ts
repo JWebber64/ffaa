@@ -14,6 +14,18 @@ function clampMaximums(source: string) {
 }
 
 describe("shared layout density contract", () => {
+  it("keeps the host setup cards on one height-aware sticky rail", () => {
+    const styles = readProjectFile("src/styles/globals.css");
+    const summaryRule = styles.match(/\.setup-summary\s*\{([^}]*)\}/)?.[1] ?? "";
+    const asideRule = styles.match(/\.setup-aside\s*\{([^}]*)\}/)?.[1] ?? "";
+
+    expect(summaryRule).not.toContain("position: sticky");
+    expect(asideRule).not.toContain("position: sticky");
+    expect(styles).toMatch(
+      /@media\s*\(min-width:\s*1025px\)\s*and\s*\(min-height:\s*940px\)\s*\{[\s\S]*?\.setup-aside\s*\{[\s\S]*?position:\s*sticky;[\s\S]*?top:\s*88px;/,
+    );
+  });
+
   it("owns page spacing and typography in named shared roles", () => {
     const tokens = readProjectFile("src/styles/tokens.css");
     const roles = [
