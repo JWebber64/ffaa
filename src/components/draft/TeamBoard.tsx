@@ -1,5 +1,4 @@
-import type { CSSProperties } from "react";
-import { ChevronsUpDown } from "lucide-react";
+import { useRef, useState, type CSSProperties, type DragEvent, type KeyboardEvent } from "react";
 import { cn } from "@/ui/cn";
 import { getComputerManagerProfile } from "@/engine/autoManager";
 import {
@@ -86,27 +85,31 @@ function getPlayerNameSizeClass(parts: string[]) {
 
 function SlotLine({
   slot,
-  availableSlots,
-  onMove,
+  canMove,
+  canAcceptDrop,
+  isMoveSelected,
+  isDropTarget,
+  activePlayerName,
+  onActivate,
+  onDrop,
+  onDragStart,
+  onDragEnd,
 }: {
   slot: SlotAssignment;
-  availableSlots: SlotAssignment[];
-  onMove?: (playerId: string, targetSlotKey: string) => void;
+  canMove?: boolean;
+  canAcceptDrop?: boolean;
+  isMoveSelected?: boolean;
+  isDropTarget?: boolean;
+  activePlayerName?: string;
+  onActivate?: () => void;
+  onDrop?: (playerId?: string) => void;
+  onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
+  onDragEnd?: () => void;
 }) {
   const filled = !!slot.assigned?.name;
   const rosterMeta = getRosterMeta(slot.assigned);
   const hasRosterMeta = !!(rosterMeta.team || rosterMeta.byeWeek);
-  const moveTargets = slot.assigned
-    ? availableSlots.filter(
-        (target) =>
-          !target.key.startsWith("overflow-") &&
-          isRosterPlayerEligibleForSlot(slot.assigned!, target)
-      )
-    : [];
-  const selectTargets = moveTargets.some((target) => target.key === slot.key)
-    ? moveTargets
-    : [slot, ...moveTargets];
-  const canMove = Boolean(slot.assigned?.playerId && onMove && moveTargets.length > 1);
+  const isInteractive = Boolean(canMove || isDropTarget);
   const nameParts = getPlayerNameParts(slot.assigned?.name);
   const nameSizeClass = getPlayerNameSizeClass(nameParts);
   const slotStyle = {
@@ -118,15 +121,75 @@ function SlotLine({
       className={cn(
         "team-slot-line",
         filled ? "is-filled" : "is-open",
-        filled && (canMove || hasRosterMeta) ? "has-meta" : ""
+        filled && hasRosterMeta ? "has-meta" : "",
+        canMove ? "is-moveable" : "",
+        isMoveSelected ? "is-move-selected" : "",
+        isDropTarget ? "is-drop-target" : ""
       )}
       style={slotStyle}
+      data-slot={filled ? "roster-player-card" : "roster-slot"}
+      data-roster-slot={slot.key}
+      draggable={Boolean(canMove)}
+      role={isInteractive ? "button" : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
+      aria-pressed={canMove ? Boolean(isMoveSelected) : undefined}
+      aria-label={
+        isDropTarget && activePlayerName
+          ? `Move ${activePlayerName} to ${slot.label}`
+          : canMove && slot.assigned?.name
+            ? `Move ${slot.assigned.name} from ${slot.label}`
+            : undefined
+      }
+      onClick={
+        isInteractive
+          ? () => {
+              if (isDropTarget) {
+                onDrop?.();
+                return;
+              }
+              onActivate?.();
+            }
+          : undefined
+      }
+      onKeyDown={
+        isInteractive
+          ? (event: KeyboardEvent<HTMLDivElement>) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              if (isDropTarget) {
+                onDrop?.();
+                return;
+              }
+              onActivate?.();
+            }
+          : undefined
+      }
+      onDragStart={canMove ? onDragStart : undefined}
+      onDragEnd={canMove ? onDragEnd : undefined}
+      onDragOver={
+        canAcceptDrop
+          ? (event) => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = "move";
+            }
+          : undefined
+      }
+      onDrop={
+        canAcceptDrop
+          ? (event) => {
+              event.preventDefault();
+              onDrop?.(event.dataTransfer.getData("text/plain") || undefined);
+            }
+          : undefined
+      }
       title={
-        filled
-          ? `${slot.label}: ${slot.assigned?.name} paid ${formatPlayerPrice(slot.assigned?.price)}${
+        isDropTarget && activePlayerName
+          ? `Move ${activePlayerName} to ${slot.label}`
+          : filled
+            ? `${slot.label}: ${slot.assigned?.name} paid ${formatPlayerPrice(slot.assigned?.price)}${
               formatProjectedValue(slot.assigned) ? `, projected ${formatProjectedValue(slot.assigned)}` : ""
-            }${rosterMeta.title ? `, ${rosterMeta.title}` : ""}`
-          : `${slot.label}: Open`
+              }${rosterMeta.title ? `, ${rosterMeta.title}` : ""}${canMove ? ". Drag or select this card to move it." : ""}`
+            : `${slot.label}: Open`
       }
     >
       <span className="team-slot-line-side">
@@ -146,32 +209,7 @@ function SlotLine({
           <span className="team-slot-line-player team-slot-line-open">Open</span>
         )}
       </span>
-      {canMove && slot.assigned?.playerId ? (
-        <span className="team-slot-line-move" title={`Move ${slot.assigned.name}`}>
-          <ChevronsUpDown size={12} aria-hidden="true" />
-          <select
-            data-slot="roster-slot-move"
-            value={slot.key}
-            aria-label={`Move ${slot.assigned.name} from ${slot.label}`}
-            onChange={(event) => {
-              if (event.target.value !== slot.key) {
-                onMove?.(slot.assigned!.playerId!, event.target.value);
-              }
-            }}
-          >
-            {selectTargets.map((target) => (
-              <option key={target.key} value={target.key}>
-                {target.label}
-                {target.assigned?.playerId && target.assigned.playerId !== slot.assigned?.playerId
-                  ? ` - swap with ${target.assigned.name}`
-                  : target.assigned
-                    ? " - current"
-                    : " - open"}
-              </option>
-            ))}
-          </select>
-        </span>
-      ) : filled && hasRosterMeta ? (
+      {filled && hasRosterMeta ? (
         <span className="team-slot-line-meta" aria-label={rosterMeta.title || undefined}>
           {rosterMeta.team ? <span className="team-slot-line-team">{rosterMeta.team}</span> : null}
           {rosterMeta.byeWeek ? <span className="team-slot-line-bye-label">bye</span> : null}
@@ -204,6 +242,14 @@ function TeamPanel({
   const roster = Array.isArray(team.roster) ? team.roster : [];
   const slotAssignments = getTeamRosterAssignments(rosterSlots, roster);
   const visibleSlots = slotAssignments;
+  const [activePlayerId, setActivePlayerId] = useState<string | null>(null);
+  const suppressNextCardActivation = useRef(false);
+  const activePlayer = activePlayerId
+    ? roster.find((player) => player.playerId === activePlayerId) ?? null
+    : null;
+  const activeSlotKey = activePlayerId
+    ? visibleSlots.find((slot) => slot.assigned?.playerId === activePlayerId)?.key ?? null
+    : null;
   const totalSlots = slotAssignments.length;
   const filledSlots = slotAssignments.filter((slot) => slot.assigned?.name).length;
   const remainingBudget = Math.max(0, (team.budget ?? 0) - (team.spent ?? 0));
@@ -297,17 +343,79 @@ function TeamPanel({
       <div className="team-panel-body">
         <div className="team-slot-list">
           {visibleSlots.map((slot) => (
-            <SlotLine
-              key={`${team.teamId}-${slot.key}`}
-              slot={slot}
-              availableSlots={visibleSlots}
-              {...(onPlayerMove
-                ? {
-                    onMove: (playerId: string, targetSlotKey: string) =>
-                      onPlayerMove(team.teamId, playerId, targetSlotKey),
-                  }
-                : {})}
-            />
+            (() => {
+              const assignedPlayerId = slot.assigned?.playerId;
+              const canMove = Boolean(
+                onPlayerMove &&
+                  assignedPlayerId &&
+                  visibleSlots.some(
+                    (target) =>
+                      target.key !== slot.key &&
+                      !target.key.startsWith("overflow-") &&
+                      isRosterPlayerEligibleForSlot(slot.assigned!, target)
+                  )
+              );
+              const isDropTarget = Boolean(
+                onPlayerMove &&
+                  activePlayer &&
+                  activeSlotKey !== slot.key &&
+                  !slot.key.startsWith("overflow-") &&
+                  isRosterPlayerEligibleForSlot(activePlayer, slot)
+              );
+              const completeMove = (draggedPlayerId = activePlayerId ?? undefined) => {
+                if (!draggedPlayerId || !onPlayerMove) return;
+                const draggedPlayer = roster.find((player) => player.playerId === draggedPlayerId);
+                const draggedSlotKey = visibleSlots.find(
+                  (candidate) => candidate.assigned?.playerId === draggedPlayerId
+                )?.key;
+                if (
+                  !draggedPlayer ||
+                  draggedSlotKey === slot.key ||
+                  slot.key.startsWith("overflow-") ||
+                  !isRosterPlayerEligibleForSlot(draggedPlayer, slot)
+                ) {
+                  return;
+                }
+                onPlayerMove(team.teamId, draggedPlayerId, slot.key);
+                setActivePlayerId(null);
+              };
+
+              return (
+                <SlotLine
+                  key={`${team.teamId}-${slot.key}`}
+                  slot={slot}
+                  canMove={canMove}
+                  canAcceptDrop={Boolean(onPlayerMove && !slot.key.startsWith("overflow-"))}
+                  isMoveSelected={Boolean(assignedPlayerId && assignedPlayerId === activePlayerId)}
+                  isDropTarget={isDropTarget}
+                  onDrop={completeMove}
+                  {...(activePlayer?.name ? { activePlayerName: activePlayer.name } : {})}
+                  {...(canMove && assignedPlayerId
+                    ? {
+                        onActivate: () => {
+                          if (suppressNextCardActivation.current) {
+                            suppressNextCardActivation.current = false;
+                            return;
+                          }
+                          setActivePlayerId((current) => (current === assignedPlayerId ? null : assignedPlayerId));
+                        },
+                        onDragStart: (event: DragEvent<HTMLDivElement>) => {
+                          event.dataTransfer.effectAllowed = "move";
+                          event.dataTransfer.setData("text/plain", assignedPlayerId);
+                          suppressNextCardActivation.current = true;
+                          setActivePlayerId(assignedPlayerId);
+                        },
+                      }
+                    : {})}
+                  onDragEnd={() => {
+                    setActivePlayerId(null);
+                    window.setTimeout(() => {
+                      suppressNextCardActivation.current = false;
+                    }, 500);
+                  }}
+                />
+              );
+            })()
           ))}
         </div>
       </div>

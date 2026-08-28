@@ -4837,6 +4837,11 @@ p {
   border: 1px solid color-mix(in srgb, var(--team-slot-color) 62%, rgba(255,255,255,0.1));
   background: color-mix(in srgb, var(--team-slot-color) 7%, rgba(255,255,255,0.025));
   overflow: hidden;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease,
+    opacity 120ms ease;
 }
 
 .team-slot-line.has-meta {
@@ -4853,6 +4858,42 @@ p {
 
 .team-slot-line.is-filled {
   background: color-mix(in srgb, var(--team-slot-color) 12%, rgba(255,255,255,0.025));
+}
+
+.team-slot-line.is-moveable {
+  cursor: grab;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.team-slot-line.is-moveable:active {
+  cursor: grabbing;
+}
+
+.team-slot-line.is-moveable:focus-visible,
+.team-slot-line.is-drop-target:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 1px;
+}
+
+.team-slot-line.is-move-selected {
+  border-color: color-mix(in srgb, var(--team-slot-color) 86%, white);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--team-slot-color) 30%, transparent);
+  opacity: 0.72;
+}
+
+.team-slot-line.is-drop-target {
+  border-color: color-mix(in srgb, var(--team-slot-color) 82%, white);
+  background: color-mix(in srgb, var(--team-slot-color) 24%, rgba(255,255,255,0.04));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--team-slot-color) 36%, transparent);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .team-slot-line.is-moveable:hover {
+    border-color: color-mix(in srgb, var(--team-slot-color) 76%, white);
+    background: color-mix(in srgb, var(--team-slot-color) 17%, rgba(255,255,255,0.035));
+  }
 }
 
 .team-slot-line-label {
@@ -4931,44 +4972,6 @@ p {
   text-transform: uppercase;
   pointer-events: none;
   overflow: hidden;
-}
-
-.team-slot-line-move {
-  position: relative;
-  z-index: 2;
-  width: var(--team-slot-meta-width);
-  min-width: var(--team-slot-meta-width);
-  height: 20px;
-  align-self: center;
-  display: grid;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, var(--team-slot-color) 48%, rgba(255,255,255,0.16));
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--team-slot-color) 16%, rgba(0,0,0,0.34));
-  color: rgba(255,255,255,0.84);
-}
-
-.team-slot-line-move:hover {
-  border-color: color-mix(in srgb, var(--team-slot-color) 72%, white);
-  background: color-mix(in srgb, var(--team-slot-color) 26%, rgba(0,0,0,0.32));
-}
-
-.team-slot-line-move:focus-within {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 1px;
-}
-
-.team-slot-line-move select {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.team-slot-line-move svg {
-  pointer-events: none;
 }
 
 .team-slot-line-meta > span,

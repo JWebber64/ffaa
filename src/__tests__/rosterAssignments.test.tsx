@@ -25,6 +25,8 @@ const benchReceiver: RosterPlayer = {
   name: "Bench Receiver",
   pos: "WR",
   price: 3,
+  team: "SF",
+  byeWeek: 8,
 };
 
 const startingReceiver: RosterPlayer = {
@@ -75,8 +77,17 @@ describe("roster slot assignments", () => {
     ]);
   });
 
-  it("exposes the legal move control on an editable team board", () => {
+  it("keeps team and bye visible while the whole player card moves to an eligible slot", () => {
     const onPlayerMove = vi.fn();
+    let dragPayload = "";
+    const dataTransfer = {
+      dropEffect: "none",
+      effectAllowed: "none",
+      setData: vi.fn((_type: string, value: string) => {
+        dragPayload = value;
+      }),
+      getData: vi.fn(() => dragPayload),
+    };
     render(
       <TeamBoard
         teams={[
@@ -93,10 +104,19 @@ describe("roster slot assignments", () => {
       />
     );
 
-    fireEvent.change(screen.getByRole("combobox", { name: "Move Bench Receiver from WR" }), {
-      target: { value: "BENCH-0" },
-    });
+    const playerCard = screen.getByRole("button", { name: "Move Bench Receiver from WR" });
+    expect(playerCard.getAttribute("draggable")).toBe("true");
+    expect(screen.getByLabelText("SF | Bye 8")).toBeTruthy();
+    expect(screen.queryByRole("combobox", { name: /Move Bench Receiver/ })).toBeNull();
+
+    fireEvent.dragStart(playerCard, { dataTransfer });
+    const benchSlot = screen.getByRole("button", { name: "Move Bench Receiver to BN1" });
+    fireEvent.dragOver(benchSlot, { dataTransfer });
+    fireEvent.drop(benchSlot, { dataTransfer });
+    fireEvent.dragEnd(playerCard, { dataTransfer });
+    fireEvent.click(playerCard);
 
     expect(onPlayerMove).toHaveBeenCalledWith("offline-t1", "bench-wr", "BENCH-0");
+    expect(screen.queryByRole("button", { name: "Move Bench Receiver to BN1" })).toBeNull();
   });
 });
