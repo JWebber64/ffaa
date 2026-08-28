@@ -176,6 +176,9 @@ const TEAM_ALIASES: Record<string, string> = {
   TAM: "TB",
   WSH: "WAS",
 };
+const PLAYER_NAME_ALIASES: Record<string, string> = {
+  "ken walker": "kenneth walker",
+};
 
 function normalizeTeam(team: unknown) {
   const raw = typeof team === "string" ? team.trim().toUpperCase() : "";
@@ -184,7 +187,7 @@ function normalizeTeam(team: unknown) {
 
 function normalizeName(name: unknown) {
   if (typeof name !== "string") return "";
-  return name
+  const normalized = name
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[.'`]/g, "")
@@ -192,6 +195,7 @@ function normalizeName(name: unknown) {
     .replace(/[^a-z0-9]+/gi, " ")
     .trim()
     .toLowerCase();
+  return PLAYER_NAME_ALIASES[normalized] ?? normalized;
 }
 
 function identityKey(name: unknown, pos: unknown, team: unknown) {
@@ -468,7 +472,7 @@ function projectionSubjectFromClay(row: EspnClayProjectionRow): PlayerStatSubjec
 function playerSubjectWithProjection(player: Player, row: EspnClayProjectionRow): PlayerStatSubject {
   const subject: PlayerStatSubject = {
     ...player,
-    name: textValue(row.name) ?? player.name,
+    name: player.name,
     pos: textValue(row.pos) ?? player.pos,
   };
 
