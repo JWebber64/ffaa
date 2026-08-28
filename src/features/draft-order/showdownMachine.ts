@@ -50,8 +50,7 @@ export type DraftOrderShowdownAction =
   | { type: "reveal-with"; draw: DraftOrderDrawRecord; animationPlan: DraftOrderAnimationPlan }
   | { type: "accept" }
   | { type: "load-shared"; draw: DraftOrderDrawRecord; animationPlan: DraftOrderAnimationPlan }
-  | { type: "restore"; state: DraftOrderShowdownState }
-  | { type: "reset" };
+  | { type: "restore"; state: DraftOrderShowdownState };
 
 function editingLocked(state: DraftOrderShowdownState) {
   return state.phase !== "setup" && state.phase !== "choose-game";
@@ -82,7 +81,7 @@ export function draftOrderShowdownReducer(
       return state.phase === "choose-game" || state.phase === "results"
         ? {
             ...state,
-            phase: "locked",
+            phase: "countdown",
             draw: action.draw,
             selectedMode: action.draw.mode,
             animationPlan: action.animationPlan,
@@ -129,19 +128,17 @@ export function draftOrderShowdownReducer(
       };
     case "restore": {
       const restored = action.state;
-      const safePhase = restored.phase === "running" || restored.phase === "countdown"
-        ? "locked"
+      const safePhase = restored.phase === "running" || restored.phase === "countdown" || restored.phase === "locked"
+        ? "countdown"
         : restored.phase;
       return { ...restored, phase: safePhase, countdown: 3 };
     }
-    case "reset":
-      return { ...INITIAL_SHOWDOWN_STATE };
   }
 }
 
 const ACTIVE_DRAW_KEY = "ffaa.draftOrder.active.v1";
 
-export function loadActiveShowdownState() {
+export function loadActiveShowdownState(): DraftOrderShowdownState | null {
   if (typeof window === "undefined") return null;
   try {
     const parsed = JSON.parse(window.localStorage.getItem(ACTIVE_DRAW_KEY) ?? "null") as unknown;
@@ -151,6 +148,10 @@ export function loadActiveShowdownState() {
     const mode = normalizeDraftOrderMode(state.draw.mode);
     return {
       ...state,
+      phase: state.phase === "running" || state.phase === "countdown" || state.phase === "locked"
+        ? "countdown"
+        : state.phase,
+      countdown: 3,
       selectedMode: mode,
       draw: { ...state.draw, mode },
       animationPlan: { ...state.animationPlan, mode },
@@ -163,9 +164,4 @@ export function loadActiveShowdownState() {
 export function persistActiveShowdownState(state: DraftOrderShowdownState) {
   if (typeof window === "undefined" || !state.draw) return;
   window.localStorage.setItem(ACTIVE_DRAW_KEY, JSON.stringify(state));
-}
-
-export function clearActiveShowdownState() {
-  if (typeof window === "undefined") return;
-  window.localStorage.removeItem(ACTIVE_DRAW_KEY);
 }

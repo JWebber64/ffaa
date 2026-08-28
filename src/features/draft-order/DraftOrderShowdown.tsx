@@ -1,8 +1,7 @@
-import { CheckCircle2, RotateCcw, Trophy, Volume2, VolumeX } from "lucide-react";
+import { Trophy, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AppStateScreen } from "../../components/AppStateScreen";
-import { appUrl } from "../../lib/appBasePath";
 import { useSleeperLeagueConnections } from "../league-hq/sleeperConnections";
 import { Button } from "../../ui/Button";
 import {
@@ -28,7 +27,6 @@ import { ParticipantSetup } from "./ParticipantSetup";
 import { ResultPanel } from "./ResultPanel";
 import { ShowdownRenderer } from "./ShowdownRenderer";
 import {
-  clearActiveShowdownState,
   draftOrderShowdownReducer,
   INITIAL_SHOWDOWN_STATE,
   loadActiveShowdownState,
@@ -59,7 +57,7 @@ function initialState(searchParams: URLSearchParams) {
 }
 
 export default function DraftOrderShowdown() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [state, dispatch] = useReducer(draftOrderShowdownReducer, searchParams, initialState);
   const { connections, activeLeagueId } = useSleeperLeagueConnections();
   const [busy, setBusy] = useState(false);
@@ -71,7 +69,7 @@ export default function DraftOrderShowdown() {
   const autoRoomLoaded = useRef(false);
   const { muted, setMuted, play } = useShowdownAudio();
   const selectedLeagueId = state.leagueId || searchParams.get("league")?.trim() || activeLeagueId;
-  const canStartOver = state.phase !== "setup" || state.participants.length > 0 || Boolean(state.roomContext) || Boolean(state.leagueId);
+  const isRevealPhase = state.phase === "countdown" || state.phase === "running";
 
   useEffect(() => {
     if (state.draw && !state.readOnly) persistActiveShowdownState(state);
@@ -134,6 +132,16 @@ export default function DraftOrderShowdown() {
     };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
+  }, [state.phase]);
+
+  useEffect(() => {
+    if (!isRevealPhase) return undefined;
+    document.documentElement.classList.add("showdown-reveal-active");
+    return () => document.documentElement.classList.remove("showdown-reveal-active");
+  }, [isRevealPhase]);
+
+  useEffect(() => {
+    if (state.phase === "locked") dispatch({ type: "begin-countdown" });
   }, [state.phase]);
 
   useEffect(() => {
@@ -288,22 +296,6 @@ export default function DraftOrderShowdown() {
     }
   }, [state.accepted, state.draw, state.participants]);
 
-  const handleStartOver = useCallback(() => {
-    if (busy) return;
-    const confirmed = window.confirm(
-      "Start over and clear this active Showdown setup? Saved draws and any order already applied to a draft room will stay intact.",
-    );
-    if (!confirmed) return;
-    clearActiveShowdownState();
-    autoRoomLoaded.current = true;
-    setSearchParams({}, { replace: true });
-    dispatch({ type: "reset" });
-    setNotice("");
-    setActionStatus("");
-    setVerification(null);
-    setAnnouncement("Showdown reset. Participant setup is ready.");
-  }, [busy, setSearchParams]);
-
   const handleChangeMode = useCallback(async (mode: DraftOrderMode) => {
     if (!state.draw) return;
     setBusy(true);
@@ -319,58 +311,46 @@ export default function DraftOrderShowdown() {
   if (loadingShare) return <AppStateScreen title="Loading Shared Draw" message="Opening the exact saved result and verification record." />;
 
   return (
-    <div className="draft-order-page">
-      <header className="draft-order-hero">
-        <div className="draft-order-hero-copy"><span className="draft-order-eyebrow">GameHQ presents</span><h1 className="ff-display">Draft Order Showdown</h1><p>Let football decide your draft order.</p><div className="draft-order-trust"><Trophy aria-hidden="true" /><span><strong>Built for draft night.</strong> Three football games. One league-wide reveal.</span></div></div>
-        <div className="draft-order-hero-side">
-          <img src={appUrl("images/draft-room-editorial.png")} alt="A fantasy football draft board prepared under stadium lights." width="1672" height="941" />
-          <div className="draft-order-scorebug"><span>SHOWDOWN</span><strong>{state.draw ? `DRAW ${state.draw.rerollIndex + 1}` : `${state.participants.length || 0} MANAGERS`}</strong><button type="button" onClick={() => setMuted(!muted)} aria-label={muted ? "Enable showdown sound" : "Mute showdown sound"}>{muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}<span>{muted ? "Sound off" : "Sound on"}</span></button></div>
-        </div>
-      </header>
+    <div className={`draft-order-page ${isRevealPhase ? "is-reveal-focus" : ""}`}>
+      {state.phase === "setup" || state.phase === "choose-game" ? (
+        <>
+          <header className="draft-order-hero">
+            <div><span className="draft-order-eyebrow">GameHQ presents</span><h1 className="ff-display">Draft Order Showdown</h1><p>Let football decide your draft order.</p><div className="draft-order-trust"><Trophy aria-hidden="true" /><span><strong>Built for draft night.</strong> Three football games. One league-wide showdown.</span></div></div>
+            <div className="draft-order-utility"><strong>{state.draw ? `Draw ${state.draw.rerollIndex + 1}` : `${state.participants.length || 0} managers`}</strong><button type="button" onClick={() => setMuted(!muted)} aria-label={muted ? "Enable showdown sound" : "Mute showdown sound"}>{muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}<span>{muted ? "Sound off" : "Sound on"}</span></button></div>
+          </header>
+          <nav className="showdown-progress-compact" aria-label="Draft order progress">
+            <span>Step {state.phase === "setup" ? 1 : 2} of 2</span>
+            <strong>{state.phase === "setup" ? "Setup managers" : "Choose game"}</strong>
+            <i aria-hidden="true"><b className="is-complete" /><b className={state.phase === "choose-game" ? "is-complete" : ""} /></i>
+          </nav>
+        </>
+      ) : null}
 
-      <div className="showdown-progress-shell">
-        <nav className="showdown-progress" aria-label="Draft order progress">
-          {["Setup", "Choose Game", "Ready", "Kickoff", "Results"].map((label, index) => {
-            const phaseIndex = state.phase === "setup" ? 0 : state.phase === "choose-game" ? 1 : state.phase === "locked" ? 2 : state.phase === "countdown" || state.phase === "running" ? 3 : 4;
-            return <span className={phaseIndex === index ? "is-current" : phaseIndex > index ? "is-complete" : ""} aria-current={phaseIndex === index ? "step" : undefined} key={label}>{phaseIndex > index ? <CheckCircle2 aria-hidden="true" /> : <i>{index + 1}</i>}{label}</span>;
-          })}
-        </nav>
-        {canStartOver && state.phase !== "running" && state.phase !== "results" ? (
-          <div className="showdown-start-over">
-            <span>Clear this active setup and return to participant entry. Saved draws stay saved.</span>
-            <Button size="sm" variant="secondary" onClick={handleStartOver} disabled={busy}><RotateCcw aria-hidden="true" /> Start Over</Button>
-          </div>
-        ) : null}
-      </div>
-
-      {notice ? <div className="showdown-notice" role="status">{notice}</div> : null}
+      {notice && !isRevealPhase ? <div className="showdown-notice" role="status">{notice}</div> : null}
 
       {state.phase === "setup" ? <ParticipantSetup participants={state.participants} onChange={(participants) => dispatch({ type: "set-participants", participants })} connections={connections} selectedLeagueId={selectedLeagueId} onLeagueSelect={(leagueId) => dispatch({ type: "set-league", leagueId })} onImportLeague={handleImportLeague} onImportRoom={handleImportRoom} roomContext={state.roomContext} busy={busy} onContinue={() => dispatch({ type: "choose-game" })} /> : null}
 
       {state.phase === "choose-game" ? <ModeSelector selectedMode={state.selectedMode} onSelect={(mode) => dispatch({ type: "select-mode", mode })} onBack={() => dispatch({ type: "back-to-setup" })} onLock={handleLock} busy={busy} /> : null}
 
-      {state.phase === "locked" && state.draw ? (
-        <section className="order-locked-panel" aria-labelledby="order-locked-title">
-          <Trophy aria-hidden="true" /><span>Ready to play</span><h2 id="order-locked-title">Your showdown is ready.</h2><p>Get everyone watching, then start the countdown.</p><dl><div><dt>Draw</dt><dd>{state.draw.rerollIndex + 1}</dd></div><div><dt>Managers</dt><dd>{state.draw.participants.length}</dd></div><div><dt>Game</dt><dd>{MODE_LABELS[state.draw.mode]}</dd></div></dl><Button size="lg" onClick={() => dispatch({ type: "begin-countdown" })}>Begin 3–2–1 Countdown</Button>
-        </section>
-      ) : null}
-
-      {state.phase === "countdown" ? <section className="showdown-countdown" role="status" aria-live="assertive"><span>Game time</span><strong>{state.countdown || "GO"}</strong><p>Who gets the first pick?</p></section> : null}
-
-      {state.phase === "running" && state.draw && state.animationPlan ? (
-        <section className="showdown-running-shell">
-          <div className="showdown-running-controls">
-            <span><Trophy aria-hidden="true" /> {MODE_LABELS[state.draw.mode]} in progress</span>
-            <div className="showdown-running-actions">
-              <Button size="sm" variant="secondary" onClick={handleStartOver}><RotateCcw aria-hidden="true" /> Start Over</Button>
-              <Button size="sm" variant="secondary" onClick={handleSkip}>Skip Animation</Button>
+      {isRevealPhase && state.draw ? (
+        <section className="showdown-focus-overlay" aria-label={`${MODE_LABELS[state.draw.mode]} showdown`}>
+          <header className="showdown-focus-toolbar">
+            <div><Trophy aria-hidden="true" /><span>{MODE_LABELS[state.draw.mode]}</span><strong>Draw {state.draw.rerollIndex + 1}</strong></div>
+            <div>
+              <button className="showdown-sound-button" type="button" onClick={() => setMuted(!muted)} aria-label={muted ? "Enable showdown sound" : "Mute showdown sound"}>{muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}<span>{muted ? "Sound off" : "Sound on"}</span></button>
+              {state.phase === "running" ? <Button size="sm" variant="secondary" onClick={handleSkip}>Skip</Button> : null}
             </div>
-          </div>
-          <ShowdownRenderer draw={state.draw} plan={state.animationPlan} onReveal={handleReveal} onComplete={handleComplete} />
+          </header>
+          {state.phase === "countdown" ? <div className="showdown-countdown" role="status" aria-live="assertive" aria-label="Showdown countdown"><strong key={state.countdown}>{state.countdown || "GO"}</strong></div> : null}
+          {state.phase === "running" && state.animationPlan ? (
+            <div className="showdown-running-shell">
+              <ShowdownRenderer draw={state.draw} plan={state.animationPlan} onReveal={handleReveal} onComplete={handleComplete} />
+            </div>
+          ) : null}
         </section>
       ) : null}
 
-      {state.phase === "results" && state.draw ? <ResultPanel draw={state.draw} roomContext={state.roomContext} accepted={state.accepted} readOnly={state.readOnly} verification={verification} actionStatus={actionStatus} onApply={handleApply} onSave={handleSave} onCopy={handleCopy} onShare={handleShare} onReplay={() => dispatch({ type: "replay" })} onReroll={handleReroll} onStartOver={handleStartOver} onChangeMode={handleChangeMode} onVerify={handleVerify} onCopyHash={handleCopyHash} /> : null}
+      {state.phase === "results" && state.draw ? <ResultPanel draw={state.draw} roomContext={state.roomContext} accepted={state.accepted} readOnly={state.readOnly} verification={verification} actionStatus={actionStatus} onApply={handleApply} onSave={handleSave} onCopy={handleCopy} onShare={handleShare} onReplay={() => dispatch({ type: "replay" })} onReroll={handleReroll} onChangeMode={handleChangeMode} onVerify={handleVerify} onCopyHash={handleCopyHash} /> : null}
 
       <div className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</div>
     </div>

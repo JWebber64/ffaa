@@ -18,6 +18,7 @@ function manualParticipant(name: string, index: number): DraftOrderParticipant {
     source: "manual",
   };
 }
+
 export function ParticipantSetup({
   participants,
   onChange,
@@ -58,25 +59,25 @@ export function ParticipantSetup({
   return (
     <section className="showdown-panel participant-setup" aria-labelledby="participant-setup-title">
       <header className="showdown-section-heading">
-        <div><span>Step 1 · Setup</span><h2 id="participant-setup-title">Bring the managers to the field</h2></div>
-        <p>Import a connected league or live GameHQ room, or enter names manually. IDs stay stable while you edit display names.</p>
+        <div><span>Step 1 · Setup</span><h2 id="participant-setup-title">Choose who is playing</h2></div>
+        <p>Start with your active league. Draft rooms and manual entry are available when you need them.</p>
       </header>
 
       <div className="participant-import-grid">
-        <article>
-          <div><Users aria-hidden="true" /><span><strong>Connected Sleeper league</strong><small>Import current teams, managers, avatars, and stable Sleeper IDs.</small></span></div>
+        <article className="is-primary">
+          <div><Users aria-hidden="true" /><span><strong>Active Sleeper league</strong><small>Bring in current teams, managers, and avatars.</small></span></div>
           <label><span>League</span><select value={selectedLeagueId} onChange={(event) => onLeagueSelect(event.target.value)} disabled={!connections.length || busy}><option value="">Choose connected league</option>{connections.map((connection) => <option value={connection.leagueId} key={connection.leagueId}>{connection.leagueName}</option>)}</select></label>
           <Button size="sm" variant="secondary" onClick={onImportLeague} disabled={!selectedLeagueId || busy}><Upload size={15} aria-hidden="true" /> Import league managers</Button>
         </article>
-        <article>
+        <article className="is-secondary">
           <div><RotateCcw aria-hidden="true" /><span><strong>GameHQ draft room</strong><small>Use this source when the host will apply the result to the live room.</small></span></div>
           <label><span>Room code</span><input value={roomCode} onChange={(event) => setRoomCode(event.target.value.toUpperCase())} placeholder="ABC123" maxLength={8} /></label>
           <Button size="sm" variant="secondary" onClick={() => onImportRoom(roomCode)} disabled={!roomCode.trim() || busy}><Upload size={15} aria-hidden="true" /> Import room</Button>
           {roomContext ? <small className="room-context-note">Room {roomContext.code} · {roomContext.draftType === "auction" ? "nomination" : "draft"} order · {roomContext.isHost ? "host controls available" : "view-only draw"}</small> : null}
         </article>
-        <article>
+        <article className="is-secondary">
           <div><Plus aria-hidden="true" /><span><strong>Paste names</strong><small>One team or manager per line. You can edit every entry below.</small></span></div>
-          <label><span>Manager or team names</span><textarea value={pastedNames} onChange={(event) => setPastedNames(event.target.value)} rows={4} placeholder={"Team Alpha\nTeam Bravo\nTeam Charlie"} /></label>
+          <label><span>Manager or team names</span><textarea value={pastedNames} onChange={(event) => setPastedNames(event.target.value)} rows={3} placeholder={"Team Alpha\nTeam Bravo\nTeam Charlie"} /></label>
           <Button size="sm" variant="secondary" onClick={addPasted} disabled={!pastedNames.trim()}><Plus size={15} aria-hidden="true" /> Add names</Button>
         </article>
       </div>
@@ -84,7 +85,10 @@ export function ParticipantSetup({
       <div className="participant-roster-heading"><div><strong>Participants</strong><span>{participants.length} managers entered</span></div><Button size="sm" variant="ghost" onClick={() => onChange([...participants, manualParticipant(`Manager ${participants.length + 1}`, participants.length)])}><Plus size={15} aria-hidden="true" /> Add manager</Button></div>
       {participants.length ? (
         <div className="participant-editor-table">
-          <div className="participant-editor-header" aria-hidden="true"><span>Seat</span><span>Manager</span><span>Team</span><span>Source</span><span /></div>
+          <div className="participant-editor-header" aria-hidden="true">
+            <div className="participant-editor-header-group"><span>Seat</span><span>Manager</span><span>Team</span><span>Source</span><span /></div>
+            <div className="participant-editor-header-group"><span>Seat</span><span>Manager</span><span>Team</span><span>Source</span><span /></div>
+          </div>
           <ol className="participant-editor-list">
             {participants.map((participant, index) => (
               <li key={participant.id}>
@@ -99,7 +103,7 @@ export function ParticipantSetup({
         </div>
       ) : <div className="participant-empty"><Users aria-hidden="true" /><strong>No managers yet</strong><span>Import a league or add one name per line to begin.</span></div>}
       <footer className="showdown-panel-actions">
-        <span className="participant-support-note">Built for 8, 10, 12, 14, and 16 managers; the engine supports any unique set from 2–32.</span>
+        <span className="participant-support-note">Works with 2–32 managers.</span>
         <Button onClick={onContinue} disabled={participants.length < 2 || participants.some((participant) => !participant.managerName.trim() && !participant.teamName.trim())}>Choose game</Button>
       </footer>
     </section>

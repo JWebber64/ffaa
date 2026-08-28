@@ -100,17 +100,19 @@ describe("shared layout density contract", () => {
     expect(design).toContain("900px-tall desktop viewport");
   });
 
-  it("keeps repeated participant editing in one compact desktop list", () => {
+  it("packs repeated participant editing into compact desktop columns", () => {
     const component = readProjectFile("src/features/draft-order/ParticipantSetup.tsx");
     const styles = readProjectFile("src/features/draft-order/draft-order.css");
     const design = readProjectFile("DESIGN.md");
 
     expect(component).toContain('className="participant-editor-table"');
     expect(component).toContain('className="participant-editor-header"');
-    expect(styles).toContain(".participant-editor-list li + li { border-top:");
-    expect(styles).toContain(".participant-editor-list input { width: 100%; min-height: 36px;");
+    expect(component).toContain('className="participant-editor-header-group"');
+    expect(styles).toContain(".participant-editor-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }");
+    expect(styles).toContain(".participant-editor-list input { width: 100%; min-height: 30px;");
     expect(design).toContain("Repeated editable data belongs in one compact list or table shell.");
     expect(design).toContain("do not turn every record into a padded card");
-    expect(design).toContain("ordinary 10-12-row editor should fit inside a 900px-tall desktop viewport");
+    expect(design).toContain("pack independent records into two or more columns");
+    expect(design).toContain("10-12-record single-line editor should occupy roughly 250-350px vertically");
   });
 });

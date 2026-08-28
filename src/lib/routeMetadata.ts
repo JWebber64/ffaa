@@ -66,7 +66,7 @@ export function metadataForPath(pathname: string): RouteMetadataInput {
   if (pathname.startsWith("/league/")) return { title: "League History", description: "Explore normalized fantasy league managers, matchups, championships, records, seasons, drafts, and transactions.", path: pathname };
   if (pathname === "/my-hq") return { title: "This Week", description: "A personalized fantasy lineup, matchup, roster-health, and league-activity command center.", path: pathname, indexable: false };
   if (pathname === "/offline-draft") return { title: "Offline Draft", description: "Run a complete fantasy draft locally on one device.", path: pathname, indexable: false };
-  if (pathname === "/draft-order") return { title: "Draft Order Showdown", description: "Create a secure, verifiable fantasy draft or nomination order through five football-themed reveal games.", path: pathname };
+  if (pathname === "/draft-order") return { title: "Draft Order Showdown", description: "Create a fantasy draft or nomination order through one of three football-themed games.", path: pathname };
   if (pathname.startsWith("/results/")) return { title: "Draft Results", description: "Review the completed GameHQ fantasy draft board and team results.", path: pathname, indexable: false };
   if (pathname.startsWith("/draft/")) return { title: "Live Draft Room", description: "Private GameHQ fantasy draft room.", path: pathname, indexable: false };
   if (pathname.startsWith("/host")) return { title: "Host a Draft", description: "Configure and host a private GameHQ fantasy draft room.", path: pathname, indexable: false };

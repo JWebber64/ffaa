@@ -1,4 +1,4 @@
-import { Check, Clipboard, Link2, Play, RefreshCw, RotateCcw, Save, Send, ShieldCheck } from "lucide-react";
+import { Check, Clipboard, Link2, Play, RefreshCw, Save, Send, ShieldCheck } from "lucide-react";
 import { Button } from "../../ui/Button";
 import { ParticipantMark } from "./renderers/shared";
 import { VerificationPanel } from "./VerificationPanel";
@@ -24,7 +24,6 @@ export function ResultPanel({
   onShare,
   onReplay,
   onReroll,
-  onStartOver,
   onChangeMode,
   onVerify,
   onCopyHash,
@@ -41,7 +40,6 @@ export function ResultPanel({
   onShare: () => void;
   onReplay: () => void;
   onReroll: () => void;
-  onStartOver: () => void;
   onChangeMode: (mode: DraftOrderMode) => void;
   onVerify: () => void;
   onCopyHash: () => void;
@@ -65,7 +63,7 @@ export function ResultPanel({
         <strong className={verification?.valid ? "is-verified" : ""}><ShieldCheck aria-hidden="true" /> {verification?.valid ? "Verified" : "Verification available"}</strong>
       </header>
 
-      <div className="results-content-grid">
+      <div className="results-content">
         <ol className="final-order-list" aria-label="Complete final draft order">
           {draw.finalParticipantIds.map((id, index) => {
             const participant = participants.get(id)!;
@@ -78,25 +76,31 @@ export function ResultPanel({
             );
           })}
         </ol>
-        <VerificationPanel draw={draw} verification={verification} onVerify={onVerify} onCopyHash={onCopyHash} />
+        <details className="verification-disclosure">
+          <summary><ShieldCheck aria-hidden="true" /><span><strong>Verify draw</strong><small>{verification?.valid ? "Verified" : "View seed and integrity check"}</small></span></summary>
+          <VerificationPanel draw={draw} verification={verification} onVerify={onVerify} onCopyHash={onCopyHash} />
+        </details>
       </div>
 
       <div className="results-actions" aria-label="Draft order actions">
-        {!readOnly ? <Button onClick={onApply} disabled={Boolean(applyReason) || accepted}>{accepted ? <Check size={16} aria-hidden="true" /> : <Send size={16} aria-hidden="true" />}{accepted ? "Applied to Draft Room" : "Apply to Draft Room"}</Button> : null}
-        {!readOnly ? <Button variant="secondary" onClick={onSave}><Save size={16} aria-hidden="true" /> Save Draw</Button> : null}
-        <Button variant="secondary" onClick={onCopy}><Clipboard size={16} aria-hidden="true" /> Copy Order</Button>
-        {!readOnly ? <Button variant="secondary" onClick={onShare}><Link2 size={16} aria-hidden="true" /> Share Replay</Button> : null}
-        <Button variant="secondary" onClick={onReplay}><Play size={16} aria-hidden="true" /> Replay Animation</Button>
-        {!readOnly ? <Button variant="danger" onClick={onReroll}><RefreshCw size={16} aria-hidden="true" /> Generate New Order</Button> : null}
-        <Button variant="secondary" onClick={onStartOver}><RotateCcw size={16} aria-hidden="true" /> Start Over</Button>
+        <div className="results-primary-actions">
+          {!readOnly ? <Button onClick={onApply} disabled={Boolean(applyReason) || accepted}>{accepted ? <Check size={16} aria-hidden="true" /> : <Send size={16} aria-hidden="true" />}{accepted ? "Applied to Draft Room" : "Apply to Draft Room"}</Button> : null}
+          {!readOnly ? <Button variant="secondary" onClick={onSave}><Save size={16} aria-hidden="true" /> Save Draw</Button> : null}
+          {!readOnly ? <Button variant="secondary" onClick={onShare}><Link2 size={16} aria-hidden="true" /> Share Replay</Button> : null}
+        </div>
+        <div className="results-secondary-actions">
+          <Button variant="ghost" onClick={onCopy}><Clipboard size={16} aria-hidden="true" /> Copy Order</Button>
+          <Button variant="ghost" onClick={onReplay}><Play size={16} aria-hidden="true" /> Replay Animation</Button>
+          {!readOnly ? <Button variant="ghost" onClick={onReroll}><RefreshCw size={16} aria-hidden="true" /> Generate New Order</Button> : null}
+        </div>
       </div>
       {applyReason && !readOnly ? <p className="results-action-note">{applyReason}</p> : null}
       {actionStatus ? <p className="results-action-status" role="status">{actionStatus}</p> : null}
 
-      <section className="alternate-reveal" aria-labelledby="alternate-reveal-title">
-        <div><span>Run it back</span><h3 id="alternate-reveal-title">Watch this order with another game</h3></div>
+      <details className="alternate-reveal">
+        <summary>Watch with another game</summary>
         <div>{DRAFT_ORDER_MODES.filter((mode) => mode !== draw.mode).map((mode) => <Button size="sm" variant="ghost" onClick={() => onChangeMode(mode)} key={mode}>{MODE_LABELS[mode]}</Button>)}</div>
-      </section>
+      </details>
     </section>
   );
 }

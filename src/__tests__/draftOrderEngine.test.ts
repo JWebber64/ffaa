@@ -79,12 +79,17 @@ describe("draft-order draw engine", () => {
     expect(draw.rerollIndex).toBe(0);
   });
 
-  it("keeps Draft Dash moving continuously while finish timing follows the locked rank", async () => {
+  it("gives Draft Dash runners continuous variable pacing while preserving finish rank", async () => {
     const draw = await createDraftOrderDraw({ participants: participants(12), mode: "draft-dash", masterSeed: SEED_A });
     const plan = await createDraftOrderAnimationPlan(draw);
     const byRank = [...plan.cues].sort((left, right) => left.rank - right.rank);
-    expect(byRank[0]!.durationMs).toBeLessThan(byRank.at(-1)!.durationMs);
-    expect(plan.totalDurationMs).toBeLessThan(7_000);
+
+    expect(new Set(plan.cues.map((cue) => cue.dashProgressPoints?.join(","))).size).toBeGreaterThan(1);
+    for (const cue of plan.cues) {
+      expect(cue.dashProgressPoints).toHaveLength(4);
+      expect([0, ...cue.dashProgressPoints!, 100]).toEqual([...new Set([0, ...cue.dashProgressPoints!, 100])].sort((left, right) => left - right));
+    }
+    expect(byRank.every((cue, index) => index === 0 || cue.durationMs > byRank[index - 1]!.durationMs)).toBe(true);
   });
 
   it("rerolling creates a new seed and visible draw index", async () => {

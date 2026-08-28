@@ -84,6 +84,7 @@ export interface DraftOrderAnimationCue {
   bounce: number;
   pathVariant: number;
   finalPercent: number;
+  dashProgressPoints?: [number, number, number, number];
 }
 
 export interface DraftOrderAnimationPlan {
@@ -116,6 +117,7 @@ export const MODE_LABELS: Record<DraftOrderMode, string> = {
   "football-plinko": "Football Plinko",
   "punt-bounce": "Punt Bounce",
 };
+
 export const MODE_DESCRIPTIONS: Record<DraftOrderMode, string> = {
   "draft-dash": "Every manager races the full field. First across the line gets the first pick.",
   "football-plinko": "Team footballs ricochet through stadium pegs, with every landing claiming a draft slot.",

@@ -244,20 +244,27 @@ export async function verifyDraftOrderDraw(draw: DraftOrderDrawRecord): Promise<
   }
 }
 
-function modeTiming(mode: DraftOrderMode, sequenceIndex: number, total: number, jitter: number) {
+function modeTiming(
+  mode: DraftOrderMode,
+  rank: number,
+  sequenceIndex: number,
+  total: number,
+  jitter: number,
+) {
   switch (mode) {
     case "draft-dash":
       return {
         delayMs: 0,
-        durationMs: 4_600 + sequenceIndex * 140 + jitter,
-        totalDurationMs: 4_600 + Math.max(0, total - 1) * 140 + 120 + 650,
+        // Rank controls the finish time, while a small bounded jitter keeps
+        // adjacent runners from looking mechanically spaced. The rank gap is
+        // larger than the jitter, so the visual finish remains consistent.
+        durationMs: 6_900 + rank * 150 + (jitter % 80),
       };
     case "football-plinko": {
       const launchGap = Math.max(620, 860 - total * 20);
       return {
         delayMs: 420 + sequenceIndex * launchGap,
         durationMs: 2_550 + jitter,
-        totalDurationMs: 420 + Math.max(0, total - 1) * launchGap + 2_670 + 620,
       };
     }
     case "punt-bounce": {
@@ -265,10 +272,24 @@ function modeTiming(mode: DraftOrderMode, sequenceIndex: number, total: number, 
       return {
         delayMs: sequenceIndex * launchGap,
         durationMs: 5_200 + jitter,
-        totalDurationMs: 5_200 + Math.max(0, total - 1) * launchGap + 900,
       };
     }
   }
+}
+
+async function createDashProgressPoints(stream: DeterministicByteStream) {
+  const segmentWeights: number[] = [];
+  for (let index = 0; index < 5; index += 1) {
+    // Moderate, positive changes create bursts and compressions without any
+    // runner pausing or moving backward.
+    segmentWeights.push(82 + await stream.nextInt(37));
+  }
+  const totalWeight = segmentWeights.reduce((sum, weight) => sum + weight, 0);
+  let cumulative = 0;
+  return segmentWeights.slice(0, 4).map((weight) => {
+    cumulative += weight;
+    return Number(((cumulative / totalWeight) * 100).toFixed(2));
+  }) as [number, number, number, number];
 }
 
 export async function createDraftOrderAnimationPlan(
@@ -301,8 +322,9 @@ export async function createDraftOrderAnimationPlan(
     const drift = (await stream.nextInt(19)) - 9;
     const bounce = 2 + (await stream.nextInt(7));
     const pathVariant = await stream.nextInt(5);
-    const timingIndex = mode === "draft-dash" ? rank : sequenceIndexes.get(participant.id) ?? rank;
-    const timing = modeTiming(mode, timingIndex, draw.participants.length, jitter);
+    const sequenceIndex = sequenceIndexes.get(participant.id) ?? rank;
+    const timing = modeTiming(mode, rank, sequenceIndex, draw.participants.length, jitter);
+    const dashProgressPoints = mode === "draft-dash" ? await createDashProgressPoints(stream) : undefined;
     cues.push({
       participantId: participant.id,
       rank,
@@ -314,13 +336,14 @@ export async function createDraftOrderAnimationPlan(
       finalPercent: mode === "punt-bounce"
         ? 92 - rank * (62 / Math.max(1, draw.participants.length - 1)) + (await stream.nextInt(70)) / 100
         : ((rank + 1) / draw.participants.length) * 100,
+      ...(dashProgressPoints ? { dashProgressPoints } : {}),
     });
   }
 
   return {
     mode,
     cues,
-    totalDurationMs: modeTiming(mode, 0, draw.participants.length, 0).totalDurationMs,
+    totalDurationMs: Math.max(0, ...cues.map((cue) => cue.delayMs + cue.durationMs)) + 520,
   };
 }
 

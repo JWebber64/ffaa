@@ -93,24 +93,33 @@ export function ParticipantMark({ participant, compact = false }: {
   );
 }
 
-export function LockedResultList({ draw, revealed }: {
+export function LockedResultList({ draw, revealed, leaderId }: {
   draw: DraftOrderDrawRecord;
   revealed?: Set<string>;
+  leaderId?: string | null;
 }) {
   const participants = new Map(draw.participants.map((participant) => [participant.id, participant]));
+  const finishedCount = revealed?.size ?? draw.finalParticipantIds.length;
+  const leader = leaderId ? participants.get(leaderId) : null;
   return (
-    <ol className="showdown-live-order" aria-label="Draft order revealed so far">
-      {draw.finalParticipantIds.map((id, index) => {
-        const participant = participants.get(id)!;
-        const visible = !revealed || revealed.has(id);
-        return (
-          <li className={visible ? "is-revealed" : ""} key={id}>
-            <span>{index + 1}</span>
-            {visible ? <ParticipantMark participant={participant} compact /> : <i aria-hidden="true">—</i>}
-            <strong>{visible ? participant.teamName : "Waiting"}</strong>
-          </li>
-        );
-      })}
-    </ol>
+    <section className="showdown-live-board" aria-label="Live finish board">
+      <header>
+        <div><span>{finishedCount ? "Latest standings" : "Current leader"}</span><strong>{leader?.teamName ?? (finishedCount ? `${finishedCount} finished` : "Race underway")}</strong></div>
+        <b>{finishedCount}/{draw.finalParticipantIds.length} finished</b>
+      </header>
+      <ol className="showdown-live-order">
+        {draw.finalParticipantIds.slice(0, 3).map((id, index) => {
+          const participant = participants.get(id)!;
+          const visible = !revealed || revealed.has(id);
+          return (
+            <li className={visible ? "is-revealed" : ""} key={id}>
+              <span>{index + 1}</span>
+              {visible ? <ParticipantMark participant={participant} compact /> : <i aria-hidden="true">—</i>}
+              <strong>{visible ? participant.teamName : "Open"}</strong>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
   );
 }

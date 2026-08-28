@@ -63,7 +63,7 @@ export default function PuntBounceRenderer(props: ShowdownRendererProps) {
           <div className="punt-yard-markers" aria-hidden="true">
             {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((yard) => <span key={yard}><b>{yard}</b><i /></span>)}
           </div>
-          <div className="punt-lanes">
+          <div className="punt-lanes" style={{ "--punt-count": draw.participants.length } as CSSProperties}>
             {draw.participants.map((participant, index) => {
               const cue = cues.get(participant.id)!;
               const resting = revealed.has(participant.id);

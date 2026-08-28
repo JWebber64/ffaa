@@ -17,7 +17,7 @@ type MenuLink = { to: string; label: string; detail: string; icon: typeof Home }
 const draftLinks: MenuLink[] = [
   { to: "/host/setup", label: "Host a draft", detail: "Create a live room", icon: Gavel },
   { to: "/host/setup", label: "Practice draft", detail: "Configure CPU-managed seats", icon: Sparkles },
-  { to: "/draft-order", label: "Draft Order Showdown", detail: "Five verifiable football reveals", icon: Dices },
+  { to: "/draft-order", label: "Draft Order Showdown", detail: "Three football draft-night games", icon: Dices },
   { to: "/offline-draft", label: "Offline draft", detail: "Run the room on one device", icon: ClipboardList },
   { to: "/join", label: "Join a room", detail: "Enter with a room code", icon: UserPlus },
 ];

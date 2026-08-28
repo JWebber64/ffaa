@@ -65,12 +65,12 @@ function renderShowdown(route = "/draft-order") {
   return render(<MemoryRouter initialEntries={[route]}><DraftOrderShowdown /></MemoryRouter>);
 }
 
-async function pasteManagersAndLock() {
+async function pasteManagersAndStart() {
   fireEvent.change(screen.getByLabelText("Manager or team names"), { target: { value: Array.from({ length: 8 }, (_, index) => `Team ${index + 1}`).join("\n") } });
   fireEvent.click(screen.getByRole("button", { name: "Add names" }));
   fireEvent.click(screen.getByRole("button", { name: "Choose game" }));
   fireEvent.click(screen.getByRole("button", { name: "Start Showdown" }));
-  await screen.findByText("Your showdown is ready.");
+  await screen.findByLabelText("Showdown countdown");
 }
 
 async function seedResults(context: DraftRoomOrderContext | null = null) {
@@ -116,33 +116,21 @@ afterEach(() => {
 });
 
 describe("Draft Order Showdown UI", () => {
-  it("uses production game artwork instead of placeholder diagrams", () => {
+  it("supports pasted manual entry, editable stable participants, game selection, and immediate countdown", async () => {
     renderShowdown();
     fireEvent.change(screen.getByLabelText("Manager or team names"), { target: { value: Array.from({ length: 8 }, (_, index) => `Team ${index + 1}`).join("\n") } });
     fireEvent.click(screen.getByRole("button", { name: "Add names" }));
     fireEvent.click(screen.getByRole("button", { name: "Choose game" }));
-
-    const artwork = screen.getAllByRole("img").filter((image) => image.closest(".mode-card-art"));
-    expect(artwork).toHaveLength(3);
-    expect(artwork[0]).toHaveAttribute("src", "/images/draft-order/draft-dash.jpg");
-    expect(document.querySelector(".mode-card-art svg")).not.toBeInTheDocument();
-  });
-
-  it("supports pasted manual entry, editable stable participants, game selection, and locking", async () => {
-    renderShowdown();
-    fireEvent.change(screen.getByLabelText("Manager or team names"), { target: { value: Array.from({ length: 8 }, (_, index) => `Team ${index + 1}`).join("\n") } });
-    fireEvent.click(screen.getByRole("button", { name: "Add names" }));
-    fireEvent.click(screen.getByRole("button", { name: "Choose game" }));
-    expect(screen.getByText("100-Yard Draft Dash")).toBeInTheDocument();
-    expect(screen.getByText("Football Plinko")).toBeInTheDocument();
-    expect(screen.getByText("Punt Bounce")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /100-Yard Draft Dash/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Football Plinko/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Punt Bounce/ })).toBeInTheDocument();
     expect(screen.queryByText("Helmet Shuffle")).not.toBeInTheDocument();
     expect(screen.queryByText("Fumble-Pile Reveal")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Start Showdown" }));
-    await screen.findByText("Your showdown is ready.");
+    expect(await screen.findByLabelText("Showdown countdown")).toBeInTheDocument();
     expect(screen.queryByLabelText("Manager or team names")).not.toBeInTheDocument();
     expect(screen.queryByText("Commitment hash")).not.toBeInTheDocument();
-    expect(screen.getByText("8", { selector: "dd" })).toBeInTheDocument();
+    expect(screen.getByText("Draw 1")).toBeInTheDocument();
   }, 10_000);
 
   it("imports an existing league through the setup flow", async () => {
@@ -156,21 +144,15 @@ describe("Draft Order Showdown UI", () => {
   it("runs the countdown, skips animation, copies the full order, and replays without rerolling", async () => {
     await import("../features/draft-order/renderers/DraftDashRenderer");
     renderShowdown();
-    await pasteManagersAndLock();
-    vi.useFakeTimers();
-    fireEvent.click(screen.getByRole("button", { name: "Begin 3–2–1 Countdown" }));
-    for (let index = 0; index < 4; index += 1) {
-      await act(async () => { vi.advanceTimersByTime(900); await Promise.resolve(); });
-    }
-    const skip = screen.getByRole("button", { name: "Skip Animation" });
-    expect(screen.getByRole("button", { name: "Start Over" })).toBeInTheDocument();
+    await pasteManagersAndStart();
+    const skip = await screen.findByRole("button", { name: "Skip" }, { timeout: 6_000 });
     fireEvent.click(skip);
     expect(screen.getByText(/owns the first pick/)).toBeInTheDocument();
     await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Copy Order" })); await Promise.resolve(); });
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(expect.stringContaining("GameHQ Draft Order"));
     fireEvent.click(screen.getByRole("button", { name: "Replay Animation" }));
     expect(screen.getByText("3")).toBeInTheDocument();
-    expect(screen.getByText("DRAW 1")).toBeInTheDocument();
+    expect(screen.getByText("Draw 1")).toBeInTheDocument();
   }, 10_000);
 
   it("rejects unauthorized official application in the result UI", async () => {
@@ -193,21 +175,8 @@ describe("Draft Order Showdown UI", () => {
     await waitFor(() => expect(adapterMocks.apply).toHaveBeenCalledWith(expect.objectContaining({ isHost: true }), expect.objectContaining({ id: firstDraw.id })));
     expect(await screen.findByRole("button", { name: "Applied to Draft Room" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "Generate New Order" }));
-    expect(await screen.findByText("Your showdown is ready.")).toBeInTheDocument();
-    expect(screen.getByText("2", { selector: "dd" })).toBeInTheDocument();
-  });
-
-  it("starts over from a completed draw without deleting saved history", async () => {
-    await seedResults(roomContext(true));
-    renderShowdown();
-    expect(await screen.findByText(/owns the first pick/)).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "Start Over" }));
-
-    expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining("Saved draws"));
-    expect(screen.getByLabelText("Manager or team names")).toHaveValue("");
-    expect(screen.queryByText(/owns the first pick/)).not.toBeInTheDocument();
-    expect(window.localStorage.getItem("ffaa.draftOrder.active.v1")).toBeNull();
+    expect(await screen.findByLabelText("Showdown countdown")).toBeInTheDocument();
+    expect(screen.getByText("Draw 2")).toBeInTheDocument();
   });
 
   it("loads a shared replay as the exact read-only result without offering a reroll", async () => {
@@ -218,6 +187,5 @@ describe("Draft Order Showdown UI", () => {
     expect(await screen.findByText(/owns the first pick/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Generate New Order" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Replay Animation" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Start Over" })).toBeInTheDocument();
   });
 });

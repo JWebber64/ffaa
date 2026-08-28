@@ -147,7 +147,7 @@ Desktop pages should use the available shared content width. At a 900px-tall des
 
 Group by proximity before adding another card. Use the compact spacing roles for card padding and related groups, the section role between separate tasks, and the page role only between page chapters. Repeated cards in one row may match height, but one card must not force unrelated rows or sections to reserve empty space.
 
-Repeated editable data belongs in one compact list or table shell. On desktop, use shared column headers, single-line controls, and row dividers; do not turn every record into a padded card or repeat the same visible field labels in every row. Once brought into view, an ordinary 10-12-row editor should fit inside a 900px-tall desktop viewport. Preserve explicit labels and full-size controls when the layout stacks on mobile.
+Repeated editable data belongs in one compact list or table shell. On desktop, use shared column headers, single-line controls, and row dividers; do not turn every record into a padded card or repeat the same visible field labels in every row. At wide desktop widths, pack independent records into two or more columns before letting the editor consume most of the viewport. A common 10-12-record single-line editor should occupy roughly 250-350px vertically, not merely fit inside a 900px-tall viewport. Preserve explicit labels and full-size controls when the layout stacks on mobile.
 
 ## Do's and Don'ts
 
