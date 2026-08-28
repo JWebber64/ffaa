@@ -335,7 +335,7 @@ export default function DraftOrderShowdown() {
             return <span className={phaseIndex === index ? "is-current" : phaseIndex > index ? "is-complete" : ""} aria-current={phaseIndex === index ? "step" : undefined} key={label}>{phaseIndex > index ? <CheckCircle2 aria-hidden="true" /> : <i>{index + 1}</i>}{label}</span>;
           })}
         </nav>
-        {canStartOver ? (
+        {canStartOver && state.phase !== "running" && state.phase !== "results" ? (
           <div className="showdown-start-over">
             <span>Clear this active setup and return to participant entry. Saved draws stay saved.</span>
             <Button size="sm" variant="secondary" onClick={handleStartOver} disabled={busy}><RotateCcw aria-hidden="true" /> Start Over</Button>
@@ -359,12 +359,18 @@ export default function DraftOrderShowdown() {
 
       {state.phase === "running" && state.draw && state.animationPlan ? (
         <section className="showdown-running-shell">
-          <div className="showdown-running-controls"><span><LockKeyhole aria-hidden="true" /> Result locked · {state.draw.verificationHash.slice(0, 14)}…</span><Button size="sm" variant="secondary" onClick={handleSkip}>Skip Animation</Button></div>
+          <div className="showdown-running-controls">
+            <span><LockKeyhole aria-hidden="true" /> Result locked · {state.draw.verificationHash.slice(0, 14)}…</span>
+            <div className="showdown-running-actions">
+              <Button size="sm" variant="secondary" onClick={handleStartOver}><RotateCcw aria-hidden="true" /> Start Over</Button>
+              <Button size="sm" variant="secondary" onClick={handleSkip}>Skip Animation</Button>
+            </div>
+          </div>
           <ShowdownRenderer draw={state.draw} plan={state.animationPlan} onReveal={handleReveal} onComplete={handleComplete} />
         </section>
       ) : null}
 
-      {state.phase === "results" && state.draw ? <ResultPanel draw={state.draw} roomContext={state.roomContext} accepted={state.accepted} readOnly={state.readOnly} verification={verification} actionStatus={actionStatus} onApply={handleApply} onSave={handleSave} onCopy={handleCopy} onShare={handleShare} onReplay={() => dispatch({ type: "replay" })} onReroll={handleReroll} onChangeMode={handleChangeMode} onVerify={handleVerify} onCopyHash={handleCopyHash} /> : null}
+      {state.phase === "results" && state.draw ? <ResultPanel draw={state.draw} roomContext={state.roomContext} accepted={state.accepted} readOnly={state.readOnly} verification={verification} actionStatus={actionStatus} onApply={handleApply} onSave={handleSave} onCopy={handleCopy} onShare={handleShare} onReplay={() => dispatch({ type: "replay" })} onReroll={handleReroll} onStartOver={handleStartOver} onChangeMode={handleChangeMode} onVerify={handleVerify} onCopyHash={handleCopyHash} /> : null}
 
       <div className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</div>
     </div>

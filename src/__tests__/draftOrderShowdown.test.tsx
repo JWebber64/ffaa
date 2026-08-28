@@ -142,6 +142,7 @@ describe("Draft Order Showdown UI", () => {
       await act(async () => { vi.advanceTimersByTime(900); await Promise.resolve(); });
     }
     const skip = screen.getByRole("button", { name: "Skip Animation" });
+    expect(screen.getByRole("button", { name: "Start Over" })).toBeInTheDocument();
     fireEvent.click(skip);
     expect(screen.getByText(/owns the first pick/)).toBeInTheDocument();
     await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Copy Order" })); await Promise.resolve(); });
