@@ -66,6 +66,19 @@ describe("draft order field identity rails", () => {
     expect(container.querySelectorAll(".dash-lane.is-finished")).toHaveLength(12);
   });
 
+  it("renders horizontal Dash lanes instead of a full-field grid", () => {
+    const styles = readProjectFile("src/features/draft-order/draft-order.css");
+    const fieldWorld = styles.match(/\.dash-course-world \{([\s\S]*?)\n\}/)?.[1] ?? "";
+    const fieldOverlay = styles.match(/\.dash-course-world::after \{([^}]*)\}/)?.[1] ?? "";
+
+    expect(styles).not.toContain(".dash-course-world::before");
+    expect(styles).not.toContain("calc(2.5% - 1px)");
+    expect(fieldWorld).not.toContain("180deg");
+    expect(fieldOverlay).toContain("linear-gradient(90deg");
+    expect(styles).toMatch(/\.dash-lane \{[^}]*border-bottom: 1px solid color-mix\(in oklch, var\(--football-chalk\) 28%, transparent\);/);
+    expect(styles).toMatch(/\.dash-lane\.is-leader \{\s*z-index: 3;\s*\}/);
+  });
+
   it("keeps every Punt avatar and settled result in the rail instead of floating over footballs", async () => {
     const { container } = render(<PuntBounceRenderer {...await fieldProps("punt-bounce")} />);
 
