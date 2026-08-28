@@ -9,6 +9,38 @@ import { ProductMenu } from "../layouts/AppShellV2";
 import { closeParentDisclosure } from "../ui/disclosureMenu";
 
 describe("app shell navigation menus", () => {
+  it("keeps only one desktop product menu open at a time", () => {
+    render(
+      <MemoryRouter>
+        <nav aria-label="Primary navigation">
+          <ProductMenu
+            label="Draft"
+            active={false}
+            links={[{ to: "/host/setup", label: "Host a draft", detail: "Create a live room", icon: Sparkles }]}
+          />
+          <ProductMenu
+            label="Research"
+            active={false}
+            links={[{ to: "/stats", label: "Rankings and stats", detail: "Rankings, values, and profiles", icon: Sparkles }]}
+          />
+        </nav>
+      </MemoryRouter>,
+    );
+
+    const draftMenu = screen.getByText("Draft").closest("details");
+    const researchMenu = screen.getByText("Research").closest("details");
+    expect(draftMenu).not.toBeNull();
+    expect(researchMenu).not.toBeNull();
+
+    fireEvent.click(within(draftMenu!).getByText("Draft"));
+    expect(draftMenu).toHaveAttribute("open");
+
+    fireEvent.click(within(researchMenu!).getByText("Research"));
+
+    expect(researchMenu).toHaveAttribute("open");
+    expect(draftMenu).not.toHaveAttribute("open");
+  });
+
   it("closes an open product menu after selecting a destination", () => {
     render(
       <MemoryRouter>

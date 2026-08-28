@@ -42,6 +42,7 @@ function toggleDisclosureFromKeyboard(event: KeyboardEvent<HTMLElement>) {
   const details = event.currentTarget.parentElement;
   if (!(details instanceof HTMLDetailsElement)) return;
   event.preventDefault();
+  if (!details.open && details.classList.contains("product-menu")) closeSiblingProductMenus(details);
   details.open = !details.open;
 }
 
@@ -49,10 +50,33 @@ function dismissDisclosureMenu(event: MouseEvent<HTMLAnchorElement>) {
   closeParentDisclosure(event.currentTarget);
 }
 
+function closeSiblingProductMenus(currentMenu: HTMLDetailsElement) {
+  const menuGroup = currentMenu.parentElement;
+  if (!menuGroup) return;
+
+  for (const sibling of menuGroup.children) {
+    if (
+      sibling instanceof HTMLDetailsElement
+      && sibling !== currentMenu
+      && sibling.classList.contains("product-menu")
+    ) {
+      sibling.open = false;
+    }
+  }
+}
+
+function dismissSiblingProductMenus(event: MouseEvent<HTMLElement>) {
+  const currentMenu = event.currentTarget.parentElement;
+  if (currentMenu instanceof HTMLDetailsElement) closeSiblingProductMenus(currentMenu);
+}
+
 export function ProductMenu({ label, links, active }: { label: string; links: MenuLink[]; active: boolean }) {
   return (
-    <details className={`product-menu ${active ? "is-active" : ""}`}>
-      <summary onKeyDown={toggleDisclosureFromKeyboard}>
+    <details
+      className={`product-menu ${active ? "is-active" : ""}`}
+      name="desktop-product-navigation"
+    >
+      <summary onClick={dismissSiblingProductMenus} onKeyDown={toggleDisclosureFromKeyboard}>
         <span>{label}</span>
         <ChevronDown size={14} aria-hidden="true" />
       </summary>
