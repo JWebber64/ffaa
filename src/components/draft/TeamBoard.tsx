@@ -1,9 +1,11 @@
 import type { CSSProperties } from "react";
+import { ChevronsUpDown } from "lucide-react";
 import { cn } from "@/ui/cn";
 import { getComputerManagerProfile } from "@/engine/autoManager";
 import {
   getTeamMaxBid,
   getTeamRosterAssignments,
+  isRosterPlayerEligibleForSlot,
   type RosterPlayer,
   type RosterSlot,
   type SlotAssignment,
@@ -84,12 +86,27 @@ function getPlayerNameSizeClass(parts: string[]) {
 
 function SlotLine({
   slot,
+  availableSlots,
+  onMove,
 }: {
   slot: SlotAssignment;
+  availableSlots: SlotAssignment[];
+  onMove?: (playerId: string, targetSlotKey: string) => void;
 }) {
   const filled = !!slot.assigned?.name;
   const rosterMeta = getRosterMeta(slot.assigned);
   const hasRosterMeta = !!(rosterMeta.team || rosterMeta.byeWeek);
+  const moveTargets = slot.assigned
+    ? availableSlots.filter(
+        (target) =>
+          !target.key.startsWith("overflow-") &&
+          isRosterPlayerEligibleForSlot(slot.assigned!, target)
+      )
+    : [];
+  const selectTargets = moveTargets.some((target) => target.key === slot.key)
+    ? moveTargets
+    : [slot, ...moveTargets];
+  const canMove = Boolean(slot.assigned?.playerId && onMove && moveTargets.length > 1);
   const nameParts = getPlayerNameParts(slot.assigned?.name);
   const nameSizeClass = getPlayerNameSizeClass(nameParts);
   const slotStyle = {
@@ -101,7 +118,7 @@ function SlotLine({
       className={cn(
         "team-slot-line",
         filled ? "is-filled" : "is-open",
-        filled && hasRosterMeta ? "has-meta" : ""
+        filled && (canMove || hasRosterMeta) ? "has-meta" : ""
       )}
       style={slotStyle}
       title={
@@ -129,7 +146,32 @@ function SlotLine({
           <span className="team-slot-line-player team-slot-line-open">Open</span>
         )}
       </span>
-      {filled && hasRosterMeta ? (
+      {canMove && slot.assigned?.playerId ? (
+        <span className="team-slot-line-move" title={`Move ${slot.assigned.name}`}>
+          <ChevronsUpDown size={12} aria-hidden="true" />
+          <select
+            data-slot="roster-slot-move"
+            value={slot.key}
+            aria-label={`Move ${slot.assigned.name} from ${slot.label}`}
+            onChange={(event) => {
+              if (event.target.value !== slot.key) {
+                onMove?.(slot.assigned!.playerId!, event.target.value);
+              }
+            }}
+          >
+            {selectTargets.map((target) => (
+              <option key={target.key} value={target.key}>
+                {target.label}
+                {target.assigned?.playerId && target.assigned.playerId !== slot.assigned?.playerId
+                  ? ` - swap with ${target.assigned.name}`
+                  : target.assigned
+                    ? " - current"
+                    : " - open"}
+              </option>
+            ))}
+          </select>
+        </span>
+      ) : filled && hasRosterMeta ? (
         <span className="team-slot-line-meta" aria-label={rosterMeta.title || undefined}>
           {rosterMeta.team ? <span className="team-slot-line-team">{rosterMeta.team}</span> : null}
           {rosterMeta.byeWeek ? <span className="team-slot-line-bye-label">bye</span> : null}
@@ -148,6 +190,7 @@ function TeamPanel({
   isMe,
   isActive,
   onOpen,
+  onPlayerMove,
 }: {
   team: Team;
   rosterSlots: RosterSlot[];
@@ -156,6 +199,7 @@ function TeamPanel({
   isMe?: boolean;
   isActive?: boolean;
   onOpen?: (teamId: string) => void;
+  onPlayerMove?: (teamId: string, playerId: string, targetSlotKey: string) => void;
 }) {
   const roster = Array.isArray(team.roster) ? team.roster : [];
   const slotAssignments = getTeamRosterAssignments(rosterSlots, roster);
@@ -253,7 +297,17 @@ function TeamPanel({
       <div className="team-panel-body">
         <div className="team-slot-list">
           {visibleSlots.map((slot) => (
-            <SlotLine key={`${team.teamId}-${slot.key}`} slot={slot} />
+            <SlotLine
+              key={`${team.teamId}-${slot.key}`}
+              slot={slot}
+              availableSlots={visibleSlots}
+              {...(onPlayerMove
+                ? {
+                    onMove: (playerId: string, targetSlotKey: string) =>
+                      onPlayerMove(team.teamId, playerId, targetSlotKey),
+                  }
+                : {})}
+            />
           ))}
         </div>
       </div>
@@ -270,6 +324,7 @@ export default function TeamBoard({
   highBidderTeamId,
   density = "readable",
   onTeamOpen,
+  onPlayerMove,
 }: {
   teams: Team[];
   rosterSlots: RosterSlot[];
@@ -279,6 +334,7 @@ export default function TeamBoard({
   highBidderTeamId?: string | null;
   density?: TeamBoardDensity;
   onTeamOpen?: (teamId: string) => void;
+  onPlayerMove?: (teamId: string, playerId: string, targetSlotKey: string) => void;
 }) {
   const boardClass =
     teams.length >= 15 ? "team-board-16" : teams.length >= 11 ? "team-board-12" : "team-board-standard";
@@ -299,6 +355,7 @@ export default function TeamBoard({
               isMe={!!myTeamId && team.teamId === myTeamId}
               isActive={!!activeTeamId && team.teamId === activeTeamId}
               {...(onTeamOpen ? { onOpen: onTeamOpen } : {})}
+              {...(onPlayerMove ? { onPlayerMove } : {})}
             />
           </div>
         ))}

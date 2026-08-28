@@ -5,6 +5,7 @@ export type RosterPlayer = {
   name?: string;
   price?: number;
   pos?: string;
+  assignedSlot?: string;
   team?: string;
   byeWeek?: number;
   auctionValue?: number;
@@ -100,6 +101,20 @@ function expandRosterSlots(rosterSlots: RosterSlot[]): SlotAssignment[] {
   });
 }
 
+export function isRosterPlayerEligibleForSlot(
+  player: RosterPlayer,
+  slot: Pick<SlotAssignment, "slot" | "flexEligible">
+) {
+  const position = normalizePosition(player.pos);
+  const slotType = normalizePosition(slot.slot);
+  if (!position || slotType === "IR") return false;
+  if (slotType === "BENCH") return true;
+  if (slotType === "FLEX" || slotType === "IDP_FLEX") {
+    return (slot.flexEligible ?? getDefaultFlexEligibility(slotType)).includes(position);
+  }
+  return position === slotType;
+}
+
 export function getTeamRosterAssignments(rosterSlots: RosterSlot[], roster: RosterPlayer[]) {
   const slots = expandRosterSlots(rosterSlots);
   const remainingPlayers = [...roster];
@@ -111,7 +126,18 @@ export function getTeamRosterAssignments(rosterSlots: RosterSlot[], roster: Rost
     return player ?? null;
   };
 
+  for (const player of roster) {
+    if (!player.assignedSlot) continue;
+    const slot = slots.find((candidate) => candidate.key === player.assignedSlot && !candidate.assigned);
+    if (!slot || !isRosterPlayerEligibleForSlot(player, slot)) continue;
+
+    slot.assigned = player;
+    const playerIndex = remainingPlayers.indexOf(player);
+    if (playerIndex >= 0) remainingPlayers.splice(playerIndex, 1);
+  }
+
   for (const slot of slots) {
+    if (slot.assigned) continue;
     if (slot.slot === "FLEX" || slot.slot === "IDP_FLEX" || slot.slot === "BENCH" || slot.slot === "IR") {
       continue;
     }
@@ -119,6 +145,7 @@ export function getTeamRosterAssignments(rosterSlots: RosterSlot[], roster: Rost
   }
 
   for (const slot of slots) {
+    if (slot.assigned) continue;
     if (slot.slot !== "FLEX" && slot.slot !== "IDP_FLEX") continue;
     slot.assigned = takeMatchingPlayer((player) => {
       const pos = normalizePosition(player.pos);
@@ -127,11 +154,13 @@ export function getTeamRosterAssignments(rosterSlots: RosterSlot[], roster: Rost
   }
 
   for (const slot of slots) {
+    if (slot.assigned) continue;
     if (slot.slot !== "BENCH") continue;
     slot.assigned = takeMatchingPlayer(() => true);
   }
 
   for (const slot of slots) {
+    if (slot.assigned) continue;
     if (slot.slot !== "IR") continue;
     slot.assigned = takeMatchingPlayer(() => true);
   }
@@ -149,6 +178,46 @@ export function getTeamRosterAssignments(rosterSlots: RosterSlot[], roster: Rost
       assigned: player,
     })),
   ];
+}
+
+export function moveRosterPlayerToSlot<T extends RosterPlayer>(
+  rosterSlots: RosterSlot[],
+  roster: T[],
+  playerId: string,
+  targetSlotKey: string
+): T[] {
+  const movingPlayer = roster.find((player) => player.playerId === playerId);
+  if (!movingPlayer) return roster;
+
+  const configuredSlots = expandRosterSlots(rosterSlots);
+  const targetSlot = configuredSlots.find((slot) => slot.key === targetSlotKey);
+  if (!targetSlot || !isRosterPlayerEligibleForSlot(movingPlayer, targetSlot)) return roster;
+
+  const assignments = getTeamRosterAssignments(rosterSlots, roster);
+  const sourceSlot = assignments.find((slot) => slot.assigned?.playerId === playerId);
+  if (sourceSlot?.key === targetSlotKey) return roster;
+
+  const targetPlayer = assignments.find((slot) => slot.key === targetSlotKey)?.assigned ?? null;
+  const targetCanTakeSource = Boolean(
+    targetPlayer &&
+      sourceSlot &&
+      !sourceSlot.key.startsWith("overflow-") &&
+      isRosterPlayerEligibleForSlot(targetPlayer, sourceSlot)
+  );
+
+  return roster.map((player) => {
+    if (player.playerId === playerId) {
+      return { ...player, assignedSlot: targetSlotKey } as T;
+    }
+    if (targetPlayer?.playerId === player.playerId) {
+      if (targetCanTakeSource && sourceSlot) {
+        return { ...player, assignedSlot: sourceSlot.key } as T;
+      }
+      const { assignedSlot: _assignedSlot, ...rest } = player;
+      return rest as T;
+    }
+    return player;
+  });
 }
 
 export function getTeamMaxBid(team: Team, totalSlots: number) {

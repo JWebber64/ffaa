@@ -4,9 +4,13 @@ import { loadPlayerPool } from "../data/loadPlayerPool";
 import { draftedRosterSize, normalizeAuctionValueScoring } from "../data/auctionValueSettings";
 import TeamBoard from "../components/draft/TeamBoard";
 import { TeamMark } from "../components/player/TeamMark";
-import type {
-  RosterPlayer,
-  RosterSlot as BoardRosterSlot,
+import {
+  getTeamRosterAssignments,
+  isRosterPlayerEligibleForSlot,
+  moveRosterPlayerToSlot,
+  type RosterPlayer,
+  type RosterSlot as BoardRosterSlot,
+  type SlotAssignment,
 } from "../components/draft/rosterAssignments";
 import RosterBuilder from "../components/premium/RosterBuilder";
 import {
@@ -38,7 +42,7 @@ type PositionFilter = "ALL" | "QB" | "RB" | "WR" | "TE" | "FLEX" | "K" | "DEF";
 type ManualPosition = (typeof MANUAL_POSITIONS)[number];
 
 type OfflineRosterPlayer = Required<Pick<RosterPlayer, "playerId" | "name" | "price" | "pos">> &
-  Pick<RosterPlayer, "team" | "byeWeek" | "auctionValue" | "projectedValue">;
+  Pick<RosterPlayer, "assignedSlot" | "team" | "byeWeek" | "auctionValue" | "projectedValue">;
 
 type OfflineTeam = {
   teamId: string;
@@ -211,6 +215,9 @@ function normalizeSavedRosterPlayer(value: unknown, fallbackIndex: number): Offl
     price,
     pos: normalizeManualPosition(raw.pos),
   };
+  if (typeof raw.assignedSlot === "string" && raw.assignedSlot.trim()) {
+    player.assignedSlot = raw.assignedSlot.trim();
+  }
   if (typeof raw.team === "string" && raw.team.trim()) player.team = raw.team.trim();
   if (typeof raw.byeWeek === "number" && Number.isFinite(raw.byeWeek)) {
     player.byeWeek = Math.round(raw.byeWeek);
@@ -642,6 +649,27 @@ export default function OfflineDraftV2() {
     if (lastAssignment?.playerId === playerId) setLastAssignment(null);
   }
 
+  function movePlayer(teamId: string, playerId: string, targetSlotKey: string) {
+    setTeams((current) =>
+      current.map((team) =>
+        team.teamId === teamId
+          ? {
+              ...team,
+              roster: moveRosterPlayerToSlot(
+                offlineConfig.rosterSlots as BoardRosterSlot[],
+                team.roster,
+                playerId,
+                targetSlotKey
+              ),
+            }
+          : team
+      )
+    );
+    setSelectedTeamId(teamId);
+    setSaveStatus(null);
+    setError(null);
+  }
+
   function undoLastAssignment() {
     if (!lastAssignment) return;
     removePlayer(lastAssignment.teamId, lastAssignment.playerId);
@@ -708,6 +736,10 @@ export default function OfflineDraftV2() {
   }
 
   const rosterSlots = offlineConfig.rosterSlots as BoardRosterSlot[];
+  const selectedTeamAssignments = useMemo(
+    () => getTeamRosterAssignments(rosterSlots, selectedTeam?.roster ?? []),
+    [rosterSlots, selectedTeam]
+  );
   const totalRosterSlots = offlineConfig.rosterSlots.reduce((sum, slot) => sum + Math.max(0, Number(slot.count) || 0), 0);
   const selectedTeamFilled = selectedTeam?.roster.length ?? 0;
   const selectedTeamProgress =
@@ -839,6 +871,7 @@ export default function OfflineDraftV2() {
           activeTeamId={selectedTeam?.teamId ?? null}
           density="compact"
           onTeamOpen={setSelectedTeamId}
+          onPlayerMove={movePlayer}
         />
       </section>
 
@@ -1033,29 +1066,72 @@ export default function OfflineDraftV2() {
 
           <div className="offline-roster-list">
             {selectedTeam && selectedTeam.roster.length > 0 ? (
-              selectedTeam.roster.map((player) => (
-                <div key={player.playerId} className="offline-roster-row">
-                  <div className="offline-roster-copy">
-                    <strong>{player.name}</strong>
-                    <span>
-                      {[player.pos, player.team, player.byeWeek ? `Bye ${player.byeWeek}` : null]
-                        .filter(Boolean)
-                        .join(" | ")}
-                    </span>
+              selectedTeam.roster.map((player) => {
+                const currentSlot = selectedTeamAssignments.find(
+                  (assignment) => assignment.assigned?.playerId === player.playerId
+                );
+                const moveTargets = selectedTeamAssignments.filter(
+                  (assignment) =>
+                    !assignment.key.startsWith("overflow-") &&
+                    isRosterPlayerEligibleForSlot(player, assignment)
+                );
+                const selectTargets: SlotAssignment[] =
+                  currentSlot && !moveTargets.some((slot) => slot.key === currentSlot.key)
+                    ? [currentSlot, ...moveTargets]
+                    : moveTargets;
+                const canMove = Boolean(currentSlot && moveTargets.length > 1);
+
+                return (
+                  <div key={player.playerId} className="offline-roster-row">
+                    <div className="offline-roster-copy">
+                      <strong>{player.name}</strong>
+                      <span>
+                        {[player.pos, player.team, player.byeWeek ? `Bye ${player.byeWeek}` : null]
+                          .filter(Boolean)
+                          .join(" | ")}
+                      </span>
+                    </div>
+                    <div className="offline-roster-actions">
+                      {canMove && currentSlot ? (
+                        <label className="offline-roster-slot-control">
+                          <span className="sr-only">Lineup slot for {player.name}</span>
+                          <select
+                            data-slot="offline-roster-slot"
+                            value={currentSlot.key}
+                            aria-label={`Lineup slot for ${player.name}`}
+                            onChange={(event) =>
+                              movePlayer(selectedTeam.teamId, player.playerId, event.target.value)
+                            }
+                          >
+                            {selectTargets.map((target) => (
+                              <option key={target.key} value={target.key}>
+                                {target.label}
+                                {target.assigned?.playerId && target.assigned.playerId !== player.playerId
+                                  ? ` - swap with ${target.assigned.name}`
+                                  : target.assigned
+                                    ? " - current"
+                                    : " - open"}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronsUpDown size={13} aria-hidden="true" />
+                        </label>
+                      ) : (
+                        <span className="offline-roster-slot-static">{currentSlot?.label ?? "Roster"}</span>
+                      )}
+                      <strong>{money(player.price)}</strong>
+                      <button
+                        type="button"
+                        title={`Remove ${player.name}`}
+                        aria-label={`Remove ${player.name}`}
+                        onClick={() => removePlayer(selectedTeam.teamId, player.playerId)}
+                      >
+                        <Trash2 size={15} aria-hidden="true" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="offline-roster-actions">
-                    <strong>{money(player.price)}</strong>
-                    <button
-                      type="button"
-                      title={`Remove ${player.name}`}
-                      aria-label={`Remove ${player.name}`}
-                      onClick={() => removePlayer(selectedTeam.teamId, player.playerId)}
-                    >
-                      <Trash2 size={15} aria-hidden="true" />
-                    </button>
-                  </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="offline-empty">No rostered players.</div>
             )}
