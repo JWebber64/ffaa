@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, ChevronsUpDown, Plus, RotateCcw, Save, Search, Trash2, Undo2, Users } from "lucide-react";
+import { ChevronsUpDown, Plus, RotateCcw, Save, Search, Trash2, Undo2, Users } from "lucide-react";
 import { loadPlayerPool } from "../data/loadPlayerPool";
 import { draftedRosterSize, normalizeAuctionValueScoring } from "../data/auctionValueSettings";
 import TeamBoard from "../components/draft/TeamBoard";
@@ -735,7 +735,6 @@ export default function OfflineDraftV2() {
                 </Button>
                 <Button size="lg" onClick={openDraftBoard} className="offline-open-button">
                   Open Draft Board
-                  <ArrowRight size={17} aria-hidden="true" />
                 </Button>
               </div>
             </div>

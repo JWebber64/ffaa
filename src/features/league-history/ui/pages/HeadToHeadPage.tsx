@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, CalendarDays, Flame, Swords, Trophy } from "lucide-react";
+import { ArrowLeft, CalendarDays, Flame, Swords, Trophy } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -145,7 +145,7 @@ export function RivalryPage() {
           <strong>{meeting.managerAFranchise.teamName} <b>{formatNumber(meeting.managerAScore)}</b></strong>
           <span>—</span>
           <strong><b>{formatNumber(meeting.managerBScore)}</b> {meeting.managerBFranchise.teamName}</strong>
-          <Link to={`../../seasons/${meeting.season}`}>Season <ArrowRight size={13} /></Link>
+          <Link to={`../../seasons/${meeting.season}`}>Season</Link>
         </article>)}</div>
       </section>
     </main>

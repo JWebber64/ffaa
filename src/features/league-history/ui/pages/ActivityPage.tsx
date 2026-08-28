@@ -1,4 +1,4 @@
-import { Activity, ArrowRight, CircleDollarSign, ExternalLink, ScrollText } from "lucide-react";
+import { Activity, CircleDollarSign, ExternalLink, ScrollText } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -149,7 +149,7 @@ export function DraftHistoryPage() {
             })}</tbody></table>
             {!filteredPicks.length ? <div className="history-draft-empty">No draft picks match these filters.</div> : null}
           </div>
-          {season ? <Link className="history-text-link" to={`../seasons/${season.season}`}>Open season archive <ArrowRight size={14} /></Link> : null}
+          {season ? <Link className="history-text-link" to={`../seasons/${season.season}`}>Open season archive</Link> : null}
         </article>;
       })}</section>
       {!drafts.length ? <div className="history-empty">No normalized draft records are available for this season.</div> : null}

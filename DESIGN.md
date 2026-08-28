@@ -163,6 +163,7 @@ Repeated editable data belongs in one compact list or table shell. On desktop, u
 - Do keep page heroes and ordinary cards at natural height.
 - Do verify the first useful follow-up content appears in a 900px-tall desktop viewport.
 - Do use one compact list or table shell for repeated editable records on desktop.
+- Do communicate clickability through clear labels, hierarchy, borders, underlines, and hover or focus states.
 - Do not use blue, cyan, teal, or navy-blue for any interface element.
 - Do not sample an official team or editorial-image color into interface chrome.
 - Do not create an orange or page-local primary-action color.
@@ -173,3 +174,4 @@ Repeated editable data belongs in one compact list or table shell. On desktop, u
 - Do not use oversized viewport-relative headings as the primary source of hierarchy.
 - Do not add empty height, padding, or spacer elements to make a page feel more important.
 - Do not wrap every repeated data row in its own padded card or repeat identical desktop field labels row after row.
+- Do not append decorative right-arrow icons or glyphs to buttons, links, feature rows, navigation links, or calls to action. Directional icons are reserved for controls where direction is the actual meaning; chevrons remain appropriate for disclosure and dropdown state.

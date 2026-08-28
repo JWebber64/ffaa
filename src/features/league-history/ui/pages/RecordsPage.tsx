@@ -1,4 +1,4 @@
-import { ArrowRight, Medal } from "lucide-react";
+import { Medal } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { buildLeagueRecordBook } from "../../analytics";
@@ -30,7 +30,7 @@ export function RecordsPage() {
             return <li key={entry.id}>
               <span>{manager ? <Link to={`../managers/${manager.id}`}>{manager.displayName}</Link> : entry.detail}</span>
               <strong>{formatNumber(entry.value, entry.label.includes("wins") || entry.label === "Championships" ? 0 : 2)}</strong>
-              {season ? <Link className="history-record-source" to={`../seasons/${season.season}`}>{season.season}<ArrowRight size={11} /></Link> : <small>{entry.detail}</small>}
+              {season ? <Link className="history-record-source" to={`../seasons/${season.season}`}>{season.season}</Link> : <small>{entry.detail}</small>}
             </li>;
           })}</ol>
         </article>)}</div>

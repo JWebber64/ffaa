@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Database } from "lucide-react";
+import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, Database } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { UniversalSelect } from "../../../../ui/UniversalSelect";
@@ -66,7 +66,7 @@ export function WeekHeader({
         </div>
         <div className="history-week-primary-links">
           <Link to={`/league/${leagueId}`}><ArrowLeft size={14} aria-hidden="true" /> League Home</Link>
-          <Link to={`/league/${leagueId}/seasons`}>Season archive <ArrowRight size={14} aria-hidden="true" /></Link>
+          <Link to={`/league/${leagueId}/seasons`}>Season archive</Link>
         </div>
       </div>
     </section>

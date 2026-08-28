@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarRange, ChartNoAxesCombined, Dices, Gavel, Scale, ShieldCheck, Sparkles, UsersRound } from "lucide-react";
+import { CalendarRange, ChartNoAxesCombined, Dices, Gavel, Scale, ShieldCheck, Sparkles, UsersRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSleeperLeagueConnections } from "../../features/league-hq/sleeperConnections";
 import { appUrl } from "../../lib/appBasePath";
@@ -26,17 +26,17 @@ export function ToolsHub({ recentPaths }: { recentPaths: string[] }) {
   return (
     <section className="tools-hub tools-hub-organized">
       <header className="tools-hero">
-        <div className="tools-hero-copy"><div className="tools-eyebrow">Fantasy decision workspace</div><h1 className="ff-display">Start with the problem.</h1><p>Prepare for the room, solve this week, or understand the environment. Every tool states which public data informs the result and where certainty ends.</p><div className="tools-hero-actions"><Link className="tools-primary-link" to={recommended.to}>{activeLeague ? `Recommended for ${activeLeague.leagueName}` : "Build an auction plan"}<ArrowRight size={16} aria-hidden="true" /></Link><Link className="tools-secondary-link" to="/stats?view=draft">Open sortable research</Link></div></div>
+        <div className="tools-hero-copy"><div className="tools-eyebrow">Fantasy decision workspace</div><h1 className="ff-display">Start with the problem.</h1><p>Prepare for the room, solve this week, or understand the environment. Every tool states which public data informs the result and where certainty ends.</p><div className="tools-hero-actions"><Link className="tools-primary-link" to={recommended.to}>{activeLeague ? `Recommended for ${activeLeague.leagueName}` : "Build an auction plan"}</Link><Link className="tools-secondary-link" to="/stats?view=draft">Open sortable research</Link></div></div>
         <div className="tools-hero-proof">{activeLeague ? <Sparkles size={28} aria-hidden="true" /> : <ShieldCheck size={28} aria-hidden="true" />}<strong>{activeLeague ? "League context connected" : "Free for everyone"}</strong><span>{activeLeague ? activeLeague.auctionSettings?.scoringLabel ?? "Connected Sleeper league" : "No account · no paywall"}</span></div>
       </header>
-      {recentTools.length ? <nav className="tools-recent" aria-label="Recently used tools"><span>Recently used</span>{recentTools.map((tool) => <Link key={tool.to} to={tool.to}>{tool.title}<ArrowRight aria-hidden="true" /></Link>)}</nav> : null}
+      {recentTools.length ? <nav className="tools-recent" aria-label="Recently used tools"><span>Recently used</span>{recentTools.map((tool) => <Link key={tool.to} to={tool.to}>{tool.title}</Link>)}</nav> : null}
       <div className="tools-groups">
         {groups.map((group) => (
           <section className={`tools-group is-${group.id}`} key={group.id} aria-labelledby={`tools-${group.id}`}>
             <header className="tools-section-head"><div><span>{group.eyebrow}</span><h2 id={`tools-${group.id}`}>{group.title}</h2></div><p>{group.description}</p></header>
             <div className="tools-card-grid">
-              {tools.filter((tool) => tool.group === group.id).map((tool) => { const Icon = tool.icon; return <Link className={`tools-card is-${tool.weight}`} to={tool.to} key={tool.to}><div className="tools-card-icon"><Icon size={22} aria-hidden="true" /></div><div className="tools-card-copy"><span>{tool.detail}</span><h3>{tool.title}</h3><p>{tool.description}</p></div><span className="tools-card-media" aria-hidden="true"><img src={appUrl(tool.image)} alt="" width="1672" height="941" loading="lazy" decoding="async" /></span><span className="tools-card-action">Open tool <ArrowRight size={15} aria-hidden="true" /></span></Link>; })}
-              {group.id === "understand" ? <Link className="tools-card is-standard is-analytics" to="/analytics"><div className="tools-card-icon"><ChartNoAxesCombined size={22} aria-hidden="true" /></div><div className="tools-card-copy"><span>Research layer</span><h3>Analytics</h3><p>Explore scoring, position, and market relationships outside a single decision workflow.</p></div><span className="tools-card-action">Open analytics <ArrowRight size={15} aria-hidden="true" /></span></Link> : null}
+              {tools.filter((tool) => tool.group === group.id).map((tool) => { const Icon = tool.icon; return <Link className={`tools-card is-${tool.weight}`} to={tool.to} key={tool.to}><div className="tools-card-icon"><Icon size={22} aria-hidden="true" /></div><div className="tools-card-copy"><span>{tool.detail}</span><h3>{tool.title}</h3><p>{tool.description}</p></div><span className="tools-card-media" aria-hidden="true"><img src={appUrl(tool.image)} alt="" width="1672" height="941" loading="lazy" decoding="async" /></span><span className="tools-card-action">Open tool</span></Link>; })}
+              {group.id === "understand" ? <Link className="tools-card is-standard is-analytics" to="/analytics"><div className="tools-card-icon"><ChartNoAxesCombined size={22} aria-hidden="true" /></div><div className="tools-card-copy"><span>Research layer</span><h3>Analytics</h3><p>Explore scoring, position, and market relationships outside a single decision workflow.</p></div><span className="tools-card-action">Open analytics</span></Link> : null}
             </div>
           </section>
         ))}

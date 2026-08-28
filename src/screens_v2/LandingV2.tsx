@@ -1,94 +1,130 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Radio } from "lucide-react";
+import { Radio } from "lucide-react";
 import { appUrl } from "../lib/appBasePath";
-import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import "./landing-v2.css";
 
-const pillars = [
+const platformFeatures = [
   {
-    id: "draft",
     number: "01",
-    eyebrow: "Draft Night",
-    title: "Keep the room moving.",
-    text: "Run auction or snake drafts with the board, clock, budgets, rosters, and every manager on the same screen.",
+    title: "Stats & Research",
+    text: "Career stats, season comparisons, projections, and rankings.",
+    to: "/stats",
+  },
+  {
+    number: "02",
+    title: "Analytics & Values",
+    text: "Auction values, trends, position analysis, and roster strategy.",
+    to: "/analytics",
+  },
+  {
+    number: "03",
+    title: "Draft Rooms & Tools",
+    text: "Live auction and snake drafts, offline boards, budgets, and roster builders.",
+    to: "/tools",
+  },
+  {
+    number: "04",
+    title: "League HQ & History",
+    text: "Lineups, matchups, standings, records, rivalries, and completed seasons.",
+    to: "/league",
+  },
+] as const;
+
+const platformChapters = [
+  {
+    number: "01",
+    eyebrow: "Stats, research, and analytics",
+    title: "See the numbers that actually change your roster.",
+    text: "Compare career and season stats, projections, rankings, position trends, and market values before making a roster move.",
+    image: "images/research-film-room.png",
+    imageAlt: "A football research room with game film and player notes.",
+    links: [{ to: "/stats", label: "Explore player research" }, { to: "/analytics", label: "Open analytics" }],
+  },
+  {
+    number: "02",
+    eyebrow: "Draft rooms and tools",
+    title: "Turn research into a complete draft plan.",
+    text: "Build auction budgets, test roster constructions, compare players, and run live auction or snake drafts with the whole room synced.",
     image: "images/draft-room-editorial.png",
     imageAlt: "A prepared fantasy football draft table overlooking a stadium at night.",
-    links: [{ to: "/host/setup", label: "Start a draft" }, { to: "/offline-draft", label: "Run it offline" }],
+    links: [{ to: "/tools", label: "Browse all tools" }, { to: "/host/setup", label: "Start a draft" }],
   },
   {
-    id: "week",
-    number: "02",
-    eyebrow: "Every Week",
-    title: "Open the league. See the work.",
-    text: "Connect Sleeper to check lineups, byes, injuries, opponents, standings, and the moves changing your league.",
-    image: "images/research-film-room.png",
-    imageAlt: "A football research room with game film, player notes, and stadium light beyond the windows.",
-    links: [{ to: "/my-hq", label: "Open This Week" }, { to: "/stats", label: "Research players" }],
-  },
-  {
-    id: "history",
     number: "03",
-    eyebrow: "League History",
-    title: "Keep what happened.",
-    text: "Bring completed Sleeper seasons into one archive for managers, rivalries, records, drafts, transactions, and weekly results.",
+    eyebrow: "League HQ",
+    title: "Know what matters before the week starts.",
+    text: "Connect Sleeper to see lineups, byes, injuries, opponents, standings, and the moves changing your league.",
+    image: "images/football-night-hero.png",
+    imageAlt: "A football beneath bright stadium lights at night.",
+    links: [{ to: "/my-hq", label: "Open This Week" }, { to: "/league", label: "Connect League HQ" }],
+  },
+  {
+    number: "04",
+    eyebrow: "League history",
+    title: "Keep every season part of the story.",
+    text: "Bring completed Sleeper seasons into one archive for managers, records, rivalries, drafts, transactions, and weekly results.",
     image: "images/league-history-trophy-room.png",
-    imageAlt: "A fantasy football trophy room with framed league history and warm stadium light.",
-    links: [{ to: "/league", label: "Connect a league" }, { to: "/league/1385319428408774656", label: "Explore G.O.A.T. League" }],
+    imageAlt: "A fantasy football trophy room with framed league history.",
+    links: [{ to: "/league", label: "Explore League History" }],
   },
 ] as const;
 
 export default function LandingV2() {
-  const { connections, activeLeagueId } = useSleeperLeagueConnections();
-  const activeConnection = connections.find((connection) => connection.leagueId === activeLeagueId);
-
   return (
     <div className="platform-home">
       <section className="platform-hero" aria-labelledby="platform-home-title">
         <div className="platform-hero-copy">
-          <span className="platform-kicker"><Radio aria-hidden="true" /> The complete fantasy season</span>
+          <span className="platform-kicker"><Radio aria-hidden="true" /> Player data · Draft tools · League intelligence</span>
           <h1 id="platform-home-title" className="ff-display">
-            <span>Run the draft.</span>
-            <span>Read the league.</span>
-            <span>Win the week.</span>
+            <span>Your edge for every</span>
+            <span>fantasy football</span>
+            <span>decision.</span>
           </h1>
-          <p>Run the room, connect Sleeper for the weekly work, and keep every completed season in one place.</p>
+          <p>Turn player stats, projections, rankings, and auction values into better rosters. Then run drafts, manage weekly matchups, and preserve league history without stitching together five different sites.</p>
           <div className="platform-hero-actions">
-            <Link className="platform-primary-link" to="/host/setup">Start a Draft<ArrowRight aria-hidden="true" /></Link>
-            {activeConnection ? (
-              <Link className="platform-secondary-link" to="/my-hq">Open {activeConnection.leagueName}<ArrowRight aria-hidden="true" /></Link>
-            ) : (
-              <Link className="platform-secondary-link" to="/league">Connect a Sleeper League<ArrowRight aria-hidden="true" /></Link>
-            )}
+            <Link className="platform-primary-link" to="/stats">Explore Player Research</Link>
+            <Link className="platform-secondary-link" to="/tools">Browse All Tools</Link>
           </div>
         </div>
 
-        <figure className="platform-product-preview">
-          <img src={appUrl("images/football-night-hero.png")} alt="A football beneath bright stadium lights at night." />
-        </figure>
-      </section>
-
-      <section className="platform-pillars" aria-labelledby="platform-pillars-title">
-        <header><span>One league. All season.</span><h2 id="platform-pillars-title" className="ff-display">Draft night is only the beginning.</h2></header>
-        <div>
-          {pillars.map(({ id, number, eyebrow, title, text, image, imageAlt, links }) => (
-            <article key={id} className={`platform-pillar is-${id}`}>
-              <figure><img src={appUrl(image)} alt={imageAlt} /></figure>
-              <div className="platform-pillar-copy">
-                <span><b>{number}</b>{eyebrow}</span>
-                <h3 className="ff-display">{title}</h3>
-                <p>{text}</p>
-                <nav aria-label={`${eyebrow} links`}>
-                  {links.map((link, index) => <Link key={link.to} className={index === 0 ? "is-primary" : ""} to={link.to}>{link.label}<ArrowRight aria-hidden="true" /></Link>)}
-                </nav>
-              </div>
-            </article>
-          ))}
+        <div className="platform-feature-index">
+          <header><strong>Everything working together</strong><span>Draft day through league history</span></header>
+          <nav aria-label="Explore Fantasy Football features">
+            {platformFeatures.map((feature) => (
+              <Link key={feature.to} to={feature.to}>
+                <b>{feature.number}</b>
+                <span><strong>{feature.title}</strong><small>{feature.text}</small></span>
+              </Link>
+            ))}
+          </nav>
+          <figure>
+            <img src={appUrl("images/football-night-hero.png")} alt="A football beneath stadium lights at night." />
+            <figcaption><strong>Fantasy football, connected.</strong><span>Move from raw numbers to roster decisions without losing the context of your league.</span></figcaption>
+          </figure>
         </div>
       </section>
 
-      <section className="platform-research-callout">
-        <div><span>Research</span><h2 className="ff-display">Make the call with the numbers in front of you.</h2><p>Search players, compare seasons, build an auction budget, and test a roster before draft night.</p></div>
-        <nav aria-label="Research links"><Link to="/stats">Player research <ArrowRight aria-hidden="true" /></Link><Link to="/analytics">Analytics <ArrowRight aria-hidden="true" /></Link><Link to="/tools">All decision tools <ArrowRight aria-hidden="true" /></Link></nav>
+      <section id="platform-features" className="platform-chapters" aria-labelledby="platform-chapters-title">
+        <header>
+          <span>The complete season</span>
+          <h2 id="platform-chapters-title" className="ff-display">Every part of fantasy football stays connected.</h2>
+        </header>
+        <div>
+          {platformChapters.map((chapter) => (
+            <article key={chapter.number}>
+              <b>{chapter.number}</b>
+              <div className="platform-chapter-copy">
+                <span>{chapter.eyebrow}</span>
+                <h3 className="ff-display">{chapter.title}</h3>
+                <p>{chapter.text}</p>
+                <nav aria-label={`${chapter.eyebrow} links`}>
+                  {chapter.links.map((link) => <Link key={link.to} to={link.to}>{link.label}</Link>)}
+                </nav>
+              </div>
+              <figure><img src={appUrl(chapter.image)} alt={chapter.imageAlt} loading="lazy" decoding="async" /></figure>
+            </article>
+          ))}
+        </div>
       </section>
     </div>
   );

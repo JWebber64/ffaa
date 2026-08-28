@@ -64,7 +64,7 @@ export function SeasonsPage() {
           <div><span>{season.status.replace(/_/g, " ")}</span><strong>{season.season}</strong></div>
           <h3>{champion ? `${champion.displayName} won the title` : "Championship unavailable"}</h3><p>{franchise?.teamName || `${season.totalRosters} franchises`}</p>
           <dl><div><dt>Matchups</dt><dd>{matchups}</dd></div><div><dt>Transactions</dt><dd>{transactions}</dd></div><div><dt>Drafts</dt><dd>{snapshot.drafts.filter((draft) => draft.leagueSeasonId === season.id).length}</dd></div></dl>
-          <span className="history-action-link">Open season <ArrowRight size={14} /></span>
+          <span className="history-action-link">Open season</span>
         </Link>;
       })}</section>
     </main>
@@ -260,7 +260,7 @@ export function SeasonArchivePage() {
             })}</tbody></table>
             {!filteredDraftPicks.length ? <div className="history-draft-empty">No auction players match these filters.</div> : null}
           </div>
-          <Link className="history-text-link" to="../drafts">Open all historical drafts <ArrowRight size={14} /></Link>
+          <Link className="history-text-link" to="../drafts">Open all historical drafts</Link>
         </> : <div className="history-empty">No draft picks were exposed for this season.</div>}
       </section> : null}
 
@@ -272,7 +272,7 @@ export function SeasonArchivePage() {
           <article><span>FAAB spent</span><strong>${formatNumber(totalFaab, 0)}</strong><small>Across {faabBids.length} recorded bids</small></article>
           <article><span>Largest bid</span><strong>{largestFaab == null ? "—" : `$${formatNumber(largestFaab, 0)}`}</strong><small>{largestFaab == null ? "No FAAB bid recorded" : "Highest recorded claim"}</small></article>
         </section>
-        <section className="history-panel history-activity-cta"><CircleDollarSign /><div><span>Complete normalized ledger</span><h2>Search every trade, waiver, and free-agent move</h2><p>The full transaction archive includes participants, assets, FAAB, status, and week.</p></div><Link className="history-text-link" to="../transactions">Open transaction history <ArrowRight size={14} /></Link></section>
+        <section className="history-panel history-activity-cta"><CircleDollarSign /><div><span>Complete normalized ledger</span><h2>Search every trade, waiver, and free-agent move</h2><p>The full transaction archive includes participants, assets, FAAB, status, and week.</p></div><Link className="history-text-link" to="../transactions">Open transaction history</Link></section>
       </> : null}
 
       <nav className="history-season-pagination" aria-label="Adjacent seasons">

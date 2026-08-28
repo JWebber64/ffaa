@@ -1,4 +1,4 @@
-import { ArrowRight, Crown, Medal, Swords, Trophy, Users } from "lucide-react";
+import { Crown, Medal, Swords, Trophy, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { calculateAllManagerCareers, calculateGoatRankings } from "../../analytics";
@@ -30,7 +30,7 @@ export function LeagueDashboardPage() {
           <span><Crown size={16} /> Defending champion</span>
           <strong>{champion?.displayName ?? "Not available"}</strong>
           <p>{championFranchise?.teamName || "Sleeper has not exposed a completed championship result."}</p>
-          {champion ? <Link to={`managers/${champion.id}`}>View career <ArrowRight size={14} /></Link> : null}
+          {champion ? <Link to={`managers/${champion.id}`}>View career</Link> : null}
         </article>
         <article><span>Seasons</span><strong>{snapshot.seasons.length}</strong><small>Normalized archives</small></article>
         <article><span>Managers</span><strong>{snapshot.managers.length}</strong><small>Permanent identities</small></article>
@@ -45,13 +45,13 @@ export function LeagueDashboardPage() {
             <div><Users size={17} /><span>Career wins</span><strong>{allTimeLeader?.manager.displayName ?? "—"}</strong><small>{allTimeLeader ? formatRecord(allTimeLeader.wins, allTimeLeader.losses, allTimeLeader.ties) : "—"}</small></div>
             <div><Trophy size={17} /><span>Career scoring</span><strong>{scoringLeader?.manager.displayName ?? "—"}</strong><small>{formatNumber(scoringLeader?.pointsFor ?? null)} points</small></div>
           </div>
-          <Link className="history-text-link" to="leaderboards">Open leaderboards <ArrowRight size={14} /></Link>
+          <Link className="history-text-link" to="leaderboards">Open leaderboards</Link>
         </article>
 
         <article className="history-panel">
           <header><div><span>Rivalries</span><h2>Every meeting matters</h2></div><Swords aria-hidden="true" /></header>
           <p>Compare permanent manager identities across renamed teams and every imported season.</p>
-          <Link className="history-action-link" to="h2h">Open H2H matrix <ArrowRight size={15} /></Link>
+          <Link className="history-action-link" to="h2h">Open H2H matrix</Link>
         </article>
       </section>
 
@@ -64,7 +64,7 @@ export function LeagueDashboardPage() {
             </Link>
           ))}
         </div>
-        <Link className="history-text-link" to={`/league/${leagueId}/seasons`}>Browse the full archive <ArrowRight size={14} /></Link>
+        <Link className="history-text-link" to={`/league/${leagueId}/seasons`}>Browse the full archive</Link>
       </section>
     </main>
   );

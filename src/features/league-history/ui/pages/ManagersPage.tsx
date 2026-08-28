@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Crown, Medal, Swords, Trophy, UserRound } from "lucide-react";
+import { ArrowLeft, Crown, Medal, Swords, Trophy, UserRound } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
 import {
@@ -38,7 +38,6 @@ export function ManagersPage() {
                 <div><dt>Titles</dt><dd>{career.championships}</dd></div>
                 <div><dt>Seasons</dt><dd>{career.seasonsPlayed}</dd></div>
               </dl>
-              <ArrowRight className="history-card-arrow" aria-hidden="true" />
             </Link>
           );
         })}
@@ -111,7 +110,7 @@ export function ManagerProfilePage() {
             <div><span>Most played</span><strong>{mostPlayed?.managerB.displayName ?? "—"}</strong><small>{mostPlayed?.meetings.length ?? 0} meetings</small></div>
             <div><span>Closest rivalry</span><strong>{closest?.managerB.displayName ?? "—"}</strong><small>{closest ? `${closest.winsA}-${closest.winsB}-${closest.ties}` : "No meetings"}</small></div>
           </div>
-          {mostPlayed ? <Link className="history-text-link" to={`../rivalries/${managerId}/${mostPlayed.managerB.id}`}>Open rivalry <ArrowRight size={14} /></Link> : null}
+          {mostPlayed ? <Link className="history-text-link" to={`../rivalries/${managerId}/${mostPlayed.managerB.id}`}>Open rivalry</Link> : null}
         </article>
       </section>
 

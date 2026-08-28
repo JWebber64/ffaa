@@ -1,4 +1,4 @@
-import { ArrowRight, History, Medal, RefreshCw, Sparkles, Swords } from "lucide-react";
+import { History, Medal, RefreshCw, Sparkles, Swords } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 
@@ -51,7 +51,7 @@ export function WeekPage() {
           <History size={28} aria-hidden="true" />
           <strong>No completed league weeks are available</strong>
           <span>Preseason placeholders and incomplete matchups are excluded from the weekly workspace.</span>
-          <Link className="history-action-link" to={`/league/${leagueId}/seasons`}>Open season archive <ArrowRight size={13} aria-hidden="true" /></Link>
+          <Link className="history-action-link" to={`/league/${leagueId}/seasons`}>Open season archive</Link>
         </div>
       </main>
     );

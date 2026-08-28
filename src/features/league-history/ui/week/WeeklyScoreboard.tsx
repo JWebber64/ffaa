@@ -1,4 +1,4 @@
-import { ArrowRight, Crown, Swords, Trophy } from "lucide-react";
+import { Crown, Swords, Trophy } from "lucide-react";
 import type React from "react";
 import { Link } from "react-router-dom";
 
@@ -41,7 +41,7 @@ export function WeeklyScoreboard({ leagueId, matchups }: { leagueId: string; mat
               </div>
               <footer>
                 <span><Swords size={13} aria-hidden="true" /> H2H through this game: {managerA?.displayName || "A"} {formatRecord(h2h.winsA, h2h.winsB, h2h.ties)}</span>
-                {rivalryUrl ? <Link to={rivalryUrl}>Full rivalry <ArrowRight size={13} aria-hidden="true" /></Link> : null}
+                {rivalryUrl ? <Link to={rivalryUrl}>Full rivalry</Link> : null}
               </footer>
             </article>
           );

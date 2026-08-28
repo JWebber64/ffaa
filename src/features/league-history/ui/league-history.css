@@ -264,7 +264,6 @@
 .history-archive-card dt { color: var(--text-1); font-size: 0.62rem; }
 .history-manager-card dd,
 .history-archive-card dd { margin: 3px 0 0; font-size: 0.86rem; font-weight: 780; }
-.history-card-arrow { position: absolute; right: 14px; top: 14px; color: var(--text-1); }
 
 .history-profile-hero,
 .history-season-hero {

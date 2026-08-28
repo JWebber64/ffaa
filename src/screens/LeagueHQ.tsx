@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import {
-  ArrowRight,
   Award,
   BookOpen,
   CalendarClock,
@@ -789,7 +788,7 @@ export default function LeagueHQ() {
               <SectionHeading eyebrow="League lore" title="Rivalries & head-to-head history" detail="Series summaries appear below. Open the all-time matrix or any series to see every recorded score." />
               {data.sleeper ? (
                 <Link className="league-link-button is-secondary" to={leagueHistoryPath(data.sleeper.leagueId, "h2h")}>
-                  View all H2H results <ArrowRight size={15} aria-hidden="true" />
+                  View all H2H results
                 </Link>
               ) : null}
             </div>
@@ -813,7 +812,7 @@ export default function LeagueHQ() {
                           to={leagueRivalryPath(data.sleeper.leagueId, rivalry.managerAId, rivalry.managerBId)}
                           aria-label={`View every result in ${rivalry.name}`}
                         >
-                          View every result <ArrowRight size={15} aria-hidden="true" />
+                          View every result
                         </Link>
                       ) : null}
                     </article>

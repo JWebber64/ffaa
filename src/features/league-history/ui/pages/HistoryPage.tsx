@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarDays, Crown, Trophy } from "lucide-react";
+import { CalendarDays, Crown, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { calculateAllManagerCareers } from "../../analytics";
@@ -25,7 +25,7 @@ export function HistoryPage() {
             <div className="history-timeline-line"><span /></div>
             <div className="history-timeline-event">
               <span><CalendarDays size={15} /> League season</span><h3>{season.totalRosters}-team season</h3><p>{champion ? `${champion.displayName} won the championship as ${championFranchise?.teamName}.` : "No completed championship result is available from Sleeper for this season."}</p>
-              <div>{champion ? <Link to={`../managers/${champion.id}`}>Champion <ArrowRight size={13} /></Link> : null}<Link to={`../seasons/${season.season}`}>Season archive <ArrowRight size={13} /></Link></div>
+              <div>{champion ? <Link to={`../managers/${champion.id}`}>Champion</Link> : null}<Link to={`../seasons/${season.season}`}>Season archive</Link></div>
             </div>
           </article>;
         })}
@@ -64,7 +64,7 @@ export function ChampionsPage() {
             <div><small>Champion</small><h3>{champion?.displayName ?? championFranchise?.teamName ?? "Unknown"}</h3><p>{championFranchise?.teamName}</p></div>
             <div className="history-title-score"><strong>{championScore == null ? "—" : formatNumber(championScore)}</strong><span>–</span><strong>{runnerUpScore == null ? "—" : formatNumber(runnerUpScore)}</strong></div>
             <div><small>Runner-up</small><strong>{runnerUp?.displayName ?? runnerUpFranchise?.teamName ?? "Unknown"}</strong><p>{runnerUpFranchise ? formatRecord(runnerUpFranchise.wins, runnerUpFranchise.losses, runnerUpFranchise.ties) : ""}</p></div>
-            <Link to={`../../seasons/${season?.season}`}>Open {season?.season} season <ArrowRight size={14} /></Link>
+            <Link to={`../../seasons/${season?.season}`}>Open {season?.season} season</Link>
           </article>;
         })}
       </section>

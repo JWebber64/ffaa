@@ -64,7 +64,7 @@ describe("shared layout density contract", () => {
     expect(Math.max(...maximums)).toBeLessThanOrEqual(4.75);
   });
 
-  it("keeps the homepage image-led instead of covering photography with mock interface cards", () => {
+  it("keeps the homepage product-led without replacing real features with a mock dashboard", () => {
     const landing = readProjectFile("src/screens_v2/LandingV2.tsx");
     const styles = readProjectFile("src/screens_v2/landing-v2.css");
 
@@ -72,10 +72,14 @@ describe("shared layout density contract", () => {
     expect(landing).not.toContain("Product preview");
     expect(landing).not.toContain("platform-promise");
     expect(landing).not.toContain("Explore Demo League");
-    expect(styles).not.toContain(".platform-product-preview::after");
+    expect(landing).toContain("Stats & Research");
+    expect(landing).toContain("Analytics & Values");
+    expect(landing).toContain("Draft Rooms & Tools");
+    expect(landing).toContain("League HQ & History");
     expect(styles).not.toContain(".platform-preview-frame");
     expect(styles).toContain("aspect-ratio: 16 / 8");
-    expect(styles).toContain(".platform-pillar.is-week figure");
+    expect(styles).toContain(".platform-feature-index");
+    expect(styles).toContain(".platform-chapters article > figure");
   });
 
   it("documents why ordinary cards and heroes stay natural-height", () => {
