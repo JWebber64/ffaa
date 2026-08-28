@@ -81,11 +81,17 @@
 .draft-order-scorebug button { display: flex; min-height: 42px; align-items: center; gap: 6px; padding: 7px 10px; border: 0; border-top: 1px solid var(--color-border-subtle); background: transparent; color: var(--color-text-secondary); font: inherit; font-size: .76rem; cursor: pointer; }
 .draft-order-scorebug button svg { width: 17px; }
 
+.showdown-progress-shell {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 22px;
+}
+
 .showdown-progress {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 2px;
-  margin: 12px 0 22px;
+  margin: 0;
   overflow: hidden;
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--r-lg);
@@ -110,6 +116,20 @@
 .showdown-progress svg { width: 18px; color: var(--green-300); }
 .showdown-progress .is-current { background: var(--color-surface-selected); color: var(--color-text-primary); }
 .showdown-progress .is-complete { color: var(--color-text-secondary); }
+
+.showdown-start-over {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-inline: 4px;
+  color: var(--color-text-muted);
+  font-size: .76rem;
+}
+
+.showdown-start-over > span { text-align: right; }
+.showdown-start-over .ui-button { flex: none; }
+.showdown-start-over svg { width: 15px; }
 
 .showdown-notice,
 .results-action-status {
@@ -224,6 +244,7 @@
 .showdown-running-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 8px 14px; }
 .showdown-running-controls > span { display: flex; align-items: center; gap: 7px; min-width: 0; color: var(--color-text-muted); font-size: .74rem; overflow-wrap: anywhere; }
 .showdown-running-controls svg { flex: none; color: var(--green-300); }
+.showdown-running-actions { display: flex; flex: none; flex-wrap: wrap; gap: 8px; }
 .showdown-renderer-loading { display: grid; min-height: 420px; place-items: center; color: var(--color-text-muted); }
 
 .showdown-game { min-width: 0; overflow: hidden; border: 1px solid var(--color-border-subtle); border-radius: var(--r-lg); background: var(--color-surface-card-secondary); }
@@ -370,6 +391,9 @@
   .showdown-progress > span { min-height: 44px; padding: 5px 2px; font-size: .56rem; }
   .showdown-progress i,
   .showdown-progress svg { display: none; }
+  .showdown-start-over { align-items: flex-end; flex-wrap: wrap; }
+  .showdown-start-over > span { flex: 1 1 220px; }
+  .showdown-start-over svg { display: block; }
   .participant-import-grid { grid-template-columns: 1fr; }
   .participant-import-grid article:last-child { grid-column: auto; }
   .participant-editor-list li { grid-template-columns: 30px minmax(0, 1fr) 44px; }
@@ -386,6 +410,8 @@
   .mode-card-copy { min-height: 128px; padding: 11px; }
   .order-locked-panel dl { gap: 12px; }
   .showdown-running-controls { align-items: stretch; flex-direction: column; }
+  .showdown-running-actions { width: 100%; }
+  .showdown-running-actions .ui-button { flex: 1 1 calc(50% - 4px); }
   .showdown-game-header { align-items: flex-start; flex-direction: column; }
   .dash-field { padding: 28px 42px 8px 58px; }
   .dash-yard-labels { inset-inline: 58px 42px; }

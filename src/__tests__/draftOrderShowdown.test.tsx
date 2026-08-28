@@ -142,6 +142,7 @@ describe("Draft Order Showdown UI", () => {
       await act(async () => { vi.advanceTimersByTime(900); await Promise.resolve(); });
     }
     const skip = screen.getByRole("button", { name: "Skip Animation" });
+    expect(screen.getByRole("button", { name: "Start Over" })).toBeInTheDocument();
     fireEvent.click(skip);
     expect(screen.getByText(/owns the first pick/)).toBeInTheDocument();
     await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Copy Order" })); await Promise.resolve(); });
@@ -175,6 +176,19 @@ describe("Draft Order Showdown UI", () => {
     expect(screen.getByText("2", { selector: "dd" })).toBeInTheDocument();
   });
 
+  it("starts over from a completed draw without deleting saved history", async () => {
+    await seedResults(roomContext(true));
+    renderShowdown();
+    expect(await screen.findByText(/owns the first pick/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Start Over" }));
+
+    expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining("Saved draws"));
+    expect(screen.getByLabelText("Manager or team names")).toHaveValue("");
+    expect(screen.queryByText(/owns the first pick/)).not.toBeInTheDocument();
+    expect(window.localStorage.getItem("ffaa.draftOrder.active.v1")).toBeNull();
+  });
+
   it("loads a shared replay as the exact read-only result without offering a reroll", async () => {
     const draw = await createDraftOrderDraw({ participants: participants(), mode: "helmet-shuffle", masterSeed: "AAECAwQFBgcICQoLDA0ODw" });
     await createDraftOrderAnimationPlan(draw);
@@ -183,5 +197,6 @@ describe("Draft Order Showdown UI", () => {
     expect(await screen.findByText(/owns the first pick/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Generate New Order" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Replay Animation" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Start Over" })).toBeInTheDocument();
   });
 });

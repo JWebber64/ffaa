@@ -1,4 +1,4 @@
-import { Check, Clipboard, Link2, Play, RefreshCw, Save, Send, ShieldCheck } from "lucide-react";
+import { Check, Clipboard, Link2, Play, RefreshCw, RotateCcw, Save, Send, ShieldCheck } from "lucide-react";
 import { Button } from "../../ui/Button";
 import { ParticipantMark } from "./renderers/shared";
 import { VerificationPanel } from "./VerificationPanel";
@@ -24,6 +24,7 @@ export function ResultPanel({
   onShare,
   onReplay,
   onReroll,
+  onStartOver,
   onChangeMode,
   onVerify,
   onCopyHash,
@@ -40,6 +41,7 @@ export function ResultPanel({
   onShare: () => void;
   onReplay: () => void;
   onReroll: () => void;
+  onStartOver: () => void;
   onChangeMode: (mode: DraftOrderMode) => void;
   onVerify: () => void;
   onCopyHash: () => void;
@@ -86,6 +88,7 @@ export function ResultPanel({
         {!readOnly ? <Button variant="secondary" onClick={onShare}><Link2 size={16} aria-hidden="true" /> Share Replay</Button> : null}
         <Button variant="secondary" onClick={onReplay}><Play size={16} aria-hidden="true" /> Replay Animation</Button>
         {!readOnly ? <Button variant="danger" onClick={onReroll}><RefreshCw size={16} aria-hidden="true" /> Generate New Order</Button> : null}
+        <Button variant="secondary" onClick={onStartOver}><RotateCcw size={16} aria-hidden="true" /> Start Over</Button>
       </div>
       {applyReason && !readOnly ? <p className="results-action-note">{applyReason}</p> : null}
       {actionStatus ? <p className="results-action-status" role="status">{actionStatus}</p> : null}
