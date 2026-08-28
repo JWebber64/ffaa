@@ -1,4 +1,4 @@
-import { Trophy, Volume2, VolumeX } from "lucide-react";
+import { RotateCcw, Trophy, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AppStateScreen } from "../../components/AppStateScreen";
@@ -29,6 +29,7 @@ import { ShowdownRenderer } from "./ShowdownRenderer";
 import {
   draftOrderShowdownReducer,
   INITIAL_SHOWDOWN_STATE,
+  clearActiveShowdownState,
   loadActiveShowdownState,
   persistActiveShowdownState,
 } from "./showdownMachine";
@@ -57,7 +58,7 @@ function initialState(searchParams: URLSearchParams) {
 }
 
 export default function DraftOrderShowdown() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [state, dispatch] = useReducer(draftOrderShowdownReducer, searchParams, initialState);
   const { connections, activeLeagueId } = useSleeperLeagueConnections();
   const [busy, setBusy] = useState(false);
@@ -308,6 +309,20 @@ export default function DraftOrderShowdown() {
     }
   }, [state.draw]);
 
+  const handleReset = useCallback(() => {
+    const hasProgress = state.participants.length > 0 || Boolean(state.draw);
+    if (hasProgress && !window.confirm("Reset Draft Order Showdown? This clears the current managers and draw from this device.")) return;
+
+    clearActiveShowdownState();
+    autoRoomLoaded.current = false;
+    dispatch({ type: "reset" });
+    setNotice("");
+    setActionStatus("");
+    setVerification(null);
+    setAnnouncement("Draft Order Showdown reset.");
+    if (searchParams.size > 0) setSearchParams({}, { replace: true });
+  }, [searchParams.size, setSearchParams, state.draw, state.participants.length]);
+
   if (loadingShare) return <AppStateScreen title="Loading Shared Draw" message="Opening the exact saved result and verification record." />;
 
   return (
@@ -316,7 +331,7 @@ export default function DraftOrderShowdown() {
         <>
           <header className="draft-order-hero">
             <div><span className="draft-order-eyebrow">GameHQ presents</span><h1 className="ff-display">Draft Order Showdown</h1><p>Let football decide your draft order.</p><div className="draft-order-trust"><Trophy aria-hidden="true" /><span><strong>Built for draft night.</strong> Three football games. One league-wide showdown.</span></div></div>
-            <div className="draft-order-utility"><strong>{state.draw ? `Draw ${state.draw.rerollIndex + 1}` : `${state.participants.length || 0} managers`}</strong><button type="button" onClick={() => setMuted(!muted)} aria-label={muted ? "Enable showdown sound" : "Mute showdown sound"}>{muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}<span>{muted ? "Sound off" : "Sound on"}</span></button></div>
+            <div className="draft-order-utility"><strong>{state.draw ? `Draw ${state.draw.rerollIndex + 1}` : `${state.participants.length || 0} managers`}</strong><button type="button" onClick={handleReset} disabled={busy}><RotateCcw aria-hidden="true" /><span>Reset</span></button><button type="button" onClick={() => setMuted(!muted)} aria-label={muted ? "Enable showdown sound" : "Mute showdown sound"}>{muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}<span>{muted ? "Sound off" : "Sound on"}</span></button></div>
           </header>
           <nav className="showdown-progress-compact" aria-label="Draft order progress">
             <span>Step {state.phase === "setup" ? 1 : 2} of 2</span>
@@ -338,6 +353,7 @@ export default function DraftOrderShowdown() {
             <div><Trophy aria-hidden="true" /><span>{MODE_LABELS[state.draw.mode]}</span><strong>Draw {state.draw.rerollIndex + 1}</strong></div>
             <div>
               <button className="showdown-sound-button" type="button" onClick={() => setMuted(!muted)} aria-label={muted ? "Enable showdown sound" : "Mute showdown sound"}>{muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}<span>{muted ? "Sound off" : "Sound on"}</span></button>
+              <Button size="sm" variant="secondary" onClick={handleReset}><RotateCcw size={16} aria-hidden="true" /> Reset</Button>
               {state.phase === "running" ? <Button size="sm" variant="secondary" onClick={handleSkip}>Skip</Button> : null}
             </div>
           </header>
@@ -350,7 +366,7 @@ export default function DraftOrderShowdown() {
         </section>
       ) : null}
 
-      {state.phase === "results" && state.draw ? <ResultPanel draw={state.draw} roomContext={state.roomContext} accepted={state.accepted} readOnly={state.readOnly} verification={verification} actionStatus={actionStatus} onApply={handleApply} onSave={handleSave} onCopy={handleCopy} onShare={handleShare} onReplay={() => dispatch({ type: "replay" })} onReroll={handleReroll} onChangeMode={handleChangeMode} onVerify={handleVerify} onCopyHash={handleCopyHash} /> : null}
+      {state.phase === "results" && state.draw ? <ResultPanel draw={state.draw} roomContext={state.roomContext} accepted={state.accepted} readOnly={state.readOnly} verification={verification} actionStatus={actionStatus} onApply={handleApply} onSave={handleSave} onCopy={handleCopy} onShare={handleShare} onReplay={() => dispatch({ type: "replay" })} onReroll={handleReroll} onReset={handleReset} onChangeMode={handleChangeMode} onVerify={handleVerify} onCopyHash={handleCopyHash} /> : null}
 
       <div className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</div>
     </div>

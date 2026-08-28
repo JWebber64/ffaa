@@ -49,6 +49,7 @@ export type DraftOrderShowdownAction =
   | { type: "replay" }
   | { type: "reveal-with"; draw: DraftOrderDrawRecord; animationPlan: DraftOrderAnimationPlan }
   | { type: "accept" }
+  | { type: "reset" }
   | { type: "load-shared"; draw: DraftOrderDrawRecord; animationPlan: DraftOrderAnimationPlan }
   | { type: "restore"; state: DraftOrderShowdownState };
 
@@ -116,6 +117,8 @@ export function draftOrderShowdownReducer(
         : state;
     case "accept":
       return { ...state, accepted: true };
+    case "reset":
+      return { ...INITIAL_SHOWDOWN_STATE };
     case "load-shared":
       return {
         ...INITIAL_SHOWDOWN_STATE,
@@ -164,4 +167,9 @@ export function loadActiveShowdownState(): DraftOrderShowdownState | null {
 export function persistActiveShowdownState(state: DraftOrderShowdownState) {
   if (typeof window === "undefined" || !state.draw) return;
   window.localStorage.setItem(ACTIVE_DRAW_KEY, JSON.stringify(state));
+}
+
+export function clearActiveShowdownState() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(ACTIVE_DRAW_KEY);
 }

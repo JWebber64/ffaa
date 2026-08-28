@@ -419,7 +419,9 @@
 .punt-kick-spot { position: absolute; left: 9px; top: calc(50% + 14px); width: 22px; height: 4px; border-radius: 50%; background: rgba(4, 10, 7, .48); box-shadow: 0 0 0 1px rgba(243, 237, 218, .12); }
 .punt-kick-spot::after { position: absolute; left: 9px; bottom: 1px; width: 4px; height: 9px; border-radius: 1px 1px 0 0; background: var(--punt-amber); content: ""; transform: skewX(-10deg); transform-origin: bottom; }
 
-.punt-ball { position: absolute; z-index: 4; left: 0; top: 50%; display: block; width: clamp(42px, 3.8vw, 54px); aspect-ratio: 72 / 44; margin-top: calc(clamp(42px, 3.8vw, 54px) * -.305); filter: drop-shadow(0 5px 4px rgba(0, 0, 0, .3)); will-change: transform; animation: punt-flight var(--punt-duration) var(--ease-in-out, cubic-bezier(.77,0,.175,1)) var(--punt-delay) both; }
+.punt-ball { position: absolute; z-index: 4; left: 0; top: 50%; display: block; width: clamp(42px, 3.8vw, 54px); aspect-ratio: 72 / 44; margin-top: calc(clamp(42px, 3.8vw, 54px) * -.305); filter: drop-shadow(0 5px 4px rgba(0, 0, 0, .3)); will-change: transform; animation: punt-forward var(--punt-duration) linear var(--punt-delay) both; }
+.punt-ball-height { display: block; width: 100%; height: 100%; will-change: transform; animation: punt-height var(--punt-duration) linear var(--punt-delay) both; }
+.punt-ball-spin { display: block; width: 100%; height: 100%; will-change: transform; animation: punt-spin var(--punt-duration) linear var(--punt-delay) both; }
 .punt-football-art { display: block; width: 100%; height: 100%; overflow: visible; }
 .punt-football-body { stroke: #e9aa69; stroke-width: 1.4; }
 .punt-football-panel { fill: none; stroke: rgba(55, 18, 7, .6); stroke-width: 1; }
@@ -429,13 +431,14 @@
 .punt-football-highlight { fill: none; stroke: rgba(255, 224, 180, .48); stroke-width: 1.6; stroke-linecap: round; }
 .punt-football-team-dot { fill: var(--football-team-color, var(--punt-amber)); stroke: rgba(255, 255, 255, .72); stroke-width: .8; }
 
-.punt-ball-shadow { position: absolute; z-index: 1; left: 8px; top: calc(50% + 14px); width: 38px; height: 8px; border-radius: 50%; background: rgba(0, 0, 0, .62); filter: blur(1.5px); transform-origin: center; will-change: transform, opacity; animation: punt-shadow-track var(--punt-duration) var(--ease-in-out, cubic-bezier(.77,0,.175,1)) var(--punt-delay) both; }
+.punt-ball-shadow { position: absolute; z-index: 1; left: 8px; top: calc(50% + 14px); display: block; width: 38px; height: 8px; will-change: transform; animation: punt-shadow-forward var(--punt-duration) linear var(--punt-delay) both; }
+.punt-ball-shadow > b { display: block; width: 100%; height: 100%; border-radius: 50%; background: rgba(0, 0, 0, .62); filter: blur(1.5px); transform-origin: center; will-change: transform, opacity; animation: punt-shadow-height var(--punt-duration) linear var(--punt-delay) both; }
 .punt-kick-flash { position: absolute; z-index: 5; left: 15px; top: calc(50% + 4px); width: 26px; height: 26px; border: 1px solid var(--punt-amber); border-radius: 50%; opacity: 0; animation: punt-kick-flash var(--punt-duration) var(--ease-out, cubic-bezier(.23,1,.32,1)) var(--punt-delay) both; }
 .punt-kick-flash b { position: absolute; left: 50%; top: -7px; width: 2px; height: 8px; border-radius: 2px; background: var(--punt-amber); transform-origin: 50% 20px; }
 .punt-kick-flash b:nth-child(2) { transform: rotate(110deg); }
 .punt-kick-flash b:nth-child(3) { transform: rotate(245deg); }
 
-.punt-impact-mark { position: absolute; z-index: 3; left: calc((100% - 54px) * var(--punt-finish) * .82); top: calc(50% + 12px); width: 28px; height: 12px; pointer-events: none; }
+.punt-impact-mark { position: absolute; z-index: 3; left: calc((100% - 54px) * var(--punt-finish) * .63); top: calc(50% + 12px); width: 28px; height: 12px; pointer-events: none; }
 .punt-impact-mark b { position: absolute; left: 12px; bottom: 0; width: 5px; height: 5px; border-radius: 50% 50% 45% 55%; background: #b8a979; opacity: 0; animation: punt-impact-dust var(--punt-duration) var(--ease-out, cubic-bezier(.23,1,.32,1)) var(--punt-delay) both; }
 .punt-impact-mark b:nth-child(2) { left: 3px; animation-name: punt-impact-dust-left; }
 .punt-impact-mark b:nth-child(3) { left: 21px; animation-name: punt-impact-dust-right; }
@@ -510,35 +513,45 @@
 @keyframes plinko-slot-hit { from { transform: translate3d(0, 5px, 0) scale(.94); } 60% { transform: translate3d(0, -2px, 0) scale(1.03); } to { transform: translate3d(0, 0, 0) scale(1); } }
 @keyframes plinko-burst { from { opacity: 0; transform: rotate(calc((var(--burst-index, 0) - 2.5) * 14deg)) scaleY(.1); } 45% { opacity: 1; } to { opacity: 0; transform: rotate(calc((var(--burst-index, 0) - 2.5) * 14deg)) scaleY(1); } }
 @keyframes plinko-live-light { from { opacity: .45; transform: scale(.82); } to { opacity: 1; transform: scale(1); } }
-@keyframes punt-flight {
-  0% { transform: translate3d(0, 7px, 0) rotate(-9deg) scale(.96); animation-timing-function: var(--ease-out, cubic-bezier(.23,1,.32,1)); }
-  4% { transform: translate3d(-4px, 10px, 0) rotate(-14deg) scale(.98); }
-  8% { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .035), -10px, 0) rotate(48deg) scale(1.04); animation-timing-function: var(--ease-in-out, cubic-bezier(.77,0,.175,1)); }
-  23% { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .27), calc(-25px - var(--punt-bounce) + var(--punt-arc-offset)), 0) rotate(310deg) scale(1); }
-  43% { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .58), calc(-42px - var(--punt-bounce) * 1.4 + var(--punt-arc-offset)), 0) rotate(690deg) scale(1); }
-  58% { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .78), calc(-13px - var(--punt-bounce) * .5), 0) rotate(970deg) scale(1); }
-  63% { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .82), 8px, 0) rotate(1040deg) scale(1.05, .9); animation-timing-function: var(--ease-out, cubic-bezier(.23,1,.32,1)); }
-  70% { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .865), calc(-15px - var(--punt-bounce) * .7), 0) rotate(calc(var(--punt-rest-angle) - 320deg)) scale(.98, 1.03); }
-  76% { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .9), 7px, 0) rotate(calc(var(--punt-rest-angle) - 230deg)) scale(1.03, .93); animation-timing-function: var(--ease-out, cubic-bezier(.23,1,.32,1)); }
-  82% { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .93), -8px, 0) rotate(calc(var(--punt-rest-angle) - 150deg)) scale(1); }
-  87% { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .953), 7px, 0) rotate(calc(var(--punt-rest-angle) - 85deg)) scale(1.02, .95); animation-timing-function: var(--ease-out, cubic-bezier(.23,1,.32,1)); }
-  92% { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .972), -3px, 0) rotate(calc(var(--punt-rest-angle) - 40deg)) scale(1); }
-  96% { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .987), 7px, 0) rotate(calc(var(--punt-rest-angle) - 15deg)) scale(1.01, .97); }
-  100% { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish)), 7px, 0) rotate(calc(var(--punt-rest-angle) + var(--punt-wobble))) scale(1); }
+@keyframes punt-forward {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish)), 0, 0); }
 }
-@keyframes punt-shadow-track {
-  0%, 4% { opacity: .55; transform: translate3d(0, 0, 0) scale(1); }
-  23% { opacity: .3; transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .27), 0, 0) scale(.72); }
-  43% { opacity: .18; transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .58), 0, 0) scale(.48); }
-  58% { opacity: .36; transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .78), 0, 0) scale(.8); }
-  63% { opacity: .68; transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .82), 0, 0) scale(1.08); }
-  70% { opacity: .35; transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .865), 0, 0) scale(.76); }
-  76% { opacity: .62; transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .9), 0, 0) scale(1); }
-  82% { opacity: .42; transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .93), 0, 0) scale(.84); }
-  87% { opacity: .62; transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .953), 0, 0) scale(1); }
-  92% { opacity: .5; transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .972), 0, 0) scale(.92); }
-  96% { opacity: .62; transform: translate3d(calc((100cqw - 54px) * var(--punt-finish) * .987), 0, 0) scale(1); }
-  100% { opacity: .62; transform: translate3d(calc((100cqw - 54px) * var(--punt-finish)), 0, 0) scale(1); }
+@keyframes punt-height {
+  0% { transform: translate3d(0, 7px, 0) scale(.98); animation-timing-function: var(--ease-out, cubic-bezier(.23,1,.32,1)); }
+  8% { transform: translate3d(0, -10px, 0) scale(1.03); animation-timing-function: cubic-bezier(.22,.61,.36,1); }
+  23% { transform: translate3d(0, calc(-25px - var(--punt-bounce) + var(--punt-arc-offset)), 0) scale(1); }
+  43% { transform: translate3d(0, calc(-42px - var(--punt-bounce) * 1.4 + var(--punt-arc-offset)), 0) scale(1); animation-timing-function: cubic-bezier(.55,.06,.68,.19); }
+  58% { transform: translate3d(0, calc(-13px - var(--punt-bounce) * .5), 0) scale(1); }
+  63% { transform: translate3d(0, 8px, 0) scale(1.04, .96); animation-timing-function: var(--ease-out, cubic-bezier(.23,1,.32,1)); }
+  70% { transform: translate3d(0, calc(-15px - var(--punt-bounce) * .7), 0) scale(.98, 1.03); animation-timing-function: cubic-bezier(.55,.06,.68,.19); }
+  76% { transform: translate3d(0, 7px, 0) scale(1.03, .96); animation-timing-function: var(--ease-out, cubic-bezier(.23,1,.32,1)); }
+  82% { transform: translate3d(0, -8px, 0) scale(1); animation-timing-function: cubic-bezier(.55,.06,.68,.19); }
+  87% { transform: translate3d(0, 7px, 0) scale(1.02, .97); animation-timing-function: var(--ease-out, cubic-bezier(.23,1,.32,1)); }
+  92% { transform: translate3d(0, -3px, 0) scale(1); animation-timing-function: cubic-bezier(.55,.06,.68,.19); }
+  96% { transform: translate3d(0, 7px, 0) scale(1.01, .98); }
+  100% { transform: translate3d(0, 7px, 0) scale(1); }
+}
+@keyframes punt-spin {
+  from { transform: rotate(-9deg); }
+  to { transform: rotate(calc(var(--punt-rest-angle) + var(--punt-wobble))); }
+}
+@keyframes punt-shadow-forward {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(calc((100cqw - 54px) * var(--punt-finish)), 0, 0); }
+}
+@keyframes punt-shadow-height {
+  0%, 4% { opacity: .55; transform: scale(1); }
+  23% { opacity: .3; transform: scale(.72); }
+  43% { opacity: .18; transform: scale(.48); }
+  58% { opacity: .36; transform: scale(.8); }
+  63% { opacity: .68; transform: scale(1.08); }
+  70% { opacity: .35; transform: scale(.76); }
+  76% { opacity: .62; transform: scale(1); }
+  82% { opacity: .42; transform: scale(.84); }
+  87% { opacity: .62; transform: scale(1); }
+  92% { opacity: .5; transform: scale(.92); }
+  96%, 100% { opacity: .62; transform: scale(1); }
 }
 @keyframes punt-kick-flash {
   0%, 3% { opacity: 0; transform: scale(.9); }
@@ -689,7 +702,10 @@
   .dash-runner,
   .plinko-token,
   .punt-ball,
+  .punt-ball-height,
+  .punt-ball-spin,
   .punt-ball-shadow,
+  .punt-ball-shadow > b,
   .punt-kick-flash,
   .punt-impact-mark b,
   .dash-finish-rank { animation-duration: 1ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; }

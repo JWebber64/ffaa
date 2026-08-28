@@ -30,4 +30,15 @@ describe("draft order state machine", () => {
     expect(draftOrderShowdownReducer(one, { type: "choose-game" }).phase).toBe("setup");
   });
 
+  it("resets every showdown state to a clean setup", () => {
+    const populated = {
+      ...INITIAL_SHOWDOWN_STATE,
+      phase: "running" as const,
+      participants,
+      accepted: true,
+    };
+
+    expect(draftOrderShowdownReducer(populated, { type: "reset" })).toEqual(INITIAL_SHOWDOWN_STATE);
+  });
+
 });

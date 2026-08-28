@@ -48,7 +48,7 @@ export default function PuntBounceRenderer(props: ShowdownRendererProps) {
     <section className="showdown-game showdown-punt" aria-labelledby="punt-title">
       <header className="showdown-game-header punt-game-header">
         <div><span>Saturday night field test</span><h2 id="punt-title">Punt Bounce</h2></div>
-        <strong>{reducedMotion ? "Static distance reveal" : "Flight, bounce, roll, stop"}</strong>
+        <strong>{reducedMotion ? "Static distance reveal" : "Continuous flight and bounce"}</strong>
       </header>
 
       <div className="punt-stadium">
@@ -84,9 +84,9 @@ export default function PuntBounceRenderer(props: ShowdownRendererProps) {
                   <span className="punt-flight-path" aria-hidden="true">
                     <i className="punt-kick-spot" />
                     <i className="punt-kick-flash"><b /><b /><b /></i>
-                    <i className="punt-ball-shadow" />
+                    <i className="punt-ball-shadow"><b /></i>
                     <i className="punt-impact-mark"><b /><b /><b /></i>
-                    <span className="punt-ball"><BroadcastFootball participant={participant} /></span>
+                    <span className="punt-ball"><span className="punt-ball-height"><span className="punt-ball-spin"><BroadcastFootball participant={participant} /></span></span></span>
                     {resting ? (
                       <em className="punt-result-badge">
                         <small>{cue.rank === 0 ? "Longest punt" : `Pick ${cue.rank + 1}`}</small>

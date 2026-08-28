@@ -118,9 +118,11 @@ afterEach(() => {
 describe("Draft Order Showdown UI", () => {
   it("supports pasted manual entry, editable stable participants, game selection, and immediate countdown", async () => {
     renderShowdown();
+    expect(screen.getByRole("button", { name: "Reset" })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Manager or team names"), { target: { value: Array.from({ length: 8 }, (_, index) => `Team ${index + 1}`).join("\n") } });
     fireEvent.click(screen.getByRole("button", { name: "Add names" }));
     fireEvent.click(screen.getByRole("button", { name: "Choose game" }));
+    expect(screen.getByRole("button", { name: "Reset" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /100-Yard Draft Dash/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Football Plinko/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Punt Bounce/ })).toBeInTheDocument();
@@ -128,6 +130,7 @@ describe("Draft Order Showdown UI", () => {
     expect(screen.queryByText("Fumble-Pile Reveal")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Start Showdown" }));
     expect(await screen.findByLabelText("Showdown countdown")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reset" })).toBeInTheDocument();
     expect(screen.queryByLabelText("Manager or team names")).not.toBeInTheDocument();
     expect(screen.queryByText("Commitment hash")).not.toBeInTheDocument();
     expect(screen.getByText("Draw 1")).toBeInTheDocument();
@@ -154,6 +157,18 @@ describe("Draft Order Showdown UI", () => {
     expect(screen.getByText("3")).toBeInTheDocument();
     expect(screen.getByText("Draw 1")).toBeInTheDocument();
   }, 10_000);
+
+  it("resets a completed draw back to empty setup and clears its active record", async () => {
+    await seedResults();
+    renderShowdown();
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+
+    expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining("Reset Draft Order Showdown"));
+    expect(screen.getByLabelText("Manager or team names")).toHaveValue("");
+    expect(screen.queryByText(/owns the first pick/)).not.toBeInTheDocument();
+    expect(window.localStorage.getItem("ffaa.draftOrder.active.v1")).toBeNull();
+  });
 
   it("rejects unauthorized official application in the result UI", async () => {
     await seedResults(roomContext(false));
@@ -187,5 +202,6 @@ describe("Draft Order Showdown UI", () => {
     expect(await screen.findByText(/owns the first pick/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Generate New Order" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Replay Animation" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reset" })).toBeInTheDocument();
   });
 });

@@ -1,4 +1,4 @@
-import { Check, Clipboard, Link2, Play, RefreshCw, Save, Send, ShieldCheck } from "lucide-react";
+import { Check, Clipboard, Link2, Play, RefreshCw, RotateCcw, Save, Send, ShieldCheck } from "lucide-react";
 import { Button } from "../../ui/Button";
 import { ParticipantMark } from "./renderers/shared";
 import { VerificationPanel } from "./VerificationPanel";
@@ -24,6 +24,7 @@ export function ResultPanel({
   onShare,
   onReplay,
   onReroll,
+  onReset,
   onChangeMode,
   onVerify,
   onCopyHash,
@@ -40,6 +41,7 @@ export function ResultPanel({
   onShare: () => void;
   onReplay: () => void;
   onReroll: () => void;
+  onReset: () => void;
   onChangeMode: (mode: DraftOrderMode) => void;
   onVerify: () => void;
   onCopyHash: () => void;
@@ -92,6 +94,7 @@ export function ResultPanel({
           <Button variant="ghost" onClick={onCopy}><Clipboard size={16} aria-hidden="true" /> Copy Order</Button>
           <Button variant="ghost" onClick={onReplay}><Play size={16} aria-hidden="true" /> Replay Animation</Button>
           {!readOnly ? <Button variant="ghost" onClick={onReroll}><RefreshCw size={16} aria-hidden="true" /> Generate New Order</Button> : null}
+          <Button variant="ghost" onClick={onReset}><RotateCcw size={16} aria-hidden="true" /> Reset</Button>
         </div>
       </div>
       {applyReason && !readOnly ? <p className="results-action-note">{applyReason}</p> : null}
