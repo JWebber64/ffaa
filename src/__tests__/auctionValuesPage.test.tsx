@@ -43,6 +43,7 @@ describe("Auction Values page", () => {
     expect(screen.getByLabelText("Fair Value source model")).toHaveTextContent("5 publishers");
     expect(screen.getByLabelText("Fair Value source model")).toHaveTextContent("Vegas (WinWithOdds)");
     expect(screen.getByLabelText("Fair Value source model")).toHaveTextContent("6 publisher votes");
+    expect(screen.getByRole("button", { name: "FLEX" })).toHaveAttribute("aria-pressed", "false");
   }, 15_000);
 
   it("restores scoring, budget, league size, source selection, search, and position from the URL", () => {

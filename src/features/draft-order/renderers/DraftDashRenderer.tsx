@@ -39,7 +39,7 @@ export default function DraftDashRenderer(props: ShowdownRendererProps) {
         <div className="dash-finish-line" aria-hidden="true"><span>FINISH</span></div>
       </div>
       <LockedResultList draw={draw} revealed={revealed} />
-      <span className="sr-only">{participants.size} managers are racing. The visual finish cannot change the locked result.</span>
+      <span className="sr-only">{participants.size} managers are racing toward the finish line.</span>
     </section>
   );
 }

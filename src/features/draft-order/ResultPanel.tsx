@@ -94,7 +94,7 @@ export function ResultPanel({
       {actionStatus ? <p className="results-action-status" role="status">{actionStatus}</p> : null}
 
       <section className="alternate-reveal" aria-labelledby="alternate-reveal-title">
-        <div><span>Same seed. Same result.</span><h3 id="alternate-reveal-title">Choose another reveal using this order</h3></div>
+        <div><span>Run it back</span><h3 id="alternate-reveal-title">Watch this order with another game</h3></div>
         <div>{DRAFT_ORDER_MODES.filter((mode) => mode !== draw.mode).map((mode) => <Button size="sm" variant="ghost" onClick={() => onChangeMode(mode)} key={mode}>{MODE_LABELS[mode]}</Button>)}</div>
       </section>
     </section>

@@ -1,4 +1,4 @@
-import { CheckCircle2, LockKeyhole, RotateCcw, ShieldCheck, Volume2, VolumeX } from "lucide-react";
+import { CheckCircle2, RotateCcw, Trophy, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AppStateScreen } from "../../components/AppStateScreen";
@@ -35,7 +35,7 @@ import {
   persistActiveShowdownState,
 } from "./showdownMachine";
 import { useShowdownAudio } from "./useShowdownAudio";
-import type { DraftOrderMode, DraftOrderVerification } from "./types";
+import { MODE_LABELS, type DraftOrderMode, type DraftOrderVerification } from "./types";
 import "./draft-order.css";
 
 async function copyText(value: string) {
@@ -185,7 +185,7 @@ export default function DraftOrderShowdown() {
       const animationPlan = await createDraftOrderAnimationPlan(draw);
       dispatch({ type: "lock", draw, animationPlan });
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "The draw could not be locked.");
+      setNotice(error instanceof Error ? error.message : "The showdown could not be started.");
     } finally {
       setBusy(false);
     }
@@ -268,7 +268,7 @@ export default function DraftOrderShowdown() {
   const handleReroll = useCallback(async () => {
     if (!state.draw) return;
     const confirmed = window.confirm(
-      `${state.accepted ? "This draw has already been applied. " : ""}Generate a completely new order with a new secure seed? This is Draw ${state.draw.rerollIndex + 2}, not a replay.`,
+      `${state.accepted ? "This draw has already been applied. " : ""}Generate a completely new order? This is Draw ${state.draw.rerollIndex + 2}, not a replay.`,
     );
     if (!confirmed) return;
     setBusy(true);
@@ -321,7 +321,7 @@ export default function DraftOrderShowdown() {
   return (
     <div className="draft-order-page">
       <header className="draft-order-hero">
-        <div className="draft-order-hero-copy"><span className="draft-order-eyebrow">GameHQ presents</span><h1 className="ff-display">Draft Order Showdown</h1><p>Let football decide your draft order.</p><div className="draft-order-trust"><ShieldCheck aria-hidden="true" /><span><strong>Verifiable before kickoff.</strong> Secure seed. Locked result. Animation-only reveal.</span></div></div>
+        <div className="draft-order-hero-copy"><span className="draft-order-eyebrow">GameHQ presents</span><h1 className="ff-display">Draft Order Showdown</h1><p>Let football decide your draft order.</p><div className="draft-order-trust"><Trophy aria-hidden="true" /><span><strong>Built for draft night.</strong> Three football games. One league-wide reveal.</span></div></div>
         <div className="draft-order-hero-side">
           <img src={appUrl("images/draft-room-editorial.png")} alt="A fantasy football draft board prepared under stadium lights." width="1672" height="941" />
           <div className="draft-order-scorebug"><span>SHOWDOWN</span><strong>{state.draw ? `DRAW ${state.draw.rerollIndex + 1}` : `${state.participants.length || 0} MANAGERS`}</strong><button type="button" onClick={() => setMuted(!muted)} aria-label={muted ? "Enable showdown sound" : "Mute showdown sound"}>{muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}<span>{muted ? "Sound off" : "Sound on"}</span></button></div>
@@ -330,7 +330,7 @@ export default function DraftOrderShowdown() {
 
       <div className="showdown-progress-shell">
         <nav className="showdown-progress" aria-label="Draft order progress">
-          {["Setup", "Choose Game", "Order Locked", "Reveal", "Results"].map((label, index) => {
+          {["Setup", "Choose Game", "Ready", "Kickoff", "Results"].map((label, index) => {
             const phaseIndex = state.phase === "setup" ? 0 : state.phase === "choose-game" ? 1 : state.phase === "locked" ? 2 : state.phase === "countdown" || state.phase === "running" ? 3 : 4;
             return <span className={phaseIndex === index ? "is-current" : phaseIndex > index ? "is-complete" : ""} aria-current={phaseIndex === index ? "step" : undefined} key={label}>{phaseIndex > index ? <CheckCircle2 aria-hidden="true" /> : <i>{index + 1}</i>}{label}</span>;
           })}
@@ -351,16 +351,16 @@ export default function DraftOrderShowdown() {
 
       {state.phase === "locked" && state.draw ? (
         <section className="order-locked-panel" aria-labelledby="order-locked-title">
-          <LockKeyhole aria-hidden="true" /><span>Order Locked</span><h2 id="order-locked-title">The result exists before the animation starts.</h2><p>Commitment hash</p><code>{state.draw.verificationHash}</code><dl><div><dt>Draw</dt><dd>{state.draw.rerollIndex + 1}</dd></div><div><dt>Managers</dt><dd>{state.draw.participants.length}</dd></div><div><dt>Algorithm</dt><dd>{state.draw.algorithmVersion}</dd></div></dl><Button size="lg" onClick={() => dispatch({ type: "begin-countdown" })}>Begin 3–2–1 Countdown</Button>
+          <Trophy aria-hidden="true" /><span>Ready to play</span><h2 id="order-locked-title">Your showdown is ready.</h2><p>Get everyone watching, then start the countdown.</p><dl><div><dt>Draw</dt><dd>{state.draw.rerollIndex + 1}</dd></div><div><dt>Managers</dt><dd>{state.draw.participants.length}</dd></div><div><dt>Game</dt><dd>{MODE_LABELS[state.draw.mode]}</dd></div></dl><Button size="lg" onClick={() => dispatch({ type: "begin-countdown" })}>Begin 3–2–1 Countdown</Button>
         </section>
       ) : null}
 
-      {state.phase === "countdown" ? <section className="showdown-countdown" role="status" aria-live="assertive"><span>Order locked</span><strong>{state.countdown || "GO"}</strong><p>Kickoff is only revealing the committed result.</p></section> : null}
+      {state.phase === "countdown" ? <section className="showdown-countdown" role="status" aria-live="assertive"><span>Game time</span><strong>{state.countdown || "GO"}</strong><p>Who gets the first pick?</p></section> : null}
 
       {state.phase === "running" && state.draw && state.animationPlan ? (
         <section className="showdown-running-shell">
           <div className="showdown-running-controls">
-            <span><LockKeyhole aria-hidden="true" /> Result locked · {state.draw.verificationHash.slice(0, 14)}…</span>
+            <span><Trophy aria-hidden="true" /> {MODE_LABELS[state.draw.mode]} in progress</span>
             <div className="showdown-running-actions">
               <Button size="sm" variant="secondary" onClick={handleStartOver}><RotateCcw aria-hidden="true" /> Start Over</Button>
               <Button size="sm" variant="secondary" onClick={handleSkip}>Skip Animation</Button>

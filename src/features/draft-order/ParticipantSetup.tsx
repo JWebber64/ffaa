@@ -81,19 +81,22 @@ export function ParticipantSetup({
         </article>
       </div>
 
-      <div className="participant-roster-heading"><div><strong>Participants</strong><span>{participants.length} locked seats when the draw begins</span></div><Button size="sm" variant="ghost" onClick={() => onChange([...participants, manualParticipant(`Manager ${participants.length + 1}`, participants.length)])}><Plus size={15} aria-hidden="true" /> Add manager</Button></div>
+      <div className="participant-roster-heading"><div><strong>Participants</strong><span>{participants.length} managers entered</span></div><Button size="sm" variant="ghost" onClick={() => onChange([...participants, manualParticipant(`Manager ${participants.length + 1}`, participants.length)])}><Plus size={15} aria-hidden="true" /> Add manager</Button></div>
       {participants.length ? (
-        <ol className="participant-editor-list">
-          {participants.map((participant, index) => (
-            <li key={participant.id}>
-              <span className="participant-seat">{index + 1}</span>
-              <label><span>Manager</span><input value={participant.managerName} onChange={(event) => updateParticipant(participant.id, "managerName", event.target.value)} /></label>
-              <label><span>Team</span><input value={participant.teamName} onChange={(event) => updateParticipant(participant.id, "teamName", event.target.value)} /></label>
-              <span className="participant-source">{participant.source === "draft-room" ? "GameHQ room" : participant.source === "sleeper" ? "Sleeper" : "Manual"}</span>
-              <button type="button" className="participant-remove" onClick={() => onChange(participants.filter((entry) => entry.id !== participant.id))} aria-label={`Remove ${participant.teamName || participant.managerName}`}><Trash2 size={16} aria-hidden="true" /></button>
-            </li>
-          ))}
-        </ol>
+        <div className="participant-editor-table">
+          <div className="participant-editor-header" aria-hidden="true"><span>Seat</span><span>Manager</span><span>Team</span><span>Source</span><span /></div>
+          <ol className="participant-editor-list">
+            {participants.map((participant, index) => (
+              <li key={participant.id}>
+                <span className="participant-seat">{index + 1}</span>
+                <label><span className="participant-field-label">Manager</span><input value={participant.managerName} onChange={(event) => updateParticipant(participant.id, "managerName", event.target.value)} /></label>
+                <label><span className="participant-field-label">Team</span><input value={participant.teamName} onChange={(event) => updateParticipant(participant.id, "teamName", event.target.value)} /></label>
+                <span className="participant-source">{participant.source === "draft-room" ? "GameHQ room" : participant.source === "sleeper" ? "Sleeper" : "Manual"}</span>
+                <button type="button" className="participant-remove" onClick={() => onChange(participants.filter((entry) => entry.id !== participant.id))} aria-label={`Remove ${participant.teamName || participant.managerName}`}><Trash2 size={16} aria-hidden="true" /></button>
+              </li>
+            ))}
+          </ol>
+        </div>
       ) : <div className="participant-empty"><Users aria-hidden="true" /><strong>No managers yet</strong><span>Import a league or add one name per line to begin.</span></div>}
       <footer className="showdown-panel-actions">
         <span className="participant-support-note">Built for 8, 10, 12, 14, and 16 managers; the engine supports any unique set from 2–32.</span>

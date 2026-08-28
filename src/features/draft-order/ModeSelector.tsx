@@ -1,4 +1,4 @@
-import { ArrowLeft, LockKeyhole } from "lucide-react";
+import { ArrowLeft, Play } from "lucide-react";
 import { Button } from "../../ui/Button";
 import { ModeArtwork } from "./ModeArtwork";
 import {
@@ -20,7 +20,7 @@ export function ModeSelector({ selectedMode, onSelect, onBack, onLock, busy }: {
     <section className="showdown-panel mode-selector-panel" aria-labelledby="mode-selector-title">
       <header className="showdown-section-heading">
         <div><span>Step 2 · Choose game</span><h2 id="mode-selector-title">How should football reveal it?</h2></div>
-        <p>The mode changes the presentation only. The same seed and participants always reproduce the same order.</p>
+        <p>Pick the game that feels right for your league, then bring everyone together for the countdown.</p>
       </header>
       <div className="mode-card-grid" role="group" aria-label="Draft order reveal game">
         {DRAFT_ORDER_MODES.map((mode) => (
@@ -39,7 +39,7 @@ export function ModeSelector({ selectedMode, onSelect, onBack, onLock, busy }: {
       </div>
       <footer className="showdown-panel-actions">
         <Button variant="ghost" onClick={onBack}><ArrowLeft size={16} aria-hidden="true" /> Edit managers</Button>
-        <Button onClick={onLock} isLoading={busy}><LockKeyhole size={16} aria-hidden="true" /> Lock order</Button>
+        <Button onClick={onLock} isLoading={busy}><Play size={16} aria-hidden="true" /> Start Showdown</Button>
       </footer>
     </section>
   );

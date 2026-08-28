@@ -1,3 +1,4 @@
+import { DEFAULT_DRAFT_ORDER_MODE, normalizeDraftOrderMode } from "./types";
 import type {
   DraftOrderAnimationPlan,
   DraftOrderDrawRecord,
@@ -23,7 +24,7 @@ export interface DraftOrderShowdownState {
 export const INITIAL_SHOWDOWN_STATE: DraftOrderShowdownState = {
   phase: "setup",
   participants: [],
-  selectedMode: "draft-dash",
+  selectedMode: DEFAULT_DRAFT_ORDER_MODE,
   draw: null,
   animationPlan: null,
   countdown: 3,
@@ -147,7 +148,13 @@ export function loadActiveShowdownState() {
     if (!parsed || typeof parsed !== "object") return null;
     const state = parsed as DraftOrderShowdownState;
     if (!state.draw || !Array.isArray(state.participants) || !state.animationPlan) return null;
-    return state;
+    const mode = normalizeDraftOrderMode(state.draw.mode);
+    return {
+      ...state,
+      selectedMode: mode,
+      draw: { ...state.draw, mode },
+      animationPlan: { ...state.animationPlan, mode },
+    };
   } catch {
     return null;
   }

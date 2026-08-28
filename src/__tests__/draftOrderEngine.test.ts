@@ -6,7 +6,11 @@ import {
   createSecureSeed,
   verifyDraftOrderDraw,
 } from "../features/draft-order/draftOrderEngine";
-import type { DraftOrderParticipant } from "../features/draft-order/types";
+import {
+  DRAFT_ORDER_MODES,
+  normalizeDraftOrderMode,
+  type DraftOrderParticipant,
+} from "../features/draft-order/types";
 
 const SEED_A = "AAECAwQFBgcICQoLDA0ODw";
 const SEED_B = "Dw4NDAsKCQgHBgUEAwIBAA";
@@ -22,6 +26,11 @@ function participants(count: number): DraftOrderParticipant[] {
 }
 
 describe("draft-order draw engine", () => {
+  it("offers only the three supported reveal games", () => {
+    expect(DRAFT_ORDER_MODES).toEqual(["draft-dash", "football-plinko", "punt-bounce"]);
+    expect(normalizeDraftOrderMode("retired-mode")).toBe("draft-dash");
+  });
+
   it("reproduces the same order from the same seed and ordered participant snapshot", async () => {
     const input = {
       participants: participants(12),
@@ -55,7 +64,7 @@ describe("draft-order draw engine", () => {
 
   it("changes reveal mode without changing the locked result", async () => {
     const draw = await createDraftOrderDraw({ participants: participants(10), mode: "draft-dash", masterSeed: SEED_A });
-    const changed = await changeDraftOrderRevealMode(draw, "helmet-shuffle");
+    const changed = await changeDraftOrderRevealMode(draw, "football-plinko");
     expect(changed.masterSeed).toBe(draw.masterSeed);
     expect(changed.finalParticipantIds).toEqual(draw.finalParticipantIds);
     expect(changed.verificationHash).toBe(draw.verificationHash);
@@ -70,6 +79,14 @@ describe("draft-order draw engine", () => {
     expect(draw.rerollIndex).toBe(0);
   });
 
+  it("keeps Draft Dash moving continuously while finish timing follows the locked rank", async () => {
+    const draw = await createDraftOrderDraw({ participants: participants(12), mode: "draft-dash", masterSeed: SEED_A });
+    const plan = await createDraftOrderAnimationPlan(draw);
+    const byRank = [...plan.cues].sort((left, right) => left.rank - right.rank);
+    expect(byRank[0]!.durationMs).toBeLessThan(byRank.at(-1)!.durationMs);
+    expect(plan.totalDurationMs).toBeLessThan(7_000);
+  });
+
   it("rerolling creates a new seed and visible draw index", async () => {
     const seed = createSecureSeed();
     const nextSeed = createSecureSeed();
@@ -81,7 +98,7 @@ describe("draft-order draw engine", () => {
   });
 
   it("verifies an unchanged record and rejects result tampering", async () => {
-    const draw = await createDraftOrderDraw({ participants: participants(14), mode: "fumble-pile", masterSeed: SEED_A });
+    const draw = await createDraftOrderDraw({ participants: participants(14), mode: "punt-bounce", masterSeed: SEED_A });
     expect((await verifyDraftOrderDraw(draw)).valid).toBe(true);
     const tampered = {
       ...draw,

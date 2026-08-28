@@ -147,6 +147,8 @@ Desktop pages should use the available shared content width. At a 900px-tall des
 
 Group by proximity before adding another card. Use the compact spacing roles for card padding and related groups, the section role between separate tasks, and the page role only between page chapters. Repeated cards in one row may match height, but one card must not force unrelated rows or sections to reserve empty space.
 
+Repeated editable data belongs in one compact list or table shell. On desktop, use shared column headers, single-line controls, and row dividers; do not turn every record into a padded card or repeat the same visible field labels in every row. Once brought into view, an ordinary 10-12-row editor should fit inside a 900px-tall desktop viewport. Preserve explicit labels and full-size controls when the layout stacks on mobile.
+
 ## Do's and Don'ts
 
 - Do use a full perimeter border when color identifies a position or state.
@@ -160,6 +162,7 @@ Group by proximity before adding another card. Use the compact spacing roles for
 - Do use the named display, page, section, panel, and card density roles.
 - Do keep page heroes and ordinary cards at natural height.
 - Do verify the first useful follow-up content appears in a 900px-tall desktop viewport.
+- Do use one compact list or table shell for repeated editable records on desktop.
 - Do not use blue, cyan, teal, or navy-blue for any interface element.
 - Do not sample an official team or editorial-image color into interface chrome.
 - Do not create an orange or page-local primary-action color.
@@ -169,3 +172,4 @@ Group by proximity before adding another card. Use the compact spacing roles for
 - Do not expose browser-native number arrows or omit the shared stepper from an editable number field.
 - Do not use oversized viewport-relative headings as the primary source of hierarchy.
 - Do not add empty height, padding, or spacer elements to make a page feel more important.
+- Do not wrap every repeated data row in its own padded card or repeat identical desktop field labels row after row.

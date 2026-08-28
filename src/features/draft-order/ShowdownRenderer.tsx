@@ -6,14 +6,12 @@ const renderers: Record<DraftOrderMode, React.LazyExoticComponent<React.Componen
   "draft-dash": lazy(() => import("./renderers/DraftDashRenderer")),
   "football-plinko": lazy(() => import("./renderers/FootballPlinkoRenderer")),
   "punt-bounce": lazy(() => import("./renderers/PuntBounceRenderer")),
-  "fumble-pile": lazy(() => import("./renderers/FumblePileRenderer")),
-  "helmet-shuffle": lazy(() => import("./renderers/HelmetShuffleRenderer")),
 };
 
 export function ShowdownRenderer(props: ShowdownRendererProps) {
   const Renderer = renderers[props.draw.mode];
   return (
-    <Suspense fallback={<div className="showdown-renderer-loading" role="status">Opening the locked reveal…</div>}>
+    <Suspense fallback={<div className="showdown-renderer-loading" role="status">Taking the field…</div>}>
       <Renderer {...props} />
     </Suspense>
   );

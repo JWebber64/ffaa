@@ -4,9 +4,15 @@ import { appUrl } from "../../lib/appBasePath";
 import { firestore } from "../../lib/firebase";
 import { isLocalMultiplayerMode } from "../../multiplayer/localMode";
 import { createSecureSeed } from "./draftOrderEngine";
-import type { DraftOrderDrawRecord } from "./types";
+import { normalizeDraftOrderMode, type DraftOrderDrawRecord } from "./types";
 
 const SAVED_DRAWS_KEY = "ffaa.draftOrder.saved.v1";
+
+function normalizeLoadedDraw(value: unknown): DraftOrderDrawRecord | null {
+  if (!value || typeof value !== "object") return null;
+  const draw = value as DraftOrderDrawRecord & { mode?: unknown };
+  return { ...draw, mode: normalizeDraftOrderMode(draw.mode) };
+}
 
 function encodePortableRecord(draw: DraftOrderDrawRecord) {
   const bytes = new TextEncoder().encode(JSON.stringify(draw));
@@ -19,7 +25,9 @@ function decodePortableRecord(value: string) {
   const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
   const binary = atob(padded);
   const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-  return JSON.parse(new TextDecoder().decode(bytes)) as DraftOrderDrawRecord;
+  const draw = normalizeLoadedDraw(JSON.parse(new TextDecoder().decode(bytes)) as unknown);
+  if (!draw) throw new Error("This replay link does not contain a valid draw record.");
+  return draw;
 }
 
 function saveDrawLocally(draw: DraftOrderDrawRecord) {
@@ -32,7 +40,9 @@ export function loadSavedDraftOrderDraws(): DraftOrderDrawRecord[] {
   if (typeof window === "undefined") return [];
   try {
     const parsed = JSON.parse(window.localStorage.getItem(SAVED_DRAWS_KEY) ?? "[]") as unknown;
-    return Array.isArray(parsed) ? parsed as DraftOrderDrawRecord[] : [];
+    return Array.isArray(parsed)
+      ? parsed.map(normalizeLoadedDraw).filter((draw): draw is DraftOrderDrawRecord => Boolean(draw))
+      : [];
   } catch {
     return [];
   }
@@ -89,7 +99,7 @@ export async function loadSharedDraftOrderDraw(searchParams: URLSearchParams) {
     try {
       const snapshot = await getDoc(doc(firestore, "draftOrderShares", token));
       if (snapshot.exists()) {
-        const draw = snapshot.data().draw as DraftOrderDrawRecord | undefined;
+        const draw = normalizeLoadedDraw(snapshot.data().draw);
         if (draw) return draw;
       }
     } catch (error) {

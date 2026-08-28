@@ -38,8 +38,8 @@
   --color-surface-card-secondary: var(--gray-800);
   --color-surface-card-tertiary: color-mix(in oklch, var(--gray-800) 78%, var(--gray-700));
   --color-surface-overlay: color-mix(in oklch, var(--gray-800) 82%, var(--green-950));
-  --color-surface-field: color-mix(in oklch, var(--gray-900) 58%, var(--gray-800));
-  --color-surface-field-hover: var(--gray-800);
+  --color-surface-field: color-mix(in oklch, var(--green-950) 62%, var(--gray-800));
+  --color-surface-field-hover: color-mix(in oklch, var(--green-900) 46%, var(--gray-800));
   --color-surface-field-disabled: color-mix(in oklch, var(--gray-900) 82%, var(--gray-800));
   --color-surface-hover: color-mix(in oklch, var(--gray-800) 84%, var(--green-900));
   --color-surface-selected: color-mix(in oklch, var(--green-800) 42%, var(--gray-800));
@@ -145,14 +145,14 @@
   --glow-a2: color-mix(in oklch, var(--green-300) 24%, transparent);
   --glow-a3: color-mix(in oklch, var(--a3) 22%, transparent);
 
-  /* Position identity stays inside the approved green and gray ramps. */
-  --pos-qb: var(--green-700);
-  --pos-rb: var(--green-500);
-  --pos-wr: var(--green-300);
-  --pos-te: var(--green-600);
-  --pos-flex: var(--green-200);
-  --pos-k: var(--gray-300);
-  --pos-dst: var(--gray-600);
+  /* Position identity is a semantic exception: each role keeps its established color. */
+  --pos-qb: #dc2626;
+  --pos-rb: #16a34a;
+  --pos-wr: #2563eb;
+  --pos-te: #ea580c;
+  --pos-flex: #0891b2;
+  --pos-k: #9333ea;
+  --pos-dst: #4b5563;
   --pos-bench: var(--gray-500);
 
   /* IDP and reserve roles reuse darker approved shades. */

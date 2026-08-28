@@ -4,11 +4,21 @@ export const DRAFT_ORDER_MODES = [
   "draft-dash",
   "football-plinko",
   "punt-bounce",
-  "fumble-pile",
-  "helmet-shuffle",
 ] as const;
 
 export type DraftOrderMode = (typeof DRAFT_ORDER_MODES)[number];
+
+export const DEFAULT_DRAFT_ORDER_MODE: DraftOrderMode = "draft-dash";
+
+const DRAFT_ORDER_MODE_SET = new Set<string>(DRAFT_ORDER_MODES);
+
+export function isDraftOrderMode(value: unknown): value is DraftOrderMode {
+  return typeof value === "string" && DRAFT_ORDER_MODE_SET.has(value);
+}
+
+export function normalizeDraftOrderMode(value: unknown): DraftOrderMode {
+  return isDraftOrderMode(value) ? value : DEFAULT_DRAFT_ORDER_MODE;
+}
 
 export type DraftOrderParticipantSource = "manual" | "sleeper" | "draft-room";
 
@@ -105,21 +115,15 @@ export const MODE_LABELS: Record<DraftOrderMode, string> = {
   "draft-dash": "100-Yard Draft Dash",
   "football-plinko": "Football Plinko",
   "punt-bounce": "Punt Bounce",
-  "fumble-pile": "Fumble-Pile Reveal",
-  "helmet-shuffle": "Helmet Shuffle",
 };
 export const MODE_DESCRIPTIONS: Record<DraftOrderMode, string> = {
-  "draft-dash": "Every manager races the full field, with each finish revealing the locked order.",
-  "football-plinko": "Team footballs ricochet through stadium pegs into their predetermined slots.",
-  "punt-bounce": "Farthest punt gets the first pick, with every final distance fixed before kickoff.",
-  "fumble-pile": "The pile gives up the order from the final pick to a dramatic first-pick reveal.",
-  "helmet-shuffle": "Shuffle the helmets, then reveal each already-assigned draft position.",
+  "draft-dash": "Every manager races the full field. First across the line gets the first pick.",
+  "football-plinko": "Team footballs ricochet through stadium pegs, with every landing claiming a draft slot.",
+  "punt-bounce": "The farthest punt wins the first pick while every bounce builds the suspense.",
 };
 
 export const MODE_REVEAL_STYLES: Record<DraftOrderMode, string> = {
   "draft-dash": "Live finish",
   "football-plinko": "Slot by slot",
   "punt-bounce": "Distance ranking",
-  "fumble-pile": "Last to first",
-  "helmet-shuffle": "Tap to reveal",
 };

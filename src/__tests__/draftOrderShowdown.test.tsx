@@ -69,8 +69,8 @@ async function pasteManagersAndLock() {
   fireEvent.change(screen.getByLabelText("Manager or team names"), { target: { value: Array.from({ length: 8 }, (_, index) => `Team ${index + 1}`).join("\n") } });
   fireEvent.click(screen.getByRole("button", { name: "Add names" }));
   fireEvent.click(screen.getByRole("button", { name: "Choose game" }));
-  fireEvent.click(screen.getByRole("button", { name: "Lock order" }));
-  await screen.findByText("The result exists before the animation starts.");
+  fireEvent.click(screen.getByRole("button", { name: "Start Showdown" }));
+  await screen.findByText("Your showdown is ready.");
 }
 
 async function seedResults(context: DraftRoomOrderContext | null = null) {
@@ -118,9 +118,18 @@ afterEach(() => {
 describe("Draft Order Showdown UI", () => {
   it("supports pasted manual entry, editable stable participants, game selection, and locking", async () => {
     renderShowdown();
-    await pasteManagersAndLock();
+    fireEvent.change(screen.getByLabelText("Manager or team names"), { target: { value: Array.from({ length: 8 }, (_, index) => `Team ${index + 1}`).join("\n") } });
+    fireEvent.click(screen.getByRole("button", { name: "Add names" }));
+    fireEvent.click(screen.getByRole("button", { name: "Choose game" }));
+    expect(screen.getByText("100-Yard Draft Dash")).toBeInTheDocument();
+    expect(screen.getByText("Football Plinko")).toBeInTheDocument();
+    expect(screen.getByText("Punt Bounce")).toBeInTheDocument();
+    expect(screen.queryByText("Helmet Shuffle")).not.toBeInTheDocument();
+    expect(screen.queryByText("Fumble-Pile Reveal")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Start Showdown" }));
+    await screen.findByText("Your showdown is ready.");
     expect(screen.queryByLabelText("Manager or team names")).not.toBeInTheDocument();
-    expect(screen.getByText("Commitment hash")).toBeInTheDocument();
+    expect(screen.queryByText("Commitment hash")).not.toBeInTheDocument();
     expect(screen.getByText("8", { selector: "dd" })).toBeInTheDocument();
   }, 10_000);
 
@@ -172,7 +181,7 @@ describe("Draft Order Showdown UI", () => {
     await waitFor(() => expect(adapterMocks.apply).toHaveBeenCalledWith(expect.objectContaining({ isHost: true }), expect.objectContaining({ id: firstDraw.id })));
     expect(await screen.findByRole("button", { name: "Applied to Draft Room" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "Generate New Order" }));
-    expect(await screen.findByText("The result exists before the animation starts.")).toBeInTheDocument();
+    expect(await screen.findByText("Your showdown is ready.")).toBeInTheDocument();
     expect(screen.getByText("2", { selector: "dd" })).toBeInTheDocument();
   });
 
@@ -190,7 +199,7 @@ describe("Draft Order Showdown UI", () => {
   });
 
   it("loads a shared replay as the exact read-only result without offering a reroll", async () => {
-    const draw = await createDraftOrderDraw({ participants: participants(), mode: "helmet-shuffle", masterSeed: "AAECAwQFBgcICQoLDA0ODw" });
+    const draw = await createDraftOrderDraw({ participants: participants(), mode: "football-plinko", masterSeed: "AAECAwQFBgcICQoLDA0ODw" });
     await createDraftOrderAnimationPlan(draw);
     persistenceMocks.loadShare.mockResolvedValue(draw);
     renderShowdown("/draft-order?share=token");

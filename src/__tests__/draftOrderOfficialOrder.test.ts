@@ -48,7 +48,7 @@ describe("official live-room order", () => {
         drawId: "draw",
         verificationHash: "hash",
         algorithmVersion: "gamehq-draft-order-v1",
-        mode: "helmet-shuffle",
+        mode: "football-plinko",
         appliedAt: "2026-08-27T00:00:00.000Z",
       },
     });

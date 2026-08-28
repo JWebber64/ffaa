@@ -32,7 +32,7 @@ function hueAndSaturation(red: number, green: number, blue: number) {
 }
 
 function prohibitedInterfaceColors(path: string) {
-  const source = readProjectFile(path);
+  const source = readProjectFile(path).replace(/^\s*--pos-[^:]+:.*$/gm, "");
   return [...source.matchAll(/#([0-9a-f]{6})\b|rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*[\d.]+)?\s*\)/gi)]
     .flatMap((match) => {
       const red = match[1] ? Number.parseInt(match[1].slice(0, 2), 16) : Number(match[2]);
@@ -81,23 +81,23 @@ describe("shared green and gray visual system", () => {
     expect(tokens).toContain("--gray-950:");
   });
 
-  it("uses only green and gray for football position identity", () => {
+  it("preserves the established semantic color for each football position", () => {
     const tokens = readProjectFile("src/styles/tokens.css");
     const positionAssignments = [
-      "--pos-qb: var(--green-700)",
-      "--pos-rb: var(--green-500)",
-      "--pos-wr: var(--green-300)",
-      "--pos-te: var(--green-600)",
-      "--pos-flex: var(--green-200)",
-      "--pos-k: var(--gray-300)",
-      "--pos-dst: var(--gray-600)",
+      "--pos-qb: #dc2626",
+      "--pos-rb: #16a34a",
+      "--pos-wr: #2563eb",
+      "--pos-te: #ea580c",
+      "--pos-flex: #0891b2",
+      "--pos-k: #9333ea",
+      "--pos-dst: #4b5563",
       "--pos-bench: var(--gray-500)",
     ];
 
     for (const assignment of positionAssignments) expect(tokens).toContain(assignment);
   });
 
-  it("does not allow blue, cyan, or teal literals in interface source", () => {
+  it("does not allow blue, cyan, or teal literals outside semantic position and team identity", () => {
     const exclusions = new Set(["src/data/nflTeamBrand.ts"]);
     const failures = sourceFiles("src")
       .filter((path) => !exclusions.has(path))

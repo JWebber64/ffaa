@@ -7,7 +7,7 @@ import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 import { formatLabel } from "./auctionValueData";
 import type { AuctionValueMode, ScoringFormat } from "./auctionValueTypes";
 
-const AUCTION_POSITION_OPTIONS = DEFAULT_POSITION_TOGGLE_OPTIONS.filter((option) => option.value !== "FLEX");
+const AUCTION_POSITION_OPTIONS = DEFAULT_POSITION_TOGGLE_OPTIONS;
 
 const SCORING_FORMATS: readonly ScoringFormat[] = ["standard", "half_ppr", "ppr"];
 
@@ -61,11 +61,11 @@ export function AuctionValueControls(props: Props) {
         </div>
         <label className="auction-field">
           <span>League size</span>
-          <NumericInput aria-label="League size" min={4} max={32} step={1} value={props.leagueSize} onChange={(event) => props.onLeagueSizeChange(Number(event.target.value) || 12)} />
+          <NumericInput aria-label="League size" className="ffaa-control" min={4} max={32} step={1} value={props.leagueSize} onChange={(event) => props.onLeagueSizeChange(Number(event.target.value) || 12)} />
         </label>
         <label className="auction-field">
           <span>Team budget</span>
-          <span className="auction-money-field"><b aria-hidden="true">$</b><NumericInput aria-label="Team auction budget" min={50} max={1000} step={1} value={props.budget} onChange={(event) => props.onBudgetChange(Number(event.target.value) || 200)} /></span>
+          <span className="auction-money-field"><b aria-hidden="true">$</b><NumericInput aria-label="Team auction budget" className="ffaa-control" min={50} max={1000} step={1} value={props.budget} onChange={(event) => props.onBudgetChange(Number(event.target.value) || 200)} /></span>
         </label>
         <label className="auction-field auction-search-field">
           <span>Player search</span>

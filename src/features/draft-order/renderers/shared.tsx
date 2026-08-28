@@ -107,7 +107,7 @@ export function LockedResultList({ draw, revealed }: {
           <li className={visible ? "is-revealed" : ""} key={id}>
             <span>{index + 1}</span>
             {visible ? <ParticipantMark participant={participant} compact /> : <i aria-hidden="true">—</i>}
-            <strong>{visible ? participant.teamName : "Position locked"}</strong>
+            <strong>{visible ? participant.teamName : "Waiting"}</strong>
           </li>
         );
       })}

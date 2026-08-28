@@ -131,7 +131,7 @@ function snapshotParticipant(participant: DraftOrderParticipant): DraftOrderPart
 }
 
 function validateParticipantSnapshot(participants: DraftOrderParticipantSnapshot[]) {
-  if (participants.length < 2) throw new Error("Add at least two managers before locking the draw.");
+  if (participants.length < 2) throw new Error("Add at least two managers to start the draw.");
   const ids = new Set<string>();
   for (const participant of participants) {
     if (!participant.id.trim()) throw new Error("Every participant needs a stable internal ID.");
@@ -244,18 +244,30 @@ export async function verifyDraftOrderDraw(draw: DraftOrderDrawRecord): Promise<
   }
 }
 
-function modeTiming(mode: DraftOrderMode, rank: number, total: number, jitter: number) {
+function modeTiming(mode: DraftOrderMode, sequenceIndex: number, total: number, jitter: number) {
   switch (mode) {
     case "draft-dash":
-      return { delayMs: 0, durationMs: 6_900 + rank * 220 + jitter, totalDurationMs: 10_800 };
-    case "football-plinko":
-      return { delayMs: 600 + rank * 430, durationMs: 2_100 + jitter, totalDurationMs: 10_200 };
-    case "punt-bounce":
-      return { delayMs: rank * 130, durationMs: 4_400 + jitter, totalDurationMs: 7_400 };
-    case "fumble-pile":
-      return { delayMs: (total - rank - 1) * 420 + 1_700, durationMs: 360, totalDurationMs: 9_400 };
-    case "helmet-shuffle":
-      return { delayMs: 0, durationMs: 2_800, totalDurationMs: 0 };
+      return {
+        delayMs: 0,
+        durationMs: 4_600 + sequenceIndex * 140 + jitter,
+        totalDurationMs: 4_600 + Math.max(0, total - 1) * 140 + 120 + 650,
+      };
+    case "football-plinko": {
+      const launchGap = Math.max(620, 860 - total * 20);
+      return {
+        delayMs: 420 + sequenceIndex * launchGap,
+        durationMs: 2_550 + jitter,
+        totalDurationMs: 420 + Math.max(0, total - 1) * launchGap + 2_670 + 620,
+      };
+    }
+    case "punt-bounce": {
+      const launchGap = Math.max(105, 190 - total * 3);
+      return {
+        delayMs: sequenceIndex * launchGap,
+        durationMs: 5_200 + jitter,
+        totalDurationMs: 5_200 + Math.max(0, total - 1) * launchGap + 900,
+      };
+    }
   }
 }
 
@@ -266,16 +278,31 @@ export async function createDraftOrderAnimationPlan(
   const animationSeed = base64UrlToBytes(await deriveSeed(draw.masterSeed, `animation:${mode}`));
   const stream = new DeterministicByteStream(animationSeed);
   const ranks = new Map(draw.finalParticipantIds.map((id, index) => [id, index]));
+  const sequenceIndexes = new Map(draw.participants.map((participant, index) => [participant.id, index]));
+
+  if (mode === "football-plinko") {
+    const launchSeed = base64UrlToBytes(await deriveSeed(draw.masterSeed, "animation:football-plinko:launch"));
+    const launchStream = new DeterministicByteStream(launchSeed);
+    const launchOrder = draw.participants.map((participant) => participant.id);
+    for (let index = launchOrder.length - 1; index > 0; index -= 1) {
+      const swapIndex = await launchStream.nextInt(index + 1);
+      const current = launchOrder[index]!;
+      launchOrder[index] = launchOrder[swapIndex]!;
+      launchOrder[swapIndex] = current;
+    }
+    launchOrder.forEach((participantId, index) => sequenceIndexes.set(participantId, index));
+  }
   const cues = [];
 
   for (const participant of draw.participants) {
     const rank = ranks.get(participant.id);
-    if (rank === undefined) throw new Error("Animation plan could not map the locked result.");
+    if (rank === undefined) throw new Error("Animation plan could not map the draw.");
     const jitter = await stream.nextInt(121);
     const drift = (await stream.nextInt(19)) - 9;
     const bounce = 2 + (await stream.nextInt(7));
     const pathVariant = await stream.nextInt(5);
-    const timing = modeTiming(mode, rank, draw.participants.length, jitter);
+    const timingIndex = mode === "draft-dash" ? rank : sequenceIndexes.get(participant.id) ?? rank;
+    const timing = modeTiming(mode, timingIndex, draw.participants.length, jitter);
     cues.push({
       participantId: participant.id,
       rank,

@@ -84,4 +84,18 @@ describe("shared layout density contract", () => {
     expect(design).toContain("Page heroes and cards use natural height.");
     expect(design).toContain("900px-tall desktop viewport");
   });
+
+  it("keeps repeated participant editing in one compact desktop list", () => {
+    const component = readProjectFile("src/features/draft-order/ParticipantSetup.tsx");
+    const styles = readProjectFile("src/features/draft-order/draft-order.css");
+    const design = readProjectFile("DESIGN.md");
+
+    expect(component).toContain('className="participant-editor-table"');
+    expect(component).toContain('className="participant-editor-header"');
+    expect(styles).toContain(".participant-editor-list li + li { border-top:");
+    expect(styles).toContain(".participant-editor-list input { width: 100%; min-height: 36px;");
+    expect(design).toContain("Repeated editable data belongs in one compact list or table shell.");
+    expect(design).toContain("do not turn every record into a padded card");
+    expect(design).toContain("ordinary 10-12-row editor should fit inside a 900px-tall desktop viewport");
+  });
 });
