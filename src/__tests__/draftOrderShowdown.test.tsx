@@ -116,6 +116,18 @@ afterEach(() => {
 });
 
 describe("Draft Order Showdown UI", () => {
+  it("uses production game artwork instead of placeholder diagrams", () => {
+    renderShowdown();
+    fireEvent.change(screen.getByLabelText("Manager or team names"), { target: { value: Array.from({ length: 8 }, (_, index) => `Team ${index + 1}`).join("\n") } });
+    fireEvent.click(screen.getByRole("button", { name: "Add names" }));
+    fireEvent.click(screen.getByRole("button", { name: "Choose game" }));
+
+    const artwork = screen.getAllByRole("img").filter((image) => image.closest(".mode-card-art"));
+    expect(artwork).toHaveLength(3);
+    expect(artwork[0]).toHaveAttribute("src", "/images/draft-order/draft-dash.jpg");
+    expect(document.querySelector(".mode-card-art svg")).not.toBeInTheDocument();
+  });
+
   it("supports pasted manual entry, editable stable participants, game selection, and locking", async () => {
     renderShowdown();
     fireEvent.change(screen.getByLabelText("Manager or team names"), { target: { value: Array.from({ length: 8 }, (_, index) => `Team ${index + 1}`).join("\n") } });

@@ -213,12 +213,9 @@
 
 .mode-card-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
 .mode-card { grid-column: span 2; display: grid; min-width: 0; overflow: hidden; padding: 0; border: 1px solid var(--color-border-default); border-radius: var(--r-lg); background: var(--color-surface-card-secondary); color: var(--color-text-primary); text-align: left; cursor: pointer; box-shadow: var(--shadow-control); }
-.mode-card-art { display: block; height: 132px; padding: 10px; background: linear-gradient(180deg, color-mix(in oklch, var(--green-900) 40%, var(--color-surface-card-tertiary)), var(--color-surface-card-secondary)); }
-.mode-card-art svg { width: 100%; height: 100%; fill: none; stroke: var(--green-200); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.mode-card-art svg rect { fill: color-mix(in oklch, var(--green-800) 44%, transparent); }
-.mode-card-art .art-ball { fill: var(--football-leather); stroke: var(--football-leather-light); }
-.mode-card-art .art-pegs { fill: var(--football-chalk-muted); stroke: none; }
-.mode-card-art .art-arc { stroke-dasharray: 6 7; }
+.mode-card-art { position: relative; display: block; height: clamp(132px, 9.5vw, 176px); overflow: hidden; background: var(--color-surface-card-tertiary); }
+.mode-card-art::after { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 52%, color-mix(in oklch, var(--color-surface-card-secondary) 62%, transparent)); box-shadow: inset 0 -1px 0 var(--color-border-subtle); content: ""; pointer-events: none; }
+.mode-card-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: saturate(.88) contrast(1.04); }
 .mode-card-copy { display: grid; gap: 5px; min-height: 142px; padding: 14px; }
 .mode-card-copy small { color: var(--green-200); font-size: .67rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .mode-card-copy strong { font-size: 1.05rem; }
@@ -628,7 +625,7 @@
   .mode-card-grid { grid-template-columns: 1fr 1fr; }
   .mode-card { grid-column: auto; }
   .mode-card:last-child { grid-column: 1 / -1; }
-  .mode-card-art { height: 104px; }
+  .mode-card-art { height: 132px; }
   .mode-card-copy { min-height: 128px; padding: 11px; }
   .order-locked-panel dl { gap: 12px; }
   .showdown-running-controls { align-items: stretch; flex-direction: column; }
@@ -679,6 +676,7 @@
 @media (max-width: 390px) {
   .mode-card-grid { grid-template-columns: 1fr; }
   .mode-card:last-child { grid-column: auto; }
+  .mode-card-art { height: 152px; }
   .mode-card-copy { min-height: 0; }
   .showdown-live-order { grid-template-columns: 1fr 1fr; }
   .showdown-live-order li { grid-template-columns: 20px 24px minmax(0, 1fr); padding-inline: 4px; }
