@@ -29,20 +29,22 @@
   color: var(--text-primary);
 }
 
-.product-shell .app-brand-monogram {
-  display: grid;
+.product-shell .app-brand-image {
+  display: block;
   width: 38px;
   height: 38px;
   flex: 0 0 38px;
-  place-items: center;
+  overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--accent-history) 50%, var(--line-1));
   border-radius: var(--r-md);
-  background: color-mix(in srgb, var(--accent-history) 12%, var(--surface-raised));
-  color: var(--accent-history);
-  font-family: "Teko", sans-serif;
-  font-size: 1.32rem;
-  font-weight: 700;
-  letter-spacing: .04em;
+  background: #030805;
+}
+
+.product-shell .app-brand-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .product-shell .app-brand-title { font-size: 1.08rem; }
@@ -128,7 +130,7 @@
 
 @media (max-width: 760px) {
   .product-shell .app-header-inner { display: flex; min-height: 58px; padding: 0 var(--space-4); flex-wrap: nowrap; }
-  .product-shell .app-brand-monogram { width: 34px; height: 34px; flex-basis: 34px; }
+  .product-shell .app-brand-image { width: 34px; height: 34px; flex-basis: 34px; }
   .product-shell .app-brand-title { font-size: 1rem; }
   .product-shell .app-brand-presenter { display: block; }
   .product-shell .product-desktop-nav,

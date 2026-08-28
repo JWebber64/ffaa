@@ -127,7 +127,14 @@ export default function AppShellV2() {
       <header className={`app-header ${isDraft ? "app-header-draft" : ""}`}>
         <div className="app-header-inner">
           <Link to="/" className="app-brand" aria-label="Fantasy Football presented by GameHQ home">
-            <span className="app-brand-monogram" aria-hidden="true">FF</span>
+            <span className="app-brand-image" aria-hidden="true">
+              <img
+                src={appUrl("images/football-header-mark.jpg")}
+                alt=""
+                width="256"
+                height="256"
+              />
+            </span>
             <span className="app-brand-text">
               <span className="app-brand-title ff-display">Fantasy Football</span>
               <span className="app-brand-presenter">Presented by GameHQ</span>
