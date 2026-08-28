@@ -116,6 +116,28 @@ afterEach(() => {
 });
 
 describe("Draft Order Showdown UI", () => {
+  it("shows all three game images without the split preview card", () => {
+    renderShowdown();
+    fireEvent.change(screen.getByLabelText("Manager or team names"), { target: { value: Array.from({ length: 8 }, (_, index) => `Team ${index + 1}`).join("\n") } });
+    fireEvent.click(screen.getByRole("button", { name: "Add names" }));
+    fireEvent.click(screen.getByRole("button", { name: "Choose game" }));
+
+    const artwork = Array.from(document.querySelectorAll<HTMLImageElement>(".mode-picker-art img"));
+    expect(artwork).toHaveLength(3);
+    expect(artwork.map((image) => image.getAttribute("src"))).toEqual([
+      "/images/draft-order/draft-dash.jpg",
+      "/images/draft-order/football-plinko.jpg",
+      "/images/draft-order/punt-bounce.jpg",
+    ]);
+    expect(artwork.map((image) => [image.width, image.height])).toEqual([
+      [1672, 941],
+      [1672, 941],
+      [1818, 865],
+    ]);
+    expect(document.querySelector(".mode-preview")).not.toBeInTheDocument();
+    expect(document.querySelector(".mode-picker svg")).not.toBeInTheDocument();
+  });
+
   it("supports pasted manual entry, editable stable participants, game selection, and immediate countdown", async () => {
     renderShowdown();
     expect(screen.getByRole("button", { name: "Reset" })).toBeInTheDocument();
