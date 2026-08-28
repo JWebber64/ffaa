@@ -2,11 +2,20 @@
 
 import { cleanup, render } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createDraftOrderAnimationPlan, createDraftOrderDraw } from "../features/draft-order/draftOrderEngine";
 import DraftDashRenderer from "../features/draft-order/renderers/DraftDashRenderer";
 import PuntBounceRenderer from "../features/draft-order/renderers/PuntBounceRenderer";
 import type { DraftOrderMode, DraftOrderParticipant } from "../features/draft-order/types";
+
+const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+
+function readProjectFile(path: string) {
+  return readFileSync(resolve(projectRoot, path), "utf8");
+}
 
 function participants(count = 12): DraftOrderParticipant[] {
   return Array.from({ length: count }, (_, index) => ({
@@ -56,8 +65,17 @@ describe("draft order field identity rails", () => {
     const { container } = render(<PuntBounceRenderer {...await fieldProps("punt-bounce")} />);
 
     expect(container.querySelectorAll(".punt-team .showdown-participant-mark")).toHaveLength(12);
+    expect(container.querySelectorAll(".punt-team .punt-team-copy")).toHaveLength(12);
     expect(container.querySelectorAll(".punt-team-result")).toHaveLength(12);
     expect(container.querySelectorAll(".punt-result-badge")).toHaveLength(0);
     expect(container.querySelector(".showdown-live-board.is-order-only")).toBeInTheDocument();
+  });
+
+  it("keeps the focused Punt lane scroller inside the field's reserved middle band", () => {
+    const styles = readProjectFile("src/features/draft-order/draft-order.css");
+
+    expect(styles).not.toContain(".punt-team > span:last-child");
+    expect(styles).toContain("grid-template-rows: var(--punt-field-top) minmax(0, 1fr) var(--punt-field-bottom);");
+    expect(styles).toMatch(/\.showdown-focus-overlay \.showdown-punt \.punt-lanes \{[\s\S]*?height: auto;[\s\S]*?grid-row: 2;[\s\S]*?overflow-y: auto;/);
   });
 });

@@ -47,7 +47,7 @@ export default function PuntBounceRenderer(props: ShowdownRendererProps) {
   return (
     <section className="showdown-game showdown-punt" aria-labelledby="punt-title">
       <header className="showdown-game-header punt-game-header">
-        <div><span>Saturday night field test</span><h2 id="punt-title">Punt Bounce</h2></div>
+        <div><h2 id="punt-title">Punt Bounce</h2></div>
         <strong>{props.complete ? "Final distances" : reducedMotion ? "Static distance reveal" : "Continuous flight and bounce"}</strong>
       </header>
 
@@ -79,7 +79,7 @@ export default function PuntBounceRenderer(props: ShowdownRendererProps) {
                 <div className={`punt-lane bounce-${cue.pathVariant} ${resting ? "is-resting" : ""} ${cue.rank === 0 ? "is-longest" : ""}`} key={participant.id} style={style}>
                   <span className="punt-team">
                     <ParticipantMark participant={participant} compact />
-                    <span><small>Punt {String(index + 1).padStart(2, "0")}</small><strong>{participant.teamName}</strong></span>
+                    <span className="punt-team-copy"><small>Punt {String(index + 1).padStart(2, "0")}</small><strong>{participant.teamName}</strong></span>
                     {resting ? <em className="punt-team-result"><strong>#{cue.rank + 1}</strong><small>{cue.finalPercent.toFixed(1)} yd</small></em> : null}
                   </span>
                   <span className="punt-flight-path" aria-hidden="true">

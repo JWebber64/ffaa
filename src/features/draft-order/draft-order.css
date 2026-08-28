@@ -416,11 +416,11 @@
 .punt-lane.is-longest.is-resting { background: linear-gradient(90deg, rgba(245, 185, 76, .1), transparent 72%); }
 
 .punt-team { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 9px; min-width: 0; height: 100%; padding: 6px 12px; border-right: 1px solid rgba(243, 237, 218, .16); background: rgba(5, 12, 8, .42); color: var(--punt-chalk); }
-.punt-team > span:last-child { display: grid; gap: 2px; min-width: 0; }
+.punt-team-copy { display: grid; min-width: 0; align-content: center; gap: 2px; }
 .punt-team small { color: rgba(243, 237, 218, .45); font-size: .5rem; font-weight: 850; letter-spacing: .11em; text-transform: uppercase; }
 .punt-team strong { overflow: hidden; font-size: clamp(.62rem, 1vw, .74rem); line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
 .punt-team .showdown-participant-mark { width: 32px; height: 32px; border-color: color-mix(in oklch, var(--participant-color) 74%, white); }
-.punt-team-result { display: grid; justify-items: end; gap: 1px; color: var(--punt-chalk); font-style: normal; line-height: 1; }
+.punt-team-result { display: grid; min-width: 44px; justify-items: end; gap: 1px; color: var(--punt-chalk); font-style: normal; font-variant-numeric: tabular-nums; line-height: 1; }
 .punt-team-result strong { color: var(--punt-amber); font-family: var(--font-display); font-size: .76rem; }
 .punt-team-result small { font-size: .44rem; letter-spacing: .04em; white-space: nowrap; }
 
@@ -886,6 +886,8 @@ html.showdown-reveal-active { overflow: hidden; }
 .showdown-focus-overlay .showdown-game-header { min-height: 48px; padding: 8px 12px; }
 .showdown-focus-overlay .showdown-game-header h2 { font-size: clamp(1rem, 2.2vw, 1.45rem); }
 .showdown-focus-overlay .showdown-game-header > strong { white-space: nowrap; }
+.showdown-focus-overlay .showdown-punt .punt-game-header { min-height: 40px; align-items: center; flex-direction: row; padding-block: 4px; }
+.showdown-focus-overlay .showdown-punt .punt-game-header h2 { margin: 0; }
 
 .showdown-live-board {
   display: grid;
@@ -975,13 +977,24 @@ html.showdown-reveal-active { overflow: hidden; }
 .showdown-focus-overlay .showdown-plinko .plinko-board { min-height: 0; height: 100%; }
 .showdown-focus-overlay .showdown-punt .punt-stadium { display: grid; min-height: 0; grid-template-rows: auto minmax(0, 1fr); padding: 6px; }
 .showdown-focus-overlay .showdown-punt .punt-scoreboard { min-height: 46px; margin-bottom: 5px; }
-.showdown-focus-overlay .showdown-punt .punt-field { min-height: 0; height: 100%; }
+.showdown-focus-overlay .showdown-punt .punt-field {
+  --punt-field-top: 50px;
+  --punt-field-bottom: 30px;
+  --punt-field-right: 24px;
+  display: grid;
+  min-height: 0;
+  height: 100%;
+  grid-template-rows: var(--punt-field-top) minmax(0, 1fr) var(--punt-field-bottom);
+  padding: 0 var(--punt-field-right) 0 0;
+}
 .showdown-focus-overlay .showdown-punt .punt-stadium-lights { left: clamp(146px, 16vw, 262px); }
 .showdown-focus-overlay .showdown-punt .punt-yard-markers { left: clamp(142px, 16vw, 258px); }
 .showdown-focus-overlay .showdown-punt .punt-field-note { left: clamp(146px, 16vw, 262px); }
 .showdown-focus-overlay .showdown-punt .punt-lanes {
   display: grid;
-  height: 100%;
+  min-height: 0;
+  height: auto;
+  grid-row: 2;
   grid-template-rows: repeat(var(--punt-count), minmax(30px, 1fr));
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -1120,6 +1133,7 @@ html.showdown-reveal-active { overflow: hidden; }
   .mode-picker { grid-template-columns: 1fr; }
   .mode-picker-option { gap: 6px; }
   .showdown-focus-toolbar .showdown-sound-button span { display: none; }
+  .showdown-focus-overlay .showdown-punt .punt-field { --punt-field-right: 16px; }
   .showdown-live-board { grid-template-columns: 1fr; gap: 5px; }
   .showdown-live-order { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .results-actions .ui-button { flex: 1 1 auto; }
@@ -1135,6 +1149,7 @@ html.showdown-reveal-active { overflow: hidden; }
   .showdown-focus-toolbar > div:first-child > strong { padding-left: 0; border-left: 0; }
   .showdown-focus-overlay .showdown-punt .punt-team > span:nth-child(2) small,
   .showdown-focus-overlay .dash-team > span:last-child small { display: none; }
+  .showdown-focus-overlay .showdown-punt .punt-field { --punt-field-top: 46px; }
   .showdown-focus-overlay .showdown-punt .punt-team .showdown-participant-mark { display: grid; }
 }
 
