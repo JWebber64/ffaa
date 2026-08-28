@@ -355,6 +355,61 @@
   object-fit: cover;
 }
 
+@media (min-width: 1180px) {
+  .platform-chapters {
+    padding: var(--space-6);
+  }
+
+  .platform-chapters > header {
+    padding-bottom: var(--space-5);
+  }
+
+  .platform-chapters > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  .platform-chapters article {
+    grid-template-columns: var(--space-8) minmax(0, 1fr) minmax(180px, 220px);
+    padding: var(--space-5);
+    align-items: center;
+    gap: var(--space-4);
+    border: 1px solid var(--line-1);
+    border-radius: var(--r-lg);
+    background: var(--color-surface-card-secondary);
+  }
+
+  .platform-chapters article > b {
+    padding-top: 3px;
+    align-self: start;
+  }
+
+  .platform-chapter-copy h3 {
+    max-width: 17ch;
+    margin: var(--space-2) 0 var(--space-3);
+    font-size: 1.75rem;
+  }
+
+  .platform-chapter-copy p {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .platform-chapter-copy nav {
+    margin-top: var(--space-3);
+    gap: var(--space-3);
+  }
+
+  .platform-chapter-copy nav a {
+    min-height: var(--space-8);
+    font-size: 0.8rem;
+  }
+
+  .platform-chapters article > figure {
+    aspect-ratio: 16 / 10;
+  }
+}
+
 @media (max-width: 1100px) {
   .platform-hero {
     grid-template-columns: 1fr;

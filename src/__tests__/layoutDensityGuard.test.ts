@@ -99,6 +99,20 @@ describe("shared layout density contract", () => {
     expect(landing).not.toContain("platform-chapter-card");
   });
 
+  it("packs homepage chapters into two stationary desktop columns", () => {
+    const styles = readProjectFile("src/screens_v2/landing-v2.css");
+    const design = readProjectFile("DESIGN.md");
+
+    expect(styles).toMatch(
+      /@media \(min-width: 1180px\) \{[\s\S]*?\.platform-chapters > div \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/,
+    );
+    expect(styles).toMatch(
+      /@media \(min-width: 1180px\) \{[\s\S]*?\.platform-chapters article \{[\s\S]*?background: var\(--color-surface-card-secondary\)/,
+    );
+    expect(styles).not.toMatch(/\.platform-chapters article:hover[\s\S]*?transform:/);
+    expect(design).toContain("independent feature chapters may use two equal columns");
+  });
+
   it("documents why ordinary cards and heroes stay natural-height", () => {
     const design = readProjectFile("DESIGN.md");
     expect(design).toContain("This is an information-dense product, not a poster.");
