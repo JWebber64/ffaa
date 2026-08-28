@@ -13,6 +13,7 @@
     "test": "vitest",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
+    "release:check": "node scripts/check-production-release.mjs",
     "preview": "vite preview",
     "espn:pull": "tsx scripts/fetch-espn-cheatsheet.ts",
     "clay:pull": "tsx scripts/fetch-espn-clay-projections.ts",

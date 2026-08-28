@@ -41,6 +41,7 @@ import { NFLVERSE_CAREER_LATEST_SEASON } from "@/data/playerCareerStats";
 import { buildPlayerGameLog } from "@/data/playerGameLog";
 import { buildPlayerStatRows } from "@/data/playerStatCategories";
 import type { PlayerStatRow } from "@/data/playerStatCategories";
+import { projectedPointsForScoring } from "@/data/toolPlayerData";
 import type { SleeperPlayerRow } from "@/data/playerStatCategories";
 import { loadSleeperPlayerDirectory } from "@/data/sleeperPlayerDirectory";
 import {
@@ -141,6 +142,9 @@ interface HubPlayerRow {
   wopr: number | null;
   projectedFantasyPoints: number | null;
   projectedFantasyPointsPerGame: number | null;
+  projectionSourceCount: number;
+  projectionLow: number | null;
+  projectionHigh: number | null;
   auctionValue: number | null;
   marketValue: number | null;
   auctionSourceValues?: Record<string, number | null>;
@@ -207,6 +211,7 @@ const ACTUAL_SEASONS = [
   TREND_BASELINE_SEASON - 2,
   TREND_BASELINE_SEASON - 3,
 ] as const;
+const LEADER_SEASONS = [DRAFT_SEASON, ...ACTUAL_SEASONS] as const;
 const WEEK_OPTIONS = Array.from({ length: 22 }, (_, index) => index + 1);
 const TEAM_COUNT_OPTIONS = [8, 10, 12, 14] as const;
 const ROW_LIMIT_OPTIONS = [25, 50, 100, 250, 1000] as const;
@@ -257,6 +262,10 @@ const DEFAULT_SORTS: Record<StatsView, StatsSortState> = {
   trends: { columnId: "netTrending", direction: "desc" },
   matchups: { columnId: "overall", direction: "asc" },
   teams: { columnId: "fantasyPointsPerGame", direction: "desc" },
+};
+const LEADER_PROJECTION_SORT: StatsSortState = {
+  columnId: "projectedFantasyPoints",
+  direction: "desc",
 };
 
 function numberValue(value: unknown): number | null {
@@ -396,46 +405,14 @@ function playerKey(name: string, position: string) {
   return `${normalizeName(name)}|${normalizePosition(position) ?? position.toUpperCase()}`;
 }
 
-function projectedFantasyPoints(projection: PlayerStatRow | null, scoring: HubScoring) {
-  const clay = projection?.espnClay;
-  if (!clay) return numberValue(projection?.winWithOdds?.projectedPoints);
-
-  const position = normalizePosition(projection.player.pos);
-  if (position === "K" || position === "DEF") return numberValue(clay.projectedPoints);
-
-  const statValues = [
-    clay.passYards,
-    clay.passTds,
-    clay.interceptions,
-    clay.rushYards,
-    clay.rushTds,
-    clay.receptions,
-    clay.recYards,
-    clay.recTds,
-  ];
-  const hasStatProjection = statValues.some((value) => numberValue(value) !== null);
-  if (!hasStatProjection) return numberValue(clay.projectedPoints);
-
-  const receptionValue = scoring === "ppr" ? 1 : scoring === "halfPpr" ? 0.5 : 0;
-  return (
-    (numberValue(clay.passYards) ?? 0) / 25 +
-    (numberValue(clay.passTds) ?? 0) * 4 -
-    (numberValue(clay.interceptions) ?? 0) * 2 +
-    (numberValue(clay.rushYards) ?? 0) / 10 +
-    (numberValue(clay.rushTds) ?? 0) * 6 +
-    (numberValue(clay.recYards) ?? 0) / 10 +
-    (numberValue(clay.recTds) ?? 0) * 6 +
-    (numberValue(clay.receptions) ?? 0) * receptionValue
-  );
-}
-
 function projectionMetrics(
   projection: PlayerStatRow | null,
   vegas: WinWithOddsProjection | null,
   scoring: HubScoring,
 ) {
   const fantasyPoints =
-    projectedFantasyPoints(projection, scoring) ?? numberValue(vegas?.projectedPoints);
+    (projection ? projectedPointsForScoring(projection, scoring) : null) ??
+    numberValue(vegas?.projectedPoints);
   const games = numberValue(projection?.espnClay?.games) ?? 17;
   const vegasPoints =
     numberValue(projection?.winWithOdds?.projectedPoints) ?? numberValue(vegas?.projectedPoints);
@@ -494,7 +471,7 @@ function deltaClass(value: number) {
   return "is-neutral";
 }
 
-function playerColumns(view: StatsView): StatsTableColumn<HubPlayerRow>[] {
+function playerColumns(view: StatsView, leaderProjectionMode = false): StatsTableColumn<HubPlayerRow>[] {
   const playerColumn: StatsTableColumn<HubPlayerRow> = {
     id: "player",
     label: "Player",
@@ -504,6 +481,62 @@ function playerColumns(view: StatsView): StatsTableColumn<HubPlayerRow>[] {
     sortValue: (row) => row.name,
     render: makePlayerIdentity,
   };
+
+  const positionRankColumn: StatsTableColumn<HubPlayerRow> = {
+    id: "positionRank",
+    label: "Pos Rk",
+    sortValue: (row) => row.positionRank,
+    render: (row) => (
+      <span className="stats-hub-rank-pill">
+        {row.positionRank ? `${row.position}${row.positionRank}` : "—"}
+      </span>
+    ),
+  };
+
+  if (leaderProjectionMode) {
+    return [
+      playerColumn,
+      positionRankColumn,
+      {
+        id: "projectedFantasyPoints",
+        label: `${DRAFT_SEASON} Proj FPTS`,
+        description: "Scoring-compatible projected fantasy points for the full 2026 season.",
+        sortValue: (row) => row.projectedFantasyPoints,
+        render: (row) => formatNumber(row.projectedFantasyPoints),
+      },
+      {
+        id: "projectedFantasyPointsPerGame",
+        label: "Proj/G",
+        description: "Projected season fantasy points divided by projected games when available, otherwise 17 games.",
+        sortValue: (row) => row.projectedFantasyPointsPerGame,
+        render: (row) => formatNumber(row.projectedFantasyPointsPerGame),
+      },
+      {
+        id: "projectionRange",
+        label: "Range",
+        description: "Lowest to highest available scoring-compatible publisher projection.",
+        sortValue: (row) => row.projectionHigh === null || row.projectionLow === null
+          ? null
+          : row.projectionHigh - row.projectionLow,
+        render: (row) => row.projectionLow === null || row.projectionHigh === null
+          ? "—"
+          : `${formatNumber(row.projectionLow)}–${formatNumber(row.projectionHigh)}`,
+      },
+      {
+        id: "projectionSourceCount",
+        label: "Sources",
+        description: "Independent publisher projections contributing to the consensus.",
+        sortValue: (row) => row.projectionSourceCount,
+        render: (row) => formatInteger(row.projectionSourceCount),
+      },
+      {
+        id: "bye",
+        label: "Bye",
+        sortValue: (row) => row.bye,
+        render: (row) => formatInteger(row.bye),
+      },
+    ];
+  }
 
   if (view === "auction") {
     const sourceColumns = AUCTION_VALUE_SOURCE_COLUMNS.map<StatsTableColumn<HubPlayerRow>>(
@@ -627,7 +660,7 @@ function playerColumns(view: StatsView): StatsTableColumn<HubPlayerRow>[] {
       {
         id: "projectionSpread",
         label: "Src Δ",
-        description: "WinWithOdds projection minus the scoring-adjusted ESPN Clay projection.",
+        description: "WinWithOdds projection minus the scoring-compatible projection consensus.",
         sortValue: (row) => row.projectionSpread,
         render: (row) => (
           <span className={`stats-hub-delta ${deltaClass(row.projectionSpread ?? 0)}`}>
@@ -786,16 +819,7 @@ function playerColumns(view: StatsView): StatsTableColumn<HubPlayerRow>[] {
 
   return [
     playerColumn,
-    {
-      id: "positionRank",
-      label: "Pos Rk",
-      sortValue: (row) => row.positionRank,
-      render: (row) => (
-        <span className="stats-hub-rank-pill">
-          {row.positionRank ? `${row.position}${row.positionRank}` : "—"}
-        </span>
-      ),
-    },
+    positionRankColumn,
     {
       id: "games",
       label: "G",
@@ -1301,13 +1325,15 @@ export default function StatsExplorer() {
   const valueView = view === "draft" || view === "auction";
   const customScoring = parseScoring(searchParams.get("scoring"));
   const seasonType = parseSeasonType(searchParams.get("games"));
-  const season = boundedNumber(
+  const season = listedNumber(
     searchParams.get("season"),
-    ACTUAL_SEASONS[0],
-    ACTUAL_SEASONS[ACTUAL_SEASONS.length - 1]!,
-    ACTUAL_SEASONS[0],
+    view === "leaders" ? DRAFT_SEASON : ACTUAL_SEASONS[0],
+    view === "leaders" ? LEADER_SEASONS : ACTUAL_SEASONS,
   );
-  const weeklySeason = view === "trends" ? TREND_BASELINE_SEASON : season;
+  const leaderProjectionMode = view === "leaders" && season === DRAFT_SEASON;
+  const weeklySeason = view === "trends" || leaderProjectionMode
+    ? TREND_BASELINE_SEASON
+    : season;
   const weekStart = boundedNumber(searchParams.get("from"), 1, 1, 22);
   const weekEnd = boundedNumber(searchParams.get("to"), 18, 1, 22);
   const customTeamCount = listedNumber(searchParams.get("teams"), 12, TEAM_COUNT_OPTIONS);
@@ -1381,7 +1407,9 @@ export default function StatsExplorer() {
   const [sleeperAuctionError, setSleeperAuctionError] = useState<string | null>(null);
   const [sleeperDirectory, setSleeperDirectory] = useState<SleeperPlayerRow[]>([]);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
-  const [sort, setSort] = useState<StatsSortState>(() => DEFAULT_SORTS[view]);
+  const [sort, setSort] = useState<StatsSortState>(() =>
+    leaderProjectionMode ? LEADER_PROJECTION_SORT : DEFAULT_SORTS[view],
+  );
 
   const playerPool = useMemo(
     () => loadPlayerPool({ scoring, teamCount, rosterSize, rosterSlots, budget }),
@@ -1431,14 +1459,15 @@ export default function StatsExplorer() {
     updateQuery({
       view: nextView === "leaders" ? null : nextView,
       position: searchParams.get("position"),
+      season: nextView !== "leaders" && season === DRAFT_SEASON ? null : searchParams.get("season"),
     });
     setSelectedPlayerId(null);
   }
 
   useEffect(() => {
-    setSort(DEFAULT_SORTS[view]);
+    setSort(leaderProjectionMode ? LEADER_PROJECTION_SORT : DEFAULT_SORTS[view]);
     setSelectedPlayerId(null);
-  }, [view]);
+  }, [leaderProjectionMode, view]);
 
   useEffect(() => {
     let active = true;
@@ -1613,6 +1642,9 @@ export default function StatsExplorer() {
         wopr: summary.averageMetrics.wopr,
         projectedFantasyPoints: projections.fantasyPoints,
         projectedFantasyPointsPerGame: projections.fantasyPointsPerGame,
+        projectionSourceCount: numberValue(projection?.player.projectionSourceCount) ?? 0,
+        projectionLow: numberValue(projection?.player.projectionLow),
+        projectionHigh: numberValue(projection?.player.projectionHigh),
         auctionValue: numberValue(projection?.player.auctionValue ?? projection?.player.projectedValue),
         marketValue: numberValue(projection?.player.marketValue),
         projectionSpread: projections.spread,
@@ -1680,6 +1712,9 @@ export default function StatsExplorer() {
         wopr: summary?.averageMetrics.wopr ?? null,
         projectedFantasyPoints: projections.fantasyPoints,
         projectedFantasyPointsPerGame: projections.fantasyPointsPerGame,
+        projectionSourceCount: numberValue(projection.player.projectionSourceCount) ?? 0,
+        projectionLow: numberValue(projection.player.projectionLow),
+        projectionHigh: numberValue(projection.player.projectionHigh),
         auctionValue: numberValue(projection.player.auctionValue ?? projection.player.projectedValue),
         marketValue: numberValue(projection.player.marketValue),
         projectionSpread: projections.spread,
@@ -1736,6 +1771,9 @@ export default function StatsExplorer() {
         wopr: null,
         projectedFantasyPoints: projectedPoints,
         projectedFantasyPointsPerGame: projectedPoints === null ? null : projectedPoints / 17,
+        projectionSourceCount: 1,
+        projectionLow: projectedPoints,
+        projectionHigh: projectedPoints,
         auctionValue: null,
         marketValue: null,
         projectionSpread: null,
@@ -1778,7 +1816,7 @@ export default function StatsExplorer() {
     return withPositionRanks(rows, (row) => row.auctionValue);
   }, [draftPlayerRows, sleeperAuctionImportedAt, sleeperAuctionPriceMap]);
 
-  const playerRows = view === "draft"
+  const playerRows = view === "draft" || leaderProjectionMode
     ? draftPlayerRows
     : view === "auction"
       ? auctionPlayerRows
@@ -1819,7 +1857,10 @@ export default function StatsExplorer() {
     );
   }, [search, teamRows]);
 
-  const currentPlayerColumns = useMemo(() => playerColumns(view), [view]);
+  const currentPlayerColumns = useMemo(
+    () => playerColumns(view, leaderProjectionMode),
+    [leaderProjectionMode, view],
+  );
   const currentDefenseColumns = useMemo(() => defenseColumns(), []);
   const currentTeamColumns = useMemo(() => teamColumns(), []);
   const sortedPlayerRows = useMemo(
@@ -1836,6 +1877,36 @@ export default function StatsExplorer() {
   );
 
   const cards = useMemo<SummaryCard[]>(() => {
+    if (leaderProjectionMode) {
+      const topProjection = [...filteredPlayerRows].sort(
+        (left, right) => (right.projectedFantasyPoints ?? 0) - (left.projectedFantasyPoints ?? 0),
+      )[0];
+      const consensusRows = filteredPlayerRows.filter((row) => row.projectionSourceCount > 1);
+      return [
+        {
+          label: `${DRAFT_SEASON} players`,
+          value: filteredPlayerRows.length.toLocaleString(),
+          helper: "Current projection pool",
+        },
+        {
+          label: "Projected leader",
+          value: topProjection?.name ?? "—",
+          helper: topProjection
+            ? `${formatNumber(topProjection.projectedFantasyPoints)} projected points`
+            : "No projection",
+        },
+        {
+          label: "Consensus coverage",
+          value: consensusRows.length.toLocaleString(),
+          helper: "Players with multiple publisher projections",
+        },
+        {
+          label: "Scoring",
+          value: scoring === "halfPpr" ? "Half PPR" : scoring.toUpperCase(),
+          helper: "Season-long projected points",
+        },
+      ];
+    }
     if (view === "auction") {
       const topValue = [...filteredPlayerRows].sort(
         (left, right) => (right.auctionValue ?? 0) - (left.auctionValue ?? 0),
@@ -1956,7 +2027,7 @@ export default function StatsExplorer() {
       { label: "Rising form", value: riser?.name ?? "—", helper: riser ? `${riser.last3FantasyPointsPerGame - riser.fantasyPointsPerGame >= 0 ? "+" : ""}${formatNumber(riser.last3FantasyPointsPerGame - riser.fantasyPointsPerGame)} vs season` : "No data" },
       { label: "Usage leader", value: opportunityLeader?.name ?? "—", helper: opportunityLeader ? `${formatNumber(opportunityLeader.opportunitiesPerGame)} opportunities/G` : "No data" },
     ];
-  }, [adpResult, filteredDefenseRows, filteredPlayerRows, filteredTeamRows, scoring, season, seasonType, sleeperAuction, teamCount, view, weekEnd, weekStart]);
+  }, [adpResult, filteredDefenseRows, filteredPlayerRows, filteredTeamRows, leaderProjectionMode, scoring, season, seasonType, sleeperAuction, teamCount, view, weekEnd, weekStart]);
 
   const selectedPlayer = useMemo(() => {
     if (!selectedPlayerId) return null;
@@ -1987,9 +2058,41 @@ export default function StatsExplorer() {
       ? false
       : view === "trends"
         ? sleeperLoading
-        : weeklyLoading;
+        : leaderProjectionMode
+          ? false
+          : weeklyLoading;
 
   function exportCurrentView() {
+    if (leaderProjectionMode) {
+      downloadCsv(
+        `gamehq-${DRAFT_SEASON}-projected-leaders-${scoring}.csv`,
+        [
+          "Player",
+          "Position",
+          "Team",
+          "Position Rank",
+          `${DRAFT_SEASON} Projected Fantasy Points`,
+          "Projected Points Per Game",
+          "Projection Low",
+          "Projection High",
+          "Projection Sources",
+          "Bye",
+        ],
+        filteredPlayerRows.map((row) => [
+          row.name,
+          row.position,
+          row.team,
+          row.positionRank ?? "",
+          row.projectedFantasyPoints ?? "",
+          row.projectedFantasyPointsPerGame ?? "",
+          row.projectionLow ?? "",
+          row.projectionHigh ?? "",
+          row.projectionSourceCount,
+          row.bye ?? "",
+        ]),
+      );
+      return;
+    }
     if (view === "matchups") {
       downloadCsv(
         `gamehq-${season}-defense-vs-position.csv`,
@@ -2081,9 +2184,16 @@ export default function StatsExplorer() {
     );
   }
 
-  const actualViews = ["leaders", "opportunity", "matchups", "teams"].includes(view);
+  const seasonSelectableView = ["leaders", "opportunity", "matchups", "teams"].includes(view);
+  const actualDataView = ["opportunity", "matchups", "teams"].includes(view) ||
+    (view === "leaders" && !leaderProjectionMode);
   const playerView = !["matchups", "teams"].includes(view);
-  const viewCopy = VIEW_COPY[view];
+  const viewCopy = leaderProjectionMode
+    ? {
+        title: `${DRAFT_SEASON} projected leaders`,
+        description: "Scoring-compatible season projections ranked by total projected fantasy points. Range and source count show the consensus behind each player.",
+      }
+    : VIEW_COPY[view];
 
   return (
     <section className="stats-explorer stats-hub">
@@ -2095,7 +2205,13 @@ export default function StatsExplorer() {
             Draft prep, weekly leaders, opportunity, trends, matchups, and team context in one public place—no subscription required.
           </p>
           <div className="stats-meta-line">
-            <span>{view === "trends" ? `${DRAFT_SEASON} live trends` : actualViews ? `${season} actuals` : `${DRAFT_SEASON} draft data`}</span>
+            <span>{leaderProjectionMode
+              ? `${DRAFT_SEASON} projections`
+              : view === "trends"
+                ? `${DRAFT_SEASON} live trends`
+                : actualDataView
+                  ? `${season} actuals`
+                  : `${DRAFT_SEASON} draft data`}</span>
             <span>{scoring === "halfPpr" ? "Half PPR" : scoring.toUpperCase()}</span>
             <span>{viewResultCount} results</span>
           </div>
@@ -2115,10 +2231,10 @@ export default function StatsExplorer() {
           <div>
             <strong>nflverse</strong>
             <span>
-              {view === "trends"
+              {view === "trends" || leaderProjectionMode
                 ? weeklyData
-                  ? `${weeklyData.rows.length.toLocaleString()} ${TREND_BASELINE_SEASON} baseline rows`
-                  : `${TREND_BASELINE_SEASON} form baseline`
+                  ? `${weeklyData.rows.length.toLocaleString()} ${TREND_BASELINE_SEASON} context rows`
+                  : `${TREND_BASELINE_SEASON} historical context`
                 : weeklyData
                   ? `${weeklyData.rows.length.toLocaleString()} weekly rows`
                   : "Weekly actuals and usage"}
@@ -2144,7 +2260,12 @@ export default function StatsExplorer() {
         </div>
         <div className="stats-hub-source">
           <Radio size={18} aria-hidden="true" />
-          <div><strong>Projection & value imports</strong><span>ESPN Clay + WinWithOdds + league-adjusted $200 value model</span></div>
+          <div>
+            <strong>Projection & value imports</strong>
+            <span>{leaderProjectionMode
+              ? `${DRAFT_SEASON} scoring consensus · up to 5 independent publishers`
+              : "ESPN Clay + WinWithOdds + league-adjusted $200 value model"}</span>
+          </div>
           <span className="stats-hub-source-status">Ready</span>
         </div>
       </div>
@@ -2174,10 +2295,23 @@ export default function StatsExplorer() {
           ) : null}
         </div>
 
-        {actualViews ? (
+        {seasonSelectableView ? (
           <div className="stats-select-shell">
-            <SelectWrapper label="Season" value={String(season)} onValueChange={(value) => updateQuery({ season: value === String(ACTUAL_SEASONS[0]) ? null : value })} className="stats-select-trigger">
-              {ACTUAL_SEASONS.map((option) => <SelectItem key={option} value={String(option)}>{option}</SelectItem>)}
+            <SelectWrapper
+              label="Season"
+              value={String(season)}
+              onValueChange={(value) => updateQuery({
+                season: value === String(view === "leaders" ? DRAFT_SEASON : ACTUAL_SEASONS[0])
+                  ? null
+                  : value,
+              })}
+              className="stats-select-trigger"
+            >
+              {(view === "leaders" ? LEADER_SEASONS : ACTUAL_SEASONS).map((option) => (
+                <SelectItem key={option} value={String(option)}>
+                  {option} {view === "leaders" && option === DRAFT_SEASON ? "projections" : "actuals"}
+                </SelectItem>
+              ))}
             </SelectWrapper>
           </div>
         ) : (
@@ -2219,7 +2353,7 @@ export default function StatsExplorer() {
           </SelectWrapper>
         </div>
 
-        {actualViews ? (
+        {actualDataView ? (
           <div className="stats-select-shell">
             <SelectWrapper label="Games" value={seasonType} onValueChange={(value) => updateQuery({ games: value === "REG" ? null : value })} className="stats-select-trigger">
               <SelectItem value="REG">Regular</SelectItem>
@@ -2251,7 +2385,7 @@ export default function StatsExplorer() {
           </div>
         ) : null}
 
-        {actualViews ? (
+        {actualDataView ? (
           <>
             <div className="stats-select-shell">
               <SelectWrapper label="From week" value={String(weekStart)} onValueChange={(value) => updateQuery({ from: value === "1" ? null : value })} className="stats-select-trigger">
@@ -2280,7 +2414,7 @@ export default function StatsExplorer() {
         </div>
         <div className="stats-hub-view-intro-actions">
           <span className="stats-hub-result-count">{viewResultCount.toLocaleString()} results</span>
-          {actualViews ? (
+          {actualDataView ? (
             <Button
               variant="secondary"
               size="sm"
@@ -2362,7 +2496,21 @@ export default function StatsExplorer() {
         </div>
       ) : null}
 
-      {actualViews && weeklyError ? <div className="stats-hub-note is-error"><Info size={17} aria-hidden="true" /><span>{weeklyError}</span></div> : null}
+      {actualDataView && weeklyError ? <div className="stats-hub-note is-error"><Info size={17} aria-hidden="true" /><span>{weeklyError}</span></div> : null}
+      {leaderProjectionMode ? (
+        <div className="stats-hub-note">
+          <Info size={17} aria-hidden="true" />
+          <span>
+            {DRAFT_SEASON} values are season-long projections, not actual results. Projected FPTS uses the scoring-compatible median of one vote per independent publisher: ESPN Mike Clay, Sleeper Season, WinWithOdds, FFToday, and CBS. Range and Sources expose the consensus behind each player.
+          </span>
+        </div>
+      ) : null}
+      {leaderProjectionMode && weeklyError ? (
+        <div className="stats-hub-note">
+          <Info size={17} aria-hidden="true" />
+          <span>{TREND_BASELINE_SEASON} historical context is temporarily unavailable; the {DRAFT_SEASON} projection ranking remains usable.</span>
+        </div>
+      ) : null}
       {view === "trends" ? (
         <div className="stats-hub-note">
           <TrendingUp size={17} aria-hidden="true" />
@@ -2434,10 +2582,14 @@ export default function StatsExplorer() {
             onRowSelect={(row) => setSelectedPlayerId(row.id)}
             emptyMessage={view === "trends" && sleeperLoading
               ? `Loading ${DRAFT_SEASON} player trends…`
-              : weeklyLoading && view !== "draft" && view !== "auction" && view !== "trends"
+              : leaderProjectionMode
+                ? `No ${DRAFT_SEASON} projections match these filters.`
+                : weeklyLoading && view !== "draft" && view !== "auction" && view !== "trends"
                 ? "Loading weekly player stats…"
                 : "No players match these filters."}
-            caption={view === "trends"
+            caption={leaderProjectionMode
+              ? `${DRAFT_SEASON} projected fantasy leaders`
+              : view === "trends"
               ? `${DRAFT_SEASON} live Sleeper player trends with ${TREND_BASELINE_SEASON} form context`
               : `${viewCopy.title} player table`}
           />
@@ -2447,7 +2599,7 @@ export default function StatsExplorer() {
       <div className="stats-hub-note">
         <Info size={17} aria-hidden="true" />
         <span>
-          Everything shown comes from active sources. Full NFL career seasons, definitions, source details, and complete selected-season game logs are available by opening a player row; empty placeholder categories are no longer exposed.
+          Everything shown comes from active sources. Full NFL career seasons, definitions, source details, and historical game logs are available by opening a player row; empty placeholder categories are no longer exposed.
         </span>
       </div>
 
