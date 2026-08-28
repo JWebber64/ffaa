@@ -1,6 +1,23 @@
 .platform-home {
+  --platform-home-canvas: color-mix(in oklch, var(--gray-800) 72%, var(--green-900));
+  --platform-home-secondary-action: color-mix(in oklch, var(--green-800) 24%, var(--gray-800));
+  --platform-home-secondary-action-hover: color-mix(in oklch, var(--green-700) 30%, var(--gray-700));
+
+  position: relative;
   display: grid;
+  isolation: isolate;
   color: var(--text-primary);
+}
+
+.platform-home::before {
+  position: absolute;
+  z-index: -1;
+  inset-block: 0;
+  left: 50%;
+  width: 100vw;
+  background: var(--platform-home-canvas);
+  content: "";
+  transform: translateX(-50%);
 }
 
 .platform-kicker {
@@ -84,15 +101,25 @@
   color: var(--color-button-primary-text);
 }
 
-.platform-secondary-link {
-  padding: 0 2px;
-  border-bottom: 1px solid var(--color-border-default);
-  color: var(--color-text-link);
+.platform-hero-actions .platform-secondary-link {
+  padding: 0 var(--space-4);
+  justify-content: center;
+  border: 1px solid color-mix(in oklch, var(--green-200) 42%, var(--gray-600));
+  border-radius: var(--r-md);
+  background: var(--platform-home-secondary-action);
+  box-shadow: inset 0 1px 0 var(--spec-2);
+  color: var(--green-100);
 }
 
-.platform-secondary-link:hover {
-  border-color: var(--color-border-brand);
-  color: var(--color-text-link-hover);
+.platform-hero-actions .platform-secondary-link:hover {
+  border-color: var(--green-300);
+  background: var(--platform-home-secondary-action-hover);
+  color: var(--gray-50);
+}
+
+.platform-hero-actions .platform-secondary-link:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
 .platform-feature-index {
@@ -372,10 +399,6 @@
   .platform-primary-link,
   .platform-secondary-link {
     justify-content: center;
-  }
-
-  .platform-secondary-link {
-    padding-inline: var(--space-2);
   }
 
   .platform-feature-index > header {

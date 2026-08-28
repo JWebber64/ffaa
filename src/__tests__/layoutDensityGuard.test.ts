@@ -82,6 +82,17 @@ describe("shared layout density contract", () => {
     expect(styles).toContain(".platform-chapters article > figure");
   });
 
+  it("keeps the homepage canvas visible and its secondary action fully shaped", () => {
+    const styles = readProjectFile("src/screens_v2/landing-v2.css");
+
+    expect(styles).toContain("--platform-home-canvas:");
+    expect(styles).toContain("var(--gray-800) 72%");
+    expect(styles).toContain(".platform-home::before");
+    expect(styles).toContain(".platform-hero-actions .platform-secondary-link");
+    expect(styles).toContain("border-radius: var(--r-md)");
+    expect(styles).toContain("padding: 0 var(--space-4)");
+  });
+
   it("documents why ordinary cards and heroes stay natural-height", () => {
     const design = readProjectFile("DESIGN.md");
     expect(design).toContain("This is an information-dense product, not a poster.");
