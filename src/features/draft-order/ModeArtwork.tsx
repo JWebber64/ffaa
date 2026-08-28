@@ -8,7 +8,7 @@ const MODE_ART: Record<DraftOrderMode, { src: string; alt: string }> = {
   },
   "football-plinko": {
     src: "images/draft-order/football-plinko.jpg",
-    alt: "A leather football dropping through a brass peg board in a stadium draft room.",
+    alt: "A round fantasy team puck dropping through a brass peg board in a stadium draft room.",
   },
   "punt-bounce": {
     src: "images/draft-order/punt-bounce.jpg",

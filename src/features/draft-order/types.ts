@@ -118,7 +118,7 @@ export const MODE_LABELS: Record<DraftOrderMode, string> = {
 };
 export const MODE_DESCRIPTIONS: Record<DraftOrderMode, string> = {
   "draft-dash": "Every manager races the full field. First across the line gets the first pick.",
-  "football-plinko": "Team footballs ricochet through stadium pegs, with every landing claiming a draft slot.",
+  "football-plinko": "Round team avatars ricochet through stadium pegs, with every landing claiming a draft slot.",
   "punt-bounce": "The farthest punt wins the first pick while every bounce builds the suspense.",
 };
 

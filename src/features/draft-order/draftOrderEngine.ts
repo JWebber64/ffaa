@@ -253,11 +253,11 @@ function modeTiming(mode: DraftOrderMode, sequenceIndex: number, total: number, 
         totalDurationMs: 4_600 + Math.max(0, total - 1) * 140 + 120 + 650,
       };
     case "football-plinko": {
-      const launchGap = Math.max(620, 860 - total * 20);
+      const launchGap = 1_900;
       return {
-        delayMs: 420 + sequenceIndex * launchGap,
-        durationMs: 2_550 + jitter,
-        totalDurationMs: 420 + Math.max(0, total - 1) * launchGap + 2_670 + 620,
+        delayMs: 350 + sequenceIndex * launchGap,
+        durationMs: 1_650 + jitter,
+        totalDurationMs: 350 + Math.max(0, total - 1) * launchGap + 1_770 + 720,
       };
     }
     case "punt-bounce": {
@@ -283,13 +283,19 @@ export async function createDraftOrderAnimationPlan(
   if (mode === "football-plinko") {
     const launchSeed = base64UrlToBytes(await deriveSeed(draw.masterSeed, "animation:football-plinko:launch"));
     const launchStream = new DeterministicByteStream(launchSeed);
-    const launchOrder = draw.participants.map((participant) => participant.id);
+    const finalistCount = Math.min(3, draw.finalParticipantIds.length);
+    const finalistIds = draw.finalParticipantIds.slice(0, finalistCount).reverse();
+    const finalistSet = new Set(finalistIds);
+    const launchOrder = draw.participants
+      .map((participant) => participant.id)
+      .filter((participantId) => !finalistSet.has(participantId));
     for (let index = launchOrder.length - 1; index > 0; index -= 1) {
       const swapIndex = await launchStream.nextInt(index + 1);
       const current = launchOrder[index]!;
       launchOrder[index] = launchOrder[swapIndex]!;
       launchOrder[swapIndex] = current;
     }
+    launchOrder.push(...finalistIds);
     launchOrder.forEach((participantId, index) => sequenceIndexes.set(participantId, index));
   }
   const cues = [];
