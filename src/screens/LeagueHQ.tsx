@@ -57,22 +57,26 @@ import {
   mergeSleeperLeagueHQ,
   type SleeperLeagueChoice,
 } from "../features/league-hq/sleeperLeague";
+import {
+  isLeagueView,
+  LEAGUE_HQ_VIEWS,
+  type LeagueView,
+} from "../features/league-hq/leagueOddsNavigation";
 import { leagueHistoryPath, leagueRivalryPath } from "../features/league-history/ui/leagueRoutes";
 import { FANTASY_SEASON } from "../config/fantasySeason";
 import "./league-hq.css";
 
-const VIEWS = [
-  { id: "overview", label: "Overview", icon: ShieldCheck },
-  { id: "rules", label: "Rules", icon: Scale },
-  { id: "managers", label: "Managers", icon: Users },
-  { id: "records", label: "Records", icon: Medal },
-  { id: "seasons", label: "Season archive", icon: History },
-  { id: "rivalries", label: "Rivalries", icon: Swords },
-  { id: "draft", label: "Draft Central", icon: Gavel },
-  { id: "futures", label: "Futures", icon: Sparkles },
-] as const;
+const LEAGUE_HQ_VIEW_ICONS: Record<LeagueView, typeof ShieldCheck> = {
+  overview: ShieldCheck,
+  futures: Sparkles,
+  rules: Scale,
+  managers: Users,
+  records: Medal,
+  seasons: History,
+  rivalries: Swords,
+  draft: Gavel,
+};
 
-type LeagueView = (typeof VIEWS)[number]["id"];
 type RecordSort = "manager" | "seasons" | "record" | "winPct" | "ppg" | "titles" | "playoffs";
 type SleeperSyncState = {
   status: "idle" | "loading" | "success" | "error";
@@ -87,10 +91,6 @@ type SleeperLookupState = {
 };
 
 const SLEEPER_SEASONS = Array.from({ length: 6 }, (_, index) => FANTASY_SEASON - index);
-
-function isLeagueView(value: string | null): value is LeagueView {
-  return VIEWS.some((view) => view.id === value);
-}
 
 function record(manager: Pick<LeagueManager, "wins" | "losses" | "ties">) {
   return `${manager.wins}-${manager.losses}${manager.ties ? `-${manager.ties}` : ""}`;
@@ -394,8 +394,8 @@ export default function LeagueHQ() {
       </section>
 
       <nav className="league-tabs" aria-label="League HQ sections">
-        {VIEWS.map((view) => {
-          const Icon = view.icon;
+        {LEAGUE_HQ_VIEWS.map((view) => {
+          const Icon = LEAGUE_HQ_VIEW_ICONS[view.id];
           return (
             <button
               key={view.id}
@@ -854,7 +854,7 @@ export default function LeagueHQ() {
 
         {activeView === "futures" ? (
           <section>
-            <SectionHeading eyebrow="Prediction desk" title="Futures odds & season ballot" detail="GameHQ model probabilities and win totals meet each manager's preseason picks." />
+            <SectionHeading eyebrow="Prediction desk" title="Power rankings & odds" detail="GameHQ Power Index title odds and win totals meet each manager's preseason picks." />
             <div className="league-model-note">
               <Sparkles aria-hidden="true" />
               <div><strong>How the GameHQ model works</strong><p>Title probabilities are derived from the Power Index and normalized across all current teams. Win totals translate the same rating onto the regular-season schedule. These are league entertainment, not sportsbook advice.</p></div>

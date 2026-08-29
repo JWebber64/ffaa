@@ -1,6 +1,6 @@
 import { lazy, useRef, type CSSProperties, type KeyboardEvent, type MouseEvent } from "react";
 import {
-  BarChart3, BookOpen, Bug, ChevronDown, ClipboardList, Dices, Gavel, History,
+  BarChart3, BookOpen, Bug, ChevronDown, ClipboardList, Dices, Gavel,
   Home, Menu, Sparkles, Trophy, UserPlus, Users, Wrench,
 } from "lucide-react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
@@ -9,12 +9,11 @@ import { appUrl } from "../lib/appBasePath";
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import { closeParentDisclosure } from "../ui/disclosureMenu";
 import { UniversalSelect } from "../ui/UniversalSelect";
+import { buildLeagueLinks, type MenuLink } from "./appShellLinks";
 import { getPrimaryDraftAction } from "./draftAction";
 import "./app-shell.css";
 
 const DebugDrawer = lazy(() => import("../components/DebugDrawer"));
-
-type MenuLink = { to: string; label: string; detail: string; icon: typeof Home };
 
 const draftLinks: MenuLink[] = [
   { to: "/host/setup", label: "Host a draft", detail: "Create a live room", icon: Gavel },
@@ -104,20 +103,7 @@ export default function AppShellV2() {
   const isResearch = isPathActive(location.pathname, ["/stats", "/auction-values", "/analytics", "/tools"]);
   const isLeague = isPathActive(location.pathname, ["/league", "/my-hq"]);
   const primaryDraftAction = getPrimaryDraftAction(location.pathname);
-  const leagueLinks: MenuLink[] = [
-    { to: "/my-hq", label: "This Week", detail: "Your next decisions", icon: Sparkles },
-    { to: "/league", label: "League HQ", detail: "Connect and manage leagues", icon: Trophy },
-    {
-      to: activeLeagueId ? `/league/${activeLeagueId}/` : "/league",
-      label: "League history",
-      detail: activeConnection ? `Open ${activeConnection.leagueName}` : "Connect a league first",
-      icon: History,
-    },
-    { to: activeLeagueId ? `/league/${activeLeagueId}/managers` : "/league", label: "Managers", detail: "Careers and identity", icon: Users },
-    { to: activeLeagueId ? `/league/${activeLeagueId}/h2h` : "/league", label: "Rivalries", detail: "Head-to-head history", icon: Trophy },
-    { to: activeLeagueId ? `/league/${activeLeagueId}/records` : "/league", label: "Records", detail: "League-wide marks", icon: History },
-    { to: activeLeagueId ? `/league?league=${activeLeagueId}&view=rules` : "/league", label: "Commissioner tools", detail: "Rules, imports, and settings", icon: Wrench },
-  ];
+  const leagueLinks = buildLeagueLinks(activeLeagueId, activeConnection?.leagueName);
   const visualAssets = {
     "--football-hero-image": `url("${appUrl("images/football-night-hero.png")}")`,
     "--football-banner-image": `url("${appUrl("images/football-playbook-banner.png")}")`,

@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-route
 
 import { ConfigProvider } from "./contexts/ConfigContext";
 import { RoleProvider } from "./contexts/RoleContext";
+import { leagueOddsRedirectTarget } from "./features/league-hq/leagueOddsNavigation";
 import { APP_ROUTER_BASENAME } from "./lib/appBasePath";
 import { metadataForPath, useRouteMetadata } from "./lib/routeMetadata";
 
@@ -24,6 +25,11 @@ const LeagueHistoryApp = lazy(() => import("./features/league-history/ui/LeagueH
 const OfflineDraftV2 = lazy(() => import("./screens_v2/OfflineDraftV2"));
 const LandingV2 = lazy(() => import("./screens_v2/LandingV2"));
 const AuthenticatedApp = lazy(() => import("./routes/AuthenticatedApp"));
+
+function LeagueOddsRedirect() {
+  const location = useLocation();
+  return <Navigate to={leagueOddsRedirectTarget(location.search)} replace />;
+}
 
 function AppRoutes() {
   const location = useLocation();
@@ -64,6 +70,7 @@ function AppRoutes() {
           <Route path="/analytics" element={<AnalyticsLab />} />
           <Route path="/tools/*" element={<Tools />} />
           <Route path="/league" element={<LeagueHQ />} />
+          <Route path="/league/odds" element={<LeagueOddsRedirect />} />
           <Route path="/my-hq" element={<MyHQ />} />
           <Route path="/draft-order" element={<DraftOrderShowdown />} />
           <Route path="/league/:leagueId/*" element={<LeagueHistoryApp />} />
