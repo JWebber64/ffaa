@@ -53,7 +53,7 @@ function leagueRosterSlots(connection: SleeperLeagueConnectionSummary) {
   for (const entry of connection.auctionSettings?.rosterSlots ?? []) {
     const slot = normalizedLeagueSlotName(entry.slot);
     const count = Math.max(0, Math.round(Number(entry.count) || 0));
-    if (!slotTypeSet.has(slot) || count <= 0) continue;
+    if (!slotTypeSet.has(slot) || slot === "IR" || count <= 0) continue;
     const typedSlot = slot as RosterSlot["slot"];
     counts.set(typedSlot, (counts.get(typedSlot) ?? 0) + count);
   }

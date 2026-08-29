@@ -133,6 +133,23 @@ describe("offline draft active league roster profile", () => {
     expect(profile?.rosterSlots.find((slot) => slot.slot === "WR")?.count).toBe(3);
   });
 
+  it("does not treat Sleeper reserve slots as draftable G.O.A.T. roster slots", () => {
+    const connectionWithReserveSlots: SleeperLeagueConnectionSummary = {
+      ...goatConnection,
+      auctionSettings: {
+        ...goatConnection.auctionSettings!,
+        rosterSize: 13,
+        rosterSlots: [
+          ...goatConnection.auctionSettings!.rosterSlots,
+          { slot: "IR", count: 2 },
+        ],
+      },
+    };
+    const profile = createOfflineDraftLeagueProfile(connectionWithReserveSlots);
+    expect(profile?.rosterSlots.some((slot) => slot.slot === "IR")).toBe(false);
+    expect(profile?.rosterSlots.find((slot) => slot.slot === "WR")?.count).toBe(3);
+  });
+
   it("restores the third WR from the active G.O.A.T. profile before any player is drafted", async () => {
     const { container } = render(<OfflineDraftV2 />);
 
