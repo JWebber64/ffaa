@@ -37,6 +37,10 @@ const GOAT_ROSTER_SLOTS: RosterSlot[] = [
   { slot: "BENCH", count: 4 },
 ];
 
+export function resolveOfflineActiveLeagueId(activeLeagueId: string, persistedLeagueId: string) {
+  return activeLeagueId.trim() || persistedLeagueId.trim();
+}
+
 function normalizedLeagueSlotName(value: unknown) {
   const slot = String(value ?? "").trim().toUpperCase();
   if (slot === "DEF" || slot === "D/ST") return "DST";

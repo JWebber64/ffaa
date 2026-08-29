@@ -8,6 +8,7 @@ import { findSleeperLeagues } from "../features/league-hq/sleeperLeague";
 import OfflineDraftV2 from "../screens_v2/OfflineDraftV2";
 import {
   createOfflineDraftLeagueProfile,
+  resolveOfflineActiveLeagueId,
   shouldApplyOfflineDraftLeagueProfile,
 } from "../screens_v2/offlineDraftLeagueProfile";
 import type { RosterSlot } from "../types/draftConfig";
@@ -107,6 +108,10 @@ describe("offline draft active league roster profile", () => {
   afterEach(() => {
     cleanup();
     window.localStorage.clear();
+  });
+
+  it("uses the persisted active league while the lazy connection hook is hydrating", () => {
+    expect(resolveOfflineActiveLeagueId("", leagueId)).toBe(leagueId);
   });
 
   it("preserves the verified three-WR G.O.A.T. roster when a cached connection is one WR stale", () => {

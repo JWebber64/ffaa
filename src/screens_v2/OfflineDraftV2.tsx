@@ -42,6 +42,7 @@ import {
   applyOfflineDraftLeagueProfile,
   createOfflineDraftLeagueProfile,
   markOfflineDraftProfileCustom,
+  resolveOfflineActiveLeagueId,
   shouldApplyOfflineDraftLeagueProfile,
   type OfflineDraftProfileSource,
 } from "./offlineDraftLeagueProfile";
@@ -589,20 +590,26 @@ function OfflineOrderStatus({
 
 export default function OfflineDraftV2() {
   const { connections, activeLeagueId, rememberConnection } = useSleeperLeagueConnections();
+  const [persistedActiveLeagueId] = useState(() => (
+    typeof window === "undefined"
+      ? ""
+      : window.localStorage.getItem("ffaa.activeSleeperLeague.v1")?.trim() ?? ""
+  ));
+  const offlineActiveLeagueId = resolveOfflineActiveLeagueId(activeLeagueId, persistedActiveLeagueId);
   const [initialExperience] = useState(loadInitialOfflineExperience);
   const initialDraft = initialExperience.draft;
   const [teams, setTeams] = useState<OfflineTeam[]>(initialDraft.teams);
   const [offlineConfig, setOfflineConfig] = useState<OfflineDraftConfig>(initialDraft.config);
   const connectedLeague = useMemo(
-    () => connections.find((connection) => connection.leagueId === activeLeagueId)
+    () => connections.find((connection) => connection.leagueId === offlineActiveLeagueId)
       ?? connections.find((connection) => connection.auctionSettings)
       ?? connections[0]
       ?? null,
-    [activeLeagueId, connections],
+    [connections, offlineActiveLeagueId],
   );
   const connectedLeagueProfile = useMemo(
-    () => createOfflineDraftLeagueProfile(connectedLeague, activeLeagueId),
-    [activeLeagueId, connectedLeague],
+    () => createOfflineDraftLeagueProfile(connectedLeague, offlineActiveLeagueId),
+    [connectedLeague, offlineActiveLeagueId],
   );
   const [refreshedLeagueProfile, setRefreshedLeagueProfile] = useState<ReturnType<typeof createOfflineDraftLeagueProfile>>(null);
   const activeLeagueProfile = refreshedLeagueProfile?.leagueId === connectedLeague?.leagueId
@@ -640,17 +647,17 @@ export default function OfflineDraftV2() {
   );
 
   useEffect(() => {
-    if (!activeLeagueId) return;
+    if (!offlineActiveLeagueId) return;
     const controller = new AbortController();
     const season = Number(connectedLeagueSeason) || new Date().getFullYear();
 
-    void findSleeperLeagues(activeLeagueId, season, {
+    void findSleeperLeagues(offlineActiveLeagueId, season, {
       fetcher: sameOriginSleeperFetcher,
       signal: controller.signal,
     })
       .then((result) => {
         if (controller.signal.aborted) return;
-        const league = result.leagues.find((item) => item.leagueId === activeLeagueId);
+        const league = result.leagues.find((item) => item.leagueId === offlineActiveLeagueId);
         if (!league) return;
         const refreshedConnection = {
           leagueId: league.leagueId,
@@ -673,7 +680,7 @@ export default function OfflineDraftV2() {
       });
 
     return () => controller.abort();
-  }, [activeLeagueId, connectedLeagueLastUsedAt, connectedLeagueSeason, rememberConnection]);
+  }, [connectedLeagueLastUsedAt, connectedLeagueSeason, offlineActiveLeagueId, rememberConnection]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
