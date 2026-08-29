@@ -51,12 +51,25 @@ const STORAGE_KEY = "ffaa.offlineDraft.v1";
 const DEFAULT_TEAM_COUNT = 12;
 const DEFAULT_BUDGET = 200;
 const TEAM_COUNT_OPTIONS = [8, 10, 12, 14, 16] as const;
+const SLEEPER_API = "https://api.sleeper.app/v1";
 
 const MANUAL_POSITIONS = ["QB", "RB", "WR", "TE", "K", "DEF"] as const;
 const SLOT_TYPE_SET = new Set<string>(SLOT_TYPES);
 
 type PositionFilter = "ALL" | "QB" | "RB" | "WR" | "TE" | "FLEX" | "K" | "DEF";
 type ManualPosition = (typeof MANUAL_POSITIONS)[number];
+
+const sameOriginSleeperFetcher: typeof fetch = (input, init) => {
+  const sourceUrl = typeof input === "string"
+    ? input
+    : input instanceof URL
+      ? input.toString()
+      : input.url;
+  const requestUrl = sourceUrl.startsWith(SLEEPER_API)
+    ? `/ff/sleeper-api${sourceUrl.slice(SLEEPER_API.length)}`
+    : sourceUrl;
+  return fetch(requestUrl, init);
+};
 
 type OfflineRosterPlayer = Required<Pick<RosterPlayer, "playerId" | "name" | "price" | "pos">> &
   Pick<RosterPlayer, "assignedSlot" | "team" | "byeWeek" | "auctionValue" | "projectedValue">;
@@ -630,7 +643,10 @@ export default function OfflineDraftV2() {
     const controller = new AbortController();
     const season = Number(connectedLeagueSeason) || new Date().getFullYear();
 
-    void findSleeperLeagues(activeLeagueId, season, { signal: controller.signal })
+    void findSleeperLeagues(activeLeagueId, season, {
+      fetcher: sameOriginSleeperFetcher,
+      signal: controller.signal,
+    })
       .then((result) => {
         if (controller.signal.aborted) return;
         const league = result.leagues.find((item) => item.leagueId === activeLeagueId);

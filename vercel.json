@@ -30,6 +30,10 @@
       "destination": "/api/league-history/import"
     },
     {
+      "source": "/ff/sleeper-api/:path*",
+      "destination": "https://api.sleeper.app/v1/:path*"
+    },
+    {
       "source": "/ff/ffc-api/:path*",
       "destination": "https://fantasyfootballcalculator.com/api/v1/:path*"
     },
