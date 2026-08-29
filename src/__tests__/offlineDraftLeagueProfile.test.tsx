@@ -4,6 +4,7 @@ import { cleanup, render, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SleeperLeagueConnectionSummary } from "../features/league-hq/sleeperConnections";
+import { findSleeperLeagues } from "../features/league-hq/sleeperLeague";
 import OfflineDraftV2 from "../screens_v2/OfflineDraftV2";
 import {
   createOfflineDraftLeagueProfile,
@@ -13,6 +14,10 @@ import type { RosterSlot } from "../types/draftConfig";
 
 vi.mock("../data/loadPlayerPool", () => ({
   loadPlayerPool: () => [],
+}));
+
+vi.mock("../features/league-hq/sleeperLeague", () => ({
+  findSleeperLeagues: vi.fn(),
 }));
 
 const leagueId = "1385319428408774656";
@@ -41,8 +46,8 @@ const goatConnection: SleeperLeagueConnectionSummary = {
     teamCount: 12,
     budget: 200,
     budgetSource: "gamehq-default",
-    rosterSize: 12,
-    rosterSlots: threeReceiverSlots,
+    rosterSize: 11,
+    rosterSlots: twoReceiverSlots,
   },
 };
 
@@ -60,6 +65,28 @@ function emptyTeams() {
 
 describe("offline draft active league roster profile", () => {
   beforeEach(() => {
+    vi.mocked(findSleeperLeagues).mockResolvedValue({
+      lookupType: "league",
+      displayName: "G.O.A.T. League",
+      leagues: [{
+        leagueId,
+        name: "G.O.A.T. League",
+        season: "2026",
+        status: "pre_draft",
+        totalRosters: 12,
+        avatarUrl: "",
+        sourceUrl: `https://sleeper.com/leagues/${leagueId}`,
+        auctionSettings: {
+          scoring: "ppr",
+          scoringLabel: "Full PPR",
+          teamCount: 12,
+          budget: 200,
+          budgetSource: "gamehq-default",
+          rosterSize: 12,
+          rosterSlots: threeReceiverSlots,
+        },
+      }],
+    });
     window.localStorage.clear();
     window.localStorage.setItem("ffaa.activeSleeperLeague.v1", leagueId);
     window.localStorage.setItem("ffaa.sleeperLeagueConnections.v1", JSON.stringify([goatConnection]));
