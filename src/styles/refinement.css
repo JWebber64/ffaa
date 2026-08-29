@@ -3283,6 +3283,10 @@ dd,
     padding: 0;
     background: transparent;
   }
+
+  .offline-board-wrap .team-board.team-board-has-status-badges {
+    padding-top: 5px;
+  }
 }
 
 /* One clean position-colored perimeter around every roster slot. */

@@ -230,7 +230,6 @@ function TeamPanel({
   isMe,
   isActive,
   showAuctionValues,
-  turnLabel,
   onOpen,
   onPlayerMove,
 }: {
@@ -241,7 +240,6 @@ function TeamPanel({
   isMe?: boolean;
   isActive?: boolean;
   showAuctionValues: boolean;
-  turnLabel: string;
   onOpen?: (teamId: string) => void;
   onPlayerMove?: (teamId: string, playerId: string, targetSlotKey: string) => void;
 }) {
@@ -304,13 +302,6 @@ function TeamPanel({
           ) : null}
         </div>
       </div>
-
-      {isNominator || isHighBidder ? (
-        <div className="team-panel-status-badges">
-          {isNominator ? <div className="team-panel-turn-marker">{turnLabel}</div> : null}
-          {isHighBidder ? <div className="team-panel-high-marker">High bid</div> : null}
-        </div>
-      ) : null}
 
       <div className="team-panel-meta-row">
         {showAuctionValues ? <div className="team-panel-meta-item" title={`Remaining budget: $${remainingBudget}`}>
@@ -474,22 +465,32 @@ export default function TeamBoard({
       style={boardStyle}
     >
       <div className="team-board-track">
-        {teams.map((team) => (
-          <div key={team.teamId} className="team-board-cell">
-            <TeamPanel
-              team={team}
-              rosterSlots={rosterSlots}
-              isNominator={!!currentNominatorTeamId && team.teamId === currentNominatorTeamId}
-              isHighBidder={!!highBidderTeamId && team.teamId === highBidderTeamId}
-              isMe={!!myTeamId && team.teamId === myTeamId}
-              isActive={!!activeTeamId && team.teamId === activeTeamId}
-              showAuctionValues={showAuctionValues}
-              turnLabel={turnLabel}
-              {...(onTeamOpen ? { onOpen: onTeamOpen } : {})}
-              {...(onPlayerMove ? { onPlayerMove } : {})}
-            />
-          </div>
-        ))}
+        {teams.map((team) => {
+          const isNominator = !!currentNominatorTeamId && team.teamId === currentNominatorTeamId;
+          const isHighBidder = !!highBidderTeamId && team.teamId === highBidderTeamId;
+
+          return (
+            <div key={team.teamId} className="team-board-cell">
+              {isNominator || isHighBidder ? (
+                <div className="team-panel-status-badges">
+                  {isNominator ? <div className="team-panel-turn-marker">{turnLabel}</div> : null}
+                  {isHighBidder ? <div className="team-panel-high-marker">High bid</div> : null}
+                </div>
+              ) : null}
+              <TeamPanel
+                team={team}
+                rosterSlots={rosterSlots}
+                isNominator={isNominator}
+                isHighBidder={isHighBidder}
+                isMe={!!myTeamId && team.teamId === myTeamId}
+                isActive={!!activeTeamId && team.teamId === activeTeamId}
+                showAuctionValues={showAuctionValues}
+                {...(onTeamOpen ? { onOpen: onTeamOpen } : {})}
+                {...(onPlayerMove ? { onPlayerMove } : {})}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
