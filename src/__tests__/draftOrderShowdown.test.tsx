@@ -194,10 +194,26 @@ describe("Draft Order Showdown UI", () => {
     await seedResults(roomContext(false));
     renderShowdown();
     fireEvent.click(screen.getByRole("button", { name: "View official order" }));
-    const applyButton = screen.getByRole("button", { name: "Apply to Draft Room" });
+    const applyButton = screen.getByRole("button", { name: "Apply to Live Room" });
     expect(applyButton).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Start Offline Draft" })).toBeEnabled();
     expect(screen.getByText("Only that room's host can apply the official order.")).toBeInTheDocument();
     expect(adapterMocks.apply).not.toHaveBeenCalled();
+  });
+
+  it("hands a manual result to the offline draft instead of showing a dead live-room action", async () => {
+    const draw = await seedResults();
+    renderShowdown();
+    fireEvent.click(screen.getByRole("button", { name: "View official order" }));
+
+    expect(screen.queryByRole("button", { name: "Apply to Live Room" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Start Offline Draft" }));
+
+    await waitFor(() => {
+      const stored = JSON.parse(window.localStorage.getItem("ffaa.offlineDraft.handoff.v1") ?? "null");
+      expect(stored).toMatchObject({ drawId: draw.id, draftType: "snake", drawNumber: 1 });
+      expect(stored.participants).toHaveLength(8);
+    });
   });
 
   it("saves, shares, applies a host-authorized order, and visibly separates a reroll", async () => {
@@ -208,9 +224,9 @@ describe("Draft Order Showdown UI", () => {
     await waitFor(() => expect(persistenceMocks.save).toHaveBeenCalledWith(expect.objectContaining({ id: firstDraw.id }), false));
     fireEvent.click(screen.getByRole("button", { name: "Share Replay" }));
     await waitFor(() => expect(persistenceMocks.share).toHaveBeenCalled());
-    fireEvent.click(screen.getByRole("button", { name: "Apply to Draft Room" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply to Live Room" }));
     await waitFor(() => expect(adapterMocks.apply).toHaveBeenCalledWith(expect.objectContaining({ isHost: true }), expect.objectContaining({ id: firstDraw.id })));
-    expect(await screen.findByRole("button", { name: "Applied to Draft Room" })).toBeDisabled();
+    expect(await screen.findByRole("button", { name: "Applied to Live Room" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "Generate New Order" }));
     expect(await screen.findByLabelText("Showdown countdown", {}, { timeout: 6_000 })).toBeInTheDocument();
     expect(screen.getByText("Draw 2")).toBeInTheDocument();

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, RotateCcw, Save, Search, Trash2, Undo2, Users } from "lucide-react";
+import { Clock3, Plus, RotateCcw, Save, Search, ShieldCheck, Trash2, Undo2, Users } from "lucide-react";
 import { loadPlayerPool } from "../data/loadPlayerPool";
 import { draftedRosterSize, normalizeAuctionValueScoring } from "../data/auctionValueSettings";
 import TeamBoard from "../components/draft/TeamBoard";
@@ -14,11 +14,16 @@ import {
 } from "../components/draft/rosterAssignments";
 import RosterBuilder from "../components/premium/RosterBuilder";
 import {
+  clearOfflineDraftHandoff,
+  loadOfflineDraftHandoff,
+  type OfflineDraftHandoff,
+  type OfflineDraftType,
+} from "../features/draft-order/offlineDraftHandoff";
+import {
   DEFAULT_ROSTER_SLOTS,
   SLOT_TYPES,
   type RosterSlot as DraftRosterSlot,
   type ScoringType,
-  type TeamCountV2,
 } from "../types/draftConfig";
 import type { Player } from "../types/draft";
 import { Button } from "../ui/Button";
@@ -31,11 +36,12 @@ import { UniversalSelect } from "../ui/UniversalSelect";
 import { cn } from "../ui/cn";
 import { matchesPositionFilter } from "../utils/positionFilter";
 import { compareOfflineDraftPlayers, suggestedPrice } from "./offlineDraftPlayerOrder";
+import { getOfflineDraftTurn } from "./offlineDraftTurn";
 
 const STORAGE_KEY = "ffaa.offlineDraft.v1";
-const DEFAULT_TEAM_COUNT: TeamCountV2 = 12;
+const DEFAULT_TEAM_COUNT = 12;
 const DEFAULT_BUDGET = 200;
-const TEAM_COUNT_OPTIONS: TeamCountV2[] = [8, 10, 12, 14, 16];
+const TEAM_COUNT_OPTIONS = [8, 10, 12, 14, 16] as const;
 
 const MANUAL_POSITIONS = ["QB", "RB", "WR", "TE", "K", "DEF"] as const;
 const SLOT_TYPE_SET = new Set<string>(SLOT_TYPES);
@@ -49,6 +55,7 @@ type OfflineRosterPlayer = Required<Pick<RosterPlayer, "playerId" | "name" | "pr
 type OfflineTeam = {
   teamId: string;
   name: string;
+  managerName?: string;
   budget: number;
   spent: number;
   managerType?: "human" | "computer";
@@ -57,16 +64,28 @@ type OfflineTeam = {
 };
 
 type OfflineDraftConfig = {
-  teamCount: TeamCountV2;
+  teamCount: number;
   defaultBudget: number;
+  draftType: OfflineDraftType;
   scoring: ScoringType;
   rosterSlots: DraftRosterSlot[];
   isOpen: boolean;
+  officialOrder?: OfflineOfficialOrder;
+};
+
+type OfflineOfficialOrder = {
+  algorithmVersion: string;
+  appliedAt: string;
+  drawId: string;
+  drawNumber: number;
+  mode: string;
+  verificationHash: string;
 };
 
 type OfflineDraftState = {
   teams: OfflineTeam[];
   config: OfflineDraftConfig;
+  lastAssignment: LastAssignment | null;
 };
 
 type LastAssignment = {
@@ -91,11 +110,29 @@ function clampSlotCount(value: unknown) {
   return Math.min(20, parsed);
 }
 
-function normalizeTeamCount(value: unknown): TeamCountV2 {
+function normalizeTeamCount(value: unknown) {
   const parsed = Number(value);
-  return TEAM_COUNT_OPTIONS.includes(parsed as TeamCountV2)
-    ? (parsed as TeamCountV2)
-    : DEFAULT_TEAM_COUNT;
+  return Number.isFinite(parsed) ? Math.min(32, Math.max(2, Math.round(parsed))) : DEFAULT_TEAM_COUNT;
+}
+
+function normalizeDraftType(value: unknown): OfflineDraftType {
+  return value === "snake" ? "snake" : "auction";
+}
+
+function normalizeOfficialOrder(value: unknown): OfflineOfficialOrder | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const raw = value as Record<string, unknown>;
+  const drawId = typeof raw.drawId === "string" ? raw.drawId.trim() : "";
+  const verificationHash = typeof raw.verificationHash === "string" ? raw.verificationHash.trim() : "";
+  if (!drawId || !verificationHash) return undefined;
+  return {
+    algorithmVersion: typeof raw.algorithmVersion === "string" ? raw.algorithmVersion : "",
+    appliedAt: typeof raw.appliedAt === "string" ? raw.appliedAt : "",
+    drawId,
+    drawNumber: Math.max(1, Math.round(Number(raw.drawNumber) || 1)),
+    mode: typeof raw.mode === "string" ? raw.mode : "",
+    verificationHash,
+  };
 }
 
 function cloneRosterSlots(slots: readonly DraftRosterSlot[]): DraftRosterSlot[] {
@@ -144,6 +181,7 @@ function createDefaultConfig(): OfflineDraftConfig {
   return {
     teamCount: DEFAULT_TEAM_COUNT,
     defaultBudget: DEFAULT_BUDGET,
+    draftType: "auction",
     scoring: "ppr",
     rosterSlots: cloneRosterSlots(DEFAULT_ROSTER_SLOTS),
     isOpen: false,
@@ -185,6 +223,7 @@ function resizeTeamsForConfig(
       teamId: existing?.teamId || `offline-t${index + 1}`,
       teamNumber: index + 1,
       name: existing?.name?.trim() || `Team ${index + 1}`,
+      ...(existing?.managerName?.trim() ? { managerName: existing.managerName.trim() } : {}),
       budget: options.resetBudgets ? config.defaultBudget : existing?.budget ?? config.defaultBudget,
       managerType: "human",
       roster: options.clearRosters ? [] : existing?.roster ?? [],
@@ -240,16 +279,19 @@ function normalizeSavedConfig(value: unknown): OfflineDraftConfig {
   const raw = value as Record<string, unknown>;
   const defaultBudget = clampWholeDollar(raw.defaultBudget) ?? DEFAULT_BUDGET;
   const rosterSlots = normalizeRosterSlots(raw.rosterSlots);
+  const officialOrder = normalizeOfficialOrder(raw.officialOrder);
 
   return {
     teamCount: normalizeTeamCount(raw.teamCount),
     defaultBudget,
+    draftType: normalizeDraftType(raw.draftType),
     scoring:
       raw.scoring === "standard" || raw.scoring === "half_ppr" || raw.scoring === "ppr"
         ? raw.scoring
         : "ppr",
     rosterSlots: rosterSlots.length > 0 ? rosterSlots : cloneRosterSlots(DEFAULT_ROSTER_SLOTS),
     isOpen: typeof raw.isOpen === "boolean" ? raw.isOpen : false,
+    ...(officialOrder ? { officialOrder } : {}),
   };
 }
 
@@ -257,7 +299,7 @@ function normalizeSavedTeams(value: unknown, fallbackBudget = DEFAULT_BUDGET): O
   if (!Array.isArray(value)) return null;
 
   const teams = value
-    .slice(0, 16)
+    .slice(0, 32)
     .map((item, index): OfflineTeam | null => {
       if (!item || typeof item !== "object") return null;
       const raw = item as Record<string, unknown>;
@@ -275,11 +317,15 @@ function normalizeSavedTeams(value: unknown, fallbackBudget = DEFAULT_BUDGET): O
         typeof raw.name === "string" && raw.name.trim()
           ? raw.name.trim()
           : `Team ${index + 1}`;
+      const managerName = typeof raw.managerName === "string" && raw.managerName.trim()
+        ? raw.managerName.trim()
+        : undefined;
 
       return withSpent({
         teamId,
         teamNumber: index + 1,
         name,
+        ...(managerName ? { managerName } : {}),
         budget,
         managerType: "human",
         roster,
@@ -290,12 +336,22 @@ function normalizeSavedTeams(value: unknown, fallbackBudget = DEFAULT_BUDGET): O
   return teams.length > 0 ? teams : null;
 }
 
+function normalizeLastAssignment(value: unknown): LastAssignment | null {
+  if (!value || typeof value !== "object") return null;
+  const raw = value as Record<string, unknown>;
+  const teamId = typeof raw.teamId === "string" ? raw.teamId.trim() : "";
+  const playerId = typeof raw.playerId === "string" ? raw.playerId.trim() : "";
+  const playerName = typeof raw.playerName === "string" ? raw.playerName.trim() : "";
+  return teamId && playerId && playerName ? { teamId, playerId, playerName } : null;
+}
+
 function loadSavedDraft(): OfflineDraftState {
   const defaultConfig = createDefaultConfig();
   if (typeof window === "undefined") {
     return {
       config: defaultConfig,
       teams: createDefaultTeams(defaultConfig),
+      lastAssignment: null,
     };
   }
 
@@ -305,6 +361,7 @@ function loadSavedDraft(): OfflineDraftState {
       return {
         config: defaultConfig,
         teams: createDefaultTeams(defaultConfig),
+        lastAssignment: null,
       };
     }
 
@@ -320,13 +377,54 @@ function loadSavedDraft(): OfflineDraftState {
           : hasRosteredPlayers,
     };
     const teams = resizeTeamsForConfig(savedTeams ?? createDefaultTeams(config), config);
-    return { config, teams };
+    return { config, teams, lastAssignment: normalizeLastAssignment(parsed.lastAssignment) };
   } catch {
     return {
       config: defaultConfig,
       teams: createDefaultTeams(defaultConfig),
+      lastAssignment: null,
     };
   }
+}
+
+function applyHandoffToDraft(state: OfflineDraftState, handoff: OfflineDraftHandoff): OfflineDraftState {
+  const config: OfflineDraftConfig = {
+    ...state.config,
+    teamCount: handoff.participants.length,
+    draftType: handoff.draftType,
+    isOpen: false,
+    officialOrder: {
+      algorithmVersion: handoff.algorithmVersion,
+      appliedAt: handoff.queuedAt,
+      drawId: handoff.drawId,
+      drawNumber: handoff.drawNumber,
+      mode: handoff.mode,
+      verificationHash: handoff.verificationHash,
+    },
+  };
+  const teams = handoff.participants.map((participant, index) => withSpent({
+    teamId: `offline-t${index + 1}`,
+    teamNumber: index + 1,
+    name: participant.teamName || participant.managerName || `Team ${index + 1}`,
+    managerName: participant.managerName || participant.teamName || `Manager ${index + 1}`,
+    budget: config.defaultBudget,
+    managerType: "human",
+    roster: [],
+  }));
+  return { config, teams, lastAssignment: null };
+}
+
+function hasActiveOfflineDraft(state: OfflineDraftState) {
+  return state.config.isOpen || state.teams.some((team) => team.roster.length > 0);
+}
+
+function loadInitialOfflineExperience() {
+  const savedDraft = loadSavedDraft();
+  const handoff = loadOfflineDraftHandoff();
+  if (handoff && !hasActiveOfflineDraft(savedDraft)) {
+    return { draft: applyHandoffToDraft(savedDraft, handoff), appliedHandoff: handoff, pendingHandoff: null };
+  }
+  return { draft: savedDraft, appliedHandoff: null, pendingHandoff: handoff };
 }
 
 function playerMeta(player: Player) {
@@ -416,10 +514,53 @@ function MoneyStepper({
   );
 }
 
+function OfflineOrderStatus({
+  officialOrder,
+  pendingHandoff,
+  onKeepCurrent,
+  onUseOrder,
+}: {
+  officialOrder: OfflineOfficialOrder | undefined;
+  pendingHandoff: OfflineDraftHandoff | null;
+  onKeepCurrent: () => void;
+  onUseOrder: () => void;
+}) {
+  if (pendingHandoff) {
+    return (
+      <section className="offline-order-status is-pending" aria-labelledby="offline-order-pending-title">
+        <ShieldCheck aria-hidden="true" />
+        <div>
+          <span>Official order waiting</span>
+          <strong id="offline-order-pending-title">Start Draw {pendingHandoff.drawNumber} as a new offline draft?</strong>
+          <p>Your current offline draft is still intact. Using this order replaces it with {pendingHandoff.participants.length} teams in the verified finish order.</p>
+        </div>
+        <div className="offline-order-actions">
+          <Button size="sm" onClick={onUseOrder}>Use Official Order</Button>
+          <Button size="sm" variant="secondary" onClick={onKeepCurrent}>Keep Current Draft</Button>
+        </div>
+      </section>
+    );
+  }
+
+  if (!officialOrder) return null;
+  return (
+    <section className="offline-order-status" aria-label={`Official order from Draw ${officialOrder.drawNumber}`}>
+      <ShieldCheck aria-hidden="true" />
+      <div>
+        <span>Verified handoff</span>
+        <strong>Official order · Draw {officialOrder.drawNumber}</strong>
+        <p>The manager list below follows the exact Showdown result saved on this device.</p>
+      </div>
+    </section>
+  );
+}
+
 export default function OfflineDraftV2() {
-  const initialDraft = useMemo(() => loadSavedDraft(), []);
+  const [initialExperience] = useState(loadInitialOfflineExperience);
+  const initialDraft = initialExperience.draft;
   const [teams, setTeams] = useState<OfflineTeam[]>(initialDraft.teams);
   const [offlineConfig, setOfflineConfig] = useState<OfflineDraftConfig>(initialDraft.config);
+  const [pendingHandoff, setPendingHandoff] = useState<OfflineDraftHandoff | null>(initialExperience.pendingHandoff);
   const playerPool = useMemo(
     () => loadPlayerPool({
       scoring: normalizeAuctionValueScoring(offlineConfig.scoring),
@@ -443,13 +584,20 @@ export default function OfflineDraftV2() {
   const [manualPosition, setManualPosition] = useState<ManualPosition>("RB");
   const [error, setError] = useState<string | null>(null);
   const [setupError, setSetupError] = useState<string | null>(null);
-  const [lastAssignment, setLastAssignment] = useState<LastAssignment | null>(null);
-  const [saveStatus, setSaveStatus] = useState<string | null>(null);
+  const [lastAssignment, setLastAssignment] = useState<LastAssignment | null>(initialDraft.lastAssignment);
+  const [saveStatus, setSaveStatus] = useState<string | null>(
+    initialExperience.appliedHandoff ? `Official order imported · Draw ${initialExperience.appliedHandoff.drawNumber}` : null,
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ teams, config: offlineConfig }));
-  }, [offlineConfig, teams]);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ teams, config: offlineConfig, lastAssignment }));
+  }, [lastAssignment, offlineConfig, teams]);
+
+  useEffect(() => {
+    if (!initialExperience.appliedHandoff) return;
+    clearOfflineDraftHandoff();
+  }, [initialExperience.appliedHandoff]);
 
   useEffect(() => {
     if (teams.some((team) => team.teamId === selectedTeamId)) return;
@@ -483,14 +631,48 @@ export default function OfflineDraftV2() {
 
   const totalPlayers = teams.reduce((sum, team) => sum + team.roster.length, 0);
   const totalSpent = teams.reduce((sum, team) => sum + team.spent, 0);
-  const priceValue = clampWholeDollar(price);
+  const totalRosterSlots = offlineConfig.rosterSlots.reduce((sum, slot) => sum + Math.max(0, Number(slot.count) || 0), 0);
+  const turn = getOfflineDraftTurn(offlineConfig.draftType, totalPlayers, teams.length, totalRosterSlots);
+  const turnTeam = turn.teamIndex === null ? null : teams[turn.teamIndex] ?? null;
+  const assignmentTeam = offlineConfig.draftType === "snake" ? turnTeam : selectedTeam;
+  const priceValue = offlineConfig.draftType === "auction" ? clampWholeDollar(price) : 0;
   const customName = playerQuery.trim();
   const isCustomPlayer = Boolean(customName && !selectedPlayer);
-  const canAssign = Boolean(selectedTeam && priceValue !== null && (selectedPlayer || customName));
+  const canAssign = Boolean(!turn.complete && assignmentTeam && priceValue !== null && (selectedPlayer || customName));
+  const teamCountOptions = Array.from(new Set([offlineConfig.teamCount, ...TEAM_COUNT_OPTIONS])).sort((a, b) => a - b);
 
-  function persistDraft(nextTeams = teams, nextConfig = offlineConfig) {
+  function persistDraft(
+    nextTeams = teams,
+    nextConfig = offlineConfig,
+    nextLastAssignment = lastAssignment,
+  ) {
     if (typeof window === "undefined") return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ teams: nextTeams, config: nextConfig }));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      teams: nextTeams,
+      config: nextConfig,
+      lastAssignment: nextLastAssignment,
+    }));
+  }
+
+  function usePendingOfficialOrder() {
+    if (!pendingHandoff) return;
+    const nextDraft = applyHandoffToDraft({ teams, config: offlineConfig, lastAssignment }, pendingHandoff);
+    setTeams(nextDraft.teams);
+    setOfflineConfig(nextDraft.config);
+    setLastAssignment(null);
+    setSelectedTeamId(nextDraft.teams[0]?.teamId ?? "");
+    setPendingHandoff(null);
+    setSaveStatus(`Official order imported · Draw ${pendingHandoff.drawNumber}`);
+    setError(null);
+    setSetupError(null);
+    clearOfflineDraftHandoff();
+    persistDraft(nextDraft.teams, nextDraft.config, null);
+  }
+
+  function keepCurrentOfflineDraft() {
+    clearOfflineDraftHandoff();
+    setPendingHandoff(null);
+    setSaveStatus("Current offline draft kept");
   }
 
   function updateTeamCount(value: string) {
@@ -512,6 +694,16 @@ export default function OfflineDraftV2() {
       setTeams((current) => resizeTeamsForConfig(current, nextConfig, { resetBudgets: true }));
     }
     setSetupError(null);
+    setSaveStatus(null);
+  }
+
+  function updateDraftType(value: string) {
+    if (value !== "auction" && value !== "snake") return;
+    setOfflineConfig((current) => ({ ...current, draftType: value }));
+    setSelectedPlayerId(null);
+    setPlayerQuery("");
+    setPrice("1");
+    setError(null);
     setSaveStatus(null);
   }
 
@@ -570,12 +762,12 @@ export default function OfflineDraftV2() {
   }
 
   function assignCurrentPlayer() {
-    if (!selectedTeam) {
-      setError("Select a team.");
+    if (!assignmentTeam) {
+      setError(turn.complete ? "This offline draft is complete." : "Select a team.");
       return;
     }
 
-    const parsedPrice = clampWholeDollar(price);
+    const parsedPrice = offlineConfig.draftType === "auction" ? clampWholeDollar(price) : 0;
     if (parsedPrice === null) {
       setError("Enter a valid price.");
       return;
@@ -595,7 +787,7 @@ export default function OfflineDraftV2() {
     setTeams((current) =>
       current.map((team) => {
         const rosterWithoutPlayer = team.roster.filter((player) => player.playerId !== rosterPlayer.playerId);
-        if (team.teamId !== selectedTeam.teamId) {
+        if (team.teamId !== assignmentTeam.teamId) {
           return withSpent({ ...team, roster: rosterWithoutPlayer });
         }
         return withSpent({ ...team, roster: [...rosterWithoutPlayer, rosterPlayer] });
@@ -603,10 +795,20 @@ export default function OfflineDraftV2() {
     );
 
     setLastAssignment({
-      teamId: selectedTeam.teamId,
+      teamId: assignmentTeam.teamId,
       playerId: rosterPlayer.playerId,
       playerName: rosterPlayer.name,
     });
+    if (offlineConfig.draftType === "snake") {
+      const nextTurn = getOfflineDraftTurn(
+        offlineConfig.draftType,
+        totalPlayers + 1,
+        teams.length,
+        totalRosterSlots,
+      );
+      const nextTeam = nextTurn.teamIndex === null ? null : teams[nextTurn.teamIndex] ?? null;
+      if (nextTeam) setSelectedTeamId(nextTeam.teamId);
+    }
     setSaveStatus(null);
     setSelectedPlayerId(null);
     setPlayerQuery("");
@@ -649,6 +851,7 @@ export default function OfflineDraftV2() {
 
   function undoLastAssignment() {
     if (!lastAssignment) return;
+    setSelectedTeamId(lastAssignment.teamId);
     removePlayer(lastAssignment.teamId, lastAssignment.playerId);
     setLastAssignment(null);
   }
@@ -717,7 +920,6 @@ export default function OfflineDraftV2() {
     () => getTeamRosterAssignments(rosterSlots, selectedTeam?.roster ?? []),
     [rosterSlots, selectedTeam]
   );
-  const totalRosterSlots = offlineConfig.rosterSlots.reduce((sum, slot) => sum + Math.max(0, Number(slot.count) || 0), 0);
   const selectedTeamFilled = selectedTeam?.roster.length ?? 0;
   const selectedTeamProgress =
     totalRosterSlots > 0 ? `${Math.min(100, (selectedTeamFilled / totalRosterSlots) * 100)}%` : "0%";
@@ -725,6 +927,12 @@ export default function OfflineDraftV2() {
   if (!offlineConfig.isOpen) {
     return (
       <div className="offline-draft">
+        <OfflineOrderStatus
+          officialOrder={offlineConfig.officialOrder}
+          pendingHandoff={pendingHandoff}
+          onKeepCurrent={keepCurrentOfflineDraft}
+          onUseOrder={usePendingOfficialOrder}
+        />
         <section className="offline-setup-grid" aria-label="Offline draft setup">
           <div className="offline-panel offline-setup-panel">
             <div className="offline-panel-head offline-console-head">
@@ -743,7 +951,7 @@ export default function OfflineDraftV2() {
                   Reset
                 </Button>
                 <Button size="lg" onClick={openDraftBoard} className="offline-open-button">
-                  Open Draft Board
+                  Open {offlineConfig.draftType === "snake" ? "Snake Draft" : "Auction Board"}
                 </Button>
               </div>
             </div>
@@ -754,8 +962,8 @@ export default function OfflineDraftV2() {
                 <strong>{offlineConfig.teamCount}</strong>
               </div>
               <div>
-                <span>Budget</span>
-                <strong>{money(offlineConfig.defaultBudget)}</strong>
+                <span>Format</span>
+                <strong>{offlineConfig.draftType === "snake" ? "Snake" : "Auction"}</strong>
               </div>
               <div>
                 <span>Roster Slots</span>
@@ -769,23 +977,34 @@ export default function OfflineDraftV2() {
 
             <div className="offline-form-grid offline-setup-controls">
               <SelectWrapper
+                label="Draft Type"
+                value={offlineConfig.draftType}
+                onValueChange={updateDraftType}
+                className="offline-select-trigger"
+              >
+                <SelectItem value="snake">Snake</SelectItem>
+                <SelectItem value="auction">Auction</SelectItem>
+              </SelectWrapper>
+
+              <SelectWrapper
                 label="Team Count"
                 value={String(offlineConfig.teamCount)}
                 onValueChange={updateTeamCount}
                 className="offline-select-trigger"
+                disabled={Boolean(offlineConfig.officialOrder)}
               >
-                {TEAM_COUNT_OPTIONS.map((teamCount) => (
+                {teamCountOptions.map((teamCount) => (
                   <SelectItem key={teamCount} value={String(teamCount)}>
                     {teamCount} Teams
                   </SelectItem>
                 ))}
               </SelectWrapper>
 
-              <MoneyStepper
+              {offlineConfig.draftType === "auction" ? <MoneyStepper
                 label="Default Budget"
                 value={offlineConfig.defaultBudget}
                 onChange={updateDefaultBudget}
-              />
+              /> : null}
 
               <SelectWrapper
                 label="Scoring"
@@ -822,7 +1041,7 @@ export default function OfflineDraftV2() {
                 <div key={team.teamId} className="offline-setup-team-row">
                   <span className="offline-setup-team-number">{team.teamNumber ?? 1}</span>
                   <div className="offline-setup-team-field">
-                    <span>Team {team.teamNumber ?? 1}</span>
+                    <span>{offlineConfig.officialOrder ? `Pick ${team.teamNumber ?? 1}` : `Team ${team.teamNumber ?? 1}`}{team.managerName ? ` · ${team.managerName}` : ""}</span>
                     <Input
                       aria-label={`Team ${team.teamNumber ?? 1} name`}
                       value={team.name}
@@ -841,15 +1060,36 @@ export default function OfflineDraftV2() {
 
   return (
     <div className="offline-draft">
+      <OfflineOrderStatus
+        officialOrder={offlineConfig.officialOrder}
+        pendingHandoff={pendingHandoff}
+        onKeepCurrent={keepCurrentOfflineDraft}
+        onUseOrder={usePendingOfficialOrder}
+      />
       <section className="offline-board-wrap" aria-label="Offline draft teams">
         <TeamBoard
           teams={teams}
           rosterSlots={rosterSlots}
-          activeTeamId={selectedTeam?.teamId ?? null}
+          currentNominatorTeamId={turnTeam?.teamId ?? null}
           density="compact"
+          showAuctionValues={offlineConfig.draftType === "auction"}
+          turnLabel={offlineConfig.draftType === "snake" ? "On the clock" : "Nominating"}
           onTeamOpen={setSelectedTeamId}
           onPlayerMove={movePlayer}
         />
+      </section>
+
+      <section className={cn("offline-turn-strip", turn.complete ? "is-complete" : "")} aria-label="Offline draft turn">
+        <Clock3 aria-hidden="true" />
+        <div>
+          <span>{turn.complete ? "Draft status" : offlineConfig.draftType === "snake" ? "On the clock" : "Next nomination"}</span>
+          <strong>{turn.complete ? "Draft complete" : turnTeam?.name ?? "Waiting for a team"}</strong>
+        </div>
+        <dl>
+          <div><dt>{offlineConfig.draftType === "snake" ? "Pick" : "Nomination"}</dt><dd>{Math.min(turn.selectionNumber, teams.length * totalRosterSlots)}</dd></div>
+          <div><dt>{offlineConfig.draftType === "snake" ? "Round" : "Cycle"}</dt><dd>{turn.round}</dd></div>
+          <div><dt>Order</dt><dd>{offlineConfig.draftType === "snake" && turn.direction === -1 ? "Reverse" : "Forward"}</dd></div>
+        </dl>
       </section>
 
       <section className="offline-manager-grid">
@@ -857,22 +1097,25 @@ export default function OfflineDraftV2() {
           <div className="offline-panel-head offline-console-head">
             <div>
               <span>Manager</span>
-              <h2>Assignment</h2>
+              <h2>{offlineConfig.draftType === "snake" ? "Pick Console" : "Auction Assignment"}</h2>
             </div>
             <div className="offline-console-toolbar">
               <div className="offline-console-stat">
                 <span>Players</span>
                 <strong>{totalPlayers}</strong>
               </div>
-              <div className="offline-console-stat">
+              {offlineConfig.draftType === "auction" ? <div className="offline-console-stat">
                 <span>Spent</span>
                 <strong>{money(totalSpent)}</strong>
-              </div>
-              {selectedTeam ? (
-                <div className="offline-team-chip" title={selectedTeam.name}>
+              </div> : <div className="offline-console-stat">
+                <span>Round</span>
+                <strong>{turn.round}</strong>
+              </div>}
+              {assignmentTeam ? (
+                <div className="offline-team-chip" title={assignmentTeam.name}>
                   <span className="offline-team-chip-dot" aria-hidden="true" />
-                  <span className="offline-team-chip-label">Editing</span>
-                  <strong>{selectedTeam.name}</strong>
+                  <span className="offline-team-chip-label">{offlineConfig.draftType === "snake" ? "On the clock" : "Assigning to"}</span>
+                  <strong>{assignmentTeam.name}</strong>
                 </div>
               ) : null}
               {saveStatus ? <div className="offline-save-status">{saveStatus}</div> : null}
@@ -897,7 +1140,7 @@ export default function OfflineDraftV2() {
 
           <div className="offline-form-grid">
             <SelectWrapper
-              label="Team"
+              label={offlineConfig.draftType === "snake" ? "View Team" : "Winning Team"}
               value={selectedTeam?.teamId ?? ""}
               onValueChange={setSelectedTeamId}
               className="offline-select-trigger"
@@ -909,11 +1152,11 @@ export default function OfflineDraftV2() {
                 ))}
             </SelectWrapper>
 
-            <MoneyStepper
+            {offlineConfig.draftType === "auction" ? <MoneyStepper
               label="Price"
               value={price}
               onChange={setPrice}
-            />
+            /> : <div className="offline-turn-help"><span>Current pick</span><strong>{turnTeam?.name ?? "Draft complete"}</strong><small>The snake order advances automatically after every assignment.</small></div>}
           </div>
 
           <div className="offline-form-grid">
@@ -923,11 +1166,11 @@ export default function OfflineDraftV2() {
               onChange={(event) => renameSelectedTeam(event.target.value)}
               className="offline-input"
             />
-            <MoneyStepper
+            {offlineConfig.draftType === "auction" ? <MoneyStepper
               label="Budget"
               value={selectedTeam?.budget ?? DEFAULT_BUDGET}
               onChange={updateSelectedBudget}
-            />
+            /> : <div className="offline-turn-help"><span>Selection order</span><strong>{turn.direction === -1 ? "Reverse" : "Forward"}</strong><small>Round {turn.round} follows the official team order shown above.</small></div>}
           </div>
 
           <div className={cn("offline-player-toolbar", isCustomPlayer ? "is-custom-player" : "")}>
@@ -967,7 +1210,7 @@ export default function OfflineDraftV2() {
 
             <Button size="lg" onClick={assignCurrentPlayer} disabled={!canAssign}>
               <Plus size={17} aria-hidden="true" />
-              {isCustomPlayer ? "Assign custom" : "Assign"}
+              {turn.complete ? "Draft Complete" : isCustomPlayer ? "Assign custom" : offlineConfig.draftType === "snake" ? `Draft to ${turnTeam?.name ?? "team"}` : "Assign Winner"}
             </Button>
           </div>
 
@@ -998,7 +1241,7 @@ export default function OfflineDraftV2() {
                     </span>
                     <span>{playerMeta(player)}</span>
                   </span>
-                  <span className="offline-player-value">{money(suggestedPrice(player))}</span>
+                  {offlineConfig.draftType === "auction" ? <span className="offline-player-value">{money(suggestedPrice(player))}</span> : null}
                 </button>
               );
             })}
@@ -1026,7 +1269,8 @@ export default function OfflineDraftV2() {
             </div>
           </div>
 
-          <div className="offline-selected-summary">
+          <div className={cn("offline-selected-summary", offlineConfig.draftType === "snake" ? "is-snake" : "")}>
+            {offlineConfig.draftType === "auction" ? <>
             <div>
               <span>Budget</span>
               <strong>{money(selectedTeam?.budget ?? DEFAULT_BUDGET)}</strong>
@@ -1039,6 +1283,10 @@ export default function OfflineDraftV2() {
               <span>Remaining</span>
               <strong>{money(Math.max(0, (selectedTeam?.budget ?? DEFAULT_BUDGET) - (selectedTeam?.spent ?? 0)))}</strong>
             </div>
+            </> : <>
+              <div><span>Rostered</span><strong>{selectedTeamFilled}</strong></div>
+              <div><span>Open Slots</span><strong>{Math.max(0, totalRosterSlots - selectedTeamFilled)}</strong></div>
+            </>}
           </div>
 
           <div className="offline-roster-list">
@@ -1095,7 +1343,7 @@ export default function OfflineDraftV2() {
                       ) : (
                         <span className="offline-roster-slot-static">{currentSlot?.label ?? "Roster"}</span>
                       )}
-                      <strong>{money(player.price)}</strong>
+                      {offlineConfig.draftType === "auction" ? <strong>{money(player.price)}</strong> : null}
                       <button
                         type="button"
                         title={`Remove ${player.name}`}

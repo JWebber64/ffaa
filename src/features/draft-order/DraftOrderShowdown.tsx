@@ -1,6 +1,6 @@
 import { ListOrdered, RotateCcw, Trophy, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppStateScreen } from "../../components/AppStateScreen";
 import { useSleeperLeagueConnections } from "../league-hq/sleeperConnections";
 import { Button } from "../../ui/Button";
@@ -22,6 +22,7 @@ import {
   loadSharedDraftOrderDraw,
   saveDraftOrderDraw,
 } from "./draftOrderPersistence";
+import { createOfflineDraftHandoff, saveOfflineDraftHandoff } from "./offlineDraftHandoff";
 import { ModeSelector } from "./ModeSelector";
 import { ParticipantSetup } from "./ParticipantSetup";
 import { ResultPanel } from "./ResultPanel";
@@ -59,6 +60,7 @@ function initialState(searchParams: URLSearchParams) {
 }
 
 export default function DraftOrderShowdown() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [state, dispatch] = useReducer(draftOrderShowdownReducer, searchParams, initialState);
   const { connections, activeLeagueId } = useSleeperLeagueConnections();
@@ -290,6 +292,19 @@ export default function DraftOrderShowdown() {
     }
   }, [state.accepted, state.draw, state.roomContext]);
 
+  const handleStartOffline = useCallback(async () => {
+    if (!state.draw) return;
+    try {
+      const checked = await verifyDraftOrderDraw(state.draw);
+      if (!checked.valid) throw new Error("Verify this draw before starting an offline draft.");
+      const handoff = createOfflineDraftHandoff(state.draw, state.roomContext);
+      saveOfflineDraftHandoff(handoff);
+      navigate(`/offline-draft?from=draft-order&draw=${encodeURIComponent(state.draw.id)}`);
+    } catch (error) {
+      setActionStatus(error instanceof Error ? error.message : "The offline draft could not be started.");
+    }
+  }, [navigate, state.draw, state.roomContext]);
+
   const handleReroll = useCallback(async () => {
     if (!state.draw) return;
     const confirmed = window.confirm(
@@ -385,7 +400,7 @@ export default function DraftOrderShowdown() {
           ) : null}
           {state.phase === "results" && resultsOpen ? (
             <ResultDialog onClose={handleCloseResults}>
-              <ResultPanel draw={state.draw} roomContext={state.roomContext} accepted={state.accepted} readOnly={state.readOnly} verification={verification} actionStatus={actionStatus} onApply={handleApply} onSave={handleSave} onCopy={handleCopy} onShare={handleShare} onReplay={handleReplay} onReroll={handleReroll} onReset={handleReset} onChangeMode={handleChangeMode} onVerify={handleVerify} onCopyHash={handleCopyHash} />
+              <ResultPanel draw={state.draw} roomContext={state.roomContext} accepted={state.accepted} readOnly={state.readOnly} verification={verification} actionStatus={actionStatus} onApply={handleApply} onStartOffline={handleStartOffline} onSave={handleSave} onCopy={handleCopy} onShare={handleShare} onReplay={handleReplay} onReroll={handleReroll} onReset={handleReset} onChangeMode={handleChangeMode} onVerify={handleVerify} onCopyHash={handleCopyHash} />
             </ResultDialog>
           ) : null}
         </section>

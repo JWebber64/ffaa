@@ -1,4 +1,4 @@
-import { Check, Clipboard, Link2, Play, RefreshCw, RotateCcw, Save, Send, ShieldCheck } from "lucide-react";
+import { Check, Clipboard, Link2, Play, RefreshCw, RotateCcw, Save, Send, ShieldCheck, WifiOff } from "lucide-react";
 import { Button } from "../../ui/Button";
 import { ParticipantMark } from "./renderers/shared";
 import { VerificationPanel } from "./VerificationPanel";
@@ -19,6 +19,7 @@ export function ResultPanel({
   verification,
   actionStatus,
   onApply,
+  onStartOffline,
   onSave,
   onCopy,
   onShare,
@@ -36,6 +37,7 @@ export function ResultPanel({
   verification: DraftOrderVerification | null;
   actionStatus: string;
   onApply: () => void;
+  onStartOffline: () => void;
   onSave: () => void;
   onCopy: () => void;
   onShare: () => void;
@@ -47,13 +49,11 @@ export function ResultPanel({
   onCopyHash: () => void;
 }) {
   const participants = new Map(draw.participants.map((participant) => [participant.id, participant]));
-  const applyReason = !roomContext
-    ? "Import a GameHQ room during setup to apply an official order."
-    : !roomContext.isHost
+  const applyReason = roomContext && !roomContext.isHost
       ? "Only that room's host can apply the official order."
-      : !roomContext.isLobby
+      : roomContext && !roomContext.isLobby
         ? "This room has already started."
-        : roomContext.participants.length !== roomContext.humanSeatCount
+        : roomContext && roomContext.participants.length !== roomContext.humanSeatCount
           ? `Waiting for all ${roomContext.humanSeatCount} human managers.`
           : "";
 
@@ -86,7 +86,8 @@ export function ResultPanel({
 
       <div className="results-actions" aria-label="Draft order actions">
         <div className="results-primary-actions">
-          {!readOnly ? <Button onClick={onApply} disabled={Boolean(applyReason) || accepted}>{accepted ? <Check size={16} aria-hidden="true" /> : <Send size={16} aria-hidden="true" />}{accepted ? "Applied to Draft Room" : "Apply to Draft Room"}</Button> : null}
+          {!readOnly && roomContext ? <Button onClick={onApply} disabled={Boolean(applyReason) || accepted}>{accepted ? <Check size={16} aria-hidden="true" /> : <Send size={16} aria-hidden="true" />}{accepted ? "Applied to Live Room" : "Apply to Live Room"}</Button> : null}
+          <Button variant={roomContext ? "secondary" : "primary"} onClick={onStartOffline}><WifiOff size={16} aria-hidden="true" /> Start Offline Draft</Button>
           {!readOnly ? <Button variant="secondary" onClick={onSave}><Save size={16} aria-hidden="true" /> Save Draw</Button> : null}
           {!readOnly ? <Button variant="secondary" onClick={onShare}><Link2 size={16} aria-hidden="true" /> Share Replay</Button> : null}
         </div>

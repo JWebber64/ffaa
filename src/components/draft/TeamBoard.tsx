@@ -90,6 +90,7 @@ function SlotLine({
   isMoveSelected,
   isDropTarget,
   activePlayerName,
+  showPrice,
   onActivate,
   onDrop,
   onDragStart,
@@ -101,6 +102,7 @@ function SlotLine({
   isMoveSelected?: boolean;
   isDropTarget?: boolean;
   activePlayerName?: string;
+  showPrice: boolean;
   onActivate?: () => void;
   onDrop?: (playerId?: string) => void;
   onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
@@ -186,7 +188,7 @@ function SlotLine({
         isDropTarget && activePlayerName
           ? `Move ${activePlayerName} to ${slot.label}`
           : filled
-            ? `${slot.label}: ${slot.assigned?.name} paid ${formatPlayerPrice(slot.assigned?.price)}${
+            ? `${slot.label}: ${slot.assigned?.name}${showPrice ? ` paid ${formatPlayerPrice(slot.assigned?.price)}` : ""}${
               formatProjectedValue(slot.assigned) ? `, projected ${formatProjectedValue(slot.assigned)}` : ""
               }${rosterMeta.title ? `, ${rosterMeta.title}` : ""}${canMove ? ". Drag or select this card to move it." : ""}`
             : `${slot.label}: Open`
@@ -194,7 +196,7 @@ function SlotLine({
     >
       <span className="team-slot-line-side">
         <span className="team-slot-line-label">{slot.label}</span>
-        {filled ? <span className="team-slot-line-price">{formatPlayerPrice(slot.assigned?.price)}</span> : null}
+        {filled && showPrice ? <span className="team-slot-line-price">{formatPlayerPrice(slot.assigned?.price)}</span> : null}
       </span>
       <span className="team-slot-line-detail">
         {filled ? (
@@ -227,6 +229,8 @@ function TeamPanel({
   isHighBidder,
   isMe,
   isActive,
+  showAuctionValues,
+  turnLabel,
   onOpen,
   onPlayerMove,
 }: {
@@ -236,6 +240,8 @@ function TeamPanel({
   isHighBidder?: boolean;
   isMe?: boolean;
   isActive?: boolean;
+  showAuctionValues: boolean;
+  turnLabel: string;
   onOpen?: (teamId: string) => void;
   onPlayerMove?: (teamId: string, playerId: string, targetSlotKey: string) => void;
 }) {
@@ -254,8 +260,8 @@ function TeamPanel({
   const filledSlots = slotAssignments.filter((slot) => slot.assigned?.name).length;
   const remainingBudget = Math.max(0, (team.budget ?? 0) - (team.spent ?? 0));
   const maxBid = getTeamMaxBid(team, totalSlots);
-  const isBudgetDanger = maxBid <= 5 || remainingBudget <= Math.max(5, totalSlots - filledSlots);
-  const isBudgetWarn = !isBudgetDanger && (maxBid <= 20 || remainingBudget <= 35);
+  const isBudgetDanger = showAuctionValues && (maxBid <= 5 || remainingBudget <= Math.max(5, totalSlots - filledSlots));
+  const isBudgetWarn = showAuctionValues && !isBudgetDanger && (maxBid <= 20 || remainingBudget <= 35);
   const cpuProfile = team.managerType === "computer" ? getComputerManagerProfile(team) : null;
   const teamTitle = team.name?.trim() || team.teamId;
   const panelTitle = cpuProfile ? `${teamTitle} - CPU profile: ${cpuProfile.label}` : teamTitle;
@@ -272,6 +278,7 @@ function TeamPanel({
         isHighBidder ? "team-panel-high-bidder" : "",
         isMe ? "team-panel-me" : "",
         isActive ? "team-panel-active" : "",
+        showAuctionValues ? "" : "team-panel-no-auction-values",
         isBudgetWarn ? "team-panel-budget-warn" : "",
         isBudgetDanger ? "team-panel-budget-danger" : ""
       )}
@@ -300,13 +307,13 @@ function TeamPanel({
 
       {isNominator || isHighBidder ? (
         <div className="team-panel-status-badges">
-          {isNominator ? <div className="team-panel-turn-marker">Nominating</div> : null}
+          {isNominator ? <div className="team-panel-turn-marker">{turnLabel}</div> : null}
           {isHighBidder ? <div className="team-panel-high-marker">High bid</div> : null}
         </div>
       ) : null}
 
       <div className="team-panel-meta-row">
-        <div className="team-panel-meta-item" title={`Remaining budget: $${remainingBudget}`}>
+        {showAuctionValues ? <div className="team-panel-meta-item" title={`Remaining budget: $${remainingBudget}`}>
           <span className="team-panel-meta-label">Budget</span>
           <span
             className={cn(
@@ -318,14 +325,14 @@ function TeamPanel({
           >
             <strong>${remainingBudget}</strong>
           </span>
-        </div>
+        </div> : null}
         <div className="team-panel-meta-item" title={`Filled roster slots: ${filledSlots}/${totalSlots}`}>
           <span className="team-panel-meta-label">Roster</span>
           <span className="team-panel-meta-value">
             <strong>{filledSlots}/{totalSlots}</strong>
           </span>
         </div>
-        <div className="team-panel-meta-item" title={`Maximum bid: $${maxBid}`}>
+        {showAuctionValues ? <div className="team-panel-meta-item" title={`Maximum bid: $${maxBid}`}>
           <span className="team-panel-meta-label">Max Bid</span>
           <span
             className={cn(
@@ -337,7 +344,7 @@ function TeamPanel({
           >
             <strong>${maxBid}</strong>
           </span>
-        </div>
+        </div> : null}
       </div>
 
       <div className="team-panel-body">
@@ -384,6 +391,7 @@ function TeamPanel({
                 <SlotLine
                   key={`${team.teamId}-${slot.key}`}
                   slot={slot}
+                  showPrice={showAuctionValues}
                   canMove={canMove}
                   canAcceptDrop={Boolean(onPlayerMove && !slot.key.startsWith("overflow-"))}
                   isMoveSelected={Boolean(assignedPlayerId && assignedPlayerId === activePlayerId)}
@@ -431,6 +439,8 @@ export default function TeamBoard({
   activeTeamId,
   highBidderTeamId,
   density = "readable",
+  showAuctionValues = true,
+  turnLabel = "Nominating",
   onTeamOpen,
   onPlayerMove,
 }: {
@@ -441,6 +451,8 @@ export default function TeamBoard({
   activeTeamId?: string | null;
   highBidderTeamId?: string | null;
   density?: TeamBoardDensity;
+  showAuctionValues?: boolean;
+  turnLabel?: string;
   onTeamOpen?: (teamId: string) => void;
   onPlayerMove?: (teamId: string, playerId: string, targetSlotKey: string) => void;
 }) {
@@ -462,6 +474,8 @@ export default function TeamBoard({
               isHighBidder={!!highBidderTeamId && team.teamId === highBidderTeamId}
               isMe={!!myTeamId && team.teamId === myTeamId}
               isActive={!!activeTeamId && team.teamId === activeTeamId}
+              showAuctionValues={showAuctionValues}
+              turnLabel={turnLabel}
               {...(onTeamOpen ? { onOpen: onTeamOpen } : {})}
               {...(onPlayerMove ? { onPlayerMove } : {})}
             />
