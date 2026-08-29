@@ -21,6 +21,18 @@ vi.mock("../features/league-hq/sleeperLeague", () => ({
   findSleeperLeagues: vi.fn(),
 }));
 
+vi.mock("../features/offline-draft/offlineDraftPersistence", () => ({
+  createOfflineDraftOnline: vi.fn(),
+  loadOfflineDraftOnlineForSession: vi.fn(),
+  saveOfflineDraftOnline: vi.fn(),
+  subscribeToOfflineDraftOnline: vi.fn(() => () => undefined),
+  offlineDraftIdFromPath: () => "",
+  offlineDraftStorageKey: (draftId = "") => draftId
+    ? `ffaa.offlineDraft.v1:${draftId}`
+    : "ffaa.offlineDraft.v1",
+  offlineDraftShareUrl: (draftId: string) => `${window.location.origin}/ff/offline-draft/${draftId}`,
+}));
+
 const leagueId = "1385319428408774656";
 const twoReceiverSlots: RosterSlot[] = [
   { slot: "QB", count: 1 },

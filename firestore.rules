@@ -43,6 +43,79 @@ service cloud.firestore {
       allow update: if false;
     }
 
+    // Offline drafts use an unguessable document id as their view link. Anyone
+    // with that exact link may read it, but only its creating browser session
+    // may change the teams, settings, bids, or rosters.
+    match /offlineDrafts/{offlineDraftId} {
+      function validOfflineDraftShape() {
+        return request.resource.data.keys().hasOnly([
+            'owner_user_id',
+            'schema_version',
+            'state',
+            'league_id',
+            'league_name',
+            'season',
+            'created_at',
+            'updated_at',
+            'version'
+          ])
+          && request.resource.data.keys().hasAll([
+            'owner_user_id',
+            'schema_version',
+            'state',
+            'created_at',
+            'updated_at',
+            'version'
+          ])
+          && request.resource.data.owner_user_id is string
+          && request.resource.data.schema_version == 1
+          && request.resource.data.state is map
+          && request.resource.data.state.keys().hasAll(['teams', 'config', 'lastAssignment'])
+          && request.resource.data.state.teams is list
+          && request.resource.data.state.teams.size() >= 2
+          && request.resource.data.state.teams.size() <= 32
+          && request.resource.data.state.config is map
+          && request.resource.data.created_at is string
+          && request.resource.data.updated_at is string
+          && request.resource.data.version is int
+          && request.resource.data.version >= 1
+          && (
+            !request.resource.data.keys().hasAny(['league_id'])
+            || request.resource.data.league_id is string
+          )
+          && (
+            !request.resource.data.keys().hasAny(['league_name'])
+            || request.resource.data.league_name is string
+          )
+          && (
+            !request.resource.data.keys().hasAny(['season'])
+            || request.resource.data.season is string
+          );
+      }
+
+      allow get: if offlineDraftId.size() >= 20 && offlineDraftId.size() <= 80;
+      allow list: if false;
+      allow create: if signedIn()
+        && offlineDraftId.size() >= 20
+        && offlineDraftId.size() <= 80
+        && validOfflineDraftShape()
+        && request.resource.data.owner_user_id == request.auth.uid;
+      allow update: if signedIn()
+        && resource.data.owner_user_id == request.auth.uid
+        && request.resource.data.owner_user_id == request.auth.uid
+        && request.resource.data.created_at == resource.data.created_at
+        && request.resource.data.schema_version == resource.data.schema_version
+        && request.resource.data.version == resource.data.version + 1
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'state',
+          'updated_at',
+          'version'
+        ])
+        && validOfflineDraftShape();
+      allow delete: if signedIn()
+        && resource.data.owner_user_id == request.auth.uid;
+    }
+
     match /drafts/{draftId} {
       function draftPath() {
         return /databases/$(database)/documents/drafts/$(draftId);

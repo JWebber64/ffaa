@@ -81,6 +81,7 @@ function AppRoutes() {
       <Routes>
         <Route element={<AppShellV2 />}>
           <Route path="/offline-draft" element={<OfflineDraftV2 />} />
+          <Route path="/offline-draft/:offlineDraftId" element={<OfflineDraftV2 />} />
         </Route>
         <Route path="*" element={<Navigate to="/offline-draft" replace />} />
       </Routes>
