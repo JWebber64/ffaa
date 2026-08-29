@@ -632,6 +632,7 @@ function OfflineOrderStatus({
 
 type OfflineCloudAccess = "local" | "owner" | "viewer";
 type OfflineCloudSync = "idle" | "creating" | "loading" | "saving" | "saved" | "error";
+type OfflineLeagueSync = "disabled" | "connecting" | "waiting" | "saving" | "editor" | "viewer" | "error";
 
 function cloudState(teams: OfflineTeam[], config: OfflineDraftConfig, lastAssignment: LastAssignment | null) {
   return { teams, config, lastAssignment } satisfies OfflineDraftCloudState;
@@ -766,6 +767,106 @@ function OfflineDraftSharedView({
   );
 }
 
+function OfflineLeagueLiveBar({
+  leagueName,
+  sync,
+  notice,
+  shareBusy = false,
+  onShare,
+}: {
+  leagueName: string;
+  sync: Exclude<OfflineLeagueSync, "disabled">;
+  notice: string;
+  shareBusy?: boolean;
+  onShare?: () => void;
+}) {
+  const message = notice || (
+    sync === "connecting"
+      ? `Connecting ${leagueName} live display…`
+      : sync === "waiting"
+        ? "Start the draft or make the first assignment to publish this board."
+        : sync === "saving"
+          ? "Publishing the latest draft change…"
+          : sync === "viewer"
+            ? `${leagueName} is updating live from the editing laptop.`
+            : sync === "error"
+              ? "Live display needs attention. This laptop still keeps its local draft."
+              : `Changes on this laptop appear live anywhere ${leagueName} is connected.`
+  );
+
+  return (
+    <section className={cn("offline-cloud-bar", sync === "viewer" ? "is-viewer" : "")} aria-label="League live display">
+      <Cloud aria-hidden="true" />
+      <div className="offline-cloud-copy">
+        <span>{sync === "viewer" ? "Live display · View only" : "League live display"}</span>
+        <strong>{message}</strong>
+      </div>
+      {onShare ? (
+        <div className="offline-cloud-actions">
+          <Button size="sm" variant="secondary" onClick={onShare} disabled={shareBusy}>
+            <Copy size={15} aria-hidden="true" />
+            Copy separate view link
+          </Button>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function OfflineLeagueSharedView({
+  leagueName,
+  state,
+  sync,
+  notice,
+}: {
+  leagueName: string;
+  state: OfflineDraftState;
+  sync: "viewer" | "error";
+  notice: string;
+}) {
+  const totalRosterSlots = state.config.rosterSlots.reduce(
+    (sum, slot) => sum + Math.max(0, Number(slot.count) || 0),
+    0,
+  );
+  const totalPlayers = state.teams.reduce((sum, team) => sum + team.roster.length, 0);
+  const turn = getOfflineDraftTurn(
+    state.config.draftType,
+    totalPlayers,
+    state.teams.length,
+    totalRosterSlots,
+  );
+  const turnTeam = turn.teamIndex === null ? null : state.teams[turn.teamIndex] ?? null;
+
+  return (
+    <div className="offline-draft is-shared-read-only">
+      <OfflineLeagueLiveBar leagueName={leagueName} sync={sync} notice={notice} />
+      <section className="offline-shared-overview" aria-labelledby="offline-league-shared-title">
+        <div>
+          <span>{leagueName}</span>
+          <h1 id="offline-league-shared-title">Offline Draft Board</h1>
+          <p>The editing laptop controls this draft. This board updates automatically through the connected league.</p>
+        </div>
+        <dl>
+          <div><dt>Teams</dt><dd>{state.teams.length}</dd></div>
+          <div><dt>Players</dt><dd>{totalPlayers}</dd></div>
+          <div><dt>Format</dt><dd>{state.config.draftType === "snake" ? "Snake" : "Auction"}</dd></div>
+          <div><dt>Status</dt><dd>{state.config.isOpen ? turn.complete ? "Complete" : "In progress" : "Setup"}</dd></div>
+        </dl>
+      </section>
+      <section className="offline-board-wrap" aria-label="League offline draft teams">
+        <TeamBoard
+          teams={state.teams}
+          rosterSlots={state.config.rosterSlots as BoardRosterSlot[]}
+          currentNominatorTeamId={state.config.isOpen ? turnTeam?.teamId ?? null : null}
+          density="compact"
+          showAuctionValues={state.config.draftType === "auction"}
+          turnLabel={state.config.draftType === "snake" ? "On the clock" : "Nominating"}
+        />
+      </section>
+    </div>
+  );
+}
+
 export default function OfflineDraftV2() {
   const { connections, activeLeagueId, rememberConnection } = useSleeperLeagueConnections();
   const [cloudDraftId, setCloudDraftId] = useState(() => (
@@ -790,6 +891,16 @@ export default function OfflineDraftV2() {
   const cloudSaveQueue = useRef<Promise<void>>(Promise.resolve());
   const cloudSaveRequest = useRef(0);
   const newlyCreatedCloudDraftId = useRef("");
+  const [leagueSync, setLeagueSync] = useState<OfflineLeagueSync>(
+    cloudDraftId || !offlineActiveLeagueId ? "disabled" : "connecting",
+  );
+  const [leagueSyncAccess, setLeagueSyncAccess] = useState<"unknown" | "editor" | "viewer">("unknown");
+  const [leagueSyncNotice, setLeagueSyncNotice] = useState("");
+  const leagueSyncReady = useRef(false);
+  const leagueLastQueuedState = useRef("");
+  const leagueSaveQueue = useRef<Promise<void>>(Promise.resolve());
+  const leagueSaveRequest = useRef(0);
+  const leagueSyncReadOnly = leagueSyncAccess === "viewer";
   const connectedLeague = useMemo(
     () => connections.find((connection) => connection.leagueId === offlineActiveLeagueId)
       ?? connections.find((connection) => connection.auctionSettings)
@@ -807,10 +918,11 @@ export default function OfflineDraftV2() {
     : connectedLeagueProfile;
   const connectedLeagueSeason = connectedLeague?.season;
   const connectedLeagueLastUsedAt = connectedLeague?.lastUsedAt;
+  const leagueDisplayName = activeLeagueProfile?.leagueName || connectedLeague?.leagueName || "this league";
   const [pendingHandoff, setPendingHandoff] = useState<OfflineDraftHandoff | null>(initialExperience.pendingHandoff);
   const playerPool = useMemo(
     () => {
-      if (cloudDraftId && cloudAccess !== "owner") return [];
+      if ((cloudDraftId && cloudAccess !== "owner") || leagueSyncReadOnly) return [];
       return loadPlayerPool({
         scoring: normalizeAuctionValueScoring(offlineConfig.scoring),
         teamCount: offlineConfig.teamCount,
@@ -822,6 +934,7 @@ export default function OfflineDraftV2() {
     [
       cloudAccess,
       cloudDraftId,
+      leagueSyncReadOnly,
       offlineConfig.defaultBudget,
       offlineConfig.rosterSlots,
       offlineConfig.scoring,
@@ -928,7 +1041,156 @@ export default function OfflineDraftV2() {
   }, [cloudDraftId]);
 
   useEffect(() => {
+    if (cloudDraftId || !/^\d{10,}$/u.test(offlineActiveLeagueId)) {
+      leagueSyncReady.current = false;
+      leagueLastQueuedState.current = "";
+      setLeagueSyncAccess("unknown");
+      setLeagueSync("disabled");
+      setLeagueSyncNotice("");
+      return;
+    }
+
+    let active = true;
+    let unsubscribe: () => void = () => undefined;
+    leagueSyncReady.current = false;
+    leagueLastQueuedState.current = "";
+    setLeagueSyncAccess("unknown");
+    setLeagueSync("connecting");
+    setLeagueSyncNotice("");
+
+    void import("../features/offline-draft/offlineLeagueDraftPersistence")
+      .then((persistence) => persistence.subscribeToOfflineLeagueDraft(
+        offlineActiveLeagueId,
+        ({ currentUserId, record }) => {
+          if (!active) return;
+
+          if (!record) {
+            leagueSyncReady.current = true;
+            setLeagueSync("waiting");
+            setLeagueSyncNotice("");
+            return;
+          }
+
+          const remoteState = normalizeDraftState(record.state);
+          if (!remoteState) {
+            leagueSyncReady.current = true;
+            setLeagueSync("error");
+            setLeagueSyncNotice("The latest league draft update could not be read.");
+            return;
+          }
+
+          const isOwner = record.ownerUserId === currentUserId;
+          const shouldHydrate = !leagueSyncReady.current || !isOwner;
+          leagueSyncReady.current = true;
+          leagueLastQueuedState.current = cloudStateSignature(record.state);
+
+          if (shouldHydrate) {
+            setTeams(remoteState.teams);
+            setOfflineConfig(remoteState.config);
+            setLastAssignment(remoteState.lastAssignment);
+            setSelectedTeamId((current) => (
+              remoteState.teams.some((team) => team.teamId === current)
+                ? current
+                : remoteState.teams[0]?.teamId ?? ""
+            ));
+            setPendingHandoff(null);
+            window.localStorage.setItem(offlineDraftStorageKey(), JSON.stringify(record.state));
+          }
+
+          setLeagueSyncAccess(isOwner ? "editor" : "viewer");
+          setLeagueSync(isOwner ? "editor" : "viewer");
+          setLeagueSyncNotice("");
+        },
+        () => {
+          if (!active) return;
+          leagueSyncReady.current = true;
+          setLeagueSync("error");
+          setLeagueSyncNotice("Live updates paused. Reload this page to reconnect.");
+        },
+      ))
+      .then((stop) => {
+        if (!active) {
+          stop();
+          return;
+        }
+        unsubscribe = stop;
+      })
+      .catch((caught) => {
+        if (!active) return;
+        leagueSyncReady.current = true;
+        setLeagueSync("error");
+        setLeagueSyncNotice(caught instanceof Error ? caught.message : "The league live display could not connect.");
+      });
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
+  }, [cloudDraftId, offlineActiveLeagueId]);
+
+  useEffect(() => {
+    if (
+      cloudDraftId
+      || !/^\d{10,}$/u.test(offlineActiveLeagueId)
+      || !leagueSyncReady.current
+      || !["waiting", "editor", "saving"].includes(leagueSync)
+    ) {
+      return;
+    }
+
+    const state = cloudState(teams, offlineConfig, lastAssignment);
+    if (leagueSync === "waiting" && !hasActiveOfflineDraft({ teams, config: offlineConfig, lastAssignment })) {
+      return;
+    }
+    const signature = cloudStateSignature(state);
+    if (signature === leagueLastQueuedState.current) return;
+
+    const request = ++leagueSaveRequest.current;
+    leagueLastQueuedState.current = signature;
+    setLeagueSyncNotice("");
+    const timeout = window.setTimeout(() => {
+      setLeagueSync("saving");
+      leagueSaveQueue.current = leagueSaveQueue.current
+        .catch(() => undefined)
+        .then(async () => {
+          const persistence = await import("../features/offline-draft/offlineLeagueDraftPersistence");
+          return persistence.saveOfflineLeagueDraft(offlineActiveLeagueId, state);
+        })
+        .then((result) => {
+          if (request !== leagueSaveRequest.current) return;
+          if (result.access === "editor") {
+            setLeagueSyncAccess("editor");
+            setLeagueSync("editor");
+            setLeagueSyncNotice("");
+            return;
+          }
+
+          const remoteState = normalizeDraftState(result.record.state);
+          if (!remoteState) throw new Error("The latest league draft update could not be read.");
+          setTeams(remoteState.teams);
+          setOfflineConfig(remoteState.config);
+          setLastAssignment(remoteState.lastAssignment);
+          setSelectedTeamId(remoteState.teams[0]?.teamId ?? "");
+          setPendingHandoff(null);
+          leagueLastQueuedState.current = cloudStateSignature(result.record.state);
+          window.localStorage.setItem(offlineDraftStorageKey(), JSON.stringify(result.record.state));
+          setLeagueSyncAccess("viewer");
+          setLeagueSync("viewer");
+          setLeagueSyncNotice("");
+        })
+        .catch((caught) => {
+          if (request !== leagueSaveRequest.current) return;
+          setLeagueSync("error");
+          setLeagueSyncNotice(caught instanceof Error ? caught.message : "The league live display could not save.");
+        });
+    }, 300);
+
+    return () => window.clearTimeout(timeout);
+  }, [cloudDraftId, lastAssignment, leagueSync, offlineActiveLeagueId, offlineConfig, teams]);
+
+  useEffect(() => {
     if (cloudDraftId && cloudAccess !== "owner") return;
+    if (leagueSyncReadOnly) return;
     if (!offlineActiveLeagueId) return;
     const controller = new AbortController();
     const season = Number(connectedLeagueSeason) || new Date().getFullYear();
@@ -962,7 +1224,7 @@ export default function OfflineDraftV2() {
       });
 
     return () => controller.abort();
-  }, [cloudAccess, cloudDraftId, connectedLeagueLastUsedAt, connectedLeagueSeason, offlineActiveLeagueId, rememberConnection]);
+  }, [cloudAccess, cloudDraftId, connectedLeagueLastUsedAt, connectedLeagueSeason, leagueSyncReadOnly, offlineActiveLeagueId, rememberConnection]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1006,6 +1268,7 @@ export default function OfflineDraftV2() {
 
   useEffect(() => {
     if (cloudDraftId && cloudAccess !== "owner") return;
+    if (leagueSyncReadOnly) return;
     if (!activeLeagueProfile) return;
     const hasRosteredPlayers = teams.some((team) => team.roster.length > 0);
     if (!shouldApplyOfflineDraftLeagueProfile(offlineConfig, activeLeagueProfile, hasRosteredPlayers)) return;
@@ -1015,7 +1278,7 @@ export default function OfflineDraftV2() {
     setTeams((current) => resizeTeamsForConfig(current, nextConfig, { resetBudgets: true }));
     setSaveStatus(`Using ${activeLeagueProfile.leagueName} roster profile`);
     setSetupError(null);
-  }, [activeLeagueProfile, cloudAccess, cloudDraftId, offlineConfig, teams]);
+  }, [activeLeagueProfile, cloudAccess, cloudDraftId, leagueSyncReadOnly, offlineConfig, teams]);
 
   useEffect(() => {
     if (!initialExperience.appliedHandoff) return;
@@ -1510,7 +1773,26 @@ export default function OfflineDraftV2() {
     );
   }
 
-  const cloudBar = (
+  if (!cloudDraftId && leagueSyncReadOnly) {
+    return (
+      <OfflineLeagueSharedView
+        leagueName={leagueDisplayName}
+        state={{ teams, config: offlineConfig, lastAssignment }}
+        sync={leagueSync === "error" ? "error" : "viewer"}
+        notice={leagueSyncNotice}
+      />
+    );
+  }
+
+  const cloudBar = !cloudDraftId && leagueSync !== "disabled" ? (
+    <OfflineLeagueLiveBar
+      leagueName={leagueDisplayName}
+      sync={leagueSync}
+      notice={leagueSyncNotice}
+      shareBusy={cloudSync === "creating"}
+      onShare={() => void shareDraftOnline()}
+    />
+  ) : (
     <OfflineDraftCloudBar
       draftId={cloudDraftId}
       access={cloudAccess}

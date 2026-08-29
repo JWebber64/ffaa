@@ -116,6 +116,69 @@ service cloud.firestore {
         && resource.data.owner_user_id == request.auth.uid;
     }
 
+    // The active league id is the rendezvous point for an automatic second-
+    // screen view. The first browser with an active draft is the only editor;
+    // other signed-in browsers may read that league's board but cannot write it.
+    match /offlineLeagueDrafts/{leagueId} {
+      function validOfflineLeagueDraftShape() {
+        return request.resource.data.keys().hasOnly([
+            'owner_user_id',
+            'schema_version',
+            'league_id',
+            'state',
+            'created_at',
+            'updated_at',
+            'version'
+          ])
+          && request.resource.data.keys().hasAll([
+            'owner_user_id',
+            'schema_version',
+            'league_id',
+            'state',
+            'created_at',
+            'updated_at',
+            'version'
+          ])
+          && request.resource.data.owner_user_id is string
+          && request.resource.data.schema_version == 1
+          && request.resource.data.league_id == leagueId
+          && request.resource.data.state is map
+          && request.resource.data.state.keys().hasOnly(['teams', 'config', 'lastAssignment'])
+          && request.resource.data.state.keys().hasAll(['teams', 'config', 'lastAssignment'])
+          && request.resource.data.state.teams is list
+          && request.resource.data.state.teams.size() >= 2
+          && request.resource.data.state.teams.size() <= 32
+          && request.resource.data.state.config is map
+          && request.resource.data.created_at is string
+          && request.resource.data.updated_at is string
+          && request.resource.data.version is int
+          && request.resource.data.version >= 1;
+      }
+
+      allow get: if signedIn()
+        && leagueId.matches('^[0-9]{10,}$');
+      allow list: if false;
+      allow create: if signedIn()
+        && leagueId.matches('^[0-9]{10,}$')
+        && validOfflineLeagueDraftShape()
+        && request.resource.data.owner_user_id == request.auth.uid
+        && request.resource.data.version == 1;
+      allow update: if signedIn()
+        && resource.data.owner_user_id == request.auth.uid
+        && request.resource.data.owner_user_id == request.auth.uid
+        && request.resource.data.created_at == resource.data.created_at
+        && request.resource.data.schema_version == resource.data.schema_version
+        && request.resource.data.version == resource.data.version + 1
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'state',
+          'updated_at',
+          'version'
+        ])
+        && validOfflineLeagueDraftShape();
+      allow delete: if signedIn()
+        && resource.data.owner_user_id == request.auth.uid;
+    }
+
     match /drafts/{draftId} {
       function draftPath() {
         return /databases/$(database)/documents/drafts/$(draftId);
