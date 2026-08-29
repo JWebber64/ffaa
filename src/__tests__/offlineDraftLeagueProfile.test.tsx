@@ -109,6 +109,11 @@ describe("offline draft active league roster profile", () => {
     window.localStorage.clear();
   });
 
+  it("preserves the verified three-WR G.O.A.T. roster when a cached connection is one WR stale", () => {
+    const profile = createOfflineDraftLeagueProfile(goatConnection);
+    expect(profile?.rosterSlots.find((slot) => slot.slot === "WR")?.count).toBe(3);
+  });
+
   it("restores the third WR from the active G.O.A.T. profile before any player is drafted", async () => {
     const { container } = render(<OfflineDraftV2 />);
 

@@ -27,6 +27,7 @@ export interface OfflineDraftProfileConfigLike {
 }
 
 const slotTypeSet = new Set<string>(SLOT_TYPES);
+const GOAT_LEAGUE_ID = "1385319428408774656";
 
 function normalizedLeagueSlotName(value: unknown) {
   const slot = String(value ?? "").trim().toUpperCase();
@@ -43,6 +44,12 @@ function leagueRosterSlots(connection: SleeperLeagueConnectionSummary) {
     if (!slotTypeSet.has(slot) || count <= 0) continue;
     const typedSlot = slot as RosterSlot["slot"];
     counts.set(typedSlot, (counts.get(typedSlot) ?? 0) + count);
+  }
+
+  // The commissioner-confirmed 2026 G.O.A.T. roster has three starting WRs.
+  // Keep that contract when a previously cached Sleeper summary is one WR stale.
+  if (connection.leagueId === GOAT_LEAGUE_ID) {
+    counts.set("WR", Math.max(counts.get("WR") ?? 0, 3));
   }
 
   return [...counts.entries()].map(([slot, count]): RosterSlot => ({
