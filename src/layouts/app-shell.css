@@ -104,17 +104,17 @@
 .product-menu-link strong { font-size: .83rem; }
 .product-menu-link small { color: var(--text-muted); font-size: .75rem; font-weight: 550; }
 
-.product-shell .app-header-right { display: flex; align-items: center; justify-content: flex-end; min-width: 0; gap: var(--space-3); }
-.league-context-control { display: grid; gap: 2px; }
-.league-context-control > span { color: var(--text-muted); font-size: .75rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.product-shell .app-header-right { --app-header-control-height: 44px; display: flex; align-items: center; justify-content: flex-end; min-width: 0; gap: var(--space-3); }
+.league-context-control { display: flex; align-items: center; gap: var(--space-2); }
+.league-context-control > span { flex: 0 0 auto; color: var(--text-muted); font-size: .75rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
 .league-context-control .ffaa-custom-select,
 .mobile-more-league .ffaa-custom-select { max-width: 180px; }
-.league-context-select,
+.league-context-select { height: var(--app-header-control-height); min-height: var(--app-header-control-height); padding: 2px 4px 2px 12px; border: 0; background: transparent; color: var(--text-primary); font: inherit; font-size: .75rem; font-weight: 700; }
 .mobile-more-league-select { min-height: 30px; padding: 2px 4px 2px 9px; border: 0; background: transparent; color: var(--text-primary); font: inherit; font-size: .75rem; font-weight: 700; }
 .league-context-select .ffaa-custom-select-icon,
 .mobile-more-league-select .ffaa-custom-select-icon { width: 24px; height: 24px; }
 .connect-league-link { color: var(--text-secondary); font-size: .75rem; font-weight: 700; }
-.shell-primary-action { display: inline-flex; min-height: 40px; padding: 0 var(--space-4); align-items: center; border: 1px solid var(--color-border-brand); border-radius: var(--r-md); background: var(--color-button-primary); color: var(--color-button-primary-text); font-size: .77rem; font-weight: 850; }
+.shell-primary-action { display: inline-flex; height: var(--app-header-control-height); min-height: var(--app-header-control-height); padding: 0 var(--space-4); align-items: center; border: 1px solid var(--color-border-brand); border-radius: var(--r-md); background: var(--color-button-primary); color: var(--color-button-primary-text); font-size: .77rem; font-weight: 850; }
 .shell-primary-action:hover { background: var(--color-button-primary-hover); color: var(--color-button-primary-text); }
 .shell-debug-action { display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid var(--line-0); border-radius: var(--r-md); background: transparent; color: var(--text-secondary); }
 .product-shell .app-main { width: min(100%, var(--content-wide)); max-width: var(--content-wide); padding: var(--space-6) clamp(16px, 2vw, 28px) 64px; }
