@@ -7596,17 +7596,31 @@ p {
   color: rgba(255,255,255,0.58);
 }
 
-.offline-roster-actions button {
+.offline-roster-remove-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
+  gap: 6px;
+  min-width: 32px;
   height: 32px;
+  padding: 0 10px;
   border: 1px solid rgba(251,113,133,0.24);
-  border-radius: 999px;
+  border-radius: 9px;
   background: rgba(251,113,133,0.11);
   color: rgba(254,205,211,0.96);
+  font-size: 0.7rem;
+  font-weight: 800;
   cursor: pointer;
+}
+
+.offline-roster-remove-button:hover {
+  border-color: rgba(251,113,133,0.48);
+  background: rgba(251,113,133,0.18);
+}
+
+.offline-roster-remove-button:focus-visible {
+  outline: 2px solid rgba(251,113,133,0.78);
+  outline-offset: 2px;
 }
 
 .offline-empty {

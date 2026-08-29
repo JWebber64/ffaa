@@ -124,6 +124,8 @@ type LastAssignment = {
   teamId: string;
   playerId: string;
   playerName: string;
+  teamName?: string;
+  price?: number;
 };
 
 function money(value: number) {
@@ -382,7 +384,17 @@ function normalizeLastAssignment(value: unknown): LastAssignment | null {
   const teamId = typeof raw.teamId === "string" ? raw.teamId.trim() : "";
   const playerId = typeof raw.playerId === "string" ? raw.playerId.trim() : "";
   const playerName = typeof raw.playerName === "string" ? raw.playerName.trim() : "";
-  return teamId && playerId && playerName ? { teamId, playerId, playerName } : null;
+  if (!teamId || !playerId || !playerName) return null;
+
+  const teamName = typeof raw.teamName === "string" ? raw.teamName.trim() : "";
+  const price = clampWholeDollar(raw.price);
+  return {
+    teamId,
+    playerId,
+    playerName,
+    ...(teamName ? { teamName } : {}),
+    ...(price !== null ? { price } : {}),
+  };
 }
 
 function normalizeDraftState(value: unknown): OfflineDraftState | null {
@@ -1285,6 +1297,8 @@ export default function OfflineDraftV2() {
       teamId: assignmentTeam.teamId,
       playerId: rosterPlayer.playerId,
       playerName: rosterPlayer.name,
+      teamName: assignmentTeam.name,
+      price: rosterPlayer.price,
     });
     if (offlineConfig.draftType === "snake") {
       const nextTurn = getOfflineDraftTurn(
@@ -1303,16 +1317,21 @@ export default function OfflineDraftV2() {
     setError(null);
   }
 
-  function removePlayer(teamId: string, playerId: string) {
+  function removePlayer(assignment: LastAssignment) {
     setTeams((current) =>
       current.map((team) =>
-        team.teamId === teamId
-          ? withSpent({ ...team, roster: team.roster.filter((player) => player.playerId !== playerId) })
+        team.teamId === assignment.teamId
+          ? withSpent({ ...team, roster: team.roster.filter((player) => player.playerId !== assignment.playerId) })
           : team
       )
     );
-    setSaveStatus(null);
-    if (lastAssignment?.playerId === playerId) setLastAssignment(null);
+    setSaveStatus(
+      assignment.teamName && typeof assignment.price === "number"
+        ? `${assignment.playerName} removed from ${assignment.teamName}; ${money(assignment.price)} returned to the team budget.`
+        : `${assignment.playerName} removed. The player is available to assign again.`
+    );
+    setError(null);
+    if (lastAssignment?.playerId === assignment.playerId) setLastAssignment(null);
   }
 
   function movePlayer(teamId: string, playerId: string, targetSlotKey: string) {
@@ -1339,7 +1358,7 @@ export default function OfflineDraftV2() {
   function undoLastAssignment() {
     if (!lastAssignment) return;
     setSelectedTeamId(lastAssignment.teamId);
-    removePlayer(lastAssignment.teamId, lastAssignment.playerId);
+    removePlayer(lastAssignment);
     setLastAssignment(null);
   }
 
@@ -1650,7 +1669,7 @@ export default function OfflineDraftV2() {
                   <strong>{assignmentTeam.name}</strong>
                 </div>
               ) : null}
-              {saveStatus ? <div className="offline-save-status">{saveStatus}</div> : null}
+              {saveStatus ? <div className="offline-save-status" role="status">{saveStatus}</div> : null}
               <Button size="sm" variant="secondary" onClick={saveDraft}>
                 <Save size={15} aria-hidden="true" />
                 Save
@@ -1661,7 +1680,7 @@ export default function OfflineDraftV2() {
               </Button>
               <Button size="sm" variant="danger" onClick={cancelDraft}>
                 <Trash2 size={15} aria-hidden="true" />
-                Cancel
+                Cancel Draft
               </Button>
               <Button size="sm" variant="danger" onClick={resetDraft}>
                 <RotateCcw size={15} aria-hidden="true" />
@@ -1878,11 +1897,19 @@ export default function OfflineDraftV2() {
                       {offlineConfig.draftType === "auction" ? <strong>{money(player.price)}</strong> : null}
                       <button
                         type="button"
-                        title={`Remove ${player.name}`}
-                        aria-label={`Remove ${player.name}`}
-                        onClick={() => removePlayer(selectedTeam.teamId, player.playerId)}
+                        className="offline-roster-remove-button"
+                        title={`Remove ${player.name} from ${selectedTeam.name}`}
+                        aria-label={`Remove assignment for ${player.name} from ${selectedTeam.name}`}
+                        onClick={() => removePlayer({
+                          teamId: selectedTeam.teamId,
+                          teamName: selectedTeam.name,
+                          playerId: player.playerId,
+                          playerName: player.name,
+                          price: player.price,
+                        })}
                       >
                         <Trash2 size={15} aria-hidden="true" />
+                        <span>Remove</span>
                       </button>
                     </div>
                   </div>
