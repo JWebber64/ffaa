@@ -458,12 +458,21 @@ export default function TeamBoard({
 }) {
   const boardClass =
     teams.length >= 15 ? "team-board-16" : teams.length >= 11 ? "team-board-12" : "team-board-standard";
+  const hasStatusBadges = Boolean(currentNominatorTeamId || highBidderTeamId);
   const boardStyle = {
     "--team-columns": String(Math.max(teams.length, 1)),
   } as CSSProperties;
 
   return (
-    <div className={cn("team-board", boardClass, `team-board-density-${density}`)} style={boardStyle}>
+    <div
+      className={cn(
+        "team-board",
+        boardClass,
+        `team-board-density-${density}`,
+        hasStatusBadges ? "team-board-has-status-badges" : ""
+      )}
+      style={boardStyle}
+    >
       <div className="team-board-track">
         {teams.map((team) => (
           <div key={team.teamId} className="team-board-cell">

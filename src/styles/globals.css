@@ -4461,6 +4461,15 @@ p {
   min-height: 0;
 }
 
+.team-board-has-status-badges {
+  padding-top: 5px;
+}
+
+.team-board-has-status-badges .team-board-cell {
+  position: relative;
+  padding-top: 22px;
+}
+
 .team-panel {
   --team-status-inset: 0px;
   position: relative;
@@ -4581,7 +4590,7 @@ p {
 
 .team-panel-status-badges {
   position: absolute;
-  top: 0;
+  top: -22px;
   left: 50%;
   z-index: 3;
   display: flex;
@@ -4589,7 +4598,7 @@ p {
   justify-content: center;
   gap: 4px;
   max-width: none;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   pointer-events: none;
 }
 
