@@ -11,6 +11,11 @@ import {
   type Team,
 } from "./rosterAssignments";
 import { formatTeamBye, normalizeTeamAbbr, resolveByeWeek } from "@/components/player/teamMarkUtils";
+import {
+  readTeamBoardPlayerTransfer,
+  writeTeamBoardPlayerTransfer,
+  type TeamBoardPlayerTransfer,
+} from "./teamBoardPlayerTransfer";
 
 export type TeamBoardDensity = "compact" | "readable";
 
@@ -86,6 +91,7 @@ function getPlayerNameSizeClass(parts: string[]) {
 function SlotLine({
   slot,
   canMove,
+  canDrag,
   canAcceptDrop,
   isMoveSelected,
   isDropTarget,
@@ -98,6 +104,7 @@ function SlotLine({
 }: {
   slot: SlotAssignment;
   canMove?: boolean;
+  canDrag?: boolean;
   canAcceptDrop?: boolean;
   isMoveSelected?: boolean;
   isDropTarget?: boolean;
@@ -111,7 +118,7 @@ function SlotLine({
   const filled = !!slot.assigned?.name;
   const rosterMeta = getRosterMeta(slot.assigned);
   const hasRosterMeta = !!(rosterMeta.team || rosterMeta.byeWeek);
-  const isInteractive = Boolean(canMove || isDropTarget);
+  const isInteractive = Boolean(canMove || canDrag || isDropTarget);
   const nameParts = getPlayerNameParts(slot.assigned?.name);
   const nameSizeClass = getPlayerNameSizeClass(nameParts);
   const slotStyle = {
@@ -124,21 +131,21 @@ function SlotLine({
         "team-slot-line",
         filled ? "is-filled" : "is-open",
         filled && hasRosterMeta ? "has-meta" : "",
-        canMove ? "is-moveable" : "",
+        canDrag ? "is-moveable" : "",
         isMoveSelected ? "is-move-selected" : "",
         isDropTarget ? "is-drop-target" : ""
       )}
       style={slotStyle}
       data-slot={filled ? "roster-player-card" : "roster-slot"}
       data-roster-slot={slot.key}
-      draggable={Boolean(canMove)}
+      draggable={Boolean(canDrag)}
       role={isInteractive ? "button" : undefined}
       tabIndex={isInteractive ? 0 : undefined}
       aria-pressed={canMove ? Boolean(isMoveSelected) : undefined}
       aria-label={
         isDropTarget && activePlayerName
           ? `Move ${activePlayerName} to ${slot.label}`
-          : canMove && slot.assigned?.name
+          : canDrag && slot.assigned?.name
             ? `Move ${slot.assigned.name} from ${slot.label}`
             : undefined
       }
@@ -166,8 +173,8 @@ function SlotLine({
             }
           : undefined
       }
-      onDragStart={canMove ? onDragStart : undefined}
-      onDragEnd={canMove ? onDragEnd : undefined}
+      onDragStart={canDrag ? onDragStart : undefined}
+      onDragEnd={canDrag ? onDragEnd : undefined}
       onDragOver={
         canAcceptDrop
           ? (event) => {
@@ -190,7 +197,7 @@ function SlotLine({
           : filled
             ? `${slot.label}: ${slot.assigned?.name}${showPrice ? ` paid ${formatPlayerPrice(slot.assigned?.price)}` : ""}${
               formatProjectedValue(slot.assigned) ? `, projected ${formatProjectedValue(slot.assigned)}` : ""
-              }${rosterMeta.title ? `, ${rosterMeta.title}` : ""}${canMove ? ". Drag or select this card to move it." : ""}`
+              }${rosterMeta.title ? `, ${rosterMeta.title}` : ""}${canDrag ? ". Drag or select this card to move it." : ""}`
             : `${slot.label}: Open`
       }
     >
@@ -232,6 +239,9 @@ function TeamPanel({
   showAuctionValues,
   onOpen,
   onPlayerMove,
+  playerTransferSelection,
+  onPlayerTransferSelectionChange,
+  onPlayerTransfer,
 }: {
   team: Team;
   rosterSlots: RosterSlot[];
@@ -242,11 +252,15 @@ function TeamPanel({
   showAuctionValues: boolean;
   onOpen?: (teamId: string) => void;
   onPlayerMove?: (teamId: string, playerId: string, targetSlotKey: string) => void;
+  playerTransferSelection?: TeamBoardPlayerTransfer | null;
+  onPlayerTransferSelectionChange?: (transfer: TeamBoardPlayerTransfer | null) => void;
+  onPlayerTransfer?: (sourceTeamId: string, targetTeamId: string, playerId: string) => void;
 }) {
   const roster = Array.isArray(team.roster) ? team.roster : [];
   const slotAssignments = getTeamRosterAssignments(rosterSlots, roster);
   const visibleSlots = slotAssignments;
   const [activePlayerId, setActivePlayerId] = useState<string | null>(null);
+  const [isTransferOver, setIsTransferOver] = useState(false);
   const suppressNextCardActivation = useRef(false);
   const activePlayer = activePlayerId
     ? roster.find((player) => player.playerId === activePlayerId) ?? null
@@ -264,6 +278,18 @@ function TeamPanel({
   const teamTitle = team.name?.trim() || team.teamId;
   const panelTitle = cpuProfile ? `${teamTitle} - CPU profile: ${cpuProfile.label}` : teamTitle;
   const hasVisibleFlags = Boolean(isNominator || isActive);
+  const canReceiveTransfer = Boolean(
+    onPlayerTransfer &&
+      playerTransferSelection &&
+      playerTransferSelection.sourceTeamId !== team.teamId,
+  );
+  const completePlayerTransfer = (transfer: TeamBoardPlayerTransfer | null) => {
+    if (!transfer || !onPlayerTransfer || transfer.sourceTeamId === team.teamId) return;
+    onPlayerTransfer(transfer.sourceTeamId, team.teamId, transfer.playerId);
+    setActivePlayerId(null);
+    setIsTransferOver(false);
+    onPlayerTransferSelectionChange?.(null);
+  };
   const panelStyle = {
     "--team-slot-rows": String(Math.max(visibleSlots.length, 1)),
   } as CSSProperties;
@@ -278,11 +304,53 @@ function TeamPanel({
         isActive ? "team-panel-active" : "",
         showAuctionValues ? "" : "team-panel-no-auction-values",
         isBudgetWarn ? "team-panel-budget-warn" : "",
-        isBudgetDanger ? "team-panel-budget-danger" : ""
+        isBudgetDanger ? "team-panel-budget-danger" : "",
+        canReceiveTransfer ? "team-panel-transfer-ready" : "",
+        isTransferOver ? "is-transfer-over" : "",
       )}
       title={panelTitle}
       style={panelStyle}
+      onDragOver={
+        onPlayerTransfer
+          ? (event) => {
+              if (!canReceiveTransfer) return;
+              event.preventDefault();
+              event.dataTransfer.dropEffect = "move";
+              setIsTransferOver(true);
+            }
+          : undefined
+      }
+      onDragLeave={
+        onPlayerTransfer
+          ? (event) => {
+              if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) return;
+              setIsTransferOver(false);
+            }
+          : undefined
+      }
+      onDrop={
+        onPlayerTransfer
+          ? (event) => {
+              const transfer = readTeamBoardPlayerTransfer(event.dataTransfer) ?? playerTransferSelection ?? null;
+              if (!transfer || transfer.sourceTeamId === team.teamId) return;
+              event.preventDefault();
+              event.stopPropagation();
+              completePlayerTransfer(transfer);
+            }
+          : undefined
+      }
     >
+      {canReceiveTransfer && playerTransferSelection ? (
+        <button
+          type="button"
+          className="team-panel-transfer-target"
+          aria-label={`Move ${playerTransferSelection.playerName} to ${teamTitle}`}
+          onClick={() => completePlayerTransfer(playerTransferSelection)}
+        >
+          <span>Move here</span>
+          <strong>{teamTitle}</strong>
+        </button>
+      ) : null}
       <div className="team-panel-head">
         <div className={cn("team-panel-title-row", hasVisibleFlags ? "" : "team-panel-title-row-solo")}>
           <button
@@ -353,6 +421,7 @@ function TeamPanel({
                       isRosterPlayerEligibleForSlot(slot.assigned!, target)
                   )
               );
+              const canDrag = Boolean(assignedPlayerId && (canMove || onPlayerTransfer));
               const isDropTarget = Boolean(
                 onPlayerMove &&
                   activePlayer &&
@@ -384,30 +453,52 @@ function TeamPanel({
                   slot={slot}
                   showPrice={showAuctionValues}
                   canMove={canMove}
+                  canDrag={canDrag}
                   canAcceptDrop={Boolean(onPlayerMove && !slot.key.startsWith("overflow-"))}
-                  isMoveSelected={Boolean(assignedPlayerId && assignedPlayerId === activePlayerId)}
+                  isMoveSelected={Boolean(
+                    assignedPlayerId &&
+                      (assignedPlayerId === activePlayerId ||
+                        (playerTransferSelection?.sourceTeamId === team.teamId &&
+                          playerTransferSelection.playerId === assignedPlayerId)),
+                  )}
                   isDropTarget={isDropTarget}
                   onDrop={completeMove}
                   {...(activePlayer?.name ? { activePlayerName: activePlayer.name } : {})}
-                  {...(canMove && assignedPlayerId
+                  {...(canDrag && assignedPlayerId
                     ? {
                         onActivate: () => {
                           if (suppressNextCardActivation.current) {
                             suppressNextCardActivation.current = false;
                             return;
                           }
-                          setActivePlayerId((current) => (current === assignedPlayerId ? null : assignedPlayerId));
+                          const nextPlayerId = activePlayerId === assignedPlayerId ? null : assignedPlayerId;
+                          setActivePlayerId(nextPlayerId);
+                          onPlayerTransferSelectionChange?.(
+                            nextPlayerId
+                              ? {
+                                  sourceTeamId: team.teamId,
+                                  playerId: assignedPlayerId,
+                                  playerName: slot.assigned?.name ?? "Player",
+                                }
+                              : null,
+                          );
                         },
                         onDragStart: (event: DragEvent<HTMLDivElement>) => {
-                          event.dataTransfer.effectAllowed = "move";
-                          event.dataTransfer.setData("text/plain", assignedPlayerId);
+                          const transfer = {
+                            sourceTeamId: team.teamId,
+                            playerId: assignedPlayerId,
+                            playerName: slot.assigned?.name ?? "Player",
+                          } satisfies TeamBoardPlayerTransfer;
+                          writeTeamBoardPlayerTransfer(event.dataTransfer, transfer);
                           suppressNextCardActivation.current = true;
                           setActivePlayerId(assignedPlayerId);
+                          onPlayerTransferSelectionChange?.(transfer);
                         },
                       }
                     : {})}
                   onDragEnd={() => {
                     setActivePlayerId(null);
+                    onPlayerTransferSelectionChange?.(null);
                     window.setTimeout(() => {
                       suppressNextCardActivation.current = false;
                     }, 500);
@@ -434,6 +525,9 @@ export default function TeamBoard({
   turnLabel = "Nominating",
   onTeamOpen,
   onPlayerMove,
+  playerTransferSelection: controlledPlayerTransferSelection,
+  onPlayerTransferSelectionChange,
+  onPlayerTransfer,
 }: {
   teams: Team[];
   rosterSlots: RosterSlot[];
@@ -446,7 +540,18 @@ export default function TeamBoard({
   turnLabel?: string;
   onTeamOpen?: (teamId: string) => void;
   onPlayerMove?: (teamId: string, playerId: string, targetSlotKey: string) => void;
+  playerTransferSelection?: TeamBoardPlayerTransfer | null;
+  onPlayerTransferSelectionChange?: (transfer: TeamBoardPlayerTransfer | null) => void;
+  onPlayerTransfer?: (sourceTeamId: string, targetTeamId: string, playerId: string) => void;
 }) {
+  const [internalPlayerTransferSelection, setInternalPlayerTransferSelection] = useState<TeamBoardPlayerTransfer | null>(null);
+  const playerTransferSelection = controlledPlayerTransferSelection === undefined
+    ? internalPlayerTransferSelection
+    : controlledPlayerTransferSelection;
+  const updatePlayerTransferSelection = (transfer: TeamBoardPlayerTransfer | null) => {
+    setInternalPlayerTransferSelection(transfer);
+    onPlayerTransferSelectionChange?.(transfer);
+  };
   const boardClass =
     teams.length >= 15 ? "team-board-16" : teams.length >= 11 ? "team-board-12" : "team-board-standard";
   const hasStatusBadges = Boolean(currentNominatorTeamId || highBidderTeamId);
@@ -487,6 +592,13 @@ export default function TeamBoard({
                 showAuctionValues={showAuctionValues}
                 {...(onTeamOpen ? { onOpen: onTeamOpen } : {})}
                 {...(onPlayerMove ? { onPlayerMove } : {})}
+                {...(onPlayerTransfer
+                  ? {
+                      onPlayerTransfer,
+                      playerTransferSelection,
+                      onPlayerTransferSelectionChange: updatePlayerTransferSelection,
+                    }
+                  : {})}
               />
             </div>
           );

@@ -64,19 +64,60 @@ afterEach(() => {
 });
 
 describe("offline draft assignment correction", () => {
-  it("removes one wrong-team assignment, refunds the team, and persists the correction", async () => {
+  function createDataTransfer() {
+    const values = new Map<string, string>();
+    return {
+      dropEffect: "none",
+      effectAllowed: "none",
+      setData: vi.fn((type: string, value: string) => values.set(type, value)),
+      getData: vi.fn((type: string) => values.get(type) ?? ""),
+    };
+  }
+
+  it("drags a wrong-team player onto the correct team and transfers the auction spend", async () => {
     render(<OfflineDraftV2 />);
 
-    const removeButton = screen.getByRole("button", {
-      name: "Remove assignment for Test Quarterback from Team 1",
-    });
-    expect(removeButton.textContent).toContain("Remove");
+    expect(screen.queryByRole("button", { name: /Remove assignment/ })).toBeNull();
+    const playerCard = screen.getByRole("button", { name: "Move Test Quarterback from QB" });
+    const dataTransfer = createDataTransfer();
 
-    fireEvent.click(removeButton);
+    fireEvent.dragStart(playerCard, { dataTransfer });
+    const teamTarget = screen.getByRole("button", { name: "Move Test Quarterback to Team 2" });
+    fireEvent.dragOver(teamTarget, { dataTransfer });
+    fireEvent.drop(teamTarget, { dataTransfer });
+    fireEvent.dragEnd(playerCard, { dataTransfer });
+
+    expect(screen.getByRole("heading", { name: "Team 2" })).toBeTruthy();
+    expect(screen.getByRole("status").textContent).toContain("Test Quarterback moved from Team 1 to Team 2.");
+
+    await waitFor(() => {
+      const saved = JSON.parse(window.localStorage.getItem(storageKey) ?? "{}") as ReturnType<typeof savedOpenDraft>;
+      expect(saved.teams[0]?.roster).toEqual([]);
+      expect(saved.teams[0]?.spent).toBe(0);
+      expect(saved.teams[1]?.roster).toEqual([
+        expect.objectContaining({ playerId: "wrong-team-player", name: "Test Quarterback", price: 27 }),
+      ]);
+      expect(saved.teams[1]?.spent).toBe(27);
+    });
+  });
+
+  it("drags a player to the single trash target and returns them to available players", async () => {
+    render(<OfflineDraftV2 />);
+
+    const playerCard = screen.getByRole("button", { name: "Move Test Quarterback from QB" });
+    const dataTransfer = createDataTransfer();
+    fireEvent.dragStart(playerCard, { dataTransfer });
+
+    const availableTarget = screen.getByRole("button", {
+      name: "Return Test Quarterback to available players",
+    });
+    fireEvent.dragOver(availableTarget, { dataTransfer });
+    fireEvent.drop(availableTarget, { dataTransfer });
+    fireEvent.dragEnd(playerCard, { dataTransfer });
 
     expect(screen.getByText("No rostered players.")).toBeTruthy();
     expect(screen.getByRole("status").textContent).toContain(
-      "Test Quarterback removed from Team 1; $27 returned to the team budget."
+      "Test Quarterback returned to available players; $27 returned to Team 1.",
     );
 
     await waitFor(() => {

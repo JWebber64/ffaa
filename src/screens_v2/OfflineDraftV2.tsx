@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Cloud, Copy, Clock3, Plus, RotateCcw, Save, Search, ShieldCheck, Trash2, Undo2, Users } from "lucide-react";
+import { CircleX, Cloud, Copy, Clock3, Plus, RotateCcw, Save, Search, ShieldCheck, Trash2, Undo2, Users } from "lucide-react";
 import { loadPlayerPool } from "../data/loadPlayerPool";
 import { draftedRosterSize, normalizeAuctionValueScoring } from "../data/auctionValueSettings";
 import { AppStateScreen } from "../components/AppStateScreen";
 import TeamBoard from "../components/draft/TeamBoard";
+import {
+  readTeamBoardPlayerTransfer,
+  writeTeamBoardPlayerTransfer,
+  type TeamBoardPlayerTransfer,
+} from "../components/draft/teamBoardPlayerTransfer";
 import { TeamMark } from "../components/player/TeamMark";
 import {
   getTeamRosterAssignments,
@@ -834,6 +839,7 @@ export default function OfflineDraftV2() {
   const [error, setError] = useState<string | null>(null);
   const [setupError, setSetupError] = useState<string | null>(null);
   const [lastAssignment, setLastAssignment] = useState<LastAssignment | null>(initialDraft.lastAssignment);
+  const [playerTransferSelection, setPlayerTransferSelection] = useState<TeamBoardPlayerTransfer | null>(null);
   const [saveStatus, setSaveStatus] = useState<string | null>(
     initialExperience.appliedHandoff ? `Official order imported · Draw ${initialExperience.appliedHandoff.drawNumber}` : null,
   );
@@ -1317,7 +1323,7 @@ export default function OfflineDraftV2() {
     setError(null);
   }
 
-  function removePlayer(assignment: LastAssignment) {
+  function returnPlayerToAvailable(assignment: LastAssignment) {
     setTeams((current) =>
       current.map((team) =>
         team.teamId === assignment.teamId
@@ -1327,11 +1333,54 @@ export default function OfflineDraftV2() {
     );
     setSaveStatus(
       assignment.teamName && typeof assignment.price === "number"
-        ? `${assignment.playerName} removed from ${assignment.teamName}; ${money(assignment.price)} returned to the team budget.`
-        : `${assignment.playerName} removed. The player is available to assign again.`
+        ? `${assignment.playerName} returned to available players; ${money(assignment.price)} returned to ${assignment.teamName}.`
+        : `${assignment.playerName} returned to available players.`
     );
     setError(null);
+    setPlayerTransferSelection(null);
     if (lastAssignment?.playerId === assignment.playerId) setLastAssignment(null);
+  }
+
+  function returnTransferToAvailable(transfer: TeamBoardPlayerTransfer) {
+    const sourceTeam = teams.find((team) => team.teamId === transfer.sourceTeamId);
+    const player = sourceTeam?.roster.find((candidate) => candidate.playerId === transfer.playerId);
+    if (!sourceTeam || !player) return;
+
+    returnPlayerToAvailable({
+      teamId: sourceTeam.teamId,
+      teamName: sourceTeam.name,
+      playerId: player.playerId,
+      playerName: player.name,
+      price: player.price,
+    });
+  }
+
+  function transferPlayer(sourceTeamId: string, targetTeamId: string, playerId: string) {
+    if (sourceTeamId === targetTeamId) return;
+    const sourceTeam = teams.find((team) => team.teamId === sourceTeamId);
+    const targetTeam = teams.find((team) => team.teamId === targetTeamId);
+    const player = sourceTeam?.roster.find((candidate) => candidate.playerId === playerId);
+    if (!sourceTeam || !targetTeam || !player) return;
+
+    const unassignedPlayer = { ...player };
+    delete unassignedPlayer.assignedSlot;
+    setTeams((current) =>
+      current.map((team) => {
+        const rosterWithoutPlayer = team.roster.filter((candidate) => candidate.playerId !== playerId);
+        if (team.teamId === targetTeamId) {
+          return withSpent({ ...team, roster: [...rosterWithoutPlayer, unassignedPlayer] });
+        }
+        if (team.teamId === sourceTeamId) {
+          return withSpent({ ...team, roster: rosterWithoutPlayer });
+        }
+        return team;
+      }),
+    );
+    setSelectedTeamId(targetTeamId);
+    setLastAssignment(null);
+    setPlayerTransferSelection(null);
+    setSaveStatus(`${player.name} moved from ${sourceTeam.name} to ${targetTeam.name}.`);
+    setError(null);
   }
 
   function movePlayer(teamId: string, playerId: string, targetSlotKey: string) {
@@ -1358,7 +1407,7 @@ export default function OfflineDraftV2() {
   function undoLastAssignment() {
     if (!lastAssignment) return;
     setSelectedTeamId(lastAssignment.teamId);
-    removePlayer(lastAssignment);
+    returnPlayerToAvailable(lastAssignment);
     setLastAssignment(null);
   }
 
@@ -1371,6 +1420,7 @@ export default function OfflineDraftV2() {
     setPrice("1");
     setError(null);
     setLastAssignment(null);
+    setPlayerTransferSelection(null);
     setSaveStatus(null);
   }
 
@@ -1396,6 +1446,7 @@ export default function OfflineDraftV2() {
     setError(null);
     setSetupError(null);
     setLastAssignment(null);
+    setPlayerTransferSelection(null);
     setSaveStatus("Cancelled");
   }
 
@@ -1627,6 +1678,9 @@ export default function OfflineDraftV2() {
           turnLabel={offlineConfig.draftType === "snake" ? "On the clock" : "Nominating"}
           onTeamOpen={setSelectedTeamId}
           onPlayerMove={movePlayer}
+          onPlayerTransfer={transferPlayer}
+          playerTransferSelection={playerTransferSelection}
+          onPlayerTransferSelectionChange={setPlayerTransferSelection}
         />
       </section>
 
@@ -1679,7 +1733,7 @@ export default function OfflineDraftV2() {
                 Undo
               </Button>
               <Button size="sm" variant="danger" onClick={cancelDraft}>
-                <Trash2 size={15} aria-hidden="true" />
+                <CircleX size={15} aria-hidden="true" />
                 Cancel Draft
               </Button>
               <Button size="sm" variant="danger" onClick={resetDraft}>
@@ -1805,18 +1859,53 @@ export default function OfflineDraftV2() {
               <span>Roster</span>
               <h2>{selectedTeam?.name ?? "Team"}</h2>
             </div>
-            <div
-              className="offline-roster-meter"
-              aria-label={`${selectedTeamFilled} of ${totalRosterSlots} roster slots filled`}
-            >
-              <span className="offline-roster-meter-count">
-                <strong>{selectedTeamFilled}</strong>
-                <span>/</span>
-                <span>{totalRosterSlots}</span>
-              </span>
-              <span className="offline-roster-meter-track" aria-hidden="true">
-                <span style={{ width: selectedTeamProgress }} />
-              </span>
+            <div className="offline-roster-head-actions">
+              <button
+                type="button"
+                className={cn(
+                  "offline-roster-return-target",
+                  playerTransferSelection ? "is-ready" : "",
+                )}
+                aria-label={
+                  playerTransferSelection
+                    ? `Return ${playerTransferSelection.playerName} to available players`
+                    : "Available players drop zone"
+                }
+                aria-disabled={!playerTransferSelection}
+                onClick={() => {
+                  if (playerTransferSelection) returnTransferToAvailable(playerTransferSelection);
+                }}
+                onDragOver={(event) => {
+                  if (!playerTransferSelection) return;
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = "move";
+                }}
+                onDrop={(event) => {
+                  const transfer = readTeamBoardPlayerTransfer(event.dataTransfer) ?? playerTransferSelection;
+                  if (!transfer) return;
+                  event.preventDefault();
+                  returnTransferToAvailable(transfer);
+                }}
+              >
+                <Trash2 size={16} aria-hidden="true" />
+                <span>
+                  <strong>Available</strong>
+                  <small>{playerTransferSelection ? `Return ${playerTransferSelection.playerName}` : "Drop player here"}</small>
+                </span>
+              </button>
+              <div
+                className="offline-roster-meter"
+                aria-label={`${selectedTeamFilled} of ${totalRosterSlots} roster slots filled`}
+              >
+                <span className="offline-roster-meter-count">
+                  <strong>{selectedTeamFilled}</strong>
+                  <span>/</span>
+                  <span>{totalRosterSlots}</span>
+                </span>
+                <span className="offline-roster-meter-track" aria-hidden="true">
+                  <span style={{ width: selectedTeamProgress }} />
+                </span>
+              </div>
             </div>
           </div>
 
@@ -1858,7 +1947,27 @@ export default function OfflineDraftV2() {
                 const canMove = Boolean(currentSlot && moveTargets.length > 1);
 
                 return (
-                  <div key={player.playerId} className="offline-roster-row">
+                  <div
+                    key={player.playerId}
+                    className={cn(
+                      "offline-roster-row",
+                      playerTransferSelection?.sourceTeamId === selectedTeam.teamId &&
+                        playerTransferSelection.playerId === player.playerId
+                        ? "is-transfer-selected"
+                        : "",
+                    )}
+                    draggable
+                    onDragStart={(event) => {
+                      const transfer = {
+                        sourceTeamId: selectedTeam.teamId,
+                        playerId: player.playerId,
+                        playerName: player.name,
+                      } satisfies TeamBoardPlayerTransfer;
+                      writeTeamBoardPlayerTransfer(event.dataTransfer, transfer);
+                      setPlayerTransferSelection(transfer);
+                    }}
+                    onDragEnd={() => setPlayerTransferSelection(null)}
+                  >
                     <div className="offline-roster-copy">
                       <strong>{player.name}</strong>
                       <span>
@@ -1895,22 +2004,6 @@ export default function OfflineDraftV2() {
                         <span className="offline-roster-slot-static">{currentSlot?.label ?? "Roster"}</span>
                       )}
                       {offlineConfig.draftType === "auction" ? <strong>{money(player.price)}</strong> : null}
-                      <button
-                        type="button"
-                        className="offline-roster-remove-button"
-                        title={`Remove ${player.name} from ${selectedTeam.name}`}
-                        aria-label={`Remove assignment for ${player.name} from ${selectedTeam.name}`}
-                        onClick={() => removePlayer({
-                          teamId: selectedTeam.teamId,
-                          teamName: selectedTeam.name,
-                          playerId: player.playerId,
-                          playerName: player.name,
-                          price: player.price,
-                        })}
-                      >
-                        <Trash2 size={15} aria-hidden="true" />
-                        <span>Remove</span>
-                      </button>
                     </div>
                   </div>
                 );

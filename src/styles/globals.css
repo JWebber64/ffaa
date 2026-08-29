@@ -4502,6 +4502,64 @@ p {
   border-color: rgba(255,255,255,0.18);
 }
 
+.team-panel-transfer-ready {
+  border-color: color-mix(in oklch, var(--green-300) 58%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--green-300) 20%, transparent);
+}
+
+.team-panel-transfer-ready.is-transfer-over {
+  border-color: color-mix(in oklch, var(--green-200) 82%, transparent);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in oklch, var(--green-300) 36%, transparent),
+    0 0 22px color-mix(in oklch, var(--green-400) 20%, transparent);
+}
+
+.team-panel-transfer-target {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-content: center;
+  gap: 4px;
+  padding: 10px;
+  border: 0;
+  border-radius: inherit;
+  background: rgba(5, 24, 16, 0.92);
+  color: rgba(236, 253, 245, 0.98);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.team-panel-transfer-target span {
+  color: rgba(167, 243, 208, 0.82);
+  font-size: 0.52rem;
+  font-weight: 850;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.team-panel-transfer-target strong {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.78rem;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-panel-transfer-target:hover,
+.team-panel-transfer-target:focus-visible,
+.team-panel-transfer-ready.is-transfer-over .team-panel-transfer-target {
+  background: rgba(7, 42, 27, 0.96);
+  box-shadow: inset 0 0 0 2px color-mix(in oklch, var(--green-300) 54%, transparent);
+}
+
+.team-panel-transfer-target:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -3px;
+}
+
 .team-panel-head {
   display: grid;
   grid-template-rows: minmax(0, 1fr);
@@ -7126,6 +7184,74 @@ p {
     0 10px 22px rgba(0,0,0,0.2);
 }
 
+.offline-roster-head-actions {
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.offline-roster-return-target {
+  min-width: 126px;
+  min-height: 38px;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  border: 1px dashed rgba(255,255,255,0.18);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.025);
+  color: rgba(209,250,229,0.56);
+  text-align: left;
+  cursor: default;
+  transition: border-color 120ms ease, background-color 120ms ease, color 120ms ease;
+}
+
+.offline-roster-return-target > span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.offline-roster-return-target strong,
+.offline-roster-return-target small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.offline-roster-return-target strong {
+  color: rgba(236,253,245,0.88);
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+.offline-roster-return-target small {
+  font-size: 0.58rem;
+  line-height: 1.1;
+}
+
+.offline-roster-return-target.is-ready {
+  border-color: rgba(251,113,133,0.64);
+  background: rgba(127,29,29,0.2);
+  color: rgba(254,205,211,0.94);
+  cursor: pointer;
+}
+
+.offline-roster-return-target.is-ready:hover,
+.offline-roster-return-target.is-ready:focus-visible {
+  border-color: rgba(253,164,175,0.9);
+  background: rgba(159,18,57,0.28);
+}
+
+.offline-roster-return-target:focus-visible {
+  outline: 2px solid rgba(251,113,133,0.78);
+  outline-offset: 2px;
+}
+
 .offline-team-chip {
   display: grid;
   grid-template-columns: 7px auto;
@@ -7489,6 +7615,19 @@ p {
   background: transparent;
 }
 
+.offline-roster-row[draggable="true"] {
+  cursor: grab;
+}
+
+.offline-roster-row[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.offline-roster-row.is-transfer-selected {
+  background: color-mix(in oklch, var(--green-400) 10%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--green-300) 34%, transparent);
+}
+
 .offline-roster-row:first-child {
   border-top: 0;
 }
@@ -7596,33 +7735,6 @@ p {
   color: rgba(255,255,255,0.58);
 }
 
-.offline-roster-remove-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-width: 32px;
-  height: 32px;
-  padding: 0 10px;
-  border: 1px solid rgba(251,113,133,0.24);
-  border-radius: 9px;
-  background: rgba(251,113,133,0.11);
-  color: rgba(254,205,211,0.96);
-  font-size: 0.7rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.offline-roster-remove-button:hover {
-  border-color: rgba(251,113,133,0.48);
-  background: rgba(251,113,133,0.18);
-}
-
-.offline-roster-remove-button:focus-visible {
-  outline: 2px solid rgba(251,113,133,0.78);
-  outline-offset: 2px;
-}
-
 .offline-empty {
   min-height: 70px;
   display: grid;
@@ -7713,6 +7825,20 @@ p {
   .offline-roster-slot-control,
   .offline-roster-slot-static {
     height: 40px;
+  }
+
+  .offline-panel-head,
+  .offline-roster-head-actions {
+    align-items: stretch;
+  }
+
+  .offline-roster-head-actions {
+    flex-direction: column-reverse;
+  }
+
+  .offline-roster-return-target,
+  .offline-roster-meter {
+    min-height: 44px;
   }
 }
 
