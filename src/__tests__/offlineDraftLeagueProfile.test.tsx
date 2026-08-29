@@ -11,7 +11,7 @@ import {
   resolveOfflineActiveLeagueId,
   shouldApplyOfflineDraftLeagueProfile,
 } from "../screens_v2/offlineDraftLeagueProfile";
-import type { RosterSlot } from "../types/draftConfig";
+import { DEFAULT_ROSTER_SLOTS, type RosterSlot } from "../types/draftConfig";
 
 vi.mock("../data/loadPlayerPool", () => ({
   loadPlayerPool: () => [],
@@ -110,7 +110,7 @@ describe("offline draft active league roster profile", () => {
         defaultBudget: 200,
         draftType: "auction",
         scoring: "ppr",
-        rosterSlots: twoReceiverSlots,
+        rosterSlots: DEFAULT_ROSTER_SLOTS,
         isOpen: true,
       },
       lastAssignment: null,
@@ -188,6 +188,10 @@ describe("offline draft active league roster profile", () => {
     };
 
     expect(shouldApplyOfflineDraftLeagueProfile(legacyConfig, profile, false)).toBe(true);
+    expect(shouldApplyOfflineDraftLeagueProfile({
+      ...legacyConfig,
+      rosterSlots: DEFAULT_ROSTER_SLOTS,
+    }, profile, false)).toBe(true);
     expect(shouldApplyOfflineDraftLeagueProfile({ ...legacyConfig, profileSource: "custom" }, profile, false)).toBe(true);
     expect(shouldApplyOfflineDraftLeagueProfile({
       ...legacyConfig,

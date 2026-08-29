@@ -1,5 +1,6 @@
 import type { SleeperLeagueConnectionSummary } from "../features/league-hq/sleeperConnections";
 import {
+  DEFAULT_ROSTER_SLOTS,
   FLEX_ELIGIBLE,
   SLOT_TYPES,
   type RosterSlot,
@@ -136,6 +137,16 @@ export function shouldApplyOfflineDraftLeagueProfile(
   hasRosteredPlayers: boolean,
 ) {
   if (hasRosteredPlayers) return false;
+  if (
+    (!config.profileSource || config.profileSource === "legacy")
+    && profile.leagueId === GOAT_LEAGUE_ID
+    && config.teamCount === profile.teamCount
+    && config.defaultBudget === profile.defaultBudget
+    && config.scoring === profile.scoring
+    && rosterProfilesMatch(config.rosterSlots, DEFAULT_ROSTER_SLOTS)
+  ) {
+    return true;
+  }
   if (config.profileSource === "custom") {
     return profile.leagueId === GOAT_LEAGUE_ID
       && config.teamCount === profile.teamCount
