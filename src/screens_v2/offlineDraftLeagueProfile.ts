@@ -28,6 +28,14 @@ export interface OfflineDraftProfileConfigLike {
 
 const slotTypeSet = new Set<string>(SLOT_TYPES);
 const GOAT_LEAGUE_ID = "1385319428408774656";
+const GOAT_ROSTER_SLOTS: RosterSlot[] = [
+  { slot: "QB", count: 1 },
+  { slot: "RB", count: 2 },
+  { slot: "WR", count: 3 },
+  { slot: "TE", count: 1 },
+  { slot: "FLEX", count: 1, flexEligible: [...FLEX_ELIGIBLE] },
+  { slot: "BENCH", count: 4 },
+];
 
 function normalizedLeagueSlotName(value: unknown) {
   const slot = String(value ?? "").trim().toUpperCase();
@@ -63,16 +71,22 @@ export function createOfflineDraftLeagueProfile(
   connection: SleeperLeagueConnectionSummary | null | undefined,
 ): OfflineDraftLeagueProfile | null {
   const settings = connection?.auctionSettings;
-  if (!connection || !settings) return null;
-  const rosterSlots = leagueRosterSlots(connection);
+  if (!connection) return null;
+  if (!settings && connection.leagueId !== GOAT_LEAGUE_ID) return null;
+  const rosterSlots = settings
+    ? leagueRosterSlots(connection)
+    : GOAT_ROSTER_SLOTS.map((slot) => ({
+        ...slot,
+        ...(slot.flexEligible ? { flexEligible: [...slot.flexEligible] } : {}),
+      }));
   if (!rosterSlots.length) return null;
 
   return {
     leagueId: connection.leagueId,
     leagueName: connection.leagueName,
-    teamCount: settings.teamCount,
-    defaultBudget: settings.budget,
-    scoring: settings.scoring === "halfPpr" ? "half_ppr" : settings.scoring,
+    teamCount: (settings?.teamCount ?? connection.totalRosters) || 12,
+    defaultBudget: settings?.budget ?? 200,
+    scoring: settings ? (settings.scoring === "halfPpr" ? "half_ppr" : settings.scoring) : "ppr",
     rosterSlots,
   };
 }

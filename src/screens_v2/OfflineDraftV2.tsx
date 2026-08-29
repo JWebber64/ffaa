@@ -596,6 +596,7 @@ export default function OfflineDraftV2() {
   const connectedLeague = useMemo(
     () => connections.find((connection) => connection.leagueId === activeLeagueId)
       ?? connections.find((connection) => connection.auctionSettings)
+      ?? connections[0]
       ?? null,
     [activeLeagueId, connections],
   );
