@@ -69,12 +69,13 @@ function leagueRosterSlots(connection: SleeperLeagueConnectionSummary) {
 
 export function createOfflineDraftLeagueProfile(
   connection: SleeperLeagueConnectionSummary | null | undefined,
+  fallbackLeagueId = "",
 ): OfflineDraftLeagueProfile | null {
   const settings = connection?.auctionSettings;
-  if (!connection) return null;
-  if (!settings && connection.leagueId !== GOAT_LEAGUE_ID) return null;
+  const leagueId = connection?.leagueId || fallbackLeagueId;
+  if (!settings && leagueId !== GOAT_LEAGUE_ID) return null;
   const rosterSlots = settings
-    ? leagueRosterSlots(connection)
+    ? leagueRosterSlots(connection as SleeperLeagueConnectionSummary)
     : GOAT_ROSTER_SLOTS.map((slot) => ({
         ...slot,
         ...(slot.flexEligible ? { flexEligible: [...slot.flexEligible] } : {}),
@@ -82,9 +83,9 @@ export function createOfflineDraftLeagueProfile(
   if (!rosterSlots.length) return null;
 
   return {
-    leagueId: connection.leagueId,
-    leagueName: connection.leagueName,
-    teamCount: (settings?.teamCount ?? connection.totalRosters) || 12,
+    leagueId,
+    leagueName: connection?.leagueName || "G.O.A.T. League",
+    teamCount: (settings?.teamCount ?? connection?.totalRosters) || 12,
     defaultBudget: settings?.budget ?? 200,
     scoring: settings ? (settings.scoring === "halfPpr" ? "half_ppr" : settings.scoring) : "ppr",
     rosterSlots,

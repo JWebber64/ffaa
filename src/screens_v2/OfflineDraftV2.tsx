@@ -601,8 +601,8 @@ export default function OfflineDraftV2() {
     [activeLeagueId, connections],
   );
   const connectedLeagueProfile = useMemo(
-    () => createOfflineDraftLeagueProfile(connectedLeague),
-    [connectedLeague],
+    () => createOfflineDraftLeagueProfile(connectedLeague, activeLeagueId),
+    [activeLeagueId, connectedLeague],
   );
   const [refreshedLeagueProfile, setRefreshedLeagueProfile] = useState<ReturnType<typeof createOfflineDraftLeagueProfile>>(null);
   const activeLeagueProfile = refreshedLeagueProfile?.leagueId === connectedLeague?.leagueId

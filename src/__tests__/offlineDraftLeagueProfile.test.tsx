@@ -122,6 +122,12 @@ describe("offline draft active league roster profile", () => {
     expect(profile?.rosterSlots.find((slot) => slot.slot === "BENCH")?.count).toBe(4);
   });
 
+  it("restores the verified G.O.A.T. roster from the active league id alone", () => {
+    const profile = createOfflineDraftLeagueProfile(null, leagueId);
+    expect(profile?.leagueId).toBe(leagueId);
+    expect(profile?.rosterSlots.find((slot) => slot.slot === "WR")?.count).toBe(3);
+  });
+
   it("restores the third WR from the active G.O.A.T. profile before any player is drafted", async () => {
     const { container } = render(<OfflineDraftV2 />);
 
