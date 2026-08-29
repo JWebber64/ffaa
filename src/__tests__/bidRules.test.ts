@@ -87,6 +87,21 @@ describe("bidRules", () => {
     expect(getBidValidation(snapshot, "t1", 3).canBid).toBe(true);
   });
 
+  it("does not reserve auction money for IR slots", () => {
+    const snapshot = makeSnapshot({
+      settings: {
+        ...baseSettings,
+        rosterSlots: [
+          { slot: "QB", count: 1 },
+          { slot: "BENCH", count: 1 },
+          { slot: "IR", count: 1 },
+        ],
+      },
+    });
+
+    expect(getBidValidation(snapshot, "t1").maxBid).toBe(9);
+  });
+
   it("rejects a player who cannot fit any roster slot", () => {
     const snapshot = makeSnapshot({
       settings: {
@@ -104,6 +119,44 @@ describe("bidRules", () => {
         secondsLeft: 10,
         call: "none",
       },
+    });
+
+    const validation = getBidValidation(snapshot, "t1", 1);
+
+    expect(validation.canBid).toBe(false);
+    expect(validation.reason).toBe("No roster slot fits this player.");
+  });
+
+  it("does not use IR as a fallback draft slot", () => {
+    const snapshot = makeSnapshot({
+      settings: {
+        ...baseSettings,
+        rosterSlots: [
+          { slot: "QB", count: 1 },
+          { slot: "RB", count: 1 },
+          { slot: "IR", count: 1 },
+        ],
+      },
+      auction: {
+        player: {
+          playerId: "p2",
+          name: "Wide Receiver",
+          pos: "WR",
+        },
+        currentBid: 0,
+        highBidderTeamId: null,
+        secondsLeft: 10,
+        call: "none",
+      },
+      teams: [
+        {
+          teamId: "t1",
+          name: "Team 1",
+          budget: 10,
+          spent: 1,
+          roster: [{ playerId: "p1", name: "Quarterback", pos: "QB", price: 1 }],
+        },
+      ],
     });
 
     const validation = getBidValidation(snapshot, "t1", 1);

@@ -20,7 +20,11 @@ import {
   syncFirebaseAuctionState,
   updateFirebaseDraftSnapshot,
 } from "../multiplayer/firebaseBackend";
-import { getBidValidation, getTeamMaxBidForSnapshot } from "../multiplayer/bidRules";
+import {
+  getBidValidation,
+  getTeamMaxBidForSnapshot,
+  getTotalRosterSlots,
+} from "../multiplayer/bidRules";
 import { getBidSubmittedAtMs, wasBidSubmittedBeforeDeadline } from "../multiplayer/auctionClock";
 import { applyAuctionStateToSnapshot, auctionStateSyncKey } from "../multiplayer/auctionState";
 import { subscribeHostToActions } from "../multiplayer/realtime";
@@ -108,10 +112,6 @@ function getTimerRemainingSeconds(snapshot: DraftSnapshotState) {
   }
 
   return Math.max(0, Math.ceil((expiresAt - nowMs()) / 1000));
-}
-
-function getTotalRosterSlots(snapshot: DraftSnapshotState) {
-  return snapshot.settings?.rosterSlots?.reduce((sum, slot) => sum + (Number(slot.count) || 0), 0) ?? 0;
 }
 
 function setTimer(snapshot: DraftSnapshotState, seconds: number): DraftSnapshotState {

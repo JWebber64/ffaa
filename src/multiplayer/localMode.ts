@@ -21,7 +21,7 @@ import {
   type DraftTeam,
 } from "./draftSnapshot";
 import { getBidSubmittedAtMs, wasBidSubmittedBeforeDeadline } from "./auctionClock";
-import { getBidValidation, getTeamMaxBidForSnapshot } from "./bidRules";
+import { getBidValidation, getTeamMaxBidForSnapshot, getTotalRosterSlots } from "./bidRules";
 import {
   normalizeDraftConfigV2,
   orderByOfficialDraftOrder,
@@ -156,10 +156,6 @@ function getAuctionCall(secondsLeft: number) {
   if (secondsLeft <= TWICE_THRESHOLD_SECONDS) return "twice" as const;
   if (secondsLeft <= ONCE_THRESHOLD_SECONDS) return "once" as const;
   return "none" as const;
-}
-
-function getTotalRosterSlots(snapshot: DraftSnapshotState) {
-  return snapshot.settings?.rosterSlots?.reduce((sum, slot) => sum + (Number(slot.count) || 0), 0) ?? 0;
 }
 
 function isDraftComplete(snapshot: DraftSnapshotState) {

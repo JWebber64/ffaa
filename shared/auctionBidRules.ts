@@ -101,23 +101,34 @@ function getDefaultFlexEligibility(slot: string) {
   return [];
 }
 
+export function getDraftableRosterSlotCount(
+  rosterSlots: readonly BidRuntimeRosterSlot[] | null | undefined
+) {
+  return (rosterSlots ?? []).reduce((sum, slot) => {
+    if (normalizePosition(slot.slot) === "IR") return sum;
+    return sum + Math.max(0, Number(slot.count) || 0);
+  }, 0);
+}
+
 function expandRosterSlots(rosterSlots: BidRuntimeRosterSlot[] | undefined): AssignableSlot[] {
   if (!Array.isArray(rosterSlots)) return [];
 
-  return rosterSlots.flatMap((slotConfig) => {
-    const slot = normalizePosition(slotConfig.slot);
-    const count = Math.max(0, Number(slotConfig.count) || 0);
-    const flexEligible =
-      Array.isArray(slotConfig.flexEligible) && slotConfig.flexEligible.length > 0
-        ? slotConfig.flexEligible.map(normalizePosition)
-        : getDefaultFlexEligibility(slot);
+  return rosterSlots
+    .filter((slotConfig) => normalizePosition(slotConfig.slot) !== "IR")
+    .flatMap((slotConfig) => {
+      const slot = normalizePosition(slotConfig.slot);
+      const count = Math.max(0, Number(slotConfig.count) || 0);
+      const flexEligible =
+        Array.isArray(slotConfig.flexEligible) && slotConfig.flexEligible.length > 0
+          ? slotConfig.flexEligible.map(normalizePosition)
+          : getDefaultFlexEligibility(slot);
 
-    return Array.from({ length: count }, () => ({
-      slot,
-      flexEligible,
-      assigned: null,
-    }));
-  });
+      return Array.from({ length: count }, () => ({
+        slot,
+        flexEligible,
+        assigned: null,
+      }));
+    });
 }
 
 function takeMatchingPlayer(
@@ -176,10 +187,7 @@ export function getBidIncrements(snapshot: BidDraftSnapshot) {
 }
 
 export function getTotalRosterSlots(snapshot: BidDraftSnapshot) {
-  return (snapshot.settings?.rosterSlots ?? []).reduce(
-    (sum, slot) => sum + Math.max(0, Number(slot.count) || 0),
-    0
-  );
+  return getDraftableRosterSlotCount(snapshot.settings?.rosterSlots);
 }
 
 export function getTeamRemainingBudget(team: BidDraftTeam | null | undefined) {

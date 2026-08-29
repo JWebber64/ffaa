@@ -60,6 +60,7 @@ import {
   type OfflineDraftProfileSource,
 } from "./offlineDraftLeagueProfile";
 import { getOfflineDraftTurn } from "./offlineDraftTurn";
+import { getDraftableRosterSlotCount } from "../multiplayer/bidRules";
 
 const DEFAULT_TEAM_COUNT = 12;
 const DEFAULT_BUDGET = 200;
@@ -716,10 +717,7 @@ function OfflineDraftSharedView({
   notice: string;
   onCopy: () => void;
 }) {
-  const totalRosterSlots = state.config.rosterSlots.reduce(
-    (sum, slot) => sum + Math.max(0, Number(slot.count) || 0),
-    0,
-  );
+  const totalRosterSlots = getDraftableRosterSlotCount(state.config.rosterSlots);
   const totalPlayers = state.teams.reduce((sum, team) => sum + team.roster.length, 0);
   const turn = getOfflineDraftTurn(
     state.config.draftType,
@@ -1056,7 +1054,7 @@ export default function OfflineDraftV2() {
 
   const totalPlayers = teams.reduce((sum, team) => sum + team.roster.length, 0);
   const totalSpent = teams.reduce((sum, team) => sum + team.spent, 0);
-  const totalRosterSlots = offlineConfig.rosterSlots.reduce((sum, slot) => sum + Math.max(0, Number(slot.count) || 0), 0);
+  const totalRosterSlots = getDraftableRosterSlotCount(offlineConfig.rosterSlots);
   const turn = getOfflineDraftTurn(offlineConfig.draftType, totalPlayers, teams.length, totalRosterSlots);
   const turnTeam = turn.teamIndex === null ? null : teams[turn.teamIndex] ?? null;
   const assignmentTeam = offlineConfig.draftType === "snake" ? turnTeam : selectedTeam;
@@ -1224,7 +1222,7 @@ export default function OfflineDraftV2() {
   }
 
   function openDraftBoard() {
-    const rosterTotal = offlineConfig.rosterSlots.reduce((sum, slot) => sum + Math.max(0, Number(slot.count) || 0), 0);
+    const rosterTotal = getDraftableRosterSlotCount(offlineConfig.rosterSlots);
     if (rosterTotal <= 0) {
       setSetupError("Add at least one roster slot before opening the board.");
       return;

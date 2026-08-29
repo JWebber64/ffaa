@@ -1,6 +1,7 @@
 import { useRef, useState, type CSSProperties, type DragEvent, type KeyboardEvent } from "react";
 import { cn } from "@/ui/cn";
 import { getComputerManagerProfile } from "@/engine/autoManager";
+import { getDraftableRosterSlotCount } from "@/multiplayer/bidRules";
 import {
   getTeamMaxBid,
   getTeamRosterAssignments,
@@ -268,8 +269,10 @@ function TeamPanel({
   const activeSlotKey = activePlayerId
     ? visibleSlots.find((slot) => slot.assigned?.playerId === activePlayerId)?.key ?? null
     : null;
-  const totalSlots = slotAssignments.length;
-  const filledSlots = slotAssignments.filter((slot) => slot.assigned?.name).length;
+  const totalSlots = getDraftableRosterSlotCount(rosterSlots);
+  const filledSlots = slotAssignments.filter(
+    (slot) => slot.slot !== "IR" && !slot.key.startsWith("overflow-") && slot.assigned?.name
+  ).length;
   const remainingBudget = Math.max(0, (team.budget ?? 0) - (team.spent ?? 0));
   const maxBid = getTeamMaxBid(team, totalSlots);
   const isBudgetDanger = showAuctionValues && (maxBid <= 5 || remainingBudget <= Math.max(5, totalSlots - filledSlots));

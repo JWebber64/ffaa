@@ -2,6 +2,7 @@ export {
   canRosterAuctionPlayer,
   getBidIncrements,
   getBidValidation,
+  getDraftableRosterSlotCount,
   getTeamMaxBidForSnapshot,
   getTeamRemainingBudget,
   getTotalRosterSlots,

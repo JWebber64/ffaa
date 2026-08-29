@@ -77,6 +77,30 @@ describe("roster slot assignments", () => {
     ]);
   });
 
+  it("excludes IR from the roster progress and max bid shown on team cards", () => {
+    const { unmount } = render(
+      <TeamBoard
+        teams={[
+          {
+            teamId: "t1",
+            name: "Team 1",
+            budget: 200,
+            spent: 3,
+            roster: [benchReceiver],
+          },
+        ]}
+        rosterSlots={rosterSlots}
+      />
+    );
+
+    const rosterProgress = screen.queryByTitle("Filled roster slots: 1/5");
+    const maxBid = screen.queryByTitle("Maximum bid: $194");
+    unmount();
+
+    expect(rosterProgress).toBeTruthy();
+    expect(maxBid).toBeTruthy();
+  });
+
   it("keeps team and bye visible while the whole player card moves to an eligible slot", () => {
     const onPlayerMove = vi.fn();
     let dragPayload = "";

@@ -7,7 +7,7 @@ import type {
   RuntimeRosterSlot,
 } from "../multiplayer/draftSnapshot";
 import { isCpuManagerProfileId, type CpuManagerProfileId } from "../types/cpuManager";
-import { getBidValidation } from "../multiplayer/bidRules";
+import { getBidValidation, getDraftableRosterSlotCount } from "../multiplayer/bidRules";
 
 const POSITION_ALIASES: Record<string, string> = {
   DEF: "DST",
@@ -245,7 +245,7 @@ function normalizePosition(pos: string | null | undefined) {
 }
 
 function getTotalRosterSlots(settings: RuntimeDraftSettings) {
-  return settings.rosterSlots.reduce((sum, slot) => sum + Math.max(0, Number(slot.count) || 0), 0);
+  return getDraftableRosterSlotCount(settings.rosterSlots);
 }
 
 function buildSlotBucket(rosterSlots: RuntimeRosterSlot[]): SlotBucket {

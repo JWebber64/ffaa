@@ -63,7 +63,12 @@ import TeamBoard, { type TeamBoardDensity } from "../components/draft/TeamBoard"
 import { getTeamMaxBid, getTeamRosterAssignments } from "../components/draft/rosterAssignments";
 import type { Player } from "../types/draft";
 import type { DraftAuctionPlayer, DraftSnapshotState } from "../multiplayer/draftSnapshot";
-import { getBidIncrements, getBidValidation, getTeamMaxBidForSnapshot } from "../multiplayer/bidRules";
+import {
+  getBidIncrements,
+  getBidValidation,
+  getDraftableRosterSlotCount,
+  getTeamMaxBidForSnapshot,
+} from "../multiplayer/bidRules";
 import { isBidWindowOpenAt } from "../multiplayer/auctionClock";
 import {
   getLocalDraftById,
@@ -1022,11 +1027,14 @@ export default function DraftRoomV2() {
   const myTeam = myTeamId ? boardTeams.find((team) => team.teamId === myTeamId) ?? null : null;
   const myRemainingBudget = bidValidation.remainingBudget;
   const myRosterRows = myTeam ? getTeamRosterAssignments(rosterSlots as any, myTeam.roster ?? []) : [];
-  const myFilledSlots = myRosterRows.filter((row) => row.assigned?.name).length;
-  const myRemainingRosterSlots = Math.max(0, myRosterRows.length - myFilledSlots);
+  const myDraftableRosterRows = myRosterRows.filter(
+    (row) => row.slot !== "IR" && !row.key.startsWith("overflow-")
+  );
+  const myFilledSlots = myDraftableRosterRows.filter((row) => row.assigned?.name).length;
+  const myRemainingRosterSlots = Math.max(0, myDraftableRosterRows.length - myFilledSlots);
   const myAverageRemainingSlotBudget =
     myRemainingRosterSlots > 0 ? myRemainingBudget / myRemainingRosterSlots : 0;
-  const slotsPerTeam = rosterSlots.reduce((sum, slot) => sum + (Number(slot.count) || 0), 0);
+  const slotsPerTeam = getDraftableRosterSlotCount(rosterSlots);
   const myMaxBid = bidValidation.maxBid;
   const nominationBidMax = draftType === "auction" ? myMaxBid : 0;
   const nominationBidValue = parseWholeDollarInput(nominationBid);
@@ -1075,7 +1083,7 @@ export default function DraftRoomV2() {
         ? `Bid ${money(activeBidAmount)}`
         : bidDisabledReason;
   const totalFilledSlots = boardTeams.reduce(
-    (sum, team) => sum + (Array.isArray(team.roster) ? team.roster.length : 0),
+    (sum, team) => sum + Math.min(Array.isArray(team.roster) ? team.roster.length : 0, slotsPerTeam),
     0
   );
   const compactMeta =
@@ -1150,7 +1158,7 @@ export default function DraftRoomV2() {
         }}
         rosterRows={myRosterRows}
         filledSlots={myFilledSlots}
-        totalSlots={myRosterRows.length}
+        totalSlots={slotsPerTeam}
         totalFilledSlots={totalFilledSlots}
         totalDraftSlots={totalDraftSlots}
         canCancelDraft={canCancelDraft}
@@ -1823,8 +1831,10 @@ function TeamRosterDrawer({
   if (!open || !team) return null;
 
   const rows = getTeamRosterAssignments(rosterSlots, team.roster ?? []);
-  const totalSlots = rows.length;
-  const filledSlots = rows.filter((row) => row.assigned?.name).length;
+  const totalSlots = getDraftableRosterSlotCount(rosterSlots);
+  const filledSlots = rows.filter(
+    (row) => row.slot !== "IR" && !row.key.startsWith("overflow-") && row.assigned?.name
+  ).length;
   const spent = team.spent ?? 0;
   const remaining = Math.max(0, (team.budget ?? 0) - spent);
   const maxBid = getTeamMaxBid(team as any, totalSlots);
