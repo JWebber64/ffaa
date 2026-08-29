@@ -19,6 +19,7 @@ import {
   type OfflineDraftHandoff,
   type OfflineDraftType,
 } from "../features/draft-order/offlineDraftHandoff";
+import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import {
   DEFAULT_ROSTER_SLOTS,
   SLOT_TYPES,
@@ -36,6 +37,13 @@ import { UniversalSelect } from "../ui/UniversalSelect";
 import { cn } from "../ui/cn";
 import { matchesPositionFilter } from "../utils/positionFilter";
 import { compareOfflineDraftPlayers, suggestedPrice } from "./offlineDraftPlayerOrder";
+import {
+  applyOfflineDraftLeagueProfile,
+  createOfflineDraftLeagueProfile,
+  markOfflineDraftProfileCustom,
+  shouldApplyOfflineDraftLeagueProfile,
+  type OfflineDraftProfileSource,
+} from "./offlineDraftLeagueProfile";
 import { getOfflineDraftTurn } from "./offlineDraftTurn";
 
 const STORAGE_KEY = "ffaa.offlineDraft.v1";
@@ -70,6 +78,8 @@ type OfflineDraftConfig = {
   scoring: ScoringType;
   rosterSlots: DraftRosterSlot[];
   isOpen: boolean;
+  profileSource: OfflineDraftProfileSource;
+  profileLeagueId?: string;
   officialOrder?: OfflineOfficialOrder;
 };
 
@@ -185,6 +195,7 @@ function createDefaultConfig(): OfflineDraftConfig {
     scoring: "ppr",
     rosterSlots: cloneRosterSlots(DEFAULT_ROSTER_SLOTS),
     isOpen: false,
+    profileSource: "default",
   };
 }
 
@@ -291,6 +302,13 @@ function normalizeSavedConfig(value: unknown): OfflineDraftConfig {
         : "ppr",
     rosterSlots: rosterSlots.length > 0 ? rosterSlots : cloneRosterSlots(DEFAULT_ROSTER_SLOTS),
     isOpen: typeof raw.isOpen === "boolean" ? raw.isOpen : false,
+    profileSource:
+      raw.profileSource === "custom" || raw.profileSource === "default" || raw.profileSource === "league"
+        ? raw.profileSource
+        : "legacy",
+    ...(typeof raw.profileLeagueId === "string" && raw.profileLeagueId.trim()
+      ? { profileLeagueId: raw.profileLeagueId.trim() }
+      : {}),
     ...(officialOrder ? { officialOrder } : {}),
   };
 }
@@ -556,10 +574,18 @@ function OfflineOrderStatus({
 }
 
 export default function OfflineDraftV2() {
+  const { connections, activeLeagueId } = useSleeperLeagueConnections();
   const [initialExperience] = useState(loadInitialOfflineExperience);
   const initialDraft = initialExperience.draft;
   const [teams, setTeams] = useState<OfflineTeam[]>(initialDraft.teams);
   const [offlineConfig, setOfflineConfig] = useState<OfflineDraftConfig>(initialDraft.config);
+  const activeLeagueProfile = useMemo(
+    () => createOfflineDraftLeagueProfile(
+      connections.find((connection) => connection.leagueId === activeLeagueId)
+        ?? connections.find((connection) => connection.auctionSettings),
+    ),
+    [activeLeagueId, connections],
+  );
   const [pendingHandoff, setPendingHandoff] = useState<OfflineDraftHandoff | null>(initialExperience.pendingHandoff);
   const playerPool = useMemo(
     () => loadPlayerPool({
@@ -593,6 +619,18 @@ export default function OfflineDraftV2() {
     if (typeof window === "undefined") return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ teams, config: offlineConfig, lastAssignment }));
   }, [lastAssignment, offlineConfig, teams]);
+
+  useEffect(() => {
+    if (!activeLeagueProfile) return;
+    const hasRosteredPlayers = teams.some((team) => team.roster.length > 0);
+    if (!shouldApplyOfflineDraftLeagueProfile(offlineConfig, activeLeagueProfile, hasRosteredPlayers)) return;
+
+    const nextConfig = applyOfflineDraftLeagueProfile(offlineConfig, activeLeagueProfile);
+    setOfflineConfig(nextConfig);
+    setTeams((current) => resizeTeamsForConfig(current, nextConfig, { resetBudgets: true }));
+    setSaveStatus(`Using ${activeLeagueProfile.leagueName} roster profile`);
+    setSetupError(null);
+  }, [activeLeagueProfile, offlineConfig, teams]);
 
   useEffect(() => {
     if (!initialExperience.appliedHandoff) return;
@@ -677,7 +715,7 @@ export default function OfflineDraftV2() {
 
   function updateTeamCount(value: string) {
     const teamCount = normalizeTeamCount(value);
-    const nextConfig = { ...offlineConfig, teamCount };
+    const nextConfig = markOfflineDraftProfileCustom({ ...offlineConfig, teamCount });
     setOfflineConfig(nextConfig);
     setTeams((current) => resizeTeamsForConfig(current, nextConfig, { resetBudgets: !offlineConfig.isOpen }));
     setSelectedTeamId((current) => (Number(current.replace("offline-t", "")) <= teamCount ? current : "offline-t1"));
@@ -688,7 +726,7 @@ export default function OfflineDraftV2() {
   function updateDefaultBudget(value: string) {
     const defaultBudget = clampWholeDollar(value);
     if (defaultBudget === null) return;
-    const nextConfig = { ...offlineConfig, defaultBudget };
+    const nextConfig = markOfflineDraftProfileCustom({ ...offlineConfig, defaultBudget });
     setOfflineConfig(nextConfig);
     if (!offlineConfig.isOpen) {
       setTeams((current) => resizeTeamsForConfig(current, nextConfig, { resetBudgets: true }));
@@ -709,11 +747,11 @@ export default function OfflineDraftV2() {
 
   function updateScoring(value: string) {
     if (value !== "standard" && value !== "half_ppr" && value !== "ppr") return;
-    setOfflineConfig((current) => ({ ...current, scoring: value }));
+    setOfflineConfig((current) => markOfflineDraftProfileCustom({ ...current, scoring: value }));
   }
 
   function updateRosterSlots(nextSlots: DraftRosterSlot[]) {
-    setOfflineConfig((current) => ({
+    setOfflineConfig((current) => markOfflineDraftProfileCustom({
       ...current,
       rosterSlots: normalizeRosterSlots(nextSlots, []),
     }));
@@ -739,7 +777,10 @@ export default function OfflineDraftV2() {
   }
 
   function resetSetup() {
-    const nextConfig = createDefaultConfig();
+    const defaultConfig = createDefaultConfig();
+    const nextConfig = activeLeagueProfile
+      ? applyOfflineDraftLeagueProfile(defaultConfig, activeLeagueProfile)
+      : defaultConfig;
     const nextTeams = createDefaultTeams(nextConfig);
     setOfflineConfig(nextConfig);
     setTeams(nextTeams);
