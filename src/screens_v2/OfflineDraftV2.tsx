@@ -824,10 +824,7 @@ function OfflineLeagueSharedView({
   sync: "viewer" | "error";
   notice: string;
 }) {
-  const totalRosterSlots = state.config.rosterSlots.reduce(
-    (sum, slot) => sum + Math.max(0, Number(slot.count) || 0),
-    0,
-  );
+  const totalRosterSlots = getDraftableRosterSlotCount(state.config.rosterSlots);
   const totalPlayers = state.teams.reduce((sum, team) => sum + team.roster.length, 0);
   const turn = getOfflineDraftTurn(
     state.config.draftType,

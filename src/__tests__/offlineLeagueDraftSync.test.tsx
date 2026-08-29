@@ -71,7 +71,7 @@ function openDraftState(teamName = "Team 1") {
       budget: 200,
       spent: 0,
       managerType: "human",
-      roster: [],
+      roster: [] as Array<{ playerId: string; name: string; price: number; pos: string }>,
     })),
     lastAssignment: null,
   };
@@ -172,4 +172,47 @@ describe("offline draft league live display", () => {
       expect(within(viewer.container).getAllByTitle("Updated Team").length).toBeGreaterThan(0);
     }, { timeout: 3_000 });
   }, 15_000);
+
+  it("does not require IR to be filled before the read-only board is complete", async () => {
+    const state = openDraftState();
+    state.config.rosterSlots = [
+      { slot: "QB", count: 1 },
+      { slot: "IR", count: 1 },
+    ];
+    state.teams = state.teams.map((team, index) => ({
+      ...team,
+      spent: 1,
+      roster: [{
+        playerId: `qb-${index + 1}`,
+        name: `Quarterback ${index + 1}`,
+        price: 1,
+        pos: "QB",
+      }],
+    }));
+
+    leagueSyncMocks.subscribe.mockImplementation(async (
+      _leagueId: string,
+      onRecord: (snapshot: OfflineLeagueDraftSnapshot) => void,
+    ) => {
+      queueMicrotask(() => onRecord({
+        currentUserId: "viewer-user",
+        record: {
+          leagueId,
+          ownerUserId: "editor-user",
+          state,
+          createdAt: "2026-08-29T00:00:00.000Z",
+          updatedAt: "2026-08-29T00:01:00.000Z",
+          version: 1,
+        },
+      }));
+      return () => undefined;
+    });
+
+    const viewer = render(<OfflineDraftV2 />);
+
+    await waitFor(() => {
+      expect(within(viewer.container).getByText("Live display · View only")).toBeTruthy();
+      expect(within(viewer.container).getByText("Complete")).toBeTruthy();
+    });
+  });
 });
