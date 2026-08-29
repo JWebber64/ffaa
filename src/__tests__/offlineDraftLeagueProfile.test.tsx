@@ -135,7 +135,7 @@ describe("offline draft active league roster profile", () => {
     expect(firstTeamLabels.filter((label) => label?.startsWith("WR"))).toEqual(["WR1", "WR2", "WR3"]);
   });
 
-  it("does not overwrite intentional custom settings or an in-progress draft", () => {
+  it("repairs the exact empty G.O.A.T. two-WR custom shape without overwriting other custom or in-progress drafts", () => {
     const profile = createOfflineDraftLeagueProfile(goatConnection);
     expect(profile).not.toBeNull();
     if (!profile) return;
@@ -148,7 +148,12 @@ describe("offline draft active league roster profile", () => {
     };
 
     expect(shouldApplyOfflineDraftLeagueProfile(legacyConfig, profile, false)).toBe(true);
-    expect(shouldApplyOfflineDraftLeagueProfile({ ...legacyConfig, profileSource: "custom" }, profile, false)).toBe(false);
+    expect(shouldApplyOfflineDraftLeagueProfile({ ...legacyConfig, profileSource: "custom" }, profile, false)).toBe(true);
+    expect(shouldApplyOfflineDraftLeagueProfile({
+      ...legacyConfig,
+      profileSource: "custom",
+      rosterSlots: [...legacyConfig.rosterSlots, { slot: "K", count: 1 }],
+    }, profile, false)).toBe(false);
     expect(shouldApplyOfflineDraftLeagueProfile(legacyConfig, profile, true)).toBe(false);
   });
 });

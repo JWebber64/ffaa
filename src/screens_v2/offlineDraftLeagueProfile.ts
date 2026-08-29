@@ -130,7 +130,14 @@ export function shouldApplyOfflineDraftLeagueProfile(
   profile: OfflineDraftLeagueProfile,
   hasRosteredPlayers: boolean,
 ) {
-  if (hasRosteredPlayers || config.profileSource === "custom") return false;
+  if (hasRosteredPlayers) return false;
+  if (config.profileSource === "custom") {
+    return profile.leagueId === GOAT_LEAGUE_ID
+      && config.teamCount === profile.teamCount
+      && config.defaultBudget === profile.defaultBudget
+      && config.scoring === profile.scoring
+      && isOnlyOneReceiverShort(config.rosterSlots, profile.rosterSlots);
+  }
   if (config.profileSource === "default") return true;
   if (config.profileSource === "league") {
     return config.profileLeagueId !== profile.leagueId || !profileMatchesConfig(config, profile);
