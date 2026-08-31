@@ -767,62 +767,12 @@ function OfflineDraftSharedView({
   );
 }
 
-function OfflineLeagueLiveBar({
-  leagueName,
-  sync,
-  notice,
-  shareBusy = false,
-  onShare,
-}: {
-  leagueName: string;
-  sync: Exclude<OfflineLeagueSync, "disabled">;
-  notice: string;
-  shareBusy?: boolean;
-  onShare?: () => void;
-}) {
-  const message = notice || (
-    sync === "connecting"
-      ? `Connecting ${leagueName} live display…`
-      : sync === "waiting"
-        ? "Start the draft or make the first assignment to publish this board."
-        : sync === "saving"
-          ? "Publishing the latest draft change…"
-          : sync === "viewer"
-            ? `${leagueName} is updating live from the editing laptop.`
-            : sync === "error"
-              ? "Live display needs attention. This laptop still keeps its local draft."
-              : `Changes on this laptop appear live anywhere ${leagueName} is connected.`
-  );
-
-  return (
-    <section className={cn("offline-cloud-bar", sync === "viewer" ? "is-viewer" : "")} aria-label="League live display">
-      <Cloud aria-hidden="true" />
-      <div className="offline-cloud-copy">
-        <span>{sync === "viewer" ? "Live display · View only" : "League live display"}</span>
-        <strong>{message}</strong>
-      </div>
-      {onShare ? (
-        <div className="offline-cloud-actions">
-          <Button size="sm" variant="secondary" onClick={onShare} disabled={shareBusy}>
-            <Copy size={15} aria-hidden="true" />
-            Copy separate view link
-          </Button>
-        </div>
-      ) : null}
-    </section>
-  );
-}
-
 function OfflineLeagueSharedView({
   leagueName,
   state,
-  sync,
-  notice,
 }: {
   leagueName: string;
   state: OfflineDraftState;
-  sync: "viewer" | "error";
-  notice: string;
 }) {
   const totalRosterSlots = getDraftableRosterSlotCount(state.config.rosterSlots);
   const totalPlayers = state.teams.reduce((sum, team) => sum + team.roster.length, 0);
@@ -836,7 +786,6 @@ function OfflineLeagueSharedView({
 
   return (
     <div className="offline-draft is-shared-read-only">
-      <OfflineLeagueLiveBar leagueName={leagueName} sync={sync} notice={notice} />
       <section className="offline-shared-overview" aria-labelledby="offline-league-shared-title">
         <div>
           <span>{leagueName}</span>
@@ -892,7 +841,7 @@ export default function OfflineDraftV2() {
     cloudDraftId || !offlineActiveLeagueId ? "disabled" : "connecting",
   );
   const [leagueSyncAccess, setLeagueSyncAccess] = useState<"unknown" | "editor" | "viewer">("unknown");
-  const [leagueSyncNotice, setLeagueSyncNotice] = useState("");
+  const [, setLeagueSyncNotice] = useState("");
   const leagueSyncReady = useRef(false);
   const leagueLastQueuedState = useRef("");
   const leagueSaveQueue = useRef<Promise<void>>(Promise.resolve());
@@ -1775,21 +1724,11 @@ export default function OfflineDraftV2() {
       <OfflineLeagueSharedView
         leagueName={leagueDisplayName}
         state={{ teams, config: offlineConfig, lastAssignment }}
-        sync={leagueSync === "error" ? "error" : "viewer"}
-        notice={leagueSyncNotice}
       />
     );
   }
 
-  const cloudBar = !cloudDraftId && leagueSync !== "disabled" ? (
-    <OfflineLeagueLiveBar
-      leagueName={leagueDisplayName}
-      sync={leagueSync}
-      notice={leagueSyncNotice}
-      shareBusy={cloudSync === "creating"}
-      onShare={() => void shareDraftOnline()}
-    />
-  ) : (
+  const cloudBar = cloudDraftId || leagueSync === "disabled" ? (
     <OfflineDraftCloudBar
       draftId={cloudDraftId}
       access={cloudAccess}
@@ -1799,7 +1738,7 @@ export default function OfflineDraftV2() {
       onCopy={() => void copyCloudViewLink()}
       onRetry={retryCloudSave}
     />
-  );
+  ) : null;
 
   if (!offlineConfig.isOpen) {
     return (

@@ -153,16 +153,18 @@ describe("offline draft league live display", () => {
     const editor = render(<OfflineDraftV2 />);
 
     await waitFor(() => expect(leagueSyncMocks.save).toHaveBeenCalled(), { timeout: 3_000 });
-    expect(within(editor.container).getByText("League live display")).toBeTruthy();
+    expect(within(editor.container).queryByRole("region", { name: "League live display" })).toBeNull();
+    expect(within(editor.container).queryByText("League live display")).toBeNull();
+    expect(within(editor.container).queryByRole("button", { name: "Copy separate view link" })).toBeNull();
 
     window.localStorage.clear();
     const viewer = render(<OfflineDraftV2 />);
 
     await waitFor(() => {
-      expect(within(viewer.container).getByText("Live display · View only")).toBeTruthy();
       expect(within(viewer.container).getByRole("heading", { name: "Offline Draft Board" })).toBeTruthy();
       expect(within(viewer.container).queryByRole("button", { name: "Save" })).toBeNull();
     });
+    expect(within(viewer.container).queryByRole("region", { name: "League live display" })).toBeNull();
 
     fireEvent.change(within(editor.container).getByLabelText("Team Name"), {
       target: { value: "Updated Team" },
@@ -211,8 +213,8 @@ describe("offline draft league live display", () => {
     const viewer = render(<OfflineDraftV2 />);
 
     await waitFor(() => {
-      expect(within(viewer.container).getByText("Live display · View only")).toBeTruthy();
       expect(within(viewer.container).getByText("Complete")).toBeTruthy();
     });
+    expect(within(viewer.container).queryByRole("region", { name: "League live display" })).toBeNull();
   });
 });
