@@ -18,13 +18,28 @@ type Pos = "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
 type Row = {
   id: string;
   season: number;
-  source: "FantasyPros ADP" | "FantasyPros ECR" | "ESPN salary-cap values";
+  source: "FantasyPros ADP" | "FantasyPros ECR" | "ESPN salary-cap values" | "Sleeper player directory";
   rank: number;                 // overall/ADP rank when available
   name: string;                 // always a non-empty string
   pos: Pos;
   nflTeam: string;              // use "FA" for free agents
   byeWeek?: number;
 };
+
+// Keep confirmed active players in the pool when a ranking source omits them.
+// A matching ranked row still wins during de-duplication when one is available.
+const REQUIRED_POOL_ROWS: Row[] = [
+  {
+    id: "2026-WR-cyrus-allen",
+    season: FANTASY_SEASON,
+    source: "Sleeper player directory",
+    rank: 230,
+    name: "Cyrus Allen",
+    pos: "WR",
+    nflTeam: "KC",
+    byeWeek: 5,
+  },
+];
 
 const OUT_JSON = path.resolve(`src/data/player-pool-${FANTASY_SEASON}.json`);
 const toSlug = (s: string) => slugify(s, { lower: true, strict: true });
@@ -354,6 +369,8 @@ async function main() {
   } catch (e) {
     console.warn("Sleeper augmentation skipped:", (e as Error).message);
   }
+
+  rows = [...rows, ...REQUIRED_POOL_ROWS];
 
   // 4) De-dup by id; sort by rank (if present), then name
   const map = new Map<string, Row>();

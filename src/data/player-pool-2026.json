@@ -2297,6 +2297,16 @@
     "byeWeek": 8
   },
   {
+    "id": "2026-WR-cyrus-allen",
+    "season": 2026,
+    "source": "Sleeper player directory",
+    "rank": 230,
+    "name": "Cyrus Allen",
+    "pos": "WR",
+    "nflTeam": "KC",
+    "byeWeek": 5
+  },
+  {
     "id": "2026-WR-savion-williams",
     "season": 2026,
     "source": "ESPN salary-cap values",
