@@ -58,6 +58,10 @@
       "destination": "/data/:path*"
     },
     {
+      "source": "/ff/teams",
+      "destination": "/index.html"
+    },
+    {
       "source": "/ff/teams/:path*",
       "destination": "/teams/:path*"
     },
