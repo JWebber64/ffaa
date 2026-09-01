@@ -19,6 +19,9 @@ const AnalyticsLab = lazy(() =>
 );
 const Tools = lazy(() => import("./screens/Tools"));
 const LeagueHQ = lazy(() => import("./screens/LeagueHQ"));
+const LeagueTeams = lazy(() => import("./screens/LeagueTeams"));
+const LeagueMatchups = lazy(() => import("./screens/LeagueMatchups"));
+const LeagueLineup = lazy(() => import("./screens/LeagueLineup"));
 const MyHQ = lazy(() => import("./screens/MyHQ"));
 const DraftOrderShowdown = lazy(() => import("./features/draft-order/DraftOrderShowdown"));
 const LeagueHistoryApp = lazy(() => import("./features/league-history/ui/LeagueHistoryApp"));
@@ -71,6 +74,10 @@ function AppRoutes() {
           <Route path="/tools/*" element={<Tools />} />
           <Route path="/league" element={<LeagueHQ />} />
           <Route path="/league/odds" element={<LeagueOddsRedirect />} />
+          <Route path="/league/teams" element={<LeagueTeams />} />
+          <Route path="/league/teams/:teamId" element={<LeagueTeams />} />
+          <Route path="/league/matchups" element={<LeagueMatchups />} />
+          <Route path="/league/lineup" element={<LeagueLineup />} />
           <Route path="/my-hq" element={<MyHQ />} />
           <Route path="/draft-order" element={<DraftOrderShowdown />} />
           <Route path="/league/:leagueId/*" element={<LeagueHistoryApp />} />

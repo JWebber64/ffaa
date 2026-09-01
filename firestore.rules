@@ -6,6 +6,11 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function permanentUser() {
+      return signedIn()
+        && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
     // Permanent league history is public read-only data. Imports run through a
     // separately authorized server or one-time migration rule, never the app.
     match /leagueHistories/{historyId} {
@@ -177,6 +182,430 @@ service cloud.firestore {
         && validOfflineLeagueDraftShape();
       allow delete: if signedIn()
         && resource.data.owner_user_id == request.auth.uid;
+    }
+
+    match /leagueSeasons/{leagueId} {
+      function seasonPath() {
+        return /databases/$(database)/documents/leagueSeasons/$(leagueId);
+      }
+
+      function savedDraftPath() {
+        return /databases/$(database)/documents/offlineLeagueDrafts/$(leagueId);
+      }
+
+      function claimPath(franchiseId) {
+        return /databases/$(database)/documents/leagueSeasons/$(leagueId)/franchiseClaims/$(franchiseId);
+      }
+
+      function membershipPath(userId) {
+        return /databases/$(database)/documents/leagueSeasons/$(leagueId)/managerMemberships/$(userId);
+      }
+
+      function weekSettingsPath(weekKey) {
+        return /databases/$(database)/documents/leagueSeasons/$(leagueId)/weekSettings/$(weekKey);
+      }
+
+      function auditEventPath(eventId) {
+        return /databases/$(database)/documents/leagueSeasons/$(leagueId)/auditEvents/$(eventId);
+      }
+
+      function lineupPath(lineupId) {
+        return /databases/$(database)/documents/leagueSeasons/$(leagueId)/lineups/$(lineupId);
+      }
+
+      function isCommissioner() {
+        return permanentUser()
+          && exists(seasonPath())
+          && get(seasonPath()).data.commissioner_user_id == request.auth.uid;
+      }
+
+      function currentSeasonHasFranchise(franchiseId) {
+        return exists(seasonPath())
+          && get(seasonPath()).data.franchise_ids is list
+          && get(seasonPath()).data.franchise_ids.hasAny([franchiseId]);
+      }
+
+      function controlsFranchise(franchiseId) {
+        return permanentUser()
+          && currentSeasonHasFranchise(franchiseId)
+          && exists(claimPath(franchiseId))
+          && get(claimPath(franchiseId)).data.status == 'approved'
+          && get(claimPath(franchiseId)).data.approved_user_id == request.auth.uid;
+      }
+
+      function validSeasonDocument() {
+        return request.resource.data.keys().hasOnly([
+            'version',
+            'league_id',
+            'commissioner_user_id',
+            'source_draft_revision',
+            'payload',
+            'schedule',
+            'franchise_ids',
+            'revision',
+            'created_at',
+            'published_at',
+            'updated_at'
+          ])
+          && request.resource.data.league_id == leagueId
+          && request.resource.data.commissioner_user_id == request.auth.uid
+          && request.resource.data.payload is map
+          && request.resource.data.schedule is list
+          && request.resource.data.franchise_ids is list
+          && request.resource.data.franchise_ids.size() >= 2
+          && request.resource.data.franchise_ids.size() <= 16
+          && request.resource.data.source_draft_revision is int
+          && request.resource.data.revision is int;
+      }
+
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if permanentUser()
+        && exists(savedDraftPath())
+        && get(savedDraftPath()).data.owner_user_id == request.auth.uid
+        && validSeasonDocument();
+      allow update: if isCommissioner()
+        && validSeasonDocument()
+        && request.resource.data.league_id == resource.data.league_id
+        && request.resource.data.commissioner_user_id == resource.data.commissioner_user_id
+        && request.resource.data.created_at == resource.data.created_at
+        && request.resource.data.revision > resource.data.revision;
+      allow delete: if isCommissioner();
+
+      match /franchiseClaims/{franchiseId} {
+        function matchingMembershipAfter() {
+          let membership = getAfter(membershipPath(request.resource.data.requested_by_user_id)).data;
+          return existsAfter(membershipPath(request.resource.data.requested_by_user_id))
+            && membership.league_id == leagueId
+            && membership.user_id == request.resource.data.requested_by_user_id
+            && membership.franchise_id == franchiseId
+            && membership.franchise_name == request.resource.data.franchise_name
+            && membership.display_name == request.resource.data.requested_display_name
+            && membership.status == request.resource.data.status;
+        }
+
+        function validClaimBase() {
+          return request.resource.data.keys().hasOnly([
+              'league_id',
+              'franchise_id',
+              'franchise_name',
+              'requested_by_user_id',
+              'requested_display_name',
+              'status',
+              'approved_user_id',
+              'requested_at',
+              'approved_at',
+              'updated_at'
+            ])
+            && request.resource.data.league_id == leagueId
+            && request.resource.data.franchise_id == franchiseId
+            && request.resource.data.franchise_name is string
+            && request.resource.data.franchise_name.size() > 0
+            && request.resource.data.franchise_name.size() <= 100
+            && request.resource.data.requested_by_user_id is string
+            && request.resource.data.requested_display_name is string
+            && request.resource.data.requested_display_name.size() >= 2
+            && request.resource.data.requested_display_name.size() <= 50;
+        }
+
+        allow read: if signedIn();
+        allow create: if permanentUser()
+          && currentSeasonHasFranchise(franchiseId)
+          && validClaimBase()
+          && matchingMembershipAfter()
+          && (
+            (
+              request.resource.data.requested_by_user_id == request.auth.uid
+              && request.resource.data.status == 'requested'
+              && request.resource.data.approved_user_id == ''
+              && request.resource.data.approved_at == ''
+            )
+            || (
+              isCommissioner()
+              && request.resource.data.requested_by_user_id == request.auth.uid
+              && request.resource.data.status == 'approved'
+              && request.resource.data.approved_user_id == request.auth.uid
+            )
+          );
+        allow update: if isCommissioner()
+          && validClaimBase()
+          && currentSeasonHasFranchise(franchiseId)
+          && matchingMembershipAfter()
+          && resource.data.status == 'requested'
+          && request.resource.data.status == 'approved'
+          && request.resource.data.approved_user_id == resource.data.requested_by_user_id
+          && request.resource.data.league_id == resource.data.league_id
+          && request.resource.data.franchise_id == resource.data.franchise_id
+          && request.resource.data.franchise_name == resource.data.franchise_name
+          && request.resource.data.requested_by_user_id == resource.data.requested_by_user_id
+          && request.resource.data.requested_display_name == resource.data.requested_display_name
+          && request.resource.data.requested_at == resource.data.requested_at;
+        allow delete: if !existsAfter(membershipPath(resource.data.requested_by_user_id))
+          && (isCommissioner()
+          || (
+            permanentUser()
+            && (
+              resource.data.requested_by_user_id == request.auth.uid
+              || resource.data.approved_user_id == request.auth.uid
+            )
+          ));
+      }
+
+      match /managerMemberships/{userId} {
+        function matchingClaimAfter() {
+          let claim = getAfter(claimPath(request.resource.data.franchise_id)).data;
+          return existsAfter(claimPath(request.resource.data.franchise_id))
+            && claim.league_id == leagueId
+            && claim.franchise_id == request.resource.data.franchise_id
+            && claim.requested_by_user_id == userId
+            && claim.franchise_name == request.resource.data.franchise_name
+            && claim.requested_display_name == request.resource.data.display_name
+            && claim.status == request.resource.data.status;
+        }
+
+        function validMembership() {
+          return request.resource.data.keys().hasOnly([
+              'league_id',
+              'user_id',
+              'franchise_id',
+              'franchise_name',
+              'display_name',
+              'status',
+              'requested_at',
+              'approved_at',
+              'updated_at'
+            ])
+            && request.resource.data.league_id == leagueId
+            && request.resource.data.user_id == userId
+            && request.resource.data.franchise_id is string
+            && currentSeasonHasFranchise(request.resource.data.franchise_id)
+            && request.resource.data.franchise_name is string
+            && request.resource.data.franchise_name.size() > 0
+            && request.resource.data.franchise_name.size() <= 100
+            && request.resource.data.display_name is string
+            && request.resource.data.display_name.size() >= 2
+            && request.resource.data.display_name.size() <= 50
+            && (request.resource.data.status == 'requested' || request.resource.data.status == 'approved');
+        }
+
+        allow read: if permanentUser() && (userId == request.auth.uid || isCommissioner());
+        allow create: if permanentUser()
+          && validMembership()
+          && matchingClaimAfter()
+          && (
+            (userId == request.auth.uid && request.resource.data.status == 'requested')
+            || (isCommissioner() && request.resource.data.status == 'approved')
+          );
+        allow update: if isCommissioner()
+          && validMembership()
+          && matchingClaimAfter()
+          && resource.data.status == 'requested'
+          && request.resource.data.status == 'approved'
+          && request.resource.data.league_id == resource.data.league_id
+          && request.resource.data.user_id == resource.data.user_id
+          && request.resource.data.franchise_id == resource.data.franchise_id
+          && request.resource.data.franchise_name == resource.data.franchise_name
+          && request.resource.data.display_name == resource.data.display_name
+          && request.resource.data.requested_at == resource.data.requested_at;
+        allow delete: if !existsAfter(claimPath(resource.data.franchise_id))
+          && (isCommissioner() || (permanentUser() && userId == request.auth.uid));
+      }
+
+      match /weekSettings/{settingsId} {
+        function validWeekSettings() {
+          return request.resource.data.keys().hasOnly([
+              'league_id',
+              'week',
+              'week_key',
+              'locked',
+              'updated_by_user_id',
+              'created_at',
+              'updated_at'
+            ])
+            && request.resource.data.league_id == leagueId
+            && request.resource.data.week is int
+            && request.resource.data.week >= 1
+            && request.resource.data.week <= 18
+            && request.resource.data.week_key == settingsId
+            && request.resource.data.locked is bool
+            && request.resource.data.updated_by_user_id == request.auth.uid;
+        }
+
+        allow read: if signedIn();
+        allow create: if isCommissioner() && validWeekSettings();
+        allow update: if isCommissioner()
+          && validWeekSettings()
+          && request.resource.data.league_id == resource.data.league_id
+          && request.resource.data.week == resource.data.week
+          && request.resource.data.week_key == resource.data.week_key
+          && request.resource.data.created_at == resource.data.created_at;
+        allow delete: if isCommissioner();
+      }
+
+      match /lineups/{lineupId} {
+        function weekKeyMatchesWeek(week, weekKey) {
+          return (week == 1 && weekKey == 'week-1')
+            || (week == 2 && weekKey == 'week-2')
+            || (week == 3 && weekKey == 'week-3')
+            || (week == 4 && weekKey == 'week-4')
+            || (week == 5 && weekKey == 'week-5')
+            || (week == 6 && weekKey == 'week-6')
+            || (week == 7 && weekKey == 'week-7')
+            || (week == 8 && weekKey == 'week-8')
+            || (week == 9 && weekKey == 'week-9')
+            || (week == 10 && weekKey == 'week-10')
+            || (week == 11 && weekKey == 'week-11')
+            || (week == 12 && weekKey == 'week-12')
+            || (week == 13 && weekKey == 'week-13')
+            || (week == 14 && weekKey == 'week-14')
+            || (week == 15 && weekKey == 'week-15')
+            || (week == 16 && weekKey == 'week-16')
+            || (week == 17 && weekKey == 'week-17')
+            || (week == 18 && weekKey == 'week-18');
+        }
+
+        function lineupIsOpen(weekKey) {
+          return !exists(weekSettingsPath(weekKey))
+            || get(weekSettingsPath(weekKey)).data.locked == false;
+        }
+
+        function matchingAuditAfter() {
+          let audit = getAfter(auditEventPath(request.resource.data.audit_event_id)).data;
+          return existsAfter(auditEventPath(request.resource.data.audit_event_id))
+            && audit.lineup_id == lineupId
+            && audit.actor_user_id == request.auth.uid
+            && audit.franchise_id == request.resource.data.franchise_id
+            && audit.week == request.resource.data.week
+            && audit.season_revision == request.resource.data.season_revision
+            && audit.after_assignments == request.resource.data.assignments;
+        }
+
+        function validLineupDocument() {
+          return request.resource.data.keys().hasOnly([
+              'league_id',
+              'franchise_id',
+              'week',
+              'week_key',
+              'season_revision',
+              'assignments',
+              'revision',
+              'audit_event_id',
+              'updated_by_user_id',
+              'created_at',
+              'updated_at'
+            ])
+            && request.resource.data.league_id == leagueId
+            && request.resource.data.franchise_id is string
+            && request.resource.data.week is int
+            && request.resource.data.week >= 1
+            && request.resource.data.week <= 18
+            && request.resource.data.week_key is string
+            && weekKeyMatchesWeek(request.resource.data.week, request.resource.data.week_key)
+            && request.resource.data.season_revision == get(seasonPath()).data.revision
+            && currentSeasonHasFranchise(request.resource.data.franchise_id)
+            && request.resource.data.assignments is map
+            && request.resource.data.assignments.size() <= 30
+            && request.resource.data.revision is int
+            && request.resource.data.audit_event_id is string
+            && request.resource.data.audit_event_id.size() >= 10
+            && request.resource.data.updated_by_user_id == request.auth.uid;
+        }
+
+        allow read: if signedIn();
+        allow create: if permanentUser()
+          && validLineupDocument()
+          && matchingAuditAfter()
+          && (
+            isCommissioner()
+            || (
+              controlsFranchise(request.resource.data.franchise_id)
+              && lineupIsOpen(request.resource.data.week_key)
+            )
+          );
+        allow update: if permanentUser()
+          && validLineupDocument()
+          && matchingAuditAfter()
+          && request.resource.data.league_id == resource.data.league_id
+          && request.resource.data.franchise_id == resource.data.franchise_id
+          && request.resource.data.week == resource.data.week
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.revision > resource.data.revision
+          && (
+            isCommissioner()
+            || (
+              controlsFranchise(resource.data.franchise_id)
+              && lineupIsOpen(request.resource.data.week_key)
+            )
+          );
+        allow delete: if isCommissioner();
+      }
+
+      match /auditEvents/{eventId} {
+        function auditLineupIsOpen(weekKey) {
+          return !exists(weekSettingsPath(weekKey))
+            || get(weekSettingsPath(weekKey)).data.locked == false;
+        }
+
+        function validAuditEvent() {
+          let lineup = getAfter(lineupPath(request.resource.data.lineup_id)).data;
+          return request.resource.data.keys().hasOnly([
+              'league_id',
+              'event_id',
+              'lineup_id',
+              'type',
+              'actor_user_id',
+              'franchise_id',
+              'week',
+              'week_key',
+              'season_revision',
+              'before_assignments',
+              'after_assignments',
+              'reason',
+              'created_at'
+            ])
+            && request.resource.data.league_id == leagueId
+            && request.resource.data.event_id == eventId
+            && request.resource.data.actor_user_id == request.auth.uid
+            && request.resource.data.franchise_id is string
+            && currentSeasonHasFranchise(request.resource.data.franchise_id)
+            && request.resource.data.week is int
+            && request.resource.data.week >= 1
+            && request.resource.data.week <= 18
+            && request.resource.data.week_key is string
+            && request.resource.data.season_revision == get(seasonPath()).data.revision
+            && request.resource.data.before_assignments is map
+            && request.resource.data.before_assignments.size() <= 30
+            && request.resource.data.after_assignments is map
+            && request.resource.data.after_assignments.size() <= 30
+            && request.resource.data.reason is string
+            && request.resource.data.reason.size() <= 240
+            && existsAfter(lineupPath(request.resource.data.lineup_id))
+            && lineup.audit_event_id == eventId
+            && lineup.franchise_id == request.resource.data.franchise_id
+            && lineup.week == request.resource.data.week
+            && lineup.season_revision == request.resource.data.season_revision
+            && lineup.assignments == request.resource.data.after_assignments
+            && (
+              (
+                request.resource.data.type == 'lineup_saved'
+                && auditLineupIsOpen(request.resource.data.week_key)
+              )
+              || (
+                request.resource.data.type == 'lineup_override'
+                && isCommissioner()
+                && !auditLineupIsOpen(request.resource.data.week_key)
+                && request.resource.data.reason.size() >= 4
+              )
+            );
+        }
+
+        allow read: if isCommissioner()
+          || (permanentUser() && controlsFranchise(resource.data.franchise_id));
+        allow create: if permanentUser()
+          && validAuditEvent()
+          && (isCommissioner() || controlsFranchise(request.resource.data.franchise_id));
+        allow update, delete: if false;
+      }
     }
 
     match /drafts/{draftId} {

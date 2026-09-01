@@ -1,5 +1,11 @@
-import type { User } from "firebase/auth";
-import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
+import type { AuthError, User } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  linkWithPopup,
+  onAuthStateChanged,
+  signInAnonymously,
+  signInWithCredential,
+} from "firebase/auth";
 import { firebaseAuth } from "./firebase";
 
 export type AppSession = {
@@ -120,4 +126,40 @@ export async function ensureFirebaseUserId() {
     throw new Error("Session missing user id");
   }
   return userId;
+}
+
+export function isPermanentFirebaseSession(session: AppSession | null) {
+  return Boolean(session?.user.uid && !session.user.isAnonymous);
+}
+
+export async function ensurePermanentFirebaseUserId() {
+  const session = await ensureFirebaseSession();
+  if (!isPermanentFirebaseSession(session)) {
+    throw new Error("Sign in with Google before publishing, claiming, or managing a league team.");
+  }
+  return session!.user.uid;
+}
+
+export async function upgradeFirebaseSessionWithGoogle() {
+  const session = await ensureFirebaseSession();
+  if (isPermanentFirebaseSession(session)) return session;
+
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+
+  try {
+    const credential = await linkWithPopup(session!.user, provider);
+    const upgraded = toSession(credential.user);
+    emitSession(upgraded);
+    return upgraded;
+  } catch (error) {
+    const authError = error as AuthError;
+    if (authError.code !== "auth/credential-already-in-use") throw error;
+    const googleCredential = GoogleAuthProvider.credentialFromError(authError);
+    if (!googleCredential) throw error;
+    const credential = await signInWithCredential(firebaseAuth, googleCredential);
+    const restored = toSession(credential.user);
+    emitSession(restored);
+    return restored;
+  }
 }
