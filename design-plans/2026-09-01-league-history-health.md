@@ -1,5 +1,9 @@
 # Make League History completeness visible and actionable
 
+## Implementation status
+
+Implemented in `e898f72` on 2026-09-01. Validation passed with the focused 50-test League History set, TypeScript, ESLint, and `npm run build:vercel`. Rendered G.O.A.T. League evidence at 1440px and 390px confirmed a single page scroll owner, public 2025 partial coverage, and 2023 `Missing · 0 / 144`; the anonymous commissioner route remained correctly role-gated while the History Health table and failure states were verified in `historyHealthPanel.test.tsx`.
+
 Written against: `f03d414fcb530809d9cfa773973207e9e129fda9`
 
 ## Evidence chain
@@ -189,5 +193,4 @@ Add a metric-level eligibility helper. Later analytics ask whether their exact r
 - After acceptance and validation: update `DESIGN.md` with the canonical coverage vocabulary, evidence/freshness presentation, and rule that provider lifecycle status is not completeness.
 - After acceptance and validation: update `docs/FANTASY_PRODUCT_ROADMAP.md` to name History Health as the data-trust prerequisite for draft and manager tendencies.
 - After acceptance and validation: mark this plan implemented with the validating commit and exact browser evidence; do not modify the accepted route ownership in `design-plans/2026-09-01-manager-team-first-information-architecture.md`.
-
 

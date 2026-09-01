@@ -1,5 +1,9 @@
 # Turn auction history into transparent Draft Receipts and Manager Draft DNA
 
+## Implementation status
+
+Implemented in `e898f72` on 2026-09-01. Rendered G.O.A.T. League verification at 1440px and 390px confirmed URL-restored Intelligence/Ledger tabs, 136 provisional 2025 receipts with 131 measured outcomes, responsive receipt cards, correct ordinal percentiles, and JWebber64's eight filtered receipts plus matching manager-profile Draft DNA. The focused 50-test set, TypeScript, ESLint, and `npm run build:vercel` passed from the clean release checkout.
+
 Written against: `f03d414fcb530809d9cfa773973207e9e129fda9`
 
 Dependency: implement `design-plans/2026-09-01-league-history-health.md` first. This plan consumes its persisted coverage manifest and metric-level eligibility rules.
@@ -215,5 +219,4 @@ The first release explicitly excludes:
 - After acceptance and validation: add the Draft Receipt and Manager Draft DNA contracts to `DESIGN.md`, including evidence labels, provisional language, keeper treatment, and excluded claims.
 - After acceptance and validation: update `docs/FANTASY_PRODUCT_ROADMAP.md` with delivered historical tendencies and the explicit remaining blockers for nomination/live-draft use.
 - After acceptance and validation: mark this plan implemented with the validating commit and browser evidence. Retain `/league/:leagueId/history/drafts` as the canonical intelligence surface established by the accepted team-first information architecture.
-
 
