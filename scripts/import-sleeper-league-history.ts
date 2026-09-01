@@ -279,8 +279,9 @@ async function main() {
     const auctionReportPath = option("auction-report");
     if (auctionReportPath) {
       const absoluteReportPath = resolve(auctionReportPath);
+      const coverage = buildFirestoreLeagueHistoryBundle(payload).root.coverage;
       await mkdir(dirname(absoluteReportPath), { recursive: true });
-      await writeFile(absoluteReportPath, `${JSON.stringify({ generatedAt: new Date().toISOString(), sources: merged.validations }, null, 2)}\n`, "utf8");
+      await writeFile(absoluteReportPath, `${JSON.stringify({ generatedAt: new Date().toISOString(), sources: merged.validations, coverage }, null, 2)}\n`, "utf8");
       console.log(`[league-history] wrote auction validation report to ${absoluteReportPath}`);
     }
   }
@@ -302,7 +303,8 @@ async function main() {
       moments: [],
     })) };
   }
-  if (selectedSeasons.length || hasFlag("drafts-only")) {
+  const scopedImport = selectedSeasons.length > 0 || hasFlag("drafts-only");
+  if (scopedImport) {
     console.log(`[league-history] scoped payload to ${payload.seasons.map((season) => season.season).join(", ") || "no"} seasons${hasFlag("drafts-only") ? " and draft/franchise rows only" : ""}`);
   }
 
@@ -324,6 +326,9 @@ async function main() {
     console.log(`[league-history] Firestore counts: ${JSON.stringify(bundle.root.counts)}`);
   }
   if (hasFlag("dry-run")) return;
+  if (scopedImport) {
+    throw new Error("Scoped --only-seasons and --drafts-only writes are disabled because they cannot safely preserve unselected Firestore history. Use --dry-run or run a complete import.");
+  }
   const routeAliases = option("route-aliases").split(",").map((value) => value.trim()).filter(Boolean);
   const result = await importToFirestore(payload, routeAliases);
   console.log(`[league-history] Firebase import complete: league ${result.historyId}`);

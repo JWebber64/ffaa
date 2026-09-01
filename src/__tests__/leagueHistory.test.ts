@@ -76,25 +76,25 @@ function transactionAsset(id: string, fromFranchiseId: string, toFranchiseId: st
 
 describe("normalized league history analytics", () => {
   it("anchors every league-history section to the league root", () => {
-    expect(leagueHistoryPath("league 123", "h2h")).toBe("/league/league%20123/h2h");
+    expect(leagueHistoryPath("league 123", "h2h")).toBe("/league/league%20123/history/h2h");
     expect(leagueHistoryPath("league 123", "/history/champions/")).toBe("/league/league%20123/history/champions");
-    expect(leagueHistoryPath("league 123")).toBe("/league/league%20123");
+    expect(leagueHistoryPath("league 123")).toBe("/league/league%20123/history");
   });
 
   it("opens normalized rivalry history from legacy Sleeper manager IDs", () => {
     expect(leagueRivalryPath("league 123", "sleeper-user-user-a", "sleeper-user-user-b"))
-      .toBe("/league/league%20123/rivalries/sleeper-user-user-a/sleeper-user-user-b");
+      .toBe("/league/league%20123/history/rivalries/sleeper-user-user-a/sleeper-user-user-b");
     expect(resolveLeagueHistoryManagerId(snapshot.managers, "sleeper-user-user-a")).toBe("a");
     expect(resolveLeagueHistoryManagerId(snapshot.managers, "user-b")).toBe("b");
     expect(resolveLeagueHistoryManagerId(snapshot.managers, "a")).toBe("a");
   });
 
   it.each([
-    ["/ff/league/123/leaderboards/h2h", "/league/123/h2h"],
+    ["/ff/league/123/leaderboards/h2h", "/league/123/history/h2h"],
     ["/ff/league/123/managers/history/champions", "/league/123/history/champions"],
-    ["/ff/league/123/h2h/leaderboards", "/league/123/leaderboards"],
-    ["/ff/league/123/managers/payouts", "/league/123/payouts"],
-    ["/ff/league/123/unknown", "/league/123"],
+    ["/ff/league/123/h2h/leaderboards", "/league/123/history/leaderboards"],
+    ["/ff/league/123/managers/payouts", "/league/123/history/payouts"],
+    ["/ff/league/123/unknown", "/league/123/history"],
   ])("recovers malformed nested league path %s", (pathname, expected) => {
     expect(recoverLeagueHistoryPath("123", pathname)).toBe(expected);
   });

@@ -16,8 +16,10 @@ import type {
   WeeklyRosterResult,
 } from "../domain/types";
 import type { LeagueHistoryImportPayload } from "../provider/sleeperMapper";
+import { buildLeagueHistoryCoverage } from "../coverage/historyCoverage";
 
-export const FIRESTORE_LEAGUE_HISTORY_SCHEMA_VERSION = 1;
+export const FIRESTORE_LEAGUE_HISTORY_SCHEMA_VERSION = 2;
+export const FIRESTORE_LEAGUE_HISTORY_MIN_SCHEMA_VERSION = 1;
 export const FIRESTORE_HISTORY_COLLECTION = "leagueHistories";
 export const FIRESTORE_SNAPSHOT_COLLECTION = "snapshotChunks";
 export const FIRESTORE_WEEK_COLLECTION = "weeks";
@@ -46,6 +48,7 @@ export interface FirestoreLeagueHistoryRoot {
   league: LeagueHistorySnapshot["league"];
   counts: Record<string, number>;
   weekDocumentCount: number;
+  coverage?: LeagueHistorySnapshot["coverage"];
 }
 
 export interface FirestoreSnapshotChunk {
@@ -114,6 +117,7 @@ export function assembleLeagueHistorySnapshot(
   for (const chunk of ordered) {
     (snapshot[chunk.kind] as SnapshotRow[]).push(...chunk.rows);
   }
+  snapshot.coverage = root.coverage ?? buildLeagueHistoryCoverage(snapshot, root.importedAt);
   return snapshot;
 }
 
@@ -499,6 +503,8 @@ export function buildFirestoreLeagueHistoryBundle(
     }
   }
 
+  const coverage = buildLeagueHistoryCoverage(snapshot, importedAt);
+  snapshot.coverage = coverage;
   snapshot.weeklyResults = [];
   snapshot.weeklyPlayerResults = [];
   const counts = {
@@ -529,6 +535,7 @@ export function buildFirestoreLeagueHistoryBundle(
     league,
     counts,
     weekDocumentCount: weeks.length,
+    coverage,
   };
   const safeSnapshot = firestoreSafe(snapshot);
   const safeRoot = firestoreSafe(root);

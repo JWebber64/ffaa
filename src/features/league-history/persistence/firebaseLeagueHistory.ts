@@ -14,6 +14,7 @@ import type { LeagueHistorySnapshot, LeagueWeekPayload, LeagueSeason } from "../
 import {
   assembleLeagueHistorySnapshot,
   FIRESTORE_HISTORY_COLLECTION,
+  FIRESTORE_LEAGUE_HISTORY_MIN_SCHEMA_VERSION,
   FIRESTORE_LEAGUE_HISTORY_SCHEMA_VERSION,
   FIRESTORE_SNAPSHOT_COLLECTION,
   FIRESTORE_WEEK_COLLECTION,
@@ -25,6 +26,7 @@ import {
 
 const requestCache = new Map<string, Promise<LeagueHistorySnapshot>>();
 const completedWeekCache = new Map<string, LeagueWeekPayload>();
+const historyWeeksCache = new Map<string, Promise<Pick<LeagueHistorySnapshot, "weeklyResults" | "weeklyPlayerResults">>>();
 
 export class LeagueHistoryNotImportedError extends Error {
   readonly code = "league-history/not-imported";
@@ -64,7 +66,11 @@ function readRoot(reference: DocumentReference, value: unknown) {
     throw new Error(`League history ${reference.id} has an invalid Firestore root document.`);
   }
   const root = value as FirestoreLeagueHistoryRoot;
-  if (root.schemaVersion !== FIRESTORE_LEAGUE_HISTORY_SCHEMA_VERSION || !root.league?.id) {
+  if (
+    root.schemaVersion < FIRESTORE_LEAGUE_HISTORY_MIN_SCHEMA_VERSION
+    || root.schemaVersion > FIRESTORE_LEAGUE_HISTORY_SCHEMA_VERSION
+    || !root.league?.id
+  ) {
     throw new Error(`League history ${reference.id} uses an unsupported Firestore schema.`);
   }
   return root;
@@ -98,6 +104,30 @@ export function loadLeagueHistory(routeId: string, options: { refresh?: boolean 
 
 export function leagueHistoryStorageConfigured() {
   return Boolean(firestore.app.options.projectId);
+}
+
+export function loadLeagueHistoryWeeks(routeId: string, options: { refresh?: boolean } = {}) {
+  const key = routeId.trim();
+  if (options.refresh) historyWeeksCache.delete(key);
+  const cached = historyWeeksCache.get(key);
+  if (cached) return cached;
+  const pending = (async () => {
+    const reference = await resolveHistoryReference(key);
+    if (!reference) throw new LeagueHistoryNotImportedError();
+    const weeksSnapshot = await getDocs(collection(reference, FIRESTORE_WEEK_COLLECTION));
+    const weeks = weeksSnapshot.docs
+      .map((row) => row.data() as FirestoreWeekDocument)
+      .sort((left, right) => right.season - left.season || left.week - right.week);
+    return {
+      weeklyResults: weeks.flatMap((week) => week.weeklyResults),
+      weeklyPlayerResults: weeks.flatMap((week) => week.weeklyPlayerResults),
+    };
+  })().catch((error) => {
+    historyWeeksCache.delete(key);
+    throw error;
+  });
+  historyWeeksCache.set(key, pending);
+  return pending;
 }
 
 export async function loadLeagueWeek(
@@ -141,9 +171,11 @@ export async function loadLeagueWeek(
 export function clearLeagueWeekCache(leagueId?: string) {
   if (!leagueId) {
     completedWeekCache.clear();
+    historyWeeksCache.clear();
     return;
   }
   for (const key of completedWeekCache.keys()) {
     if (key.startsWith(`${leagueId}:`)) completedWeekCache.delete(key);
   }
+  historyWeeksCache.delete(leagueId);
 }

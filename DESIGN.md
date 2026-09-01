@@ -161,6 +161,14 @@ On wide landing pages, independent feature chapters may use two equal columns wi
 
 Repeated editable data belongs in one compact list or table shell. On desktop, use shared column headers, single-line controls, and row dividers; do not turn every record into a padded card or repeat the same visible field labels in every row. At wide desktop widths, pack independent records into two or more columns before letting the editor consume most of the viewport. A common 10-12-record single-line editor should occupy roughly 250-350px vertically, not merely fit inside a 900px-tall viewport. Preserve explicit labels and full-size controls when the layout stacks on mobile.
 
+## League History evidence
+
+League History completeness uses the canonical states `complete`, `partial`, `missing`, `unknown`, and `not applicable`. Every status is derived from persisted evidence and a documented denominator or invariant. Provider lifecycle values such as `complete` are source metadata only and never establish historical completeness by themselves. Public History and commissioner History Health consume the same coverage manifest, with observed and expected counts shown whenever both are known.
+
+Draft Receipts are auditable outcomes for recorded, non-keeper auction purchases. They show the price, observed roster weeks on the drafting franchise, starter points, raw points per dollar, and comparison sample. Missing weekly evidence remains unavailable rather than becoming zero. Cross-season price bands are normalized to each season's team budget; keepers remain separate from paid-purchase efficiency.
+
+Manager Draft DNA is descriptive, not a grade or recommendation. It may show position allocation, price-band allocation, top-three spend share, observed starter points per dollar, and repeat targets. Partial inputs must say `Provisional`; small comparison populations suppress percentiles. Do not infer injury-adjusted value, steals or reaches, nomination behavior, bid timing, or live-draft advice without the corresponding historical source and an approved methodology.
+
 ## Do's and Don'ts
 
 - Do use a full perimeter border when color identifies a position or state.

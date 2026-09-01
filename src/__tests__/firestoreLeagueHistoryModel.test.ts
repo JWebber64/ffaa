@@ -5,6 +5,7 @@ import {
   assembleLeagueHistorySnapshot,
   buildFirestoreLeagueHistoryBundle,
   FIRESTORE_CHUNK_MAX_BYTES,
+  FIRESTORE_LEAGUE_HISTORY_SCHEMA_VERSION,
 } from "../features/league-history/persistence/firestoreLeagueHistoryModel";
 
 const payload = {
@@ -216,6 +217,12 @@ describe("Firestore League History model", () => {
     const bundle = buildFirestoreLeagueHistoryBundle(payload, ["legacy-supabase-uuid"]);
 
     expect(bundle.historyId).toBe("league-current");
+    expect(bundle.root.schemaVersion).toBe(FIRESTORE_LEAGUE_HISTORY_SCHEMA_VERSION);
+    expect(bundle.root.coverage?.seasons[0]?.domains.drafts).toMatchObject({
+      status: "partial",
+      observed: 1,
+      expected: 2,
+    });
     expect(bundle.root.routeIds).toEqual(expect.arrayContaining([
       "league-current",
       "league-old",
@@ -256,5 +263,18 @@ describe("Firestore League History model", () => {
     for (const chunk of bundle.chunks) {
       expect(new TextEncoder().encode(JSON.stringify(chunk.data)).length).toBeLessThanOrEqual(FIRESTORE_CHUNK_MAX_BYTES);
     }
+  });
+
+  it("conservatively reconstructs coverage for version-one roots", () => {
+    const bundle = buildFirestoreLeagueHistoryBundle(payload);
+    const legacyRoot = { ...bundle.root, schemaVersion: 1, coverage: undefined };
+    const assembled = assembleLeagueHistorySnapshot(legacyRoot, bundle.chunks.map((entry) => entry.data));
+
+    expect(assembled.coverage?.seasons[0]?.domains.drafts).toMatchObject({
+      status: "partial",
+      observed: 1,
+      expected: 2,
+    });
+    expect(assembled.coverage?.seasons[0]?.domains.weeklyResults.status).toBe("missing");
   });
 });

@@ -5,6 +5,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { UniversalSelect } from "../../../../ui/UniversalSelect";
 import type { HistoricalDraftPick, HistoricalMatchup } from "../../domain/types";
 import { useLeagueHistorySnapshot } from "../historyContext";
+import { coverageForSeason, coverageStatusLabel } from "../../coverage/historyCoverage";
 import { formatNumber, formatRecord, ordinal } from "../format";
 
 const ARCHIVE_SECTIONS = ["overview", "standings", "games", "auction", "activity"] as const;
@@ -161,8 +162,9 @@ export function SeasonArchivePage() {
     return totals;
   }, {});
   const auctionLedger = settingRecord(drafts[0]?.settings.auctionLedger);
-  const expectedRosterSpots = settingNumber(auctionLedger.expectedRosterSpots);
-  const ledgerComplete = auctionLedger.isComplete === true;
+  const draftCoverage = coverageForSeason(snapshot, season.id)?.domains.drafts ?? null;
+  const expectedRosterSpots = draftCoverage?.expected ?? settingNumber(auctionLedger.expectedRosterSpots);
+  const ledgerStatusLabel = coverageStatusLabel(draftCoverage?.status ?? "unknown");
 
   const tradeCount = transactions.filter((transaction) => transaction.transactionType === "trade").length;
   const waiverCount = transactions.filter((transaction) => transaction.transactionType === "waiver").length;
@@ -240,7 +242,7 @@ export function SeasonArchivePage() {
         <header className="history-section-header"><div><span>Draft archive</span><h2>{drafts[0]?.draftType || "Sleeper"} draft · {draftPicks.length} players</h2></div><ScrollText /></header>
         {draftPicks.length ? <>
           <section className="history-draft-summary" aria-label="Auction summary">
-            <div><span>Ledger status</span><strong>{ledgerComplete ? "Complete" : "Recorded source"}</strong></div>
+            <div><span>Ledger status</span><strong>{ledgerStatusLabel}</strong></div>
             <div><span>Recorded players</span><strong>{draftPicks.length}{expectedRosterSpots == null ? "" : ` / ${expectedRosterSpots}`}</strong></div>
             <div><span>Recorded spend</span><strong>${formatNumber(recordedSpend, 0)}</strong></div>
             <div><span>Largest buy</span><strong>{largestBuy ? `${largestBuy.playerName} · $${formatNumber(largestBuy.auctionPrice, 0)}` : "Unavailable"}</strong></div>

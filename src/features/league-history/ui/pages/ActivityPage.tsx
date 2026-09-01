@@ -1,12 +1,15 @@
 import { Activity, CircleDollarSign, ExternalLink, ScrollText } from "lucide-react";
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import type { KeyboardEvent } from "react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 
 import { UniversalSelect } from "../../../../ui/UniversalSelect";
+import { coverageForSeason, coverageStatusLabel } from "../../coverage/historyCoverage";
 import type { HistoricalTransactionAsset, Manager, SeasonFranchise } from "../../domain/types";
 import { useLeagueHistorySnapshot } from "../historyContext";
 import { formatNumber } from "../format";
 import { groupTransactionAssetsByRecipient } from "../transactionPresentation";
+import { DraftIntelligencePanel } from "../draft/DraftIntelligencePanel";
 
 const TRANSACTION_PAGE_SIZE = 100;
 
@@ -71,10 +74,34 @@ function settingNumber(value: unknown) {
 
 export function DraftHistoryPage() {
   const snapshot = useLeagueHistorySnapshot();
-  const [seasonFilter, setSeasonFilter] = useState("all");
-  const [managerFilter, setManagerFilter] = useState("all");
+  const { leagueId = snapshot.league.currentExternalLeagueId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const hasAuctionPicks = snapshot.draftPicks.some((pick) => pick.auctionPrice != null);
+  const requestedView = searchParams.get("view");
+  const activeView = requestedView === "ledger" || requestedView === "intelligence"
+    ? requestedView
+    : hasAuctionPicks ? "intelligence" : "ledger";
+  const seasonFilter = searchParams.get("season") || "all";
+  const managerFilter = searchParams.get("manager") || "all";
   const [query, setQuery] = useState("");
   const [sortMode, setSortMode] = useState("recorded");
+  const setUrlFilter = (key: "view" | "season" | "manager", value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value === "all" || (key === "view" && value === "intelligence")) next.delete(key);
+    else next.set(key, value);
+    setSearchParams(next);
+  };
+  const moveDraftViewFocus = (event: KeyboardEvent<HTMLButtonElement>, current: "intelligence" | "ledger") => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const next = event.key === "Home"
+      ? "intelligence"
+      : event.key === "End"
+        ? "ledger"
+        : current === "intelligence" ? "ledger" : "intelligence";
+    setUrlFilter("view", next);
+    requestAnimationFrame(() => document.getElementById(`draft-view-${next}`)?.focus());
+  };
   const seasonById = new Map(snapshot.seasons.map((season) => [season.id, season]));
   const franchiseById = new Map(snapshot.franchises.map((franchise) => [franchise.id, franchise]));
   const managerById = new Map(snapshot.managers.map((manager) => [manager.id, manager]));
@@ -87,15 +114,20 @@ export function DraftHistoryPage() {
   return (
     <main className="history-content">
       <section className="history-page-heading history-page-heading-row">
-        <div><span>Draft foundation</span><h2>Historical drafts</h2><p>Snake drafts and supplemental auction workbooks share one verified ledger. Missing sale order and partial source records remain explicitly unavailable.</p></div>
+        <div><span>Draft foundation</span><h2>Historical drafts</h2><p>Snake drafts and supplemental auction workbooks share one verified ledger. Missing sale order and partial source records remain explicitly labeled.</p></div>
         <div className="history-filter-bar history-draft-toolbar">
-          <label><span>Season</span><UniversalSelect value={seasonFilter} onValueChange={setSeasonFilter}><option value="all">All time</option>{seasons.map((season) => <option key={season} value={season}>{season}</option>)}</UniversalSelect></label>
-          <label><span>Manager</span><UniversalSelect value={managerFilter} onValueChange={setManagerFilter}><option value="all">All managers</option>{managerOptions.map((manager) => <option key={manager.id} value={manager.id}>{manager.displayName}</option>)}</UniversalSelect></label>
-          <label className="history-draft-search"><span>Find a player</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or team" /></label>
-          <label><span>Sort</span><UniversalSelect value={sortMode} onValueChange={setSortMode}><option value="recorded">Recorded order</option><option value="price">Price high to low</option><option value="player">Player A–Z</option><option value="manager">Manager A–Z</option></UniversalSelect></label>
+          <label><span>Season</span><UniversalSelect value={seasonFilter} onValueChange={(value) => setUrlFilter("season", value)}><option value="all">All time</option>{seasons.map((season) => <option key={season} value={season}>{season}</option>)}</UniversalSelect></label>
+          <label><span>Manager</span><UniversalSelect value={managerFilter} onValueChange={(value) => setUrlFilter("manager", value)}><option value="all">All managers</option>{managerOptions.map((manager) => <option key={manager.id} value={manager.id}>{manager.displayName}</option>)}</UniversalSelect></label>
+          {activeView === "ledger" ? <><label className="history-draft-search"><span>Find a player</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or team" /></label>
+          <label><span>Sort</span><UniversalSelect value={sortMode} onValueChange={setSortMode}><option value="recorded">Recorded order</option><option value="price">Price high to low</option><option value="player">Player A–Z</option><option value="manager">Manager A–Z</option></UniversalSelect></label></> : null}
         </div>
       </section>
-      <section className="history-draft-list">{drafts.map((draft) => {
+      <div className="history-draft-view-tabs" role="tablist" aria-label="Draft history views">
+        <button id="draft-view-intelligence" type="button" role="tab" tabIndex={activeView === "intelligence" ? 0 : -1} aria-selected={activeView === "intelligence"} aria-controls="draft-intelligence-panel" className={activeView === "intelligence" ? "is-active" : ""} onClick={() => setUrlFilter("view", "intelligence")} onKeyDown={(event) => moveDraftViewFocus(event, "intelligence")}>Intelligence</button>
+        <button id="draft-view-ledger" type="button" role="tab" tabIndex={activeView === "ledger" ? 0 : -1} aria-selected={activeView === "ledger"} aria-controls="draft-ledger-panel" className={activeView === "ledger" ? "is-active" : ""} onClick={() => setUrlFilter("view", "ledger")} onKeyDown={(event) => moveDraftViewFocus(event, "ledger")}>Ledger</button>
+      </div>
+      {activeView === "intelligence" ? <div id="draft-intelligence-panel" role="tabpanel"><DraftIntelligencePanel leagueId={leagueId} snapshot={snapshot} seasonFilter={seasonFilter} managerFilter={managerFilter} /></div> : null}
+      {activeView === "ledger" ? <section id="draft-ledger-panel" role="tabpanel" className="history-draft-list">{drafts.map((draft) => {
         const season = seasonById.get(draft.leagueSeasonId);
         const allPicks = snapshot.draftPicks.filter((pick) => pick.draftId === draft.id);
         const filteredPicks = allPicks.filter((pick) => {
@@ -123,12 +155,14 @@ export function DraftHistoryPage() {
         const ledger = settingRecord(draft.settings.auctionLedger);
         const sourceUrl = typeof ledger.url === "string" ? ledger.url : "";
         const sourceLabel = typeof ledger.label === "string" ? ledger.label : "";
-        const recordedSales = settingNumber(ledger.recordedSales);
-        const expectedRosterSpots = settingNumber(ledger.expectedRosterSpots);
-        const recordedSpend = settingNumber(ledger.recordedSpend);
-        const expectedBudget = settingNumber(ledger.expectedBudget);
-        const sourceComplete = ledger.isComplete === true;
-        const orderKnown = ledger.orderKnown !== false;
+        const coverage = coverageForSeason(snapshot, draft.leagueSeasonId)?.domains.drafts ?? null;
+        const recordedSales = coverage?.observed ?? settingNumber(ledger.recordedSales) ?? allPicks.length;
+        const expectedRosterSpots = coverage?.expected ?? settingNumber(ledger.expectedRosterSpots);
+        const recordedSpend = coverage?.recordedSpend ?? settingNumber(ledger.recordedSpend);
+        const expectedBudget = coverage?.expectedSpend ?? settingNumber(ledger.expectedBudget);
+        const sourceComplete = coverage?.status === "complete";
+        const orderKnown = coverage?.orderKnown ?? ledger.orderKnown !== false;
+        const coverageLabel = coverageStatusLabel(coverage?.status ?? "unknown");
         const totalSpend = auctionPicks.reduce((sum, pick) => sum + (pick.auctionPrice ?? 0), 0);
         const positionTotals = auctionPicks.reduce<Record<string, number>>((totals, pick) => {
           const position = pick.position || "Other";
@@ -137,8 +171,8 @@ export function DraftHistoryPage() {
         }, {});
         return <article className="history-panel history-draft-panel" key={draft.id}>
           <header><div><span>{season?.season} draft</span><h2>{draft.draftType || "Imported"} · {allPicks.length} picks</h2></div><ScrollText /></header>
-          <div className="history-draft-summary"><div><span>Ledger status</span><strong>{sourceUrl ? sourceComplete ? "Complete" : "Partial source" : draft.status.replace(/_/g, " ")}</strong></div><div><span>{draft.draftType === "auction" ? "Recorded spend" : "Budget"}</span><strong>{draft.draftType === "auction" ? `$${formatNumber(recordedSpend ?? totalSpend, 0)}` : draft.budget == null ? "—" : `$${formatNumber(draft.budget, 0)}`}</strong></div><div><span>Recorded picks</span><strong>{recordedSales ?? allPicks.length}{expectedRosterSpots == null ? "" : ` / ${expectedRosterSpots}`}</strong></div><div><span>Largest buy</span><strong>{biggest ? `${biggest.playerName} · $${formatNumber(biggest.auctionPrice, 0)}` : "Unavailable"}</strong></div></div>
-          {sourceUrl ? <div className="history-draft-source"><div><strong>{sourceComplete ? "Verified source ledger" : "Verified partial ledger"}</strong><span>{recordedSales} recorded sales · ${formatNumber(recordedSpend, 0)} of ${formatNumber(expectedBudget, 0)}{orderKnown ? "" : " · nomination order unavailable"}</span></div><a className="history-text-link" href={sourceUrl} target="_blank" rel="noreferrer">Open {sourceLabel || "source workbook"} <ExternalLink size={13} /></a></div> : null}
+          <div className="history-draft-summary"><div><span>Ledger status</span><strong>{coverageLabel}</strong></div><div><span>{draft.draftType === "auction" ? "Recorded spend" : "Budget"}</span><strong>{draft.draftType === "auction" ? `$${formatNumber(recordedSpend ?? totalSpend, 0)}` : draft.budget == null ? "—" : `$${formatNumber(draft.budget, 0)}`}</strong></div><div><span>Recorded picks</span><strong>{recordedSales}{expectedRosterSpots == null ? "" : ` / ${expectedRosterSpots}`}</strong></div><div><span>Largest buy</span><strong>{biggest ? `${biggest.playerName} · $${formatNumber(biggest.auctionPrice, 0)}` : "Unavailable"}</strong></div></div>
+          {sourceUrl ? <div className="history-draft-source"><div><strong>{sourceComplete ? "Verified source ledger" : coverageLabel}</strong><span>{recordedSales} recorded sales{expectedRosterSpots == null ? "" : ` of ${expectedRosterSpots}`}{recordedSpend == null ? "" : ` · $${formatNumber(recordedSpend, 0)}`}{expectedBudget == null ? "" : ` of $${formatNumber(expectedBudget, 0)}`}{orderKnown ? "" : " · nomination order unavailable"}</span></div><a className="history-text-link" href={sourceUrl} target="_blank" rel="noreferrer">Open {sourceLabel || "source workbook"} <ExternalLink size={13} /></a></div> : null}
           {auctionPicks.length ? <div className="history-position-spend" aria-label="Auction spend by position">{Object.entries(positionTotals).sort(([left], [right]) => ["QB", "RB", "WR", "TE", "K", "DEF"].indexOf(left) - ["QB", "RB", "WR", "TE", "K", "DEF"].indexOf(right)).map(([position, spend]) => <span key={position}><small>{position}</small><strong>${formatNumber(spend, 0)}</strong></span>)}</div> : null}
           <div className="history-draft-table-heading"><span>{filteredPicks.length === allPicks.length ? `${allPicks.length} recorded picks` : `${filteredPicks.length} of ${allPicks.length} picks`}</span>{!orderKnown ? <small>“Recorded order” falls back to player name because nomination order is unavailable.</small> : null}</div>
           <div className="history-table-wrap history-draft-table-wrap">
@@ -151,8 +185,8 @@ export function DraftHistoryPage() {
           </div>
           {season ? <Link className="history-text-link" to={`../seasons/${season.season}`}>Open season archive</Link> : null}
         </article>;
-      })}</section>
-      {!drafts.length ? <div className="history-empty">No normalized draft records are available for this season.</div> : null}
+      })}</section> : null}
+      {activeView === "ledger" && !drafts.length ? <div className="history-empty">No normalized draft records are available for this season.</div> : null}
     </main>
   );
 }

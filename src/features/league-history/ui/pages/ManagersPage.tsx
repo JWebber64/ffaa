@@ -9,6 +9,7 @@ import {
 } from "../../analytics";
 import { useLeagueHistorySnapshot } from "../historyContext";
 import { formatNumber, formatPercentage, formatRecord, ordinal } from "../format";
+import { ManagerDraftDNASummary } from "../draft/ManagerDraftDNASummary";
 
 export function ManagersPage() {
   const snapshot = useLeagueHistorySnapshot();
@@ -48,7 +49,7 @@ export function ManagersPage() {
 
 export function ManagerProfilePage() {
   const snapshot = useLeagueHistorySnapshot();
-  const { managerId = "" } = useParams();
+  const { managerId = "", leagueId = snapshot.league.currentExternalLeagueId } = useParams();
   const career = calculateManagerCareer(snapshot, managerId);
   const goat = calculateGoatRankings(snapshot).find((row) => row.managerId === managerId);
   if (!career) return <main className="history-content"><div className="history-empty">Manager not found.</div></main>;
@@ -116,7 +117,7 @@ export function ManagerProfilePage() {
 
       <section className="history-section-grid">
         <article className="history-panel"><header><div><span>Trophy case</span><h2>Career honors</h2></div><Trophy /></header><div className="history-trophy-row"><strong>{career.championships}</strong><span>Championships</span><strong>{career.regularSeasonTitles}</strong><span>Regular-season titles</span></div></article>
-        <article className="history-panel"><header><div><span>Historical activity</span><h2>Drafts & transactions</h2></div><Crown /></header><p>{draftPicks.length} stored draft picks · {transactionAssets.length} stored transaction assets.</p><div className="history-inline-links"><Link to="../drafts">Draft archive</Link><Link to="../transactions">Transaction archive</Link></div></article>
+        <article className="history-panel"><header><div><span>Historical activity</span><h2>Draft DNA</h2></div><Crown /></header><ManagerDraftDNASummary leagueId={leagueId} managerId={managerId} snapshot={snapshot} /><p>{draftPicks.length} stored draft picks · {transactionAssets.length} stored transaction assets.</p><div className="history-inline-links"><Link to="../drafts">Draft archive</Link><Link to="../transactions">Transaction archive</Link></div></article>
       </section>
     </main>
   );

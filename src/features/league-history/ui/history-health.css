@@ -1,0 +1,69 @@
+.history-health { display: grid; gap: var(--space-4, 16px); }
+.history-health-summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-3, 12px);
+  padding: var(--space-4, 16px);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--r-lg, 16px);
+  background: var(--color-surface-card-primary);
+}
+.history-health-summary > svg { width: 24px; height: 24px; color: var(--text-2); }
+.history-health-summary.is-ready > svg { color: var(--a2); }
+.history-health-summary.is-limited > svg { color: #fbbf24; }
+.history-health-summary span,
+.history-health-summary small { color: var(--text-2); }
+.history-health-summary > div > span { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.history-health-summary h2 { margin: 3px 0 4px; font-size: 1.2rem; }
+.history-health-summary p { max-width: 760px; margin: 0; color: var(--text-1); }
+.history-health-summary small { display: block; margin-top: 7px; }
+
+.history-health-table { overflow: hidden; border: 1px solid var(--color-border-default); border-radius: var(--r-lg, 16px); background: var(--color-surface-card-primary); }
+.history-health-row { display: grid; grid-template-columns: minmax(90px, 0.7fr) repeat(5, minmax(118px, 1fr)) minmax(130px, 0.9fr); }
+.history-health-row + .history-health-row { border-top: 1px solid var(--color-border-default); }
+.history-health-row > * { min-width: 0; padding: 12px; }
+.history-health-row > * + * { border-left: 1px solid var(--color-border-default); }
+.history-health-header { background: var(--color-surface-card-secondary); color: var(--text-2); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.04em; }
+.history-health-season,
+.history-health-domain,
+.history-health-source { display: grid; align-content: start; gap: 3px; }
+.history-health-season span,
+.history-health-domain span,
+.history-health-source span { overflow-wrap: anywhere; color: var(--text-2); font-size: 0.72rem; }
+.history-health-domain strong { color: var(--text-1); font-size: 0.78rem; }
+.history-health-domain.is-complete strong { color: var(--a2); }
+.history-health-domain.is-partial strong { color: #fbbf24; }
+.history-health-domain.is-missing strong { color: #fda4af; }
+.history-health-source a { display: inline-flex; align-items: center; gap: 5px; width: fit-content; color: var(--a2); font-size: 0.75rem; font-weight: 750; }
+.history-health-note { margin: 0; color: var(--text-2); font-size: 0.78rem; }
+.history-health-empty,
+.history-health-state { display: flex; min-height: 120px; align-items: center; justify-content: center; gap: 12px; padding: 20px; border: 1px dashed var(--color-border-default); border-radius: var(--r-lg, 16px); color: var(--text-1); }
+.history-health-state > div { max-width: 680px; }
+.history-health-state p { margin: 4px 0 0; color: var(--text-2); }
+.history-health-state.is-error > svg { color: #fda4af; }
+
+@media (max-width: 900px) {
+  .history-health-table { overflow: visible; border: 0; background: transparent; }
+  .history-health-header { display: none; }
+  .history-health-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: hidden; border: 1px solid var(--color-border-default); border-radius: var(--r-lg, 16px); background: var(--color-surface-card-primary); }
+  .history-health-row + .history-health-row { margin-top: 10px; border-top: 1px solid var(--color-border-default); }
+  .history-health-row > * + * { border-left: 0; }
+  .history-health-row > * { border-top: 1px solid var(--color-border-default); }
+  .history-health-row > *:nth-child(-n + 2) { border-top: 0; }
+  .history-health-row > *:nth-child(even) { border-left: 1px solid var(--color-border-default); }
+  .history-health-row > *::before,
+  .history-health-domain::before { content: attr(data-label); display: block; margin-bottom: 5px; color: var(--text-2); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+}
+
+@media (max-width: 560px) {
+  .history-health-summary { grid-template-columns: auto minmax(0, 1fr); }
+  .history-health-summary > button { grid-column: 1 / -1; width: 100%; }
+  .history-health-row { grid-template-columns: 1fr; }
+  .history-health-row > *,
+  .history-health-row > *:nth-child(-n + 2) { border-top: 1px solid var(--color-border-default); }
+  .history-health-row > *:first-child { border-top: 0; }
+  .history-health-row > *:nth-child(even) { border-left: 0; }
+}
+
+

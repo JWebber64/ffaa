@@ -249,6 +249,45 @@ export interface HistoricalTransactionAsset {
   metadata: Record<string, JsonValue>;
 }
 
+export type HistoryCoverageStatus = "complete" | "partial" | "missing" | "unknown" | "not_applicable";
+
+export type HistoryCoverageDomain =
+  | "franchises"
+  | "managerIdentity"
+  | "matchups"
+  | "weeklyResults"
+  | "weeklyPlayerResults"
+  | "drafts"
+  | "transactions";
+
+export interface HistoryDomainCoverage {
+  status: HistoryCoverageStatus;
+  observed: number;
+  expected: number | null;
+  source: string;
+  sourceUrl: string;
+  importedAt: string;
+  reasons: string[];
+  recordedSpend?: number | null;
+  expectedSpend?: number | null;
+  orderKnown?: boolean | null;
+  mappedFranchises?: number | null;
+  expectedFranchises?: number | null;
+}
+
+export interface LeagueSeasonCoverage {
+  seasonId: string;
+  season: number;
+  importedAt: string;
+  domains: Record<HistoryCoverageDomain, HistoryDomainCoverage>;
+}
+
+export interface LeagueHistoryCoverage {
+  version: 1;
+  generatedAt: string;
+  seasons: LeagueSeasonCoverage[];
+}
+
 export interface LeagueHistorySnapshot {
   league: FantasyLeague;
   seasons: LeagueSeason[];
@@ -262,6 +301,7 @@ export interface LeagueHistorySnapshot {
   draftPicks: HistoricalDraftPick[];
   transactions: HistoricalTransaction[];
   transactionAssets: HistoricalTransactionAsset[];
+  coverage?: LeagueHistoryCoverage;
 }
 
 export interface ManagerCareerStats {

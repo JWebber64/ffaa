@@ -58,6 +58,7 @@ import {
   type SleeperLeagueChoice,
 } from "../features/league-hq/sleeperLeague";
 import { leagueHistoryPath, leagueRivalryPath } from "../features/league-history/ui/leagueRoutes";
+import { HistoryHealthPanel } from "../features/league-history/ui/HistoryHealthPanel";
 import { FANTASY_SEASON } from "../config/fantasySeason";
 import "./league-hq.css";
 
@@ -67,6 +68,7 @@ const VIEWS = [
   { id: "managers", label: "Managers", icon: Users },
   { id: "records", label: "Records", icon: Medal },
   { id: "seasons", label: "Season archive", icon: History },
+  { id: "history-health", label: "History health", icon: ClipboardCheck },
   { id: "rivalries", label: "Rivalries", icon: Swords },
   { id: "draft", label: "Draft Central", icon: Gavel },
   { id: "futures", label: "Futures", icon: Sparkles },
@@ -791,6 +793,15 @@ export default function LeagueHQ() {
               ))}
             </div>
             {!data.seasons.length ? <EmptyState title="The archive is ready" detail="Import completed seasons to unlock recaps, podiums, awards, and manager reviews." /> : null}
+          </section>
+        ) : null}
+
+        {activeView === "history-health" ? (
+          <section>
+            <SectionHeading eyebrow="History import" title="History Health" detail="See which seasons and sources are ready for records, receipts, and manager analytics." />
+            {activeLeagueId
+              ? <HistoryHealthPanel leagueId={activeLeagueId} />
+              : <EmptyState title="Connect a Sleeper league" detail="History Health appears after a league is selected." />}
           </section>
         ) : null}
 

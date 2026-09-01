@@ -1033,3 +1033,119 @@
   .history-decision-chevron { transition: none; }
   .history-week-loading > span { animation: none; }
 }
+/* Draft receipts and manager construction intelligence */
+.history-draft-view-tabs { display: flex; gap: 4px; width: fit-content; padding: 4px; border: 1px solid var(--line-0); border-radius: 9px; background: var(--bg-2); }
+.history-draft-view-tabs button { min-height: 40px; padding: 0 15px; border: 0; border-radius: 6px; background: transparent; color: var(--text-1); font: inherit; font-size: 0.78rem; font-weight: 780; cursor: pointer; }
+.history-draft-view-tabs button:hover,
+.history-draft-view-tabs button:focus-visible { background: color-mix(in srgb, var(--a2) 8%, transparent); color: var(--text-0); outline: none; }
+.history-draft-view-tabs button:focus-visible { box-shadow: 0 0 0 2px color-mix(in srgb, var(--a2) 58%, transparent); }
+.history-draft-view-tabs button.is-active { background: color-mix(in srgb, var(--a2) 14%, var(--bg-1)); color: var(--a2); }
+.draft-intelligence { display: grid; gap: 14px; margin-top: 14px; }
+.draft-intelligence-evidence { display: grid; grid-template-columns: minmax(150px, 0.35fr) minmax(0, 1fr); align-items: center; gap: 16px; padding: 13px 15px; border: 1px solid var(--line-0); border-radius: 9px; background: var(--bg-2); }
+.draft-intelligence-evidence.is-provisional { border-color: color-mix(in srgb, #fbbf24 32%, var(--line-0)); }
+.draft-intelligence-evidence > div { display: grid; gap: 3px; }
+.draft-intelligence-evidence span,
+.draft-intelligence-evidence small { color: var(--text-1); font-size: 0.68rem; }
+.draft-intelligence-evidence strong { font-size: 0.86rem; }
+.draft-intelligence-evidence p { margin: 0; color: var(--text-1); font-size: 0.78rem; }
+.draft-intelligence-evidence small { grid-column: 1 / -1; }
+.draft-intelligence-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; overflow: hidden; border: 1px solid var(--line-0); border-radius: 9px; background: var(--line-0); gap: 1px; }
+.draft-intelligence-summary > div { min-width: 0; padding: 12px; background: var(--bg-1); }
+.draft-intelligence-summary dt { color: var(--text-1); font-size: 0.68rem; }
+.draft-intelligence-summary dd { margin: 4px 0 0; font-size: 0.88rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.draft-dna,
+.draft-manager-comparison,
+.draft-receipts { overflow: hidden; border: 1px solid var(--line-0); border-radius: 10px; background: var(--bg-1); }
+.draft-dna > header,
+.draft-manager-comparison > header,
+.draft-receipts > header { display: flex; align-items: end; justify-content: space-between; gap: 14px; padding: 14px 15px; border-bottom: 1px solid var(--line-0); }
+.draft-dna > header span,
+.draft-manager-comparison > header span,
+.draft-receipts > header span { color: var(--a2); font-size: 0.65rem; font-weight: 820; letter-spacing: 0.08em; text-transform: uppercase; }
+.draft-dna > header h3,
+.draft-manager-comparison > header h3,
+.draft-receipts > header h3 { margin: 3px 0 0; font-size: 1rem; }
+.draft-dna > header small,
+.draft-manager-comparison > header small,
+.draft-receipts > header small { max-width: 420px; color: var(--text-1); font-size: 0.7rem; text-align: right; }
+.draft-dna-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; border-bottom: 1px solid var(--line-0); }
+.draft-dna-facts > div { padding: 12px 15px; }
+.draft-dna-facts > div + div { border-left: 1px solid var(--line-0); }
+.draft-dna-facts dt { color: var(--text-1); font-size: 0.67rem; }
+.draft-dna-facts dd { margin: 4px 0 0; font-size: 0.85rem; font-weight: 800; }
+.draft-dna-distributions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.draft-dna-distributions > section { display: grid; gap: 8px; padding: 14px 15px; }
+.draft-dna-distributions > section + section { border-left: 1px solid var(--line-0); }
+.draft-dna-distributions h4 { margin: 0 0 3px; font-size: 0.75rem; }
+.draft-dna-distributions section > div { display: grid; grid-template-columns: minmax(90px, 0.7fr) minmax(80px, 1fr) minmax(100px, auto); align-items: center; gap: 9px; font-size: 0.68rem; }
+.draft-dna-distributions section > div > span { color: var(--text-1); }
+.draft-dna-distributions i { height: 5px; overflow: hidden; border-radius: 999px; background: var(--bg-3); }
+.draft-dna-distributions i b { display: block; height: 100%; border-radius: inherit; background: var(--a2); }
+.draft-dna-distributions section > div > strong { text-align: right; font-variant-numeric: tabular-nums; }
+.draft-dna-repeat { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 12px 15px; border-top: 1px solid var(--line-0); font-size: 0.72rem; }
+.draft-dna-repeat span { color: var(--text-1); }
+.draft-manager-comparison .history-table-wrap,
+.draft-receipts .history-table-wrap { border: 0; border-radius: 0; }
+.draft-receipts-table th button { width: 100%; border: 0; background: transparent; color: inherit; font: inherit; font-weight: inherit; text-align: left; cursor: pointer; }
+.draft-receipts-table th button:focus-visible { outline: 2px solid var(--a2); outline-offset: 2px; }
+.draft-receipts-table td small { display: block; margin-top: 3px; color: var(--text-1); font-size: 0.64rem; }
+.draft-receipts-table td:nth-child(n + 3):nth-child(-n + 7) { font-variant-numeric: tabular-nums; }
+.draft-keepers { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 5px 12px; padding: 13px 15px; border: 1px solid var(--line-0); border-radius: 9px; background: var(--bg-2); font-size: 0.74rem; }
+.draft-keepers span,
+.draft-keepers small { color: var(--text-1); }
+.draft-keepers small { grid-column: 1 / -1; }
+.draft-intelligence-state { display: grid; min-height: 130px; place-content: center; gap: 5px; margin-top: 14px; padding: 24px; border: 1px dashed var(--line-1); border-radius: 10px; text-align: center; }
+.draft-intelligence-state span { color: var(--text-1); }
+
+@media (max-width: 780px) {
+  .draft-intelligence-summary,
+  .draft-dna-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .draft-dna-facts > div:nth-child(3) { border-left: 0; border-top: 1px solid var(--line-0); }
+  .draft-dna-facts > div:nth-child(4) { border-top: 1px solid var(--line-0); }
+  .draft-dna-distributions { grid-template-columns: 1fr; }
+  .draft-dna-distributions > section + section { border-top: 1px solid var(--line-0); border-left: 0; }
+  .draft-receipts-table { min-width: 0; }
+  .draft-receipts-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .draft-receipts-table,
+  .draft-receipts-table tbody,
+  .draft-receipts-table tr,
+  .draft-receipts-table td { display: block; width: 100%; }
+  .draft-receipts-table tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 7px; border-bottom: 1px solid var(--line-0); }
+  .draft-receipts-table td { min-width: 0; padding: 8px; border-bottom: 0; text-align: left !important; }
+  .draft-receipts-table td::before { content: attr(data-label); display: block; margin-bottom: 4px; color: var(--text-1); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; }
+  .draft-receipts-table td:first-child { position: static; background: transparent; }
+}
+
+@media (max-width: 520px) {
+  .history-draft-view-tabs { width: 100%; }
+  .history-draft-view-tabs button { flex: 1; }
+  .draft-intelligence-evidence { grid-template-columns: 1fr; }
+  .draft-intelligence-evidence small { grid-column: auto; }
+  .draft-dna > header,
+  .draft-manager-comparison > header,
+  .draft-receipts > header { align-items: flex-start; flex-direction: column; }
+  .draft-dna > header small,
+  .draft-manager-comparison > header small,
+  .draft-receipts > header small { text-align: left; }
+  .draft-dna-distributions section > div { grid-template-columns: minmax(80px, 1fr) minmax(70px, 0.8fr); }
+  .draft-dna-distributions section > div > strong { grid-column: 1 / -1; text-align: left; }
+  .draft-receipts-table tr { grid-template-columns: 1fr; }
+  .draft-keepers { grid-template-columns: 1fr; }
+  .draft-keepers small { grid-column: auto; }
+}
+
+.draft-manager-profile { display: grid; gap: 11px; }
+.draft-manager-profile > p { margin: 0; color: var(--text-1); font-size: 0.75rem; }
+.draft-manager-profile dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; overflow: hidden; border: 1px solid var(--line-0); border-radius: 8px; }
+.draft-manager-profile dl > div { padding: 9px 10px; }
+.draft-manager-profile dl > div:nth-child(even) { border-left: 1px solid var(--line-0); }
+.draft-manager-profile dl > div:nth-child(n + 3) { border-top: 1px solid var(--line-0); }
+.draft-manager-profile dt { color: var(--text-1); font-size: 0.62rem; }
+.draft-manager-profile dd { margin: 3px 0 0; font-size: 0.78rem; font-weight: 800; }
+.draft-manager-profile-positions { display: flex; flex-wrap: wrap; gap: 6px; }
+.draft-manager-profile-positions > span { display: inline-grid; grid-template-columns: auto auto; gap: 1px 7px; padding: 7px 8px; border: 1px solid var(--line-0); border-radius: 7px; background: var(--bg-2); }
+.draft-manager-profile-positions small { color: var(--text-1); }
+.draft-manager-profile-positions strong { font-size: 0.7rem; }
+.draft-manager-profile-positions em { grid-column: 1 / -1; color: var(--text-1); font-size: 0.58rem; font-style: normal; }
+.draft-manager-profile > small { color: var(--text-1); line-height: 1.4; }
+.draft-manager-profile-state { display: grid; gap: 4px; padding: 14px; border: 1px dashed var(--line-1); border-radius: 8px; color: var(--text-1); font-size: 0.72rem; }

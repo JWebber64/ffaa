@@ -4,6 +4,12 @@ This roadmap extends the product around three jobs: run the draft, win the week,
 
 Complexity is relative: **S** (days), **M** (one to two focused iterations), **L** (multi-system project), **XL** (program of work). Suggested order is the dependency-aware sequence within each priority.
 
+## Delivered data-trust foundation
+
+- History Health persists and renders per-season coverage for franchises, manager mapping, matchups, weekly player results, drafts, and transactions. It is the prerequisite for all historical draft and manager analytics.
+- Draft Receipts and Manager Draft DNA deliver the supported historical portion of opponent budget and roster tendencies: budget-normalized spend structure, repeat targets, and observed returns on the drafting franchise.
+- Nomination patterns, bid timing, injury-adjusted value, grades, and live DraftRoom recommendations remain blocked until nomination/order evidence and a separately approved consumer methodology exist.
+
 ## P0 — Trustworthy decisions and draft-room continuity
 
 | Order | Feature | User problem | Proposed solution | Data requirements | Technical dependencies | Complexity |
