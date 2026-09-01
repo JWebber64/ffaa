@@ -454,6 +454,18 @@ export function positionLabel(position: string) {
   return normalizeSlot(position) === "DST" ? "DEF" : normalizeSlot(position);
 }
 
+export function leaguePositionClass(position: string) {
+  const basePosition = positionLabel(position).replace(/\d+$/, "");
+  const colorPosition = basePosition === "BN" || basePosition === "BENCH"
+    ? "bench"
+    : basePosition === "SUPER_FLEX"
+      ? "flex"
+      : basePosition === "IDP" || basePosition === "IDP_FLEX"
+        ? "idpflex"
+        : basePosition.toLowerCase();
+  return `pos-${colorPosition}`;
+}
+
 export function isSupportedToolPosition(position: string): position is ToolPosition {
   return ["QB", "RB", "WR", "TE", "K", "DEF"].includes(positionLabel(position));
 }

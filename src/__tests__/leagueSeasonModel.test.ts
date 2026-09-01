@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { ToolPlayer } from "../data/toolPlayerData";
 import {
   buildRoundRobinSchedule,
+  leaguePositionClass,
   normalizeLineupAssignments,
   parseLeagueSeasonDraft,
   projectAssignedLineup,
@@ -77,6 +78,32 @@ function savedDraft(teamCount = 4) {
 }
 
 describe("league season draft model", () => {
+  it("maps numbered lineup labels to their semantic position color classes", () => {
+    expect([
+      "QB",
+      "RB1",
+      "RB2",
+      "WR1",
+      "WR2",
+      "WR3",
+      "TE",
+      "FLEX",
+      "BN1",
+      "DST",
+    ].map((position) => leaguePositionClass(position))).toEqual([
+      "pos-qb",
+      "pos-rb",
+      "pos-rb",
+      "pos-wr",
+      "pos-wr",
+      "pos-wr",
+      "pos-te",
+      "pos-flex",
+      "pos-bench",
+      "pos-def",
+    ]);
+  });
+
   it("normalizes saved draft teams into franchises and recalculates spend from the roster", () => {
     const season = parseLeagueSeasonDraft(savedDraft(), {
       leagueId: "1385319428408774656",

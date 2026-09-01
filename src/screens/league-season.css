@@ -297,17 +297,16 @@
 .league-position.pos-rb { background: var(--pos-rb); }
 .league-position.pos-wr { background: var(--pos-wr); }
 .league-position.pos-te { background: var(--pos-te); }
+.league-position.pos-flex { background: var(--pos-flex); }
 .league-position.pos-k { background: var(--pos-k); }
 .league-position.pos-def,
 .league-position.pos-dst { background: var(--pos-dst); }
-.league-position.pos-bn1,
-.league-position.pos-bn2,
-.league-position.pos-bn3,
-.league-position.pos-bn4,
-.league-position.pos-bn5,
-.league-position.pos-bn6,
-.league-position.pos-bn7,
-.league-position.pos-bn8 { background: var(--pos-bench); }
+.league-position.pos-bench { background: var(--pos-bench); }
+.league-position.pos-ir { background: var(--pos-ir); }
+.league-position.pos-dl { background: var(--pos-dl); }
+.league-position.pos-lb { background: var(--pos-lb); }
+.league-position.pos-db { background: var(--pos-db); }
+.league-position.pos-idpflex { background: var(--pos-idpflex); }
 .league-mobile-label { display: none; }
 
 .league-week-toolbar {
