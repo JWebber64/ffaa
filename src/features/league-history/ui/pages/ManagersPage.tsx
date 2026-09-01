@@ -10,6 +10,7 @@ import {
 import { useLeagueHistorySnapshot } from "../historyContext";
 import { formatNumber, formatPercentage, formatRecord, ordinal } from "../format";
 import { ManagerDraftDNASummary } from "../draft/ManagerDraftDNASummary";
+import { RosterLegacySummary } from "../roster/RosterLegacySummary";
 
 export function ManagersPage() {
   const snapshot = useLeagueHistorySnapshot();
@@ -119,6 +120,15 @@ export function ManagerProfilePage() {
         <article className="history-panel"><header><div><span>Trophy case</span><h2>Career honors</h2></div><Trophy /></header><div className="history-trophy-row"><strong>{career.championships}</strong><span>Championships</span><strong>{career.regularSeasonTitles}</strong><span>Regular-season titles</span></div></article>
         <article className="history-panel"><header><div><span>Historical activity</span><h2>Draft DNA</h2></div><Crown /></header><ManagerDraftDNASummary leagueId={leagueId} managerId={managerId} snapshot={snapshot} /><p>{draftPicks.length} stored draft picks · {transactionAssets.length} stored transaction assets.</p><div className="history-inline-links"><Link to="../drafts">Draft archive</Link><Link to="../transactions">Transaction archive</Link></div></article>
       </section>
+
+      <RosterLegacySummary
+        leagueId={leagueId}
+        managerId={managerId}
+        snapshot={snapshot}
+        eyebrow="Recorded lineup identity"
+        title="Roster Legacy"
+        detail="The most-started player at each position across this manager’s recorded weekly lineups. Starts are counted from stored lineup evidence, not inferred ownership."
+      />
     </main>
   );
 }

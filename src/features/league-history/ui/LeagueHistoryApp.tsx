@@ -36,6 +36,7 @@ import { useRouteMetadata } from "../../../lib/routeMetadata";
 import { ShareButton } from "../../../components/ShareButton";
 import type { LeagueHistorySnapshot } from "../domain/types";
 import { closeParentDisclosure, useDismissibleDisclosureMenus } from "../../../ui/disclosureMenu";
+import { LeagueHistoryImportingState } from "./LeagueHistoryImportingState";
 import "./league-history.css";
 
 const HISTORY_NAV_GROUPS = [
@@ -101,6 +102,9 @@ function LeagueHistoryLayout() {
         <div className="history-skeleton" aria-hidden="true"><span /><span /><span /></div>
       </main>
     );
+  }
+  if (state.status === "importing") {
+    return <LeagueHistoryImportingState />;
   }
   if (state.status === "error" || !state.data) {
     return (

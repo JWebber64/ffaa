@@ -72,6 +72,14 @@ export function HistoryHealthPanel({ leagueId }: { leagueId: string }) {
   if (history.status === "loading") {
     return <section className="history-health-state" aria-busy="true"><RefreshCw aria-hidden="true" /><strong>Checking imported history…</strong></section>;
   }
+  if (history.status === "importing") {
+    return (
+      <section className="history-health-state is-importing" aria-busy="true" aria-live="polite">
+        <RefreshCw aria-hidden="true" />
+        <div><strong>Building League History</strong><p>Sleeper seasons are being normalized and saved. This panel checks automatically and will show coverage when the archive is ready.</p></div>
+      </section>
+    );
+  }
   if (history.status === "error" || !history.data) {
     return (
       <section className="history-health-state is-error" role="status">
@@ -118,5 +126,4 @@ function LoadedHistoryHealth({
     </section>
   );
 }
-
 

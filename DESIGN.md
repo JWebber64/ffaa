@@ -169,6 +169,8 @@ Draft Receipts are auditable outcomes for recorded, non-keeper auction purchases
 
 Manager Draft DNA is descriptive, not a grade or recommendation. It may show position allocation, price-band allocation, top-three spend share, observed starter points per dollar, and repeat targets. Partial inputs must say `Provisional`; small comparison populations suppress percentiles. Do not infer injury-adjusted value, steals or reaches, nomination behavior, bid timing, or live-draft advice without the corresponding historical source and an approved methodology.
 
+Roster Legacy counts only stored `WeeklyPlayerResult` rows marked as starters and connects them to permanent manager identity through the recorded weekly roster and season franchise. Position leaders rank by recorded starts, then observed starter points, then player name. Missing points remain unavailable rather than zero, incomplete weekly-player coverage is labeled `Provisional`, and roster-slot assignment or historical NFL-team affiliation must not be inferred from the current payload.
+
 ## Do's and Don'ts
 
 - Do use a full perimeter border when color identifies a position or state.

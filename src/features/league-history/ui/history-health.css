@@ -42,6 +42,8 @@
 .history-health-state > div { max-width: 680px; }
 .history-health-state p { margin: 4px 0 0; color: var(--text-2); }
 .history-health-state.is-error > svg { color: #fda4af; }
+.history-health-state.is-importing { justify-content: flex-start; border-style: solid; background: var(--color-surface-card-primary); }
+.history-health-state.is-importing > svg { flex: 0 0 auto; color: var(--a2); }
 
 @media (max-width: 900px) {
   .history-health-table { overflow: visible; border: 0; background: transparent; }
@@ -65,5 +67,4 @@
   .history-health-row > *:first-child { border-top: 0; }
   .history-health-row > *:nth-child(even) { border-left: 0; }
 }
-
 

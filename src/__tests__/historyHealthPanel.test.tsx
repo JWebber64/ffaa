@@ -84,6 +84,13 @@ describe("HistoryHealthPanel", () => {
     expect(screen.getByText("Not imported")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Check again" })).toBeInTheDocument();
   });
-});
 
+  it("distinguishes an active import from missing history", () => {
+    useLeagueHistoryMock.mockReturnValue({ status: "importing", data: null, error: "", refresh: vi.fn() });
+    render(<MemoryRouter><HistoryHealthPanel leagueId="league" /></MemoryRouter>);
+    expect(screen.getByText("Building League History")).toBeInTheDocument();
+    expect(screen.getByText(/checks automatically/i)).toBeInTheDocument();
+    expect(screen.queryByText("History source data is missing")).not.toBeInTheDocument();
+  });
+});
 
