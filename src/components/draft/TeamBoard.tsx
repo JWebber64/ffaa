@@ -243,6 +243,7 @@ function TeamPanel({
   playerTransferSelection,
   onPlayerTransferSelectionChange,
   onPlayerTransfer,
+  showBudgetOverage,
 }: {
   team: Team;
   rosterSlots: RosterSlot[];
@@ -256,6 +257,7 @@ function TeamPanel({
   playerTransferSelection?: TeamBoardPlayerTransfer | null;
   onPlayerTransferSelectionChange?: (transfer: TeamBoardPlayerTransfer | null) => void;
   onPlayerTransfer?: (sourceTeamId: string, targetTeamId: string, playerId: string) => void;
+  showBudgetOverage?: boolean;
 }) {
   const roster = Array.isArray(team.roster) ? team.roster : [];
   const slotAssignments = getTeamRosterAssignments(rosterSlots, roster);
@@ -273,7 +275,10 @@ function TeamPanel({
   const filledSlots = slotAssignments.filter(
     (slot) => slot.slot !== "IR" && !slot.key.startsWith("overflow-") && slot.assigned?.name
   ).length;
-  const remainingBudget = Math.max(0, (team.budget ?? 0) - (team.spent ?? 0));
+  const rawRemainingBudget = (team.budget ?? 0) - (team.spent ?? 0);
+  const isOverBudget = Boolean(showAuctionValues && showBudgetOverage && rawRemainingBudget < 0);
+  const remainingBudget = isOverBudget ? rawRemainingBudget : Math.max(0, rawRemainingBudget);
+  const remainingBudgetLabel = remainingBudget < 0 ? `-$${Math.abs(remainingBudget)}` : `$${remainingBudget}`;
   const maxBid = getTeamMaxBid(team, totalSlots);
   const isBudgetDanger = showAuctionValues && (maxBid <= 5 || remainingBudget <= Math.max(5, totalSlots - filledSlots));
   const isBudgetWarn = showAuctionValues && !isBudgetDanger && (maxBid <= 20 || remainingBudget <= 35);
@@ -375,17 +380,21 @@ function TeamPanel({
       </div>
 
       <div className="team-panel-meta-row">
-        {showAuctionValues ? <div className="team-panel-meta-item" title={`Remaining budget: $${remainingBudget}`}>
+        {showAuctionValues ? <div
+          className="team-panel-meta-item"
+          title={isOverBudget ? `Over budget by $${Math.abs(remainingBudget)}` : `Remaining budget: $${remainingBudget}`}
+        >
           <span className="team-panel-meta-label">Budget</span>
           <span
             className={cn(
               "team-panel-meta-value",
               "team-panel-budget-cell",
+              isOverBudget ? "is-over-budget" : "",
               isBudgetDanger ? "is-danger" : "",
               isBudgetWarn ? "is-warn" : ""
             )}
           >
-            <strong>${remainingBudget}</strong>
+            <strong>{remainingBudgetLabel}</strong>
           </span>
         </div> : null}
         <div className="team-panel-meta-item" title={`Filled roster slots: ${filledSlots}/${totalSlots}`}>
@@ -531,6 +540,7 @@ export default function TeamBoard({
   playerTransferSelection: controlledPlayerTransferSelection,
   onPlayerTransferSelectionChange,
   onPlayerTransfer,
+  showBudgetOverage = false,
 }: {
   teams: Team[];
   rosterSlots: RosterSlot[];
@@ -546,6 +556,7 @@ export default function TeamBoard({
   playerTransferSelection?: TeamBoardPlayerTransfer | null;
   onPlayerTransferSelectionChange?: (transfer: TeamBoardPlayerTransfer | null) => void;
   onPlayerTransfer?: (sourceTeamId: string, targetTeamId: string, playerId: string) => void;
+  showBudgetOverage?: boolean;
 }) {
   const [internalPlayerTransferSelection, setInternalPlayerTransferSelection] = useState<TeamBoardPlayerTransfer | null>(null);
   const playerTransferSelection = controlledPlayerTransferSelection === undefined
@@ -593,6 +604,7 @@ export default function TeamBoard({
                 isMe={!!myTeamId && team.teamId === myTeamId}
                 isActive={!!activeTeamId && team.teamId === activeTeamId}
                 showAuctionValues={showAuctionValues}
+                showBudgetOverage={showBudgetOverage}
                 {...(onTeamOpen ? { onOpen: onTeamOpen } : {})}
                 {...(onPlayerMove ? { onPlayerMove } : {})}
                 {...(onPlayerTransfer

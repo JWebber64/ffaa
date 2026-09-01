@@ -589,6 +589,54 @@ function MoneyStepper({
   );
 }
 
+function PlayerPriceEditor({
+  playerName,
+  value,
+  onValueChange,
+}: {
+  playerName: string;
+  value: number;
+  onValueChange: (value: number) => void;
+}) {
+  const [draftValue, setDraftValue] = useState(String(value));
+
+  useEffect(() => {
+    setDraftValue(String(value));
+  }, [value]);
+
+  return (
+    <label className="offline-roster-price-control" title={`Edit ${playerName} price`}>
+      <span className="offline-roster-price-currency" aria-hidden="true">$</span>
+      <NumericInput
+        aria-label={`Price for ${playerName}`}
+        className="offline-roster-price-input"
+        data-slot="offline-player-price"
+        inputMode="numeric"
+        min={0}
+        onBlur={() => {
+          if (clampWholeDollar(draftValue) === null) setDraftValue(String(value));
+        }}
+        onChange={(event) => {
+          const nextValue = event.target.value;
+          setDraftValue(nextValue);
+          const parsedValue = clampWholeDollar(nextValue);
+          if (parsedValue !== null && parsedValue !== value) onValueChange(parsedValue);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") event.currentTarget.blur();
+          if (event.key === "Escape") {
+            setDraftValue(String(value));
+            event.currentTarget.blur();
+          }
+        }}
+        shellClassName="offline-roster-price-field"
+        step={1}
+        value={draftValue}
+      />
+    </label>
+  );
+}
+
 function OfflineOrderStatus({
   officialOrder,
   pendingHandoff,
@@ -1590,6 +1638,46 @@ export default function OfflineDraftV2() {
     setError(null);
   }
 
+  function updatePlayerPrice(
+    teamId: string,
+    playerId: string,
+    playerName: string,
+    previousPrice: number,
+    nextPrice: number
+  ) {
+    if (previousPrice === nextPrice) return;
+    const team = teams.find((candidate) => candidate.teamId === teamId);
+    if (!team) return;
+
+    const nextSpent = team.spent - previousPrice + nextPrice;
+    const nextBalance = team.budget - nextSpent;
+    setTeams((current) =>
+      current.map((candidate) =>
+        candidate.teamId === teamId
+          ? withSpent({
+              ...candidate,
+              roster: candidate.roster.map((player) =>
+                player.playerId === playerId ? { ...player, price: nextPrice } : player
+              ),
+            })
+          : candidate
+      )
+    );
+    setLastAssignment((current) =>
+      current?.teamId === teamId && current.playerId === playerId
+        ? { ...current, price: nextPrice }
+        : current
+    );
+    setSaveStatus(
+      `${playerName} price updated from ${money(previousPrice)} to ${money(nextPrice)}. ${
+        nextBalance < 0
+          ? `${team.name} is ${money(Math.abs(nextBalance))} over budget.`
+          : `${team.name} has ${money(nextBalance)} remaining.`
+      }`
+    );
+    setError(null);
+  }
+
   function movePlayer(teamId: string, playerId: string, targetSlotKey: string) {
     setTeams((current) =>
       current.map((team) =>
@@ -1687,6 +1775,9 @@ export default function OfflineDraftV2() {
   const selectedTeamFilled = selectedTeam?.roster.length ?? 0;
   const selectedTeamProgress =
     totalRosterSlots > 0 ? `${Math.min(100, (selectedTeamFilled / totalRosterSlots) * 100)}%` : "0%";
+  const selectedTeamBalance =
+    (selectedTeam?.budget ?? DEFAULT_BUDGET) - (selectedTeam?.spent ?? 0);
+  const selectedTeamOverage = Math.max(0, -selectedTeamBalance);
 
   if (cloudDraftId && !cloudReady) {
     return (
@@ -1897,6 +1988,7 @@ export default function OfflineDraftV2() {
           onPlayerTransfer={transferPlayer}
           playerTransferSelection={playerTransferSelection}
           onPlayerTransferSelectionChange={setPlayerTransferSelection}
+          showBudgetOverage
         />
       </section>
 
@@ -2135,9 +2227,9 @@ export default function OfflineDraftV2() {
               <span>Spent</span>
               <strong>{money(selectedTeam?.spent ?? 0)}</strong>
             </div>
-            <div>
-              <span>Remaining</span>
-              <strong>{money(Math.max(0, (selectedTeam?.budget ?? DEFAULT_BUDGET) - (selectedTeam?.spent ?? 0)))}</strong>
+            <div className={cn(selectedTeamOverage > 0 ? "is-over-budget" : "")}>
+              <span>{selectedTeamOverage > 0 ? "Over budget" : "Remaining"}</span>
+              <strong>{money(selectedTeamOverage > 0 ? selectedTeamOverage : selectedTeamBalance)}</strong>
             </div>
             </> : <>
               <div><span>Rostered</span><strong>{selectedTeamFilled}</strong></div>
@@ -2219,7 +2311,19 @@ export default function OfflineDraftV2() {
                       ) : (
                         <span className="offline-roster-slot-static">{currentSlot?.label ?? "Roster"}</span>
                       )}
-                      {offlineConfig.draftType === "auction" ? <strong>{money(player.price)}</strong> : null}
+                      {offlineConfig.draftType === "auction" ? (
+                        <PlayerPriceEditor
+                          playerName={player.name}
+                          value={player.price}
+                          onValueChange={(nextPrice) => updatePlayerPrice(
+                            selectedTeam.teamId,
+                            player.playerId,
+                            player.name,
+                            player.price,
+                            nextPrice
+                          )}
+                        />
+                      ) : null}
                     </div>
                   </div>
                 );

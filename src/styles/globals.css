@@ -7589,6 +7589,16 @@ p {
   line-height: 1;
 }
 
+.offline-selected-summary div.is-over-budget {
+  border-color: rgba(251,113,133,0.34);
+  background: rgba(127,29,29,0.2);
+}
+
+.offline-selected-summary div.is-over-budget span,
+.offline-selected-summary div.is-over-budget strong {
+  color: rgba(254,202,202,0.98);
+}
+
 .offline-roster-list {
   position: relative;
   z-index: 1;
@@ -7659,11 +7669,37 @@ p {
   gap: 8px;
 }
 
-.offline-roster-actions strong {
-  min-width: 38px;
-  text-align: right;
+.offline-roster-price-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   color: rgba(209,250,229,0.96);
-  font-size: 0.88rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.offline-roster-price-currency {
+  color: rgba(209,250,229,0.88);
+}
+
+.offline-roster-price-field {
+  width: 82px;
+  height: 32px;
+}
+
+.offline-roster-price-input {
+  height: 100%;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 9px;
+  background: rgba(255,255,255,0.045);
+  color: rgba(238,255,249,0.96);
+  font: inherit;
+  outline: none;
+}
+
+.offline-roster-price-field:focus-within .offline-roster-price-input {
+  border-color: rgba(47,201,148,0.64);
+  box-shadow: 0 0 0 2px rgba(47,201,148,0.15);
 }
 
 .offline-roster-slot-control,
