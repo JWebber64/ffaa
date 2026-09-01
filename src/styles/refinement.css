@@ -3889,6 +3889,144 @@ body,
   background: var(--color-surface-card-primary);
 }
 
+/* Offline Draft manager action hierarchy */
+.offline-assignment-panel .offline-console-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 16px;
+}
+
+.offline-assignment-panel .offline-console-toolbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 10px 0 0;
+  border: 0;
+  border-top: 1px solid var(--color-border-subtle);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.offline-console-metrics,
+.offline-console-actions {
+  display: flex;
+  align-items: center;
+}
+
+.offline-console-metrics {
+  gap: 14px;
+}
+
+.offline-console-actions {
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.offline-assignment-panel .offline-console-stat {
+  min-width: 64px;
+  height: auto;
+  padding: 0 14px 0 0;
+  border: 0;
+  border-right: 1px solid var(--color-border-subtle);
+  border-radius: 0;
+  background: transparent;
+}
+
+.offline-assignment-panel .offline-console-stat:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.offline-assignment-panel .offline-team-chip {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "label"
+    "name";
+  min-width: 138px;
+  max-width: min(240px, 42vw);
+  padding: 7px 12px;
+  border-color: var(--color-border-brand);
+  border-radius: 9px;
+  background: var(--color-surface-selected);
+  box-shadow: none;
+}
+
+.offline-assignment-panel .offline-reset-action {
+  color: var(--color-status-danger);
+}
+
+.offline-assignment-panel .offline-reset-action:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--color-status-danger) 42%, transparent);
+  background: color-mix(in srgb, var(--color-status-danger) 10%, transparent);
+  color: var(--color-text-primary);
+}
+
+.offline-assignment-panel .offline-cancel-action {
+  border-color: color-mix(in srgb, var(--color-status-danger) 68%, transparent);
+  background: color-mix(in srgb, var(--color-status-danger) 22%, var(--color-surface-card-secondary));
+}
+
+.offline-assignment-panel .offline-cancel-action:hover:not(:disabled) {
+  border-color: var(--color-status-danger);
+  background: color-mix(in srgb, var(--color-status-danger) 30%, var(--color-surface-card-secondary));
+}
+
+.offline-assignment-panel .offline-console-actions .ui-button {
+  min-height: 36px;
+  border-radius: 9px;
+}
+
+.offline-assignment-status {
+  margin: 10px 14px 0;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-brand);
+  border-radius: 8px;
+  background: var(--color-surface-selected);
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 780px) {
+  .offline-assignment-panel .offline-console-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .offline-assignment-panel .offline-team-chip {
+    width: 100%;
+    max-width: none;
+  }
+
+  .offline-assignment-panel .offline-console-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .offline-console-metrics {
+    justify-content: flex-start;
+  }
+
+  .offline-console-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .offline-console-actions .ui-button {
+    width: 100%;
+  }
+
+  .offline-console-actions .offline-cancel-action {
+    grid-column: 1 / -1;
+  }
+}
+
 .stats-hub-table th,
 .stats-hub-table th.is-sticky,
 .tool-table thead th,

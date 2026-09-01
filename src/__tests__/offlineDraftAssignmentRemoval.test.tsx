@@ -74,6 +74,22 @@ describe("offline draft assignment correction", () => {
     };
   }
 
+  it("keeps the active draft toolbar focused on recovery and destructive actions", () => {
+    const { container } = render(<OfflineDraftV2 />);
+    const toolbar = container.querySelector(".offline-console-toolbar");
+    const teamState = container.querySelector(".offline-console-head > .offline-team-chip");
+
+    expect(toolbar).toBeTruthy();
+    expect(toolbar?.querySelector(".offline-console-metrics")).toBeTruthy();
+    expect(toolbar?.querySelector(".offline-console-actions")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /^Save$/ })).toBeNull();
+    expect(screen.getByRole("button", { name: "Undo" }).classList.contains("ui-button-ghost")).toBe(true);
+    expect(screen.getByRole("button", { name: "Reset" }).classList.contains("offline-reset-action")).toBe(true);
+    expect(screen.getByRole("button", { name: "Cancel Draft" }).classList.contains("offline-cancel-action")).toBe(true);
+    expect(teamState).toBeTruthy();
+    expect(teamState?.querySelector(".offline-team-chip-dot")).toBeNull();
+  });
+
   it("drags a wrong-team player onto the correct team and transfers the auction spend", async () => {
     render(<OfflineDraftV2 />);
 

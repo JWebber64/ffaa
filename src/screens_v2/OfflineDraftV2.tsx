@@ -2012,44 +2012,43 @@ export default function OfflineDraftV2() {
               <span>Manager</span>
               <h2>{offlineConfig.draftType === "snake" ? "Pick Console" : "Auction Assignment"}</h2>
             </div>
-            <div className="offline-console-toolbar">
-              <div className="offline-console-stat">
-                <span>Players</span>
-                <strong>{totalPlayers}</strong>
+            {assignmentTeam ? (
+              <div className="offline-team-chip" title={assignmentTeam.name}>
+                <span className="offline-team-chip-label">{offlineConfig.draftType === "snake" ? "On the clock" : "Assigning to"}</span>
+                <strong>{assignmentTeam.name}</strong>
               </div>
-              {offlineConfig.draftType === "auction" ? <div className="offline-console-stat">
-                <span>Spent</span>
-                <strong>{money(totalSpent)}</strong>
-              </div> : <div className="offline-console-stat">
-                <span>Round</span>
-                <strong>{turn.round}</strong>
-              </div>}
-              {assignmentTeam ? (
-                <div className="offline-team-chip" title={assignmentTeam.name}>
-                  <span className="offline-team-chip-dot" aria-hidden="true" />
-                  <span className="offline-team-chip-label">{offlineConfig.draftType === "snake" ? "On the clock" : "Assigning to"}</span>
-                  <strong>{assignmentTeam.name}</strong>
+            ) : null}
+            <div className="offline-console-toolbar">
+              <div className="offline-console-metrics" aria-label="Draft totals">
+                <div className="offline-console-stat">
+                  <span>Players</span>
+                  <strong>{totalPlayers}</strong>
                 </div>
-              ) : null}
-              {saveStatus ? <div className="offline-save-status" role="status">{saveStatus}</div> : null}
-              <Button size="sm" variant="secondary" onClick={saveDraft}>
-                <Save size={15} aria-hidden="true" />
-                Save
-              </Button>
-              <Button size="sm" variant="secondary" onClick={undoLastAssignment} disabled={!lastAssignment}>
-                <Undo2 size={15} aria-hidden="true" />
-                Undo
-              </Button>
-              <Button size="sm" variant="danger" onClick={cancelDraft}>
-                <CircleX size={15} aria-hidden="true" />
-                Cancel Draft
-              </Button>
-              <Button size="sm" variant="danger" onClick={resetDraft}>
-                <RotateCcw size={15} aria-hidden="true" />
-                Reset
-              </Button>
+                {offlineConfig.draftType === "auction" ? <div className="offline-console-stat">
+                  <span>Spent</span>
+                  <strong>{money(totalSpent)}</strong>
+                </div> : <div className="offline-console-stat">
+                  <span>Round</span>
+                  <strong>{turn.round}</strong>
+                </div>}
+              </div>
+              <div className="offline-console-actions">
+                <Button size="sm" variant="ghost" onClick={undoLastAssignment} disabled={!lastAssignment}>
+                  <Undo2 size={15} aria-hidden="true" />
+                  Undo
+                </Button>
+                <Button size="sm" variant="ghost" className="offline-reset-action" onClick={resetDraft}>
+                  <RotateCcw size={15} aria-hidden="true" />
+                  Reset
+                </Button>
+                <Button size="sm" variant="danger" className="offline-cancel-action" onClick={cancelDraft}>
+                  <CircleX size={15} aria-hidden="true" />
+                  Cancel Draft
+                </Button>
+              </div>
             </div>
           </div>
+          {saveStatus ? <div className="offline-assignment-status" role="status">{saveStatus}</div> : null}
 
           <div className="offline-form-grid">
             <SelectWrapper
