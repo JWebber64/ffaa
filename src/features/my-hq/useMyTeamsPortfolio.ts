@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { buildCurrentToolPlayers } from "../../data/toolPlayerData";
+import { loadSleeperPlayerDirectory } from "../../data/sleeperPlayerDirectory";
 import {
   useSleeperLeagueConnections,
   type SleeperLeagueConnectionSummary,
@@ -21,14 +22,19 @@ export type PortfolioTeam = {
   decision: MyHQDecision | null;
 };
 
-const playerPools = new Map<string, ReturnType<typeof buildCurrentToolPlayers>>();
+const playerPools = new Map<string, Promise<ReturnType<typeof buildCurrentToolPlayers>>>();
 const portfolioCache = new Map<string, { loadedAt: number; data: MyHQData }>();
 
 function playersForConnection(connection: SleeperLeagueConnectionSummary) {
   const scoring = connection.auctionSettings?.scoring ?? "halfPpr";
   const existing = playerPools.get(scoring);
   if (existing) return existing;
-  const players = buildCurrentToolPlayers(scoring);
+  const players = loadSleeperPlayerDirectory()
+    .then((sleeperRows) => buildCurrentToolPlayers(scoring, [], {}, sleeperRows))
+    .catch((error) => {
+      playerPools.delete(scoring);
+      throw error;
+    });
   playerPools.set(scoring, players);
   return players;
 }
@@ -129,7 +135,8 @@ export function useMyTeamsPortfolio() {
       const cached = portfolioCache.get(key);
       if (cached && Date.now() - cached.loadedAt < PORTFOLIO_CACHE_MS) return;
       try {
-        const data = await loadMyHQ(connection, playersForConnection(connection), controller.signal);
+        const players = await playersForConnection(connection);
+        const data = await loadMyHQ(connection, players, controller.signal);
         if (controller.signal.aborted) return;
         portfolioCache.set(key, { loadedAt: Date.now(), data });
         setStates((current) => ({

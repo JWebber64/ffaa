@@ -204,7 +204,7 @@ export function buildAvailableRecommendations(
 ) {
   return [...allPlayers]
     .filter((player) => (
-      !allRosteredIds.has(player.id)
+      !allRosteredIds.has(player.sleeperId?.trim() || player.id)
       && player.projectedPointsPerGame !== null
       && !player.injuryStatus
     ))
@@ -333,7 +333,11 @@ export async function loadMyHQ(
   const userRoster = rosters.find((roster) => rosterOwnerIds(roster).includes(connection.managerProviderUserId!));
   if (!userRoster) throw new Error(`${connection.managerDisplayName ?? "Your Sleeper account"} does not own a roster in this league.`);
 
-  const playerById = new Map(allPlayers.map((player) => [player.id, player]));
+  const playerById = new Map<string, ToolPlayer>();
+  for (const player of allPlayers) {
+    playerById.set(player.id, player);
+    if (player.sleeperId) playerById.set(player.sleeperId, player);
+  }
   const starterIds = userRoster.starters ?? [];
   const starterSlots = (league.roster_positions ?? []).filter(isStarterSlot);
   const rosterPlayerIds = userRoster.players ?? [];

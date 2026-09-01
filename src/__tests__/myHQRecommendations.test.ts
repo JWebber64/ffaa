@@ -82,6 +82,30 @@ describe("My HQ league-aware recommendations", () => {
     expect(recommendations[0]?.evidence).toContain("4 projection sources");
   });
 
+  it("uses Sleeper player ids when excluding players rostered elsewhere", () => {
+    const rosteredElsewhere = player({
+      id: "2026-WR-rostered-star",
+      sleeperId: "9999",
+      name: "Rostered Star",
+      projectedPointsPerGame: 20,
+    });
+    const freeAgent = player({
+      id: "2026-WR-free-agent",
+      sleeperId: "8888",
+      name: "Free Agent",
+      projectedPointsPerGame: 14,
+    });
+
+    const recommendations = buildAvailableRecommendations(
+      [rosteredElsewhere, freeAgent],
+      new Set(["9999"]),
+      [],
+      ["WR", "FLEX"],
+    );
+
+    expect(recommendations.map((recommendation) => recommendation.player.sleeperId)).toEqual(["8888"]);
+  });
+
   it("finds a legal flex replacement and labels roster-set evidence for waiver advice", () => {
     const injuredStarter = player({
       id: "starter-wr",
@@ -125,4 +149,3 @@ describe("My HQ league-aware recommendations", () => {
       .toContain("Current Sleeper roster set");
   });
 });
-

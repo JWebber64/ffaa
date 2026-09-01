@@ -11,6 +11,7 @@ export type ToolPosition = "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
 
 export interface ToolPlayer {
   id: string;
+  sleeperId?: string;
   name: string;
   position: ToolPosition;
   team: string;
@@ -174,6 +175,7 @@ export function buildToolPlayers(
 
     return [{
       id: row.player.id,
+      sleeperId: String(row.sleeper?.playerId ?? ""),
       name: row.player.name,
       position,
       team: normalizeToolTeam(row.player.nflTeam),
