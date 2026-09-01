@@ -42,6 +42,26 @@
       "destination": "https://fantasyfootballcalculator.com/api/v1/:path*"
     },
     {
+      "source": "/ff/favicon-32.png",
+      "destination": "/favicon-32.png"
+    },
+    {
+      "source": "/ff/icon-180.png",
+      "destination": "/icon-180.png"
+    },
+    {
+      "source": "/ff/icon-192.png",
+      "destination": "/icon-192.png"
+    },
+    {
+      "source": "/ff/icon-512.png",
+      "destination": "/icon-512.png"
+    },
+    {
+      "source": "/ff/site.webmanifest",
+      "destination": "/site.webmanifest"
+    },
+    {
       "source": "/ff/assets/:path*",
       "destination": "/assets/:path*"
     },
