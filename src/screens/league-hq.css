@@ -26,6 +26,18 @@
   box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32), inset 0 1px rgba(255, 255, 255, 0.07);
 }
 
+.league-hq > .league-hero {
+  min-height: clamp(390px, 24vw, 440px);
+  background:
+    linear-gradient(90deg, oklch(0.12 0 0 / 0.92), oklch(0.12 0 0 / 0.72) 34%, oklch(0.12 0 0 / 0.28) 58%, oklch(0.12 0 0 / 0.08)),
+    linear-gradient(0deg, oklch(0.12 0 0 / 0.36), transparent 58%),
+    var(--league-editorial-image);
+  background-color: oklch(0.12 0 0);
+  background-blend-mode: normal;
+  background-position: center 38%;
+  background-size: auto, auto, cover;
+}
+
 .league-hero::after {
   content: "FFAA";
   position: absolute;
@@ -607,6 +619,7 @@
 @media (max-width: 760px) {
   .league-hq { width: 100%; padding-top: 0; }
   .league-hero { flex-direction: column; padding: var(--space-4); border-radius: var(--r-xl); }
+  .league-hq > .league-hero { min-height: 0; background-position: 32% center; }
   .league-hero-actions { display: grid; width: 100%; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
   .league-hero-actions > .ui-button,
   .league-hero-actions > span { grid-column: 1 / -1; width: 100%; }
