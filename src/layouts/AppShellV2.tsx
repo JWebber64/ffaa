@@ -171,7 +171,7 @@ export default function AppShellV2() {
           <summary onKeyDown={toggleDisclosureFromKeyboard}><Menu aria-hidden="true" /><span>More</span></summary>
           <div className="mobile-more-panel">
             <strong>Explore Fantasy Football</strong>
-            {[...researchLinks, ...draftLinks.slice(2), { to: "/host/setup", label: "Draft settings", detail: "Configure a room", icon: Gavel }].map(({ to, label, icon: Icon }) => (
+            {[...leagueLinks.slice(1, 4), ...researchLinks, ...draftLinks.slice(2), { to: "/host/setup", label: "Draft settings", detail: "Configure a room", icon: Gavel }].map(({ to, label, icon: Icon }) => (
               <Link key={`${to}-${label}`} to={to} onClick={dismissDisclosureMenu}><Icon aria-hidden="true" /><span>{label}</span></Link>
             ))}
             {connections.length ? (

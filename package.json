@@ -13,6 +13,7 @@
     "test": "vitest",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
+    "test:firestore-rules": "npx firebase-tools@15.28.2 emulators:exec --only firestore \"vitest run src/__tests__/leagueSeasonFirestoreRules.test.ts\"",
     "release:check": "node scripts/check-production-release.mjs",
     "preview": "vite preview",
     "espn:pull": "tsx scripts/fetch-espn-cheatsheet.ts",
@@ -54,6 +55,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@tailwindcss/postcss": "^4.2.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
