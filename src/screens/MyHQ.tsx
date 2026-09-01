@@ -1,17 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
-import { Activity, AlertTriangle, CheckCircle2, Clock3, History, Radio, ShieldAlert, Sparkles, Swords, Trophy, Users } from "lucide-react";
+import { Activity, AlertTriangle, ArrowRight, CheckCircle2, Clock3, History, Radio, ShieldAlert, Sparkles, Swords, Trophy, Users } from "lucide-react";
 import { Link } from "react-router-dom";
-import { buildCurrentToolPlayers } from "../data/toolPlayerData";
 import { calculateHeadToHead, calculateManagerCareer } from "../features/league-history/analytics";
 import { useLeagueHistory } from "../features/league-history/useLeagueHistory";
-import { useSleeperLeagueConnections, type SleeperLeagueConnectionSummary } from "../features/league-hq/sleeperConnections";
-import { loadMyHQ, type MyHQData } from "../features/my-hq/myHQ";
+import type { SleeperLeagueConnectionSummary } from "../features/league-hq/sleeperConnections";
+import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
+import { ManagerIdentityForm } from "../features/league-workspace/ManagerIdentityForm";
+import type { MyHQData } from "../features/my-hq/myHQ";
 import "./my-hq.css";
-
-type LoadState =
-  | { status: "idle" | "loading"; data: null; error: "" }
-  | { status: "ready"; data: MyHQData; error: "" }
-  | { status: "error"; data: null; error: string };
 
 function formatScore(value: number | null) {
   return value === null ? "—" : value.toFixed(2);
@@ -27,7 +22,7 @@ function HistoryMemory({ connection, week }: { connection: SleeperLeagueConnecti
       <section className="hq-memory-card">
         <History aria-hidden="true" />
         <div><span>League memory</span><h2>History is not available yet</h2><p>Import completed Sleeper seasons in League HQ to unlock career and rivalry context.</p></div>
-        <Link to="/league">Open League HQ</Link>
+        <Link to={`/league/${connection.leagueId}/manage`}>Open league management <ArrowRight aria-hidden="true" /></Link>
       </section>
     );
   }
@@ -51,47 +46,27 @@ function HistoryMemory({ connection, week }: { connection: SleeperLeagueConnecti
           <div><span>Record chase</span><strong>{nextWinMark ? `${nextWinMark - career.wins} to ${nextWinMark} wins` : "Unavailable"}</strong><small>Based only on completed imported matchups</small></div>
         </div>
       ) : <p>Your Sleeper identity is not mapped to an imported historical manager yet.</p>}
-      <Link to={`/league/${connection.leagueId}/managers${manager ? `/${manager.id}` : ""}`}>Explore league history</Link>
+      <Link to={`/league/${connection.leagueId}/history/managers${manager ? `/${manager.id}` : ""}`}>Explore league history <ArrowRight aria-hidden="true" /></Link>
     </section>
   );
 }
 
 export default function MyHQ() {
-  const { connections, activeLeagueId } = useSleeperLeagueConnections();
-  const connection = connections.find((candidate) => candidate.leagueId === activeLeagueId) ?? null;
-  const scoring = connection?.auctionSettings?.scoring ?? "halfPpr";
-  const players = useMemo(() => buildCurrentToolPlayers(scoring), [scoring]);
-  const [state, setState] = useState<LoadState>({ status: "idle", data: null, error: "" });
-
-  useEffect(() => {
-    if (!connection) {
-      setState({ status: "idle", data: null, error: "" });
-      return;
-    }
-    const controller = new AbortController();
-    setState({ status: "loading", data: null, error: "" });
-    void loadMyHQ(connection, players, controller.signal)
-      .then((data) => setState({ status: "ready", data, error: "" }))
-      .catch((error: unknown) => {
-        if (controller.signal.aborted) return;
-        setState({ status: "error", data: null, error: error instanceof Error ? error.message : "This Week could not load." });
-      });
-    return () => controller.abort();
-  }, [connection, players]);
+  const { connection, teamState: state } = useLeagueWorkspace();
 
   if (!connection) {
     return (
       <div className="my-hq my-hq-gate">
-        <span className="hq-kicker">Your weekly command center</span>
-        <h1 className="ff-display">Connect a league to open This Week</h1>
+        <span className="hq-kicker">My team</span>
+        <h1 className="ff-display">Connect a league to open your team</h1>
         <p>GameHQ needs a Sleeper league and your manager identity before it can show a real roster, matchup, or decision queue.</p>
-        <Link className="hq-primary-link" to="/league">Connect in League HQ</Link>
+        <Link className="hq-primary-link" to="/leagues">Connect leagues <ArrowRight aria-hidden="true" /></Link>
       </div>
     );
   }
 
   if (state.status === "idle" || state.status === "loading") {
-    return <div className="my-hq my-hq-gate"><span className="hq-kicker">This Week</span><h1 className="ff-display">Reading {connection.leagueName}…</h1><p>Loading your live Sleeper roster, matchup, standings, and recent league activity.</p></div>;
+    return <div className="my-hq my-hq-gate" aria-busy="true"><span className="hq-kicker">My team</span><h1 className="ff-display">Reading {connection.leagueName}…</h1><p>Loading your live Sleeper roster, matchup, standings, and recent league activity.</p></div>;
   }
 
   if (state.status === "error") {
@@ -99,9 +74,11 @@ export default function MyHQ() {
       <div className="my-hq my-hq-gate is-error">
         <ShieldAlert aria-hidden="true" />
         <span className="hq-kicker">Connection needs attention</span>
-        <h1 className="ff-display">This Week cannot identify your team</h1>
+        <h1 className="ff-display">GameHQ cannot identify your team</h1>
         <p>{state.error}</p>
-        <Link className="hq-primary-link" to="/league">Review league connection</Link>
+        {!connection.managerProviderUserId
+          ? <ManagerIdentityForm connection={connection} />
+          : <Link className="hq-primary-link" to="/leagues">Review league connection <ArrowRight aria-hidden="true" /></Link>}
       </div>
     );
   }
@@ -111,14 +88,15 @@ export default function MyHQ() {
     <div className="my-hq">
       <header className="hq-hero">
         <div>
-          <span className="hq-kicker">{data.week ? `Week ${data.week}` : "Preseason"} · {data.leagueName}</span>
-          <h1 className="ff-display">Make the next decision count.</h1>
-          <p>{data.teamName} enters {data.week ? `Week ${data.week}` : data.seasonPhase} at {data.record}, standing {data.standing} of {data.totalTeams}.</p>
+          <span className="hq-kicker">My team · {data.week ? `Week ${data.week}` : "Preseason"}</span>
+          <h1 className="ff-display">{data.teamName}</h1>
+          <p>{data.leagueName} · {data.record} · {data.standing} of {data.totalTeams} entering {data.week ? `Week ${data.week}` : data.seasonPhase}.</p>
         </div>
         <div className="hq-matchup-card">
           <span><Radio aria-hidden="true" /> {data.week ? "Current matchup" : "Next matchup"}</span>
           <div><strong>{data.teamName}</strong><b>{formatScore(data.teamScore)}</b></div>
           <div><strong>{data.opponentName}</strong><b>{formatScore(data.opponentScore)}</b></div>
+          {data.teamBaselinePoints !== null || data.opponentBaselinePoints !== null ? <div className="hq-matchup-baseline"><span>Season baseline</span><strong>{data.teamBaselinePoints?.toFixed(1) ?? "—"}–{data.opponentBaselinePoints?.toFixed(1) ?? "—"}</strong></div> : null}
           <small>{data.projectionNote}</small>
         </div>
       </header>
@@ -129,10 +107,10 @@ export default function MyHQ() {
           {data.decisions.map((decision) => (
             <article key={decision.id} className={`hq-decision is-${decision.urgency}`}>
               {decision.urgency === "clear" ? <CheckCircle2 aria-hidden="true" /> : <AlertTriangle aria-hidden="true" />}
-              <div><span>{decision.urgency === "now" ? "Act now" : decision.urgency === "watch" ? "Watch" : "Lineup check"}</span><h3>{decision.title}</h3><p>{decision.detail}</p></div>
+              <div><span>{decision.urgency === "now" ? "Act now" : decision.urgency === "watch" ? "Watch" : "Lineup check"}</span><h3>{decision.title}</h3><p>{decision.detail}</p><small className="hq-decision-evidence">{decision.evidence}</small></div>
               {decision.actionTo.startsWith("http")
-                ? <a href={decision.actionTo} target="_blank" rel="noreferrer">{decision.actionLabel}</a>
-                : <Link to={decision.actionTo}>{decision.actionLabel}</Link>}
+                ? <a href={decision.actionTo} target="_blank" rel="noreferrer">{decision.actionLabel}<ArrowRight aria-hidden="true" /></a>
+                : <Link to={decision.actionTo}>{decision.actionLabel}<ArrowRight aria-hidden="true" /></Link>}
             </article>
           ))}
         </div>
@@ -157,9 +135,9 @@ export default function MyHQ() {
 
       <section className="hq-tool-row" aria-label="Recommended next tools">
         <div><Sparkles aria-hidden="true" /><span>Keep working</span><h2>Turn the signal into an answer</h2></div>
-        <Link to="/tools/player-compare">Compare players</Link>
-        <Link to="/stats">Research matchups</Link>
-        <Link to={`/league/${connection.leagueId}/`}>Open history <Trophy aria-hidden="true" /></Link>
+        <Link to="/tools/player-compare">Compare players <ArrowRight aria-hidden="true" /></Link>
+        <Link to="/stats">Research matchups <ArrowRight aria-hidden="true" /></Link>
+        <Link to={`/league/${connection.leagueId}/history`}>Open history <Trophy aria-hidden="true" /></Link>
       </section>
     </div>
   );

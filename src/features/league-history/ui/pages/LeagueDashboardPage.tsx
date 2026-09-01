@@ -64,7 +64,7 @@ export function LeagueDashboardPage() {
             </Link>
           ))}
         </div>
-        <Link className="history-text-link" to={`/league/${leagueId}/seasons`}>Browse the full archive</Link>
+        <Link className="history-text-link" to={`/league/${leagueId}/history/seasons`}>Browse the full archive</Link>
       </section>
     </main>
   );

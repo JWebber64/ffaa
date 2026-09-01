@@ -1,7 +1,8 @@
 import type { Manager } from "../domain/types";
 
 const RECOVERABLE_SECTIONS = [
-  "history/champions",
+  "champions",
+  "archive",
   "leaderboards",
   "transactions",
   "managers",
@@ -17,8 +18,13 @@ const RECOVERABLE_SECTIONS = [
 
 export function leagueHistoryPath(leagueId: string, section = "") {
   const normalizedSection = section.replace(/^\/+|\/+$/g, "");
-  const basePath = `/league/${encodeURIComponent(leagueId)}`;
-  return normalizedSection ? `${basePath}/${normalizedSection}` : basePath;
+  const canonicalSection = normalizedSection === "history"
+    ? "archive"
+    : normalizedSection.startsWith("history/")
+      ? normalizedSection.slice("history/".length)
+      : normalizedSection;
+  const basePath = `/league/${encodeURIComponent(leagueId)}/history`;
+  return canonicalSection ? `${basePath}/${canonicalSection}` : basePath;
 }
 
 export function leagueRivalryPath(leagueId: string, managerAId: string, managerBId: string) {

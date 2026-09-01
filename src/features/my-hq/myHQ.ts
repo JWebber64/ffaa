@@ -8,11 +8,17 @@ type SleeperLeague = {
   name: string;
   season: string;
   status: string;
+  owner_id?: string | null;
   roster_positions?: string[];
 };
 
 type SleeperState = { week?: number; display_week?: number; season?: string; season_type?: string };
-type SleeperUser = { user_id: string; display_name: string; metadata?: { team_name?: string } | null };
+type SleeperUser = {
+  user_id: string;
+  display_name: string;
+  is_owner?: boolean;
+  metadata?: { team_name?: string } | null;
+};
 type SleeperRoster = {
   roster_id: number;
   owner_id?: string | null;
@@ -39,6 +45,7 @@ export type MyHQDecision = {
   detail: string;
   actionLabel: string;
   actionTo: string;
+  evidence: string;
 };
 
 export type MyHQPlayerAlert = {
@@ -48,6 +55,16 @@ export type MyHQPlayerAlert = {
   team: string;
   reason: string;
   projectedPointsPerGame: number | null;
+};
+
+export type MyHQPlayerRecommendation = {
+  id: string;
+  player: ToolPlayer;
+  dropPlayer: ToolPlayer | null;
+  eligibleSlots: string[];
+  baselineGain: number | null;
+  confidence: "higher" | "moderate" | "limited";
+  evidence: string;
 };
 
 export type MyHQData = {
@@ -62,16 +79,23 @@ export type MyHQData = {
   totalTeams: number;
   opponentName: string;
   managerProviderUserId: string;
+  leagueOwnerProviderUserId: string;
   opponentProviderUserId: string;
   teamScore: number | null;
   opponentScore: number | null;
+  teamBaselinePoints: number | null;
+  opponentBaselinePoints: number | null;
   starters: ToolPlayer[];
   bench: ToolPlayer[];
+  starterSlots: string[];
+  rosteredPlayerIds: string[];
   alerts: MyHQPlayerAlert[];
   decisions: MyHQDecision[];
+  availableRecommendations: MyHQPlayerRecommendation[];
   closestMatchup: string;
   recentActivity: string[];
   projectionNote: string;
+  loadedAt: string;
 };
 
 function numberValue(value: unknown) {
@@ -83,6 +107,11 @@ function scoreValue(matchup?: SleeperMatchup) {
   if (!matchup) return null;
   if (Number.isFinite(Number(matchup.custom_points))) return Number(matchup.custom_points);
   return Number.isFinite(Number(matchup.points)) ? Number(matchup.points) : null;
+}
+
+function lineupBaseline(players: ToolPlayer[]) {
+  const projected = players.flatMap((player) => player.projectedPointsPerGame ?? []);
+  return projected.length ? projected.reduce((sum, value) => sum + value, 0) : null;
 }
 
 function rosterOwnerIds(roster: SleeperRoster) {
@@ -115,13 +144,104 @@ function transactionLabel(transaction: SleeperTransaction, playerById: Map<strin
   return `${transaction.type.replace(/_/g, " ")} transaction completed.`;
 }
 
-function buildDecisions(
+const SLOT_ELIGIBILITY: Record<string, string[]> = {
+  FLEX: ["RB", "WR", "TE"],
+  RB_WR_TE: ["RB", "WR", "TE"],
+  SUPER_FLEX: ["QB", "RB", "WR", "TE"],
+  SUPERFLEX: ["QB", "RB", "WR", "TE"],
+  WRRB_FLEX: ["RB", "WR"],
+  REC_FLEX: ["WR", "TE"],
+};
+
+function normalizedSlot(value: string) {
+  return value.trim().toUpperCase().replace(/[^A-Z]+/g, "_");
+}
+
+function isStarterSlot(value: string) {
+  return !["BN", "BENCH", "IR", "RESERVE", "TAXI"].includes(normalizedSlot(value));
+}
+
+export function isPlayerEligibleForSleeperSlot(position: string, slot: string) {
+  const normalizedPosition = position.trim().toUpperCase() === "DST" ? "DEF" : position.trim().toUpperCase();
+  const normalized = normalizedSlot(slot);
+  if (normalized === "DST") return normalizedPosition === "DEF";
+  return (SLOT_ELIGIBILITY[normalized] ?? [normalized]).includes(normalizedPosition);
+}
+
+function projectionConfidence(player: ToolPlayer): MyHQPlayerRecommendation["confidence"] {
+  const sourceCount = player.projectionSourceCount ?? 0;
+  if (sourceCount >= 3) return "higher";
+  if (sourceCount >= 2) return "moderate";
+  return "limited";
+}
+
+function projectionEvidence(player: ToolPlayer) {
+  const sourceCount = player.projectionSourceCount ?? 0;
+  const sourceLabel = sourceCount
+    ? `${sourceCount} projection ${sourceCount === 1 ? "source" : "sources"}`
+    : "limited projection coverage";
+  if (!player.projectionUpdatedAt) return sourceLabel;
+  const updated = Date.parse(player.projectionUpdatedAt);
+  return Number.isFinite(updated)
+    ? `${sourceLabel} · updated ${new Date(updated).toLocaleDateString()}`
+    : sourceLabel;
+}
+
+function compatibleDropCandidate(player: ToolPlayer, bench: ToolPlayer[]) {
+  const samePosition = bench.filter((candidate) => candidate.position === player.position);
+  const pool = samePosition.length ? samePosition : bench;
+  return [...pool]
+    .filter((candidate) => candidate.projectedPointsPerGame !== null)
+    .sort((left, right) => (left.projectedPointsPerGame ?? 0) - (right.projectedPointsPerGame ?? 0))[0]
+    ?? null;
+}
+
+export function buildAvailableRecommendations(
+  allPlayers: ToolPlayer[],
+  allRosteredIds: Set<string>,
+  bench: ToolPlayer[],
+  starterSlots: string[],
+) {
+  return [...allPlayers]
+    .filter((player) => (
+      !allRosteredIds.has(player.id)
+      && player.projectedPointsPerGame !== null
+      && !player.injuryStatus
+    ))
+    .sort((left, right) => (right.projectedPointsPerGame ?? 0) - (left.projectedPointsPerGame ?? 0))
+    .flatMap((player): MyHQPlayerRecommendation[] => {
+      const eligibleSlots = [...new Set(starterSlots.filter((slot) => isPlayerEligibleForSleeperSlot(player.position, slot))
+        .map((slot) => normalizedSlot(slot)))] as string[];
+      if (!eligibleSlots.length) return [];
+      const dropPlayer = compatibleDropCandidate(player, bench);
+      const baselineGain = dropPlayer?.projectedPointsPerGame === null || !dropPlayer
+        ? null
+        : (player.projectedPointsPerGame ?? 0) - dropPlayer.projectedPointsPerGame;
+      return [{
+        id: `available-${player.id}`,
+        player,
+        dropPlayer,
+        eligibleSlots,
+        baselineGain,
+        confidence: projectionConfidence(player),
+        evidence: projectionEvidence(player),
+      }];
+    })
+    .sort((left, right) => (
+      (right.baselineGain ?? -999) - (left.baselineGain ?? -999)
+      || (right.player.projectedPointsPerGame ?? 0) - (left.player.projectedPointsPerGame ?? 0)
+    ))
+    .slice(0, 12);
+}
+
+export function buildMyHQDecisions(
+  leagueId: string,
   week: number,
   starterIds: string[],
+  starterSlots: string[],
   starters: ToolPlayer[],
   bench: ToolPlayer[],
-  allRosteredIds: Set<string>,
-  allPlayers: ToolPlayer[],
+  availableRecommendations: MyHQPlayerRecommendation[],
 ) {
   const decisions: MyHQDecision[] = [];
   const emptySlots = starterIds.filter((id) => !id || id === "0").length;
@@ -133,48 +253,43 @@ function buildDecisions(
       detail: "Sleeper reports an empty starter position. Set the legal lineup before lock.",
       actionLabel: "Open Sleeper lineup",
       actionTo: "https://sleeper.com/",
+      evidence: "Sleeper public roster snapshot",
     });
   }
 
-  for (const starter of starters) {
+  for (const [starterIndex, starter] of starters.entries()) {
     const injury = starter.injuryStatus.trim().toUpperCase();
     const onBye = week > 0 && starter.byeWeek === week;
     if (!onBye && !["O", "OUT", "IR", "D", "DOUBTFUL", "Q", "QUESTIONABLE"].includes(injury)) continue;
+    const slot = starterSlots[starterIndex] ?? starter.position;
     const alternative = bench
-      .filter((candidate) => candidate.position === starter.position && candidate.id !== starter.id)
+      .filter((candidate) => isPlayerEligibleForSleeperSlot(candidate.position, slot) && candidate.id !== starter.id)
       .sort((left, right) => (right.projectedPointsPerGame ?? -1) - (left.projectedPointsPerGame ?? -1))[0];
     decisions.push({
       id: `starter-${starter.id}`,
       urgency: onBye || ["O", "OUT", "IR", "D", "DOUBTFUL"].includes(injury) ? "now" : "watch",
       title: onBye ? `${starter.name} is on bye` : `${starter.name} is ${starter.injuryStatus || starter.status}`,
       detail: alternative
-        ? `${alternative.name} is the highest season-baseline ${starter.position} option currently on your bench.`
-        : `No same-position bench replacement is available in the connected roster data.`,
+        ? `${alternative.name} is the highest season-baseline option on your bench that is eligible for ${normalizedSlot(slot).replace(/_/g, " ")}.`
+        : `No eligible bench replacement is available for ${normalizedSlot(slot).replace(/_/g, " ")}.`,
       actionLabel: alternative ? "Compare players" : "Open player research",
-      actionTo: alternative ? "/tools/player-compare" : `/stats?position=${starter.position}`,
+      actionTo: alternative ? "/tools/player-compare" : `/league/${encodeURIComponent(leagueId)}/players?position=${starter.position}`,
+      evidence: `Sleeper starter status · ${projectionEvidence(alternative ?? starter)}`,
     });
   }
 
-  const weakestStarter = starters
-    .filter((player) => player.projectedPointsPerGame !== null)
-    .sort((left, right) => (left.projectedPointsPerGame ?? 0) - (right.projectedPointsPerGame ?? 0))[0];
-  if (weakestStarter) {
-    const freeAgent = allPlayers.find((candidate) =>
-      candidate.position === weakestStarter.position
-      && !allRosteredIds.has(candidate.id)
-      && (candidate.projectedPointsPerGame ?? 0) > (weakestStarter.projectedPointsPerGame ?? 0) + 1.5
-      && !candidate.injuryStatus,
-    );
-    if (freeAgent) {
-      decisions.push({
-        id: `waiver-${freeAgent.id}`,
-        urgency: "watch",
-        title: `${freeAgent.name} clears your weakest ${weakestStarter.position} baseline`,
-        detail: `${freeAgent.projectedPointsPerGame?.toFixed(1)} versus ${weakestStarter.projectedPointsPerGame?.toFixed(1)} projected points per game over the season. Confirm availability and weekly context in your league before adding.`,
-        actionLabel: "Research the matchup",
-        actionTo: `/stats?position=${freeAgent.position}`,
-      });
-    }
+  const availableUpgrade = availableRecommendations.find((recommendation) => (recommendation.baselineGain ?? 0) > 1.5);
+  if (availableUpgrade) {
+    const { player: freeAgent, dropPlayer, baselineGain } = availableUpgrade;
+    decisions.push({
+      id: `waiver-${freeAgent.id}`,
+      urgency: "watch",
+      title: `${freeAgent.name} is a verified free agent in this league`,
+      detail: `${freeAgent.projectedPointsPerGame?.toFixed(1)} season-baseline PPG${dropPlayer ? ` versus ${dropPlayer.name} at ${dropPlayer.projectedPointsPerGame?.toFixed(1)}` : ""}${baselineGain === null ? "" : ` · +${baselineGain.toFixed(1)}`}. Review weekly context before making an add/drop.`,
+      actionLabel: "Review verified options",
+      actionTo: `/league/${encodeURIComponent(leagueId)}/players?position=${freeAgent.position}`,
+      evidence: `Current Sleeper roster set · ${availableUpgrade.evidence}`,
+    });
   }
 
   if (!decisions.length) {
@@ -184,7 +299,8 @@ function buildDecisions(
       title: "No urgent lineup flags found",
       detail: "The connected lineup has no empty slots, current-week byes, or stored injury designations. Recheck official statuses before lock.",
       actionLabel: "Review player research",
-      actionTo: "/stats",
+      actionTo: `/league/${encodeURIComponent(leagueId)}/players`,
+      evidence: "Sleeper roster status · GameHQ season projection consensus",
     });
   }
   return decisions.slice(0, 5);
@@ -219,16 +335,23 @@ export async function loadMyHQ(
 
   const playerById = new Map(allPlayers.map((player) => [player.id, player]));
   const starterIds = userRoster.starters ?? [];
+  const starterSlots = (league.roster_positions ?? []).filter(isStarterSlot);
   const rosterPlayerIds = userRoster.players ?? [];
   const starterIdSet = new Set(starterIds.filter((id) => id && id !== "0"));
-  const starters = starterIds.flatMap((id) => playerById.get(id) ?? []);
+  const starterEntries = starterIds.flatMap((id, index) => {
+    const player = playerById.get(id);
+    return player ? [{ player, slot: starterSlots[index] ?? player.position }] : [];
+  });
+  const starters = starterEntries.map((entry) => entry.player);
   const bench = rosterPlayerIds.flatMap((id) => starterIdSet.has(id) ? [] : playerById.get(id) ?? []);
   const allRosteredIds = new Set(rosters.flatMap((roster) => roster.players ?? []));
+  const availableRecommendations = buildAvailableRecommendations(allPlayers, allRosteredIds, bench, starterSlots);
   const userMatchup = matchups.find((matchup) => matchup.roster_id === userRoster.roster_id);
   const opponentMatchup = userMatchup?.matchup_id == null
     ? undefined
     : matchups.find((matchup) => matchup.matchup_id === userMatchup.matchup_id && matchup.roster_id !== userRoster.roster_id);
   const opponentRoster = rosters.find((roster) => roster.roster_id === opponentMatchup?.roster_id);
+  const opponentStarters = (opponentRoster?.starters ?? []).flatMap((id) => playerById.get(id) ?? []);
   const opponentProviderUserId = opponentRoster ? rosterOwnerIds(opponentRoster)[0] ?? "" : "";
   const sortedRosters = [...rosters].sort((left, right) =>
     numberValue(right.settings?.wins) - numberValue(left.settings?.wins)
@@ -274,13 +397,29 @@ export async function loadMyHQ(
     totalTeams: rosters.length,
     opponentName: teamNameForRoster(opponentRoster, users),
     managerProviderUserId: connection.managerProviderUserId,
+    leagueOwnerProviderUserId: league.owner_id?.trim()
+      || users.find((user) => user.is_owner)?.user_id
+      || "",
     opponentProviderUserId,
     teamScore: scoreValue(userMatchup),
     opponentScore: scoreValue(opponentMatchup),
+    teamBaselinePoints: lineupBaseline(starters),
+    opponentBaselinePoints: lineupBaseline(opponentStarters),
     starters,
     bench,
+    starterSlots,
+    rosteredPlayerIds: [...allRosteredIds],
     alerts,
-    decisions: buildDecisions(week, starterIds, starters, bench, allRosteredIds, allPlayers),
+    decisions: buildMyHQDecisions(
+      connection.leagueId,
+      week,
+      starterIds,
+      starterEntries.map((entry) => entry.slot),
+      starters,
+      bench,
+      availableRecommendations,
+    ),
+    availableRecommendations,
     closestMatchup,
     recentActivity: transactions
       .filter((transaction) => transaction.status === "complete")
@@ -288,5 +427,6 @@ export async function loadMyHQ(
       .slice(0, 4)
       .map((transaction) => transactionLabel(transaction, playerById)),
     projectionNote: "Player comparisons use GameHQ’s current full-season baseline. Sleeper does not expose a public live matchup projection here, so no weekly projection is invented.",
+    loadedAt: new Date().toISOString(),
   };
 }

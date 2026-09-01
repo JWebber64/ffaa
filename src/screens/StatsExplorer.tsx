@@ -1317,7 +1317,12 @@ function standardRosterSlots(rosterSize: number): AuctionValueRosterSlot[] {
   return bench ? [...starters, { slot: "BENCH", count: bench }] : starters;
 }
 
-export default function StatsExplorer() {
+type StatsExplorerProps = {
+  embeddedLeagueId?: string;
+  embeddedLeagueName?: string;
+};
+
+export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: StatsExplorerProps = {}) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { connections, activeLeagueId, setActiveLeagueId } = useSleeperLeagueConnections();
@@ -1339,7 +1344,7 @@ export default function StatsExplorer() {
   const customTeamCount = listedNumber(searchParams.get("teams"), 12, TEAM_COUNT_OPTIONS);
   const customRosterSize = listedNumber(searchParams.get("roster"), 15, ROSTER_SIZE_OPTIONS);
   const customBudget = boundedNumber(searchParams.get("budget"), 200, 1, 1000);
-  const requestedValueProfile = searchParams.get("league");
+  const requestedValueProfile = searchParams.get("league") ?? embeddedLeagueId ?? null;
   const connectedValueProfiles = useMemo(
     () => connections.filter((connection) => connection.auctionSettings),
     [connections],
@@ -2199,10 +2204,12 @@ export default function StatsExplorer() {
     <section className="stats-explorer stats-hub">
       <div className="stats-hero">
         <div className="stats-hub-hero-copy">
-          <div className="stats-kicker">Free fantasy football research</div>
-          <h1 className="stats-title ff-display">Stats Hub</h1>
+          <div className="stats-kicker">{embeddedLeagueId ? `${embeddedLeagueName ?? "Active league"} players` : "Free fantasy football research"}</div>
+          <h1 className="stats-title ff-display">{embeddedLeagueId ? "League Players" : "Stats Hub"}</h1>
           <p className="stats-hub-subtitle">
-            Draft prep, weekly leaders, opportunity, trends, matchups, and team context in one public place—no subscription required.
+            {embeddedLeagueId
+              ? "Use the active league's scoring profile when available, then research rankings, opportunity, trends, matchups, and player context."
+              : "Draft prep, weekly leaders, opportunity, trends, matchups, and team context in one public place—no subscription required."}
           </p>
           <div className="stats-meta-line">
             <span>{leaderProjectionMode
@@ -2218,8 +2225,8 @@ export default function StatsExplorer() {
         </div>
         <div className="stats-hub-free-badge">
           <ShieldCheck size={28} aria-hidden="true" />
-          <strong>Free for everyone</strong>
-          <span>Public data · clear attribution</span>
+          <strong>{embeddedLeagueId ? "League context connected" : "Free for everyone"}</strong>
+          <span>{embeddedLeagueId ? "Read-only roster context" : "Public data · clear attribution"}</span>
         </div>
       </div>
 

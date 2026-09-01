@@ -4,6 +4,7 @@ import {
   loadSleeperLeagueHQ,
   mergeSleeperLeagueHQ,
   normalizeSleeperLeagueLookup,
+  resolveSleeperManagerIdentity,
 } from "../features/league-hq/sleeperLeague";
 
 function createSleeperFetcher() {
@@ -83,6 +84,7 @@ describe("Sleeper League HQ import", () => {
             name: "Alpha League",
             season: "2026",
             status: "in_season",
+            owner_id: "commissioner-456",
             total_rosters: 10,
             settings: { reserve_slots: 2 },
             scoring_settings: { rec: 0.5 },
@@ -103,13 +105,72 @@ describe("Sleeper League HQ import", () => {
     expect(result.displayName).toBe("Test Manager");
     expect(result.providerUserId).toBe("user-123");
     expect(result.leagues.map((league) => league.name)).toEqual(["Alpha League", "Zeta League"]);
-    expect(result.leagues[0]).toMatchObject({ leagueId: "111111111111", totalRosters: 10 });
+    expect(result.leagues[0]).toMatchObject({
+      leagueId: "111111111111",
+      totalRosters: 10,
+      ownerProviderUserId: "commissioner-456",
+    });
     expect(result.leagues[0]?.auctionSettings).toMatchObject({
       scoring: "halfPpr",
       teamCount: 10,
       budget: 200,
       budgetSource: "gamehq-default",
       rosterSize: 7,
+    });
+  });
+
+  it("verifies a manager identity against the selected league roster", async () => {
+    const payloads = new Map<string, unknown>([
+      ["/user/test-manager", { user_id: "user-123", display_name: "Test Manager" }],
+      ["/user/user-123/leagues/nfl/2026", [{
+        league_id: "111111111111",
+        name: "Alpha League",
+        season: "2026",
+        status: "in_season",
+        total_rosters: 10,
+      }]],
+      ["/league/111111111111/users", [
+        {
+          user_id: "user-123",
+          display_name: "Test Manager",
+          avatar: "avatar-123",
+          metadata: { team_name: "The Test Team" },
+        },
+        {
+          user_id: "commissioner-456",
+          display_name: "Commissioner",
+          is_owner: true,
+        },
+      ]],
+      ["/league/111111111111/rosters", [{
+        roster_id: 7,
+        owner_id: "user-123",
+        settings: {},
+      }]],
+    ]);
+    const fetcher = (async (input: string | URL | Request) => {
+      const path = new URL(typeof input === "string" ? input : input instanceof URL ? input : input.url).pathname.replace("/v1", "");
+      if (!payloads.has(path)) return new Response("not found", { status: 404 });
+      return new Response(JSON.stringify(payloads.get(path)), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }) as typeof fetch;
+
+    const identity = await resolveSleeperManagerIdentity(
+      "111111111111",
+      "test-manager",
+      2026,
+      { fetcher },
+    );
+
+    expect(identity).toEqual({
+      providerUserId: "user-123",
+      displayName: "Test Manager",
+      teamName: "The Test Team",
+      avatarUrl: "https://sleepercdn.com/avatars/thumbs/avatar-123",
+      rosterId: 7,
+      leagueOwnerProviderUserId: "commissioner-456",
     });
   });
 

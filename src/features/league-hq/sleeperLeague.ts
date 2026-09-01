@@ -28,6 +28,7 @@ interface SleeperLeague {
   name: string;
   season: string;
   status: string;
+  owner_id?: string | null;
   total_rosters: number;
   previous_league_id?: string | null;
   draft_id?: string | null;
@@ -127,7 +128,17 @@ export interface SleeperLeagueChoice {
   totalRosters: number;
   avatarUrl: string;
   sourceUrl: string;
+  ownerProviderUserId?: string;
   auctionSettings: SleeperLeagueAuctionSettings;
+}
+
+export interface SleeperManagerIdentity {
+  providerUserId: string;
+  displayName: string;
+  teamName: string;
+  avatarUrl: string;
+  rosterId: number;
+  leagueOwnerProviderUserId: string;
 }
 
 export interface SleeperLeagueLookupResult {
@@ -189,6 +200,7 @@ function leagueChoice(league: SleeperLeague): SleeperLeagueChoice {
     totalRosters: numberValue(league.total_rosters),
     avatarUrl: league.avatar ? `https://sleepercdn.com/avatars/thumbs/${league.avatar}` : "",
     sourceUrl: `https://sleeper.com/leagues/${league.league_id}`,
+    ...(textValue(league.owner_id) ? { ownerProviderUserId: textValue(league.owner_id) } : {}),
     auctionSettings: auctionSettingsFromLeague(league),
   };
 }
@@ -340,6 +352,45 @@ function auctionSettingsFromLeague(league: SleeperLeague, draftBudget = 0): Slee
       0,
     ),
     rosterSlots,
+  };
+}
+
+export async function resolveSleeperManagerIdentity(
+  leagueId: string,
+  username: string,
+  season: number,
+  options: { fetcher?: Fetcher; signal?: AbortSignal } = {},
+): Promise<SleeperManagerIdentity> {
+  if (!/^\d{10,}$/.test(leagueId.trim())) throw new Error("Choose a valid connected Sleeper league.");
+  const normalized = normalizeSleeperLeagueLookup(username);
+  if (normalized.kind !== "user" || !normalized.value) {
+    throw new Error("Enter your Sleeper username, not a league ID.");
+  }
+  const fetcher = options.fetcher ?? fetch;
+  const lookup = await findSleeperLeagues(normalized.value, season, options);
+  const providerUserId = lookup.providerUserId;
+  const league = lookup.leagues.find((candidate) => candidate.leagueId === leagueId);
+  if (!providerUserId || !league) {
+    throw new Error(`${lookup.displayName} does not have a roster in this league for ${season}.`);
+  }
+  const [users, rosters] = await Promise.all([
+    sleeperJson<SleeperUser[]>(`/league/${leagueId}/users`, fetcher, options.signal),
+    sleeperJson<SleeperRoster[]>(`/league/${leagueId}/rosters`, fetcher, options.signal),
+  ]);
+  const roster = rosters.find((candidate) => (
+    candidate.owner_id === providerUserId || candidate.co_owners?.includes(providerUserId)
+  ));
+  if (!roster) throw new Error(`${lookup.displayName} does not own a roster in this league.`);
+  const user = users.find((candidate) => candidate.user_id === providerUserId) ?? null;
+  return {
+    providerUserId,
+    displayName: user?.display_name?.trim() || lookup.displayName,
+    teamName: teamName(user, roster.roster_id),
+    avatarUrl: avatarUrl(user),
+    rosterId: roster.roster_id,
+    leagueOwnerProviderUserId: league.ownerProviderUserId
+      ?? users.find((candidate) => candidate.is_owner)?.user_id
+      ?? "",
   };
 }
 

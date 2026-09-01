@@ -1,9 +1,8 @@
 import { useMemo } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, Cloud, CloudOff, Info, Radio } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { buildCurrentToolPlayers } from "../data/toolPlayerData";
 import { LeagueSeasonHero } from "../features/league-season/LeagueSeasonHero";
-import { LeagueSeasonNav } from "../features/league-season/LeagueSeasonNav";
 import { getLeagueProjectionFreshness, projectionFreshnessSummary } from "../features/league-season/leagueProjectionFreshness";
 import {
   DEFAULT_REGULAR_SEASON_WEEKS,
@@ -40,16 +39,18 @@ function topProjection(lineup: ProjectedLineup) {
     .sort((left, right) => (right.baselinePoints ?? 0) - (left.baselinePoints ?? 0))[0] ?? null;
 }
 
-export default function LeagueMatchups() {
+export default function LeagueMatchups({ personalOnly = false }: { personalOnly?: boolean }) {
+  const { leagueId: routeLeagueId = "" } = useParams();
   const { connections, activeLeagueId } = useSleeperLeagueConnections();
-  const connection = connections.find((candidate) => candidate.leagueId === activeLeagueId) ?? null;
-  const draftState = useLeagueSeasonDraft(activeLeagueId);
-  const management = useLeagueSeasonManagement(activeLeagueId);
+  const leagueId = routeLeagueId || activeLeagueId;
+  const connection = connections.find((candidate) => candidate.leagueId === leagueId) ?? null;
+  const draftState = useLeagueSeasonDraft(leagueId);
+  const management = useLeagueSeasonManagement(leagueId);
   const [searchParams, setSearchParams] = useSearchParams();
   const week = clampWeek(searchParams.get("week"));
   const draftSeason = draftState.status === "ready" ? draftState.season : null;
   const season = management.record?.season ?? draftSeason;
-  const weekLineups = useLeagueWeekLineups(activeLeagueId, week, Boolean(management.record), management.record?.revision ?? 0);
+  const weekLineups = useLeagueWeekLineups(leagueId, week, Boolean(management.record), management.record?.revision ?? 0);
   const players = useMemo(() => {
     if (!season) return [];
     const rosterSize = season.rosterSlots.reduce((sum, slot) => slot.slot === "IR" ? sum : sum + slot.count, 0);
@@ -76,8 +77,12 @@ export default function LeagueMatchups() {
     const schedule = management.record?.schedule.length
       ? management.record.schedule
       : buildRoundRobinSchedule(season.franchises, DEFAULT_REGULAR_SEASON_WEEKS);
-    return schedule.filter((matchup) => matchup.week === week);
-  }, [management.record, season, week]);
+    const weeklyMatchups = schedule.filter((matchup) => matchup.week === week);
+    const focusedFranchiseId = management.membership?.franchiseId || searchParams.get("team");
+    return personalOnly && focusedFranchiseId
+      ? weeklyMatchups.filter((matchup) => matchup.homeFranchiseId === focusedFranchiseId || matchup.awayFranchiseId === focusedFranchiseId)
+      : weeklyMatchups;
+  }, [management.membership?.franchiseId, management.record, personalOnly, searchParams, season, week]);
   const franchiseById = useMemo(
     () => new Map(season?.franchises.map((franchise) => [franchise.id, franchise]) ?? []),
     [season],
@@ -92,7 +97,6 @@ export default function LeagueMatchups() {
   if (!season) {
     return (
       <div className="league-season-page league-season-gate">
-        <LeagueSeasonNav />
         <div className="league-season-gate-content">
           <CalendarDays aria-hidden="true" />
           <span>League matchups</span>
@@ -109,12 +113,11 @@ export default function LeagueMatchups() {
 
   return (
     <div className="league-season-page">
-      <LeagueSeasonNav />
       <LeagueSeasonHero
         variant="matchups"
-        eyebrow={`Matchups · ${connection?.leagueName ?? "Active league"}`}
-        title={`Week ${week} projection board`}
-        description="Compare every team using saved manager lineups when available and legal projected starters everywhere else."
+        eyebrow={`${personalOnly ? "My matchup" : "Matchups"} · ${connection?.leagueName ?? "Active league"}`}
+        title={`Week ${week} ${personalOnly ? "matchup" : "projection board"}`}
+        description={personalOnly ? "Keep the active manager's opponent, lineup state, and weekly baseline in one focused view." : "Compare every team using saved manager lineups when available and legal projected starters everywhere else."}
         imagePath="images/league-season/matchup-night-v1.png"
         imageAlt="Rain falls across an empty night stadium with opposing sidelines facing the field."
         sourceIcon={isPublished || season.source === "shared" ? <Cloud aria-hidden="true" /> : <CloudOff aria-hidden="true" />}
@@ -156,11 +159,11 @@ export default function LeagueMatchups() {
             <article key={matchup.id} className={isFocused ? "is-focused" : ""}>
               <header><span><Radio aria-hidden="true" /> Matchup {index + 1}</span><small>{leader ? `${leader.displayName} baseline edge · ${Math.abs(difference).toFixed(1)}` : "Even baseline"}</small></header>
               <div className="league-matchup-scoreboard">
-                <Link to={`/league/teams/${away.id}`} className={leader?.id === away.id ? "is-projected-leader" : ""}>
+                <Link to={`/league/${encodeURIComponent(leagueId)}/teams/${away.id}`} className={leader?.id === away.id ? "is-projected-leader" : ""}>
                   <span>Away</span><strong>{away.displayName}</strong><small>{projectionCoverage(awayLineup)}</small>
                 </Link>
                 <div><b>{formatProjection(awayLineup)}</b><span>projected</span><b>{formatProjection(homeLineup)}</b></div>
-                <Link to={`/league/teams/${home.id}`} className={leader?.id === home.id ? "is-projected-leader" : ""}>
+                <Link to={`/league/${encodeURIComponent(leagueId)}/teams/${home.id}`} className={leader?.id === home.id ? "is-projected-leader" : ""}>
                   <span>Home</span><strong>{home.displayName}</strong><small>{projectionCoverage(homeLineup)}</small>
                 </Link>
               </div>

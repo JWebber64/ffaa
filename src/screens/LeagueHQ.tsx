@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import {
+  ArrowRight,
   Award,
   BookOpen,
   CalendarClock,
@@ -27,8 +28,7 @@ import {
   Wifi,
   WifiOff,
 } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
-import { appUrl } from "../lib/appBasePath";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDraftStore } from "../store/draftStore";
 import { Button } from "../ui/Button";
 import { UniversalSelect } from "../ui/UniversalSelect";
@@ -57,26 +57,22 @@ import {
   mergeSleeperLeagueHQ,
   type SleeperLeagueChoice,
 } from "../features/league-hq/sleeperLeague";
-import {
-  isLeagueView,
-  LEAGUE_HQ_VIEWS,
-  type LeagueView,
-} from "../features/league-hq/leagueOddsNavigation";
 import { leagueHistoryPath, leagueRivalryPath } from "../features/league-history/ui/leagueRoutes";
 import { FANTASY_SEASON } from "../config/fantasySeason";
 import "./league-hq.css";
 
-const LEAGUE_HQ_VIEW_ICONS: Record<LeagueView, typeof ShieldCheck> = {
-  overview: ShieldCheck,
-  futures: Sparkles,
-  rules: Scale,
-  managers: Users,
-  records: Medal,
-  seasons: History,
-  rivalries: Swords,
-  draft: Gavel,
-};
+const VIEWS = [
+  { id: "overview", label: "Overview", icon: ShieldCheck },
+  { id: "rules", label: "Rules", icon: Scale },
+  { id: "managers", label: "Managers", icon: Users },
+  { id: "records", label: "Records", icon: Medal },
+  { id: "seasons", label: "Season archive", icon: History },
+  { id: "rivalries", label: "Rivalries", icon: Swords },
+  { id: "draft", label: "Draft Central", icon: Gavel },
+  { id: "futures", label: "Futures", icon: Sparkles },
+] as const;
 
+type LeagueView = (typeof VIEWS)[number]["id"];
 type RecordSort = "manager" | "seasons" | "record" | "winPct" | "ppg" | "titles" | "playoffs";
 type SleeperSyncState = {
   status: "idle" | "loading" | "success" | "error";
@@ -91,6 +87,10 @@ type SleeperLookupState = {
 };
 
 const SLEEPER_SEASONS = Array.from({ length: 6 }, (_, index) => FANTASY_SEASON - index);
+
+function isLeagueView(value: string | null): value is LeagueView {
+  return VIEWS.some((view) => view.id === value);
+}
 
 function record(manager: Pick<LeagueManager, "wins" | "losses" | "ties">) {
   return `${manager.wins}-${manager.losses}${manager.ties ? `-${manager.ties}` : ""}`;
@@ -132,6 +132,8 @@ export default function LeagueHQ() {
   const roster = useDraftStore((state) => state.templateRoster);
   const nominationSeconds = useDraftStore((state) => state.auctionSettings.countdownSeconds);
   const antiSnipeSeconds = useDraftStore((state) => state.auctionSettings.antiSnipeSeconds);
+  const navigate = useNavigate();
+  const { leagueId: routeLeagueId = "" } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
     connections,
@@ -141,7 +143,7 @@ export default function LeagueHQ() {
     forgetConnection,
     setActiveLeagueId,
   } = useSleeperLeagueConnections();
-  const requestedLeagueId = searchParams.get("league")?.trim() ?? "";
+  const requestedLeagueId = routeLeagueId || searchParams.get("league")?.trim() || "";
   const activeLeagueId = /^\d{10,}$/.test(requestedLeagueId)
     ? requestedLeagueId
     : savedActiveLeagueId;
@@ -206,11 +208,17 @@ export default function LeagueHQ() {
   const chooseLeague = useCallback((leagueId: string) => {
     if (!/^\d{10,}$/.test(leagueId)) return;
     setActiveLeagueId(leagueId);
+    if (routeLeagueId) {
+      const view = searchParams.get("view");
+      navigate(`/league/${encodeURIComponent(leagueId)}/manage${view ? `?view=${encodeURIComponent(view)}` : ""}`);
+      setSleeperSync({ status: "idle", message: "" });
+      return;
+    }
     const next = new URLSearchParams(searchParams);
     next.set("league", leagueId);
     setSearchParams(next);
     setSleeperSync({ status: "idle", message: "" });
-  }, [searchParams, setActiveLeagueId, setSearchParams]);
+  }, [navigate, routeLeagueId, searchParams, setActiveLeagueId, setSearchParams]);
 
   useEffect(() => {
     if (!/^\d{10,}$/.test(requestedLeagueId) || requestedLeagueId === savedActiveLeagueId) return;
@@ -305,6 +313,7 @@ export default function LeagueHQ() {
       ...(choice.avatarUrl ? { avatarUrl: choice.avatarUrl } : {}),
       ...(lookupState.providerUserId ? { managerProviderUserId: lookupState.providerUserId } : {}),
       ...(lookupState.displayName ? { managerDisplayName: lookupState.displayName } : {}),
+      ...(choice.ownerProviderUserId ? { leagueOwnerProviderUserId: choice.ownerProviderUserId } : {}),
       auctionSettings: choice.auctionSettings,
     }));
     rememberConnections(additions);
@@ -381,10 +390,10 @@ export default function LeagueHQ() {
           </Button>
           {data.sleeper ? (
             <>
-              <Link className="league-hero-history-link" to={`/league/${data.sleeper.leagueId}/week`}>
+              <Link className="league-hero-history-link" to={`/league/${data.sleeper.leagueId}/history/week`}>
                 <CalendarDays size={16} aria-hidden="true" /> This Week
               </Link>
-              <Link className="league-hero-history-link" to={`/league/${data.sleeper.leagueId}`}>
+              <Link className="league-hero-history-link" to={`/league/${data.sleeper.leagueId}/history`}>
                 <History size={16} aria-hidden="true" /> League History
               </Link>
             </>
@@ -394,8 +403,8 @@ export default function LeagueHQ() {
       </section>
 
       <nav className="league-tabs" aria-label="League HQ sections">
-        {LEAGUE_HQ_VIEWS.map((view) => {
-          const Icon = LEAGUE_HQ_VIEW_ICONS[view.id];
+        {VIEWS.map((view) => {
+          const Icon = view.icon;
           return (
             <button
               key={view.id}
@@ -642,49 +651,35 @@ export default function LeagueHQ() {
                 </div>
               </section>
 
-              <div className="league-overview-side">
-                <section className="league-panel">
-                  <SectionHeading eyebrow="All-time" title="League leaders" />
-                  <div className="league-leader-list">
-                    {leaders.map((leader) => (
-                      <div key={leader.id}>
-                        <span>{leader.label}</span>
-                        <strong>{managerLabel(leader.managerId)}</strong>
-                        <b>{leader.value}</b>
-                      </div>
+              <section className="league-panel">
+                <SectionHeading eyebrow="All-time" title="League leaders" />
+                <div className="league-leader-list">
+                  {leaders.map((leader) => (
+                    <div key={leader.id}>
+                      <span>{leader.label}</span>
+                      <strong>{managerLabel(leader.managerId)}</strong>
+                      <b>{leader.value}</b>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="league-panel">
+                <SectionHeading eyebrow="Last-place archive" title="Wall of shame" />
+                {lastPlaces.length ? (
+                  <div className="league-shame-list">
+                    {lastPlaces.map((season) => (
+                      <div key={season.year}><strong>{season.year}</strong><span>{season.lastPlaceTeam || managerLabel(season.lastPlaceManagerId)}</span><small>{season.lastPlaceRecord}</small></div>
                     ))}
                   </div>
-                </section>
+                ) : <EmptyState title="The wall is clean" detail="Last-place finishes appear here after seasons are imported." />}
+              </section>
 
-                <section className="league-panel">
-                  <SectionHeading eyebrow="Last-place archive" title="Wall of shame" />
-                  {lastPlaces.length ? (
-                    <div className="league-shame-list">
-                      {lastPlaces.map((season) => (
-                        <div key={season.year}><strong>{season.year}</strong><span>{season.lastPlaceTeam || managerLabel(season.lastPlaceManagerId)}</span><small>{season.lastPlaceRecord}</small></div>
-                      ))}
-                    </div>
-                  ) : <EmptyState title="The wall is clean" detail="Last-place finishes appear here after seasons are imported." />}
-                </section>
-
-                <section className="league-panel league-draft-card">
-                  <SectionHeading eyebrow="Draft Central" title={countdown.label} detail={countdown.detail} />
-                  <CalendarClock aria-hidden="true" />
-                  <div><Button size="sm" onClick={() => chooseView("draft")}>Open Draft Central</Button></div>
-                </section>
-
-                <figure className="league-overview-editorial">
-                  <img
-                    src={appUrl("images/league-overview-archive.jpg")}
-                    alt="An open championship ledger beside brass football trophies and folded green pennants."
-                    width="1536"
-                    height="1024"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <figcaption><span>League archive</span><strong>Every season belongs in the record.</strong></figcaption>
-                </figure>
-              </div>
+              <section className="league-panel league-draft-card">
+                <SectionHeading eyebrow="Draft Central" title={countdown.label} detail={countdown.detail} />
+                <CalendarClock aria-hidden="true" />
+                <div><Button size="sm" onClick={() => chooseView("draft")}>Open Draft Central</Button></div>
+              </section>
             </div>
           </>
         ) : null}
@@ -805,7 +800,7 @@ export default function LeagueHQ() {
               <SectionHeading eyebrow="League lore" title="Rivalries & head-to-head history" detail="Series summaries appear below. Open the all-time matrix or any series to see every recorded score." />
               {data.sleeper ? (
                 <Link className="league-link-button is-secondary" to={leagueHistoryPath(data.sleeper.leagueId, "h2h")}>
-                  View all H2H results
+                  View all H2H results <ArrowRight size={15} aria-hidden="true" />
                 </Link>
               ) : null}
             </div>
@@ -829,7 +824,7 @@ export default function LeagueHQ() {
                           to={leagueRivalryPath(data.sleeper.leagueId, rivalry.managerAId, rivalry.managerBId)}
                           aria-label={`View every result in ${rivalry.name}`}
                         >
-                          View every result
+                          View every result <ArrowRight size={15} aria-hidden="true" />
                         </Link>
                       ) : null}
                     </article>
@@ -854,7 +849,7 @@ export default function LeagueHQ() {
 
         {activeView === "futures" ? (
           <section>
-            <SectionHeading eyebrow="Prediction desk" title="Power rankings & odds" detail="GameHQ Power Index title odds and win totals meet each manager's preseason picks." />
+            <SectionHeading eyebrow="Prediction desk" title="Futures odds & season ballot" detail="GameHQ model probabilities and win totals meet each manager's preseason picks." />
             <div className="league-model-note">
               <Sparkles aria-hidden="true" />
               <div><strong>How the GameHQ model works</strong><p>Title probabilities are derived from the Power Index and normalized across all current teams. Win totals translate the same rating onto the regular-season schedule. These are league entertainment, not sportsbook advice.</p></div>

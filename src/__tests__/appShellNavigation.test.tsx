@@ -1,13 +1,15 @@
 /* @vitest-environment jsdom */
 
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { Sparkles } from "lucide-react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
-import { ProductMenu } from "../layouts/AppShellV2";
+import { afterEach, describe, expect, it } from "vitest";
+import { DesktopProductNavigation, ProductMenu } from "../layouts/AppShellV2";
 import { getPrimaryDraftAction } from "../layouts/draftAction";
 import { closeParentDisclosure } from "../ui/disclosureMenu";
+
+afterEach(cleanup);
 
 describe("app shell navigation menus", () => {
   it("offers the offline workflow instead of a self-link from host setup", () => {
@@ -19,7 +21,7 @@ describe("app shell navigation menus", () => {
   it("keeps only one desktop product menu open at a time", () => {
     render(
       <MemoryRouter>
-        <nav aria-label="Primary navigation">
+        <DesktopProductNavigation>
           <ProductMenu
             label="Draft"
             active={false}
@@ -30,7 +32,7 @@ describe("app shell navigation menus", () => {
             active={false}
             links={[{ to: "/stats", label: "Rankings and stats", detail: "Rankings, values, and profiles", icon: Sparkles }]}
           />
-        </nav>
+        </DesktopProductNavigation>
       </MemoryRouter>,
     );
 
@@ -66,6 +68,55 @@ describe("app shell navigation menus", () => {
     fireEvent.click(within(menu!).getByRole("link", { name: /This Week/ }));
 
     expect(menu).not.toHaveAttribute("open");
+  });
+
+  it("closes an open product menu after a pointer press elsewhere on the page", () => {
+    render(
+      <MemoryRouter>
+        <DesktopProductNavigation>
+          <ProductMenu
+            label="League"
+            active={false}
+            links={[{ to: "/my-hq", label: "This Week", detail: "Your next decisions", icon: Sparkles }]}
+          />
+          <button type="button">Page content</button>
+        </DesktopProductNavigation>
+      </MemoryRouter>,
+    );
+
+    const menu = screen.getByText("League").closest("details");
+    expect(menu).not.toBeNull();
+    menu!.open = true;
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Page content" }));
+
+    expect(menu).not.toHaveAttribute("open");
+  });
+
+  it("closes an open product menu with Escape and returns focus to its summary", () => {
+    render(
+      <MemoryRouter>
+        <DesktopProductNavigation>
+          <ProductMenu
+            label="League"
+            active={false}
+            links={[{ to: "/my-hq", label: "This Week", detail: "Your next decisions", icon: Sparkles }]}
+          />
+        </DesktopProductNavigation>
+      </MemoryRouter>,
+    );
+
+    const summary = screen.getByText("League").closest("summary");
+    const menu = summary?.closest("details");
+    expect(summary).not.toBeNull();
+    expect(menu).not.toBeNull();
+    menu!.open = true;
+    within(menu!).getByRole("link", { name: /This Week/ }).focus();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(menu).not.toHaveAttribute("open");
+    expect(summary).toHaveFocus();
   });
 
   it("closes the nearest disclosure without changing another menu", () => {

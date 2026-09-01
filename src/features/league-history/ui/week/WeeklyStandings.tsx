@@ -25,7 +25,7 @@ export function WeeklyStandings({ leagueId, standings }: { leagueId: string; sta
         {standings.map((row) => (
           <div role="row" key={row.franchise.id}>
             <strong role="cell">{row.rank}</strong>
-            <div role="cell">{row.manager ? <Link to={`/league/${leagueId}/managers/${row.manager.id}`}>{row.manager.displayName}</Link> : <span>{row.franchise.historicalUsername || "Unassigned"}</span>}<small>{row.franchise.teamName}</small></div>
+            <div role="cell">{row.manager ? <Link to={`/league/${leagueId}/history/managers/${row.manager.id}`}>{row.manager.displayName}</Link> : <span>{row.franchise.historicalUsername || "Unassigned"}</span>}<small>{row.franchise.teamName}</small></div>
             <span role="cell">{formatRecord(row.wins, row.losses, row.ties)}</span>
             <span role="cell">{formatNumber(row.pointsFor, 2)}</span>
             <span role="cell">{formatNumber(row.pointsAgainst, 2)}</span>

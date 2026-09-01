@@ -6,7 +6,7 @@ import type { WeeklyMatchupView } from "../../analytics/weeklyWorkspace";
 import { formatNumber, formatRecord } from "../format";
 
 function ManagerLink({ leagueId, managerId, children }: { leagueId: string; managerId: string | undefined; children: React.ReactNode }) {
-  return managerId ? <Link to={`/league/${leagueId}/managers/${managerId}`}>{children}</Link> : <span>{children}</span>;
+  return managerId ? <Link to={`/league/${leagueId}/history/managers/${managerId}`}>{children}</Link> : <span>{children}</span>;
 }
 
 export function WeeklyScoreboard({ leagueId, matchups }: { leagueId: string; matchups: WeeklyMatchupView[] }) {

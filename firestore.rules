@@ -11,6 +11,35 @@ service cloud.firestore {
         && request.auth.token.firebase.sign_in_provider != 'anonymous';
     }
 
+    // Connected fantasy teams follow a permanent GameHQ account across
+    // devices. The profile stores only public Sleeper identifiers and cached
+    // display context; it never grants lineup or commissioner permissions.
+    match /fantasyManagerProfiles/{userId} {
+      function validProfile() {
+        return request.resource.data.keys().hasOnly([
+            'version',
+            'user_id',
+            'active_league_id',
+            'connections_json',
+            'updated_at'
+          ])
+          && request.resource.data.version == 1
+          && request.resource.data.user_id == userId
+          && request.resource.data.active_league_id is string
+          && request.resource.data.active_league_id.size() <= 32
+          && request.resource.data.connections_json is string
+          && request.resource.data.connections_json.size() <= 100000
+          && request.resource.data.updated_at == request.time;
+      }
+
+      allow get: if permanentUser() && request.auth.uid == userId;
+      allow list: if false;
+      allow create, update: if permanentUser()
+        && request.auth.uid == userId
+        && validProfile();
+      allow delete: if permanentUser() && request.auth.uid == userId;
+    }
+
     // Permanent league history is public read-only data. Imports run through a
     // separately authorized server or one-time migration rule, never the app.
     match /leagueHistories/{historyId} {

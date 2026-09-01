@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AlertCircle, CalendarDays, ChevronLeft, ChevronRight, LockKeyhole, RotateCcw, Save, ShieldCheck, Unlock } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 
 import { buildCurrentToolPlayers } from "../data/toolPlayerData";
 import { LeagueAccountPanel } from "../features/league-season/LeagueAccountPanel";
 import { LeagueSeasonHero } from "../features/league-season/LeagueSeasonHero";
-import { LeagueSeasonNav } from "../features/league-season/LeagueSeasonNav";
 import { getLeagueProjectionFreshness, projectionFreshnessSummary } from "../features/league-season/leagueProjectionFreshness";
 import { saveLeagueLineup, setLeagueWeekLocked } from "../features/league-season/leagueSeasonPersistence";
 import {
@@ -50,7 +49,6 @@ function LeagueLineupGate({
 }) {
   return (
     <div className="league-season-page league-season-gate">
-      <LeagueSeasonNav />
       <div className="league-season-gate-content is-editorial">
         <div className="league-season-gate-copy">
           {icon}
@@ -75,12 +73,14 @@ function LeagueLineupGate({
 }
 
 export default function LeagueLineup() {
+  const { leagueId: routeLeagueId = "" } = useParams();
   const { connections, activeLeagueId } = useSleeperLeagueConnections();
-  const connection = connections.find((candidate) => candidate.leagueId === activeLeagueId) ?? null;
-  const management = useLeagueSeasonManagement(activeLeagueId);
+  const leagueId = routeLeagueId || activeLeagueId;
+  const connection = connections.find((candidate) => candidate.leagueId === leagueId) ?? null;
+  const management = useLeagueSeasonManagement(leagueId);
   const [searchParams, setSearchParams] = useSearchParams();
   const week = clampWeek(searchParams.get("week"));
-  const weekLineups = useLeagueWeekLineups(activeLeagueId, week, Boolean(management.record), management.record?.revision ?? 0);
+  const weekLineups = useLeagueWeekLineups(leagueId, week, Boolean(management.record), management.record?.revision ?? 0);
   const [assignments, setAssignments] = useState<LeagueLineupAssignments>({});
   const [dirty, setDirty] = useState(false);
   const [overrideReason, setOverrideReason] = useState("");
@@ -166,7 +166,7 @@ export default function LeagueLineup() {
     if (!selected) return;
     setSaveState({ status: "saving", message: "Saving weekly lineup…" });
     try {
-      await saveLeagueLineup(activeLeagueId, selected.id, week, assignments, overrideReason);
+      await saveLeagueLineup(leagueId, selected.id, week, assignments, overrideReason);
       setDirty(false);
       setSaveState({ status: "success", message: `Week ${week} lineup saved.` });
     } catch (error) {
@@ -177,7 +177,7 @@ export default function LeagueLineup() {
   async function changeWeekLock(locked: boolean) {
     setSaveState({ status: "saving", message: locked ? `Locking Week ${week}…` : `Reopening Week ${week}…` });
     try {
-      await setLeagueWeekLocked(activeLeagueId, week, locked);
+      await setLeagueWeekLocked(leagueId, week, locked);
       setSaveState({ status: "success", message: locked ? `Week ${week} lineups locked.` : `Week ${week} lineups reopened.` });
     } catch (error) {
       setSaveState({ status: "error", message: error instanceof Error ? error.message : "The lineup lock could not be changed." });
@@ -189,11 +189,11 @@ export default function LeagueLineup() {
   }
 
   if (!season || !management.record) {
-    return <LeagueLineupGate icon={<ShieldCheck aria-hidden="true" />} title="Publish the league season first" description="A commissioner-published roster and schedule are required before weekly lineups can be saved." action={{ label: "Open League Teams", to: "/league/teams" }} />;
+    return <LeagueLineupGate icon={<ShieldCheck aria-hidden="true" />} title="Publish the league season first" description="A commissioner-published roster and schedule are required before weekly lineups can be saved." action={{ label: "Open League Teams", to: `/league/${encodeURIComponent(leagueId)}/teams` }} />;
   }
 
   if (!selected) {
-    return <LeagueLineupGate icon={<ShieldCheck aria-hidden="true" />} title="Your team is not assigned yet" description="Sign in and request a franchise on League Teams. The commissioner must approve it before your account can save lineups." action={{ label: "Request a team", to: "/league/teams" }} />;
+    return <LeagueLineupGate icon={<ShieldCheck aria-hidden="true" />} title="Your team is not assigned yet" description="Sign in and request a franchise on League Teams. The commissioner must approve it before your account can save lineups." action={{ label: "Request a team", to: `/league/${encodeURIComponent(leagueId)}/teams` }} />;
   }
 
   const usedPlayers = new Set(Object.values(assignments));
@@ -206,7 +206,6 @@ export default function LeagueLineup() {
 
   return (
     <div className="league-season-page">
-      <LeagueSeasonNav />
       <LeagueSeasonHero
         variant="lineup"
         eyebrow={`Weekly lineup · ${connection?.leagueName ?? "Active league"}`}

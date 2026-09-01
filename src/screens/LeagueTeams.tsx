@@ -16,7 +16,6 @@ import { Link, useParams } from "react-router-dom";
 import { buildCurrentToolPlayers } from "../data/toolPlayerData";
 import { LeagueAccountPanel } from "../features/league-season/LeagueAccountPanel";
 import { LeagueSeasonHero } from "../features/league-season/LeagueSeasonHero";
-import { LeagueSeasonNav } from "../features/league-season/LeagueSeasonNav";
 import { getLeagueProjectionFreshness, projectionFreshnessSummary } from "../features/league-season/leagueProjectionFreshness";
 import {
   approveFranchiseClaim,
@@ -63,7 +62,6 @@ function errorMessage(error: unknown, fallback: string) {
 function LeagueSeasonGate({ status, message }: { status: string; message: string }) {
   return (
     <div className="league-season-page league-season-gate">
-      <LeagueSeasonNav />
       <div className="league-season-gate-content">
         <Users aria-hidden="true" />
         <span>League teams</span>
@@ -124,11 +122,12 @@ function claimSummary(claim: FranchiseClaim | undefined) {
 }
 
 export default function LeagueTeams() {
-  const { teamId = "" } = useParams();
+  const { leagueId: routeLeagueId = "", teamId = "" } = useParams();
   const { connections, activeLeagueId } = useSleeperLeagueConnections();
-  const connection = connections.find((candidate) => candidate.leagueId === activeLeagueId) ?? null;
-  const draftState = useLeagueSeasonDraft(activeLeagueId);
-  const management = useLeagueSeasonManagement(activeLeagueId);
+  const leagueId = routeLeagueId || activeLeagueId;
+  const connection = connections.find((candidate) => candidate.leagueId === leagueId) ?? null;
+  const draftState = useLeagueSeasonDraft(leagueId);
+  const management = useLeagueSeasonManagement(leagueId);
   const [managerName, setManagerName] = useState(connection?.managerDisplayName || "");
   const [action, setAction] = useState<ActionState>({ status: "idle", key: "", message: "" });
   const draftSeason = draftState.status === "ready" ? draftState.season : null;
@@ -152,7 +151,7 @@ export default function LeagueTeams() {
   );
   const projectionFreshness = useMemo(() => getLeagueProjectionFreshness(players), [players]);
 
-  useEffect(() => setManagerName(connection?.managerDisplayName || ""), [activeLeagueId, connection?.managerDisplayName]);
+  useEffect(() => setManagerName(connection?.managerDisplayName || ""), [leagueId, connection?.managerDisplayName]);
 
   if (!season) {
     const gateState = management.status === "loading" || draftState.status === "loading" ? "loading" : draftState.status;
@@ -187,7 +186,7 @@ export default function LeagueTeams() {
   }
 
   function publish() {
-    return runAction("publish", () => publishLeagueSeason(activeLeagueId), management.record ? "League season republished from the latest saved draft." : "League season published. Managers can now request their teams.");
+    return runAction("publish", () => publishLeagueSeason(leagueId), management.record ? "League season republished from the latest saved draft." : "League season published. Managers can now request their teams.");
   }
 
   function claimSelected() {
@@ -195,15 +194,14 @@ export default function LeagueTeams() {
     return runAction(
       `claim-${selected.id}`,
       () => isCommissioner
-        ? assignFranchiseToCommissioner(activeLeagueId, selected.id, name)
-        : requestFranchiseClaim(activeLeagueId, selected.id, name),
+        ? assignFranchiseToCommissioner(leagueId, selected.id, name)
+        : requestFranchiseClaim(leagueId, selected.id, name),
       isCommissioner ? `${selected.displayName} is now your managed team.` : `Request sent for ${selected.displayName}.`,
     );
   }
 
   return (
     <div className="league-season-page">
-      <LeagueSeasonNav />
       <LeagueSeasonHero
         variant="teams"
         eyebrow={`League teams · ${connection?.leagueName ?? "Active league"}`}
@@ -244,8 +242,8 @@ export default function LeagueTeams() {
               <article key={claim.franchiseId}>
                 <div><strong>{claim.requestedDisplayName}</strong><small>wants {claim.franchiseName}</small></div>
                 <div>
-                  <button type="button" onClick={() => runAction(`approve-${claim.franchiseId}`, () => approveFranchiseClaim(activeLeagueId, claim.franchiseId), `${claim.requestedDisplayName} can now manage ${claim.franchiseName}.`)} disabled={action.status === "working"}><Check aria-hidden="true" /> Approve</button>
-                  <button type="button" onClick={() => runAction(`remove-${claim.franchiseId}`, () => removeFranchiseClaim(activeLeagueId, claim.franchiseId), `Request removed for ${claim.franchiseName}.`)} disabled={action.status === "working"}><X aria-hidden="true" /> Decline</button>
+                  <button type="button" onClick={() => runAction(`approve-${claim.franchiseId}`, () => approveFranchiseClaim(leagueId, claim.franchiseId), `${claim.requestedDisplayName} can now manage ${claim.franchiseName}.`)} disabled={action.status === "working"}><Check aria-hidden="true" /> Approve</button>
+                  <button type="button" onClick={() => runAction(`remove-${claim.franchiseId}`, () => removeFranchiseClaim(leagueId, claim.franchiseId), `Request removed for ${claim.franchiseName}.`)} disabled={action.status === "working"}><X aria-hidden="true" /> Decline</button>
                 </div>
               </article>
             ))}
@@ -259,7 +257,7 @@ export default function LeagueTeams() {
           const active = franchise.id === selected.id;
           const claim = management.claims.find((entry) => entry.franchiseId === franchise.id);
           return (
-            <Link key={franchise.id} to={`/league/teams/${franchise.id}`} className={active ? "is-active" : ""} aria-current={active ? "page" : undefined}>
+            <Link key={franchise.id} to={`/league/${encodeURIComponent(leagueId)}/teams/${franchise.id}`} className={active ? "is-active" : ""} aria-current={active ? "page" : undefined}>
               <span className="league-team-mark" aria-hidden="true">{initials(franchise.displayName)}</span>
               <span><strong>{franchise.displayName}</strong><small>{franchise.roster.length} players · {claimSummary(claim)}</small></span>
               <b>{formatProjection(candidate.projectedTotal, candidate.projectedStarterCount)}<small>baseline</small></b>
@@ -280,13 +278,13 @@ export default function LeagueTeams() {
             ) : isMyApprovedTeam ? (
               <>
                 <span className="league-my-team"><Check aria-hidden="true" /> Your approved team</span>
-                <Link className="league-lineup-link" to={`/league/lineup?team=${encodeURIComponent(selected.id)}`}>Set weekly lineup</Link>
-                <button type="button" className="is-quiet" onClick={() => runAction(`release-${selected.id}`, () => removeFranchiseClaim(activeLeagueId, selected.id), `${selected.displayName} is no longer assigned to this session.`)} disabled={action.status === "working"}>Release team</button>
+                <Link className="league-lineup-link" to={`/league/${encodeURIComponent(leagueId)}/team/roster?team=${encodeURIComponent(selected.id)}`}>Set weekly lineup</Link>
+                <button type="button" className="is-quiet" onClick={() => runAction(`release-${selected.id}`, () => removeFranchiseClaim(leagueId, selected.id), `${selected.displayName} is no longer assigned to this session.`)} disabled={action.status === "working"}>Release team</button>
               </>
             ) : isMyPendingRequest ? (
               <>
                 <span className="league-ownership-note"><Clock3 aria-hidden="true" /> Waiting for commissioner approval</span>
-                <button type="button" className="is-quiet" onClick={() => runAction(`cancel-${selected.id}`, () => removeFranchiseClaim(activeLeagueId, selected.id), `Request canceled for ${selected.displayName}.`)} disabled={action.status === "working"}>Cancel request</button>
+                <button type="button" className="is-quiet" onClick={() => runAction(`cancel-${selected.id}`, () => removeFranchiseClaim(leagueId, selected.id), `Request canceled for ${selected.displayName}.`)} disabled={action.status === "working"}>Cancel request</button>
               </>
             ) : selectedClaim ? (
               <span className="league-ownership-note"><ShieldCheck aria-hidden="true" /> {claimSummary(selectedClaim)}</span>
@@ -312,7 +310,7 @@ export default function LeagueTeams() {
 
         <div className="league-roster-section-heading">
           <div><span>Projected lineup</span><h3>Starters and depth</h3></div>
-          <Link to={`/league/matchups?team=${encodeURIComponent(selected.id)}`}>View matchups</Link>
+          <Link to={`/league/${encodeURIComponent(leagueId)}/matchups?team=${encodeURIComponent(selected.id)}`}>View matchups</Link>
         </div>
         <RosterTable lineup={lineup} />
       </section>

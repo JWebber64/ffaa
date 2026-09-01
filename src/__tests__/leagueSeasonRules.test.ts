@@ -4,6 +4,14 @@ import { describe, expect, it } from "vitest";
 const rules = readFileSync(new URL("../../firestore.rules", import.meta.url), "utf8");
 
 describe("league season Firestore rules", () => {
+  it("keeps synced fantasy-manager profiles private to permanent account owners", () => {
+    expect(rules).toMatch(/match \/fantasyManagerProfiles\/\{userId\}/);
+    expect(rules).toMatch(/allow get: if permanentUser\(\) && request\.auth\.uid == userId/);
+    expect(rules).toMatch(/allow list: if false/);
+    expect(rules).toMatch(/connections_json[\s\S]*?size\(\) <= 100000/);
+    expect(rules).toMatch(/request\.resource\.data\.updated_at == request\.time/);
+  });
+
   it("keeps season publication with the saved draft owner and future updates with the commissioner", () => {
     expect(rules).toMatch(/match \/leagueSeasons\/\{leagueId\}/);
     expect(rules).toMatch(/get\(savedDraftPath\(\)\)\.data\.owner_user_id == request\.auth\.uid/);

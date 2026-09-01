@@ -1,0 +1,83 @@
+.manager-identity-form {
+  display: grid;
+  width: min(560px, 100%);
+  margin-inline: auto;
+  gap: var(--space-3);
+  text-align: start;
+}
+
+.manager-identity-form label {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.manager-identity-form label > span,
+.manager-identity-form > small {
+  color: var(--text-muted);
+  font-size: .75rem;
+  font-weight: 750;
+}
+
+.manager-identity-form input {
+  width: 100%;
+  min-height: var(--control-height);
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-field-border);
+  border-radius: var(--r-md);
+  background: var(--color-field-bg);
+  color: var(--color-field-text);
+  font: inherit;
+}
+
+.manager-identity-form button {
+  min-height: var(--control-height);
+  padding-inline: var(--space-4);
+  justify-self: start;
+  border: 1px solid var(--color-border-brand);
+  border-radius: var(--r-md);
+  background: var(--color-button-primary);
+  color: var(--color-button-primary-text);
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 850;
+}
+
+.manager-identity-form button:disabled {
+  cursor: wait;
+  opacity: .7;
+}
+
+.manager-identity-form > p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: .78rem;
+}
+
+.manager-identity-form > p.is-error {
+  color: var(--accent-danger);
+}
+
+.manager-identity-form > p.is-success {
+  color: var(--accent-live);
+}
+
+.manager-identity-form.is-compact {
+  grid-template-columns: minmax(180px, 1fr) auto;
+  align-items: end;
+}
+
+.manager-identity-form.is-compact > p,
+.manager-identity-form.is-compact > small {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 560px) {
+  .manager-identity-form.is-compact {
+    grid-template-columns: 1fr;
+  }
+
+  .manager-identity-form.is-compact > p,
+  .manager-identity-form.is-compact > small {
+    grid-column: auto;
+  }
+}

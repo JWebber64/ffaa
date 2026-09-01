@@ -167,7 +167,7 @@ export function DecisionLab({
                     ) : null}
                   </>
                 )}
-                {manager ? <Link className="history-action-link" to={`/league/${leagueId}/managers/${manager.id}`}>Manager career <ExternalLink size={13} aria-hidden="true" /></Link> : null}
+                {manager ? <Link className="history-action-link" to={`/league/${leagueId}/history/managers/${manager.id}`}>Manager career <ExternalLink size={13} aria-hidden="true" /></Link> : null}
               </div>
             </details>
           );

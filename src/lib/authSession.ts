@@ -128,7 +128,7 @@ export async function ensureFirebaseUserId() {
   return userId;
 }
 
-export function isPermanentFirebaseSession(session: AppSession | null) {
+export function isPermanentFirebaseSession(session: AppSession | null): session is AppSession {
   return Boolean(session?.user.uid && !session.user.isAnonymous);
 }
 

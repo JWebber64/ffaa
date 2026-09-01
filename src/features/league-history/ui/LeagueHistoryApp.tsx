@@ -16,6 +16,7 @@ import {
   ChevronDown,
   Settings2,
 } from "lucide-react";
+import { useRef } from "react";
 import { Link, Navigate, NavLink, Outlet, Route, Routes, useLocation, useParams } from "react-router-dom";
 
 import { Button } from "../../../ui/Button";
@@ -34,7 +35,7 @@ import { leagueHistoryPath, recoverLeagueHistoryPath } from "./leagueRoutes";
 import { useRouteMetadata } from "../../../lib/routeMetadata";
 import { ShareButton } from "../../../components/ShareButton";
 import type { LeagueHistorySnapshot } from "../domain/types";
-import { closeParentDisclosure } from "../../../ui/disclosureMenu";
+import { closeParentDisclosure, useDismissibleDisclosureMenus } from "../../../ui/disclosureMenu";
 import "./league-history.css";
 
 const HISTORY_NAV_GROUPS = [
@@ -42,7 +43,7 @@ const HISTORY_NAV_GROUPS = [
     { to: "managers", label: "Managers", detail: "Career profiles and identity", icon: Users },
     { to: "h2h", label: "Head to head", detail: "Every manager matchup", icon: Swords },
   ] },
-  { label: "History", roots: ["history", "records", "leaderboards", "seasons", "drafts", "transactions", "trades", "waivers"], links: [
+  { label: "History", roots: ["archive", "champions", "records", "leaderboards", "seasons", "drafts", "transactions", "trades", "waivers"], links: [
     { to: "history", label: "League history", detail: "Champions and eras", icon: History },
     { to: "history/champions", label: "Champions", detail: "Title timeline", icon: Crown },
     { to: "records", label: "Records", detail: "League-wide marks", icon: Medal },
@@ -61,16 +62,17 @@ const HISTORY_NAV_GROUPS = [
 function historyMetadata(snapshot: LeagueHistorySnapshot | null, pathname: string) {
   if (!snapshot) return { title: "League History", description: "Explore normalized fantasy league history, managers, matchups, records, seasons, drafts, and transactions." };
   const segments = pathname.split("/").filter(Boolean);
-  const section = segments[2] ?? "overview";
-  const detail = segments[3] ?? "";
+  const historyIndex = segments.findIndex((segment, index) => index >= 2 && segment === "history");
+  const section = segments[historyIndex + 1] ?? "overview";
+  const detail = segments[historyIndex + 2] ?? "";
   const manager = section === "managers" && detail ? snapshot.managers.find((candidate) => candidate.id === detail) : null;
   const rivalryA = section === "rivalries" ? snapshot.managers.find((candidate) => candidate.id === detail) : null;
-  const rivalryB = section === "rivalries" ? snapshot.managers.find((candidate) => candidate.id === segments[4]) : null;
+  const rivalryB = section === "rivalries" ? snapshot.managers.find((candidate) => candidate.id === segments[historyIndex + 3]) : null;
   if (manager) return { title: `${manager.displayName} · ${snapshot.league.name}`, description: `${manager.displayName}'s career, seasons, records, rivalries, drafts, and league history in ${snapshot.league.name}.` };
   if (rivalryA && rivalryB) return { title: `${rivalryA.displayName} vs ${rivalryB.displayName}`, description: `All-time head-to-head results and rivalry history for ${rivalryA.displayName} and ${rivalryB.displayName} in ${snapshot.league.name}.` };
   const labels: Record<string, string> = {
     overview: "Overview", week: "This Week", managers: "Managers", h2h: "All-time Head to Head",
-    history: detail === "champions" ? "Champions" : "History", records: "Records", seasons: detail ? `${detail} Season` : "Seasons",
+    archive: "History", champions: "Champions", records: "Records", seasons: detail ? `${detail} Season` : "Seasons",
     leaderboards: "Leaderboards", drafts: "Draft History", payouts: "Payout History", transactions: "Transactions", trades: "Trades", waivers: "Waivers",
   };
   const label = labels[section] ?? "League History";
@@ -80,6 +82,8 @@ function historyMetadata(snapshot: LeagueHistorySnapshot | null, pathname: strin
 function LeagueHistoryLayout() {
   const { leagueId = "" } = useParams();
   const location = useLocation();
+  const navigationRef = useRef<HTMLElement>(null);
+  useDismissibleDisclosureMenus(navigationRef);
   const state = useLeagueHistory(leagueId);
   const metadataSnapshot = state.data;
   const pageMetadata = historyMetadata(metadataSnapshot, location.pathname);
@@ -105,7 +109,7 @@ function LeagueHistoryLayout() {
         <h1>This league is not in League History yet</h1>
         <p>{state.error}</p>
         <div className="history-state-actions">
-          <Link to="/league"><Button variant="secondary"><ArrowLeft size={16} /> League HQ</Button></Link>
+          <Link to="/leagues"><Button variant="secondary"><ArrowLeft size={16} /> League connections</Button></Link>
           <Button onClick={state.refresh}><RefreshCw size={16} /> Try again</Button>
         </div>
       </main>
@@ -118,8 +122,8 @@ function LeagueHistoryLayout() {
     <div className="history-shell">
       <header className="history-masthead">
         <div>
-          <Link className="history-back" to={`/league?league=${snapshot.league.currentExternalLeagueId}`}>
-            <ArrowLeft size={14} aria-hidden="true" /> League HQ
+          <Link className="history-back" to={`/league/${encodeURIComponent(leagueId)}/manage`}>
+            <ArrowLeft size={14} aria-hidden="true" /> Manage league
           </Link>
           <span className="history-kicker">League History</span>
           <h1>{snapshot.league.name}</h1>
@@ -130,7 +134,7 @@ function LeagueHistoryLayout() {
           <div className="history-provider-mark"><span>S</span><small>Sleeper source</small></div>
         </div>
       </header>
-      <nav className="history-nav" aria-label="League history navigation">
+      <nav className="history-nav" aria-label="League history navigation" ref={navigationRef}>
         <NavLink to={leagueHistoryPath(leagueId, "")} end><Trophy size={15} aria-hidden="true" /><span>Overview</span></NavLink>
         <NavLink to={leagueHistoryPath(leagueId, "week")}><CalendarDays size={15} aria-hidden="true" /><span>This Week</span></NavLink>
         {HISTORY_NAV_GROUPS.map((group) => {
@@ -142,7 +146,7 @@ function LeagueHistoryLayout() {
                 {group.links.map((link) => {
                   const { label, detail, icon: Icon } = link;
                   const target = "leagueView" in link
-                    ? `/league?league=${encodeURIComponent(leagueId)}&view=${link.leagueView}`
+                    ? `/league/${encodeURIComponent(leagueId)}/manage?view=${link.leagueView}`
                     : leagueHistoryPath(leagueId, link.to);
                   return <NavLink key={target} to={target} onClick={(event) => closeParentDisclosure(event.currentTarget)}>
                     <Icon size={16} aria-hidden="true" /><span><strong>{label}</strong><small>{detail}</small></span>
@@ -174,8 +178,8 @@ export default function LeagueHistoryApp() {
         <Route path="managers/:managerId" element={<ManagerProfilePage />} />
         <Route path="h2h" element={<HeadToHeadMatrixPage />} />
         <Route path="rivalries/:managerAId/:managerBId" element={<RivalryPage />} />
-        <Route path="history" element={<HistoryPage />} />
-        <Route path="history/champions" element={<ChampionsPage />} />
+        <Route path="archive" element={<HistoryPage />} />
+        <Route path="champions" element={<ChampionsPage />} />
         <Route path="records" element={<RecordsPage />} />
         <Route path="seasons" element={<SeasonsPage />} />
         <Route path="seasons/:season" element={<SeasonArchivePage />} />

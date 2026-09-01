@@ -3,6 +3,7 @@ import {
   MAX_SLEEPER_LEAGUE_CONNECTIONS,
   mergeSleeperLeagueConnection,
   mergeSleeperLeagueConnections,
+  mergeSyncedSleeperLeagueConnections,
   parseSleeperLeagueConnections,
   type SleeperLeagueConnectionSummary,
 } from "../features/league-hq/sleeperConnections";
@@ -73,6 +74,7 @@ describe("Sleeper league connections", () => {
       ...connection("111111111111", "Alpha", "2026-08-10T00:00:00.000Z"),
       managerProviderUserId: "user-123",
       managerDisplayName: "Test Manager",
+      leagueOwnerProviderUserId: "commissioner-456",
     };
     const parsed = parseSleeperLeagueConnections(JSON.stringify([saved]));
 
@@ -80,6 +82,31 @@ describe("Sleeper league connections", () => {
       leagueId: "111111111111",
       managerProviderUserId: "user-123",
       managerDisplayName: "Test Manager",
+      leagueOwnerProviderUserId: "commissioner-456",
+    });
+  });
+
+  it("merges cloud and local leagues while preserving fields from the newest connection", () => {
+    const local = {
+      ...connection("111111111111", "Local Alpha", "2026-08-10T00:00:00.000Z"),
+      managerProviderUserId: "manager-local",
+      managerTeamName: "Local Team",
+    };
+    const remoteNewer = {
+      ...connection("111111111111", "Cloud Alpha", "2026-08-11T00:00:00.000Z"),
+      managerRecord: "8-3",
+      leagueOwnerProviderUserId: "commissioner-456",
+    };
+    const remoteOnly = connection("222222222222", "Cloud Beta", "2026-08-09T00:00:00.000Z");
+
+    const merged = mergeSyncedSleeperLeagueConnections([local], [remoteNewer, remoteOnly]);
+
+    expect(merged.map((item) => item.leagueName)).toEqual(["Cloud Alpha", "Cloud Beta"]);
+    expect(merged[0]).toMatchObject({
+      managerProviderUserId: "manager-local",
+      managerTeamName: "Local Team",
+      managerRecord: "8-3",
+      leagueOwnerProviderUserId: "commissioner-456",
     });
   });
 

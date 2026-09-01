@@ -51,7 +51,7 @@ export function WeekPage() {
           <History size={28} aria-hidden="true" />
           <strong>No completed league weeks are available</strong>
           <span>Preseason placeholders and incomplete matchups are excluded from the weekly workspace.</span>
-          <Link className="history-action-link" to={`/league/${leagueId}/seasons`}>Open season archive</Link>
+          <Link className="history-action-link" to={`/league/${leagueId}/history/seasons`}>Open season archive</Link>
         </div>
       </main>
     );
@@ -133,11 +133,11 @@ export function WeekPage() {
       ) : null}
 
       <nav className="history-week-footer-nav" aria-label="League week destinations">
-        {neighbors.previous ? <Link to={`/league/${leagueId}/week?season=${neighbors.previous.season}&week=${neighbors.previous.week}`}>Previous completed week</Link> : <span aria-disabled="true">Previous completed week</span>}
-        {neighbors.next ? <Link to={`/league/${leagueId}/week?season=${neighbors.next.season}&week=${neighbors.next.week}`}>Next completed week</Link> : <span aria-disabled="true">Next completed week</span>}
-        <Link to={`/league/${leagueId}/seasons`}><History size={14} aria-hidden="true" /> Season archive</Link>
-        <Link to={`/league/${leagueId}/records`}><Medal size={14} aria-hidden="true" /> Records</Link>
-        <Link to={`/league/${leagueId}/h2h`}><Swords size={14} aria-hidden="true" /> H2H matrix</Link>
+        {neighbors.previous ? <Link to={`/league/${leagueId}/history/week?season=${neighbors.previous.season}&week=${neighbors.previous.week}`}>Previous completed week</Link> : <span aria-disabled="true">Previous completed week</span>}
+        {neighbors.next ? <Link to={`/league/${leagueId}/history/week?season=${neighbors.next.season}&week=${neighbors.next.week}`}>Next completed week</Link> : <span aria-disabled="true">Next completed week</span>}
+        <Link to={`/league/${leagueId}/history/seasons`}><History size={14} aria-hidden="true" /> Season archive</Link>
+        <Link to={`/league/${leagueId}/history/records`}><Medal size={14} aria-hidden="true" /> Records</Link>
+        <Link to={`/league/${leagueId}/history/h2h`}><Swords size={14} aria-hidden="true" /> H2H matrix</Link>
       </nav>
     </main>
   );

@@ -33,7 +33,7 @@ export function WeekHeader({
 }) {
   const seasons = [...new Set(options.map((option) => option.season))].sort((left, right) => right - left);
   const weeks = options.filter((option) => option.season === season).map((option) => option.week).sort((left, right) => left - right);
-  const weekUrl = (option: CompletedWeekOption) => `/league/${leagueId}/week?season=${option.season}&week=${option.week}`;
+  const weekUrl = (option: CompletedWeekOption) => `/league/${leagueId}/history/week?season=${option.season}&week=${option.week}`;
   return (
     <section className="history-week-hero" aria-labelledby="history-week-title">
       <div className="history-week-hero-copy">
@@ -66,7 +66,7 @@ export function WeekHeader({
         </div>
         <div className="history-week-primary-links">
           <Link to={`/league/${leagueId}`}><ArrowLeft size={14} aria-hidden="true" /> League Home</Link>
-          <Link to={`/league/${leagueId}/seasons`}>Season archive</Link>
+          <Link to={`/league/${leagueId}/history/seasons`}>Season archive</Link>
         </div>
       </div>
     </section>

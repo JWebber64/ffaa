@@ -32,6 +32,13 @@ export interface SleeperLeagueConnectionSummary {
   avatarUrl?: string;
   managerProviderUserId?: string;
   managerDisplayName?: string;
+  managerTeamName?: string;
+  leagueOwnerProviderUserId?: string;
+  managerRecord?: string;
+  managerStanding?: number;
+  currentWeek?: number;
+  opponentName?: string;
+  teamSnapshotAt?: string;
   auctionSettings?: SleeperLeagueAuctionSettings;
 }
 
@@ -103,6 +110,27 @@ export function parseSleeperLeagueConnections(raw: string | null) {
         ...(String(entry.managerDisplayName ?? "").trim()
           ? { managerDisplayName: String(entry.managerDisplayName).trim() }
           : {}),
+        ...(String(entry.managerTeamName ?? "").trim()
+          ? { managerTeamName: String(entry.managerTeamName).trim() }
+          : {}),
+        ...(String(entry.leagueOwnerProviderUserId ?? "").trim()
+          ? { leagueOwnerProviderUserId: String(entry.leagueOwnerProviderUserId).trim() }
+          : {}),
+        ...(String(entry.managerRecord ?? "").trim()
+          ? { managerRecord: String(entry.managerRecord).trim() }
+          : {}),
+        ...(positiveInteger(entry.managerStanding)
+          ? { managerStanding: positiveInteger(entry.managerStanding) }
+          : {}),
+        ...(Number.isFinite(Number(entry.currentWeek)) && Number(entry.currentWeek) >= 0
+          ? { currentWeek: Math.round(Number(entry.currentWeek)) }
+          : {}),
+        ...(String(entry.opponentName ?? "").trim()
+          ? { opponentName: String(entry.opponentName).trim() }
+          : {}),
+        ...(String(entry.teamSnapshotAt ?? "").trim()
+          ? { teamSnapshotAt: String(entry.teamSnapshotAt).trim() }
+          : {}),
         ...(auctionSettings ? { auctionSettings } : {}),
       }];
     });
@@ -147,6 +175,29 @@ export function mergeSleeperLeagueConnections(
   );
 }
 
+export function mergeSyncedSleeperLeagueConnections(
+  localConnections: SleeperLeagueConnectionSummary[],
+  remoteConnections: SleeperLeagueConnectionSummary[],
+) {
+  const byLeagueId = new Map<string, SleeperLeagueConnectionSummary>();
+  for (const connection of [...localConnections, ...remoteConnections]) {
+    const current = byLeagueId.get(connection.leagueId);
+    if (!current) {
+      byLeagueId.set(connection.leagueId, connection);
+      continue;
+    }
+    const newer = connection.lastUsedAt.localeCompare(current.lastUsedAt) >= 0 ? connection : current;
+    const older = newer === connection ? current : connection;
+    byLeagueId.set(
+      connection.leagueId,
+      mergeSleeperLeagueConnection([older], newer)[0]!,
+    );
+  }
+  return [...byLeagueId.values()]
+    .sort((left, right) => right.lastUsedAt.localeCompare(left.lastUsedAt))
+    .slice(0, MAX_SLEEPER_LEAGUE_CONNECTIONS);
+}
+
 function readConnectionsSnapshot() {
   if (typeof window === "undefined") return observedConnections;
   const raw = window.localStorage.getItem(CONNECTIONS_KEY);
@@ -187,14 +238,15 @@ function subscribeToStore(listener: () => void) {
   };
 }
 
-function persistConnections(connections: SleeperLeagueConnectionSummary[]) {
+export function replaceSleeperLeagueConnections(connections: SleeperLeagueConnectionSummary[]) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(CONNECTIONS_KEY, JSON.stringify(connections));
+  const normalized = parseSleeperLeagueConnections(JSON.stringify(connections));
+  window.localStorage.setItem(CONNECTIONS_KEY, JSON.stringify(normalized));
   observedConnectionsRaw = undefined;
   emitStoreChange();
 }
 
-function persistActiveLeague(leagueId: string) {
+export function replaceActiveSleeperLeague(leagueId: string) {
   if (typeof window === "undefined") return;
   if (leagueId) window.localStorage.setItem(ACTIVE_LEAGUE_KEY, leagueId);
   else window.localStorage.removeItem(ACTIVE_LEAGUE_KEY);
@@ -206,26 +258,26 @@ export function useSleeperLeagueConnections() {
   const activeLeagueId = useSyncExternalStore(subscribeToStore, readActiveLeagueSnapshot, () => "");
 
   const rememberConnection = useCallback((connection: SleeperLeagueConnectionSummary) => {
-    persistConnections(mergeSleeperLeagueConnection(readConnectionsSnapshot(), connection));
+    replaceSleeperLeagueConnections(mergeSleeperLeagueConnection(readConnectionsSnapshot(), connection));
   }, []);
 
   const rememberConnections = useCallback((additions: SleeperLeagueConnectionSummary[]) => {
     if (!additions.length) return;
-    persistConnections(mergeSleeperLeagueConnections(readConnectionsSnapshot(), additions));
+    replaceSleeperLeagueConnections(mergeSleeperLeagueConnections(readConnectionsSnapshot(), additions));
   }, []);
 
   const forgetConnection = useCallback((leagueId: string) => {
     const previousActiveLeagueId = readActiveLeagueSnapshot();
     const next = readConnectionsSnapshot().filter((connection) => connection.leagueId !== leagueId);
-    persistConnections(next);
+    replaceSleeperLeagueConnections(next);
     if (previousActiveLeagueId === leagueId || !next.some((connection) => connection.leagueId === previousActiveLeagueId)) {
-      persistActiveLeague(next[0]?.leagueId ?? "");
+      replaceActiveSleeperLeague(next[0]?.leagueId ?? "");
     }
   }, []);
 
   const setActiveLeagueId = useCallback((leagueId: string) => {
     if (leagueId && !/^\d{10,}$/.test(leagueId)) return;
-    persistActiveLeague(leagueId);
+    replaceActiveSleeperLeague(leagueId);
   }, []);
 
   return {

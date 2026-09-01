@@ -1,0 +1,180 @@
+.league-overview-page {
+  display: grid;
+  gap: var(--space-5);
+  color: var(--text-primary);
+}
+
+.league-overview-page > header {
+  display: flex;
+  padding: var(--space-page-hero);
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-section-gap);
+  border: 1px solid var(--line-1);
+  border-radius: var(--r-xl);
+  background: linear-gradient(115deg, color-mix(in srgb, var(--green-950) 76%, var(--surface-base)), var(--surface-base));
+}
+
+.league-overview-page > header > div {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.league-overview-page > header span,
+.league-overview-grid span {
+  color: var(--accent-action);
+  font-size: .75rem;
+  font-weight: 850;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.league-overview-page h1 {
+  margin: 0;
+  font-size: var(--type-display-page);
+  line-height: var(--line-display);
+}
+
+.league-overview-page > header p,
+.league-overview-grid p {
+  max-width: 700px;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.league-overview-page dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(90px, 1fr));
+  margin: 0;
+  gap: var(--space-3);
+}
+
+.league-overview-page dl div {
+  display: grid;
+  padding: var(--space-3);
+  gap: 2px;
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-md);
+  background: var(--surface-raised);
+}
+
+.league-overview-page dt {
+  color: var(--text-muted);
+  font-size: .75rem;
+}
+
+.league-overview-page dd {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 850;
+}
+
+.league-overview-notice {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--r-md);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  font-size: .8rem;
+}
+
+.league-overview-destinations {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.league-overview-destinations a {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  min-width: 0;
+  padding: var(--space-4);
+  align-items: start;
+  gap: var(--space-2);
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-lg);
+  background: var(--surface-base);
+  color: var(--text-primary);
+}
+
+.league-overview-destinations a:hover {
+  border-color: var(--color-border-brand);
+  background: var(--color-surface-hover);
+}
+
+.league-overview-destinations svg {
+  width: 18px;
+  color: var(--accent-action);
+}
+
+.league-overview-destinations span {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.league-overview-destinations strong {
+  font-size: .82rem;
+}
+
+.league-overview-destinations small {
+  color: var(--text-muted);
+  font-size: .75rem;
+  line-height: 1.4;
+}
+
+.league-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.league-overview-grid section {
+  display: grid;
+  padding: var(--space-panel-padding);
+  gap: var(--space-3);
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-lg);
+  background: var(--surface-base);
+}
+
+.league-overview-grid section > div {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.league-overview-grid svg {
+  width: 18px;
+  color: var(--accent-action);
+}
+
+.league-overview-grid strong {
+  font-size: 1rem;
+}
+
+@media (max-width: 1040px) {
+  .league-overview-destinations {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .league-overview-page > header {
+    display: grid;
+  }
+
+  .league-overview-page h1 {
+    font-size: min(var(--type-display-page), 2.7rem);
+  }
+
+  .league-overview-destinations {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .league-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
