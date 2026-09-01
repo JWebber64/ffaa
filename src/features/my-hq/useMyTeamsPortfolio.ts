@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { buildCurrentToolPlayers } from "../../data/toolPlayerData";
-import { loadSleeperPlayerDirectory } from "../../data/sleeperPlayerDirectory";
 import {
   useSleeperLeagueConnections,
   type SleeperLeagueConnectionSummary,
 } from "../league-hq/sleeperConnections";
 import { loadMyHQ, type MyHQData, type MyHQDecision } from "./myHQ";
+import { loadPlayersForConnection } from "./playerPool";
 
 const PORTFOLIO_CACHE_MS = 2 * 60 * 1000;
 const PORTFOLIO_FETCH_CONCURRENCY = 3;
@@ -22,22 +21,7 @@ export type PortfolioTeam = {
   decision: MyHQDecision | null;
 };
 
-const playerPools = new Map<string, Promise<ReturnType<typeof buildCurrentToolPlayers>>>();
 const portfolioCache = new Map<string, { loadedAt: number; data: MyHQData }>();
-
-function playersForConnection(connection: SleeperLeagueConnectionSummary) {
-  const scoring = connection.auctionSettings?.scoring ?? "halfPpr";
-  const existing = playerPools.get(scoring);
-  if (existing) return existing;
-  const players = loadSleeperPlayerDirectory()
-    .then((sleeperRows) => buildCurrentToolPlayers(scoring, [], {}, sleeperRows))
-    .catch((error) => {
-      playerPools.delete(scoring);
-      throw error;
-    });
-  playerPools.set(scoring, players);
-  return players;
-}
 
 function cacheKey(connection: SleeperLeagueConnectionSummary) {
   return `${connection.leagueId}:${connection.managerProviderUserId ?? ""}:${connection.auctionSettings?.scoring ?? "halfPpr"}`;
@@ -135,7 +119,7 @@ export function useMyTeamsPortfolio() {
       const cached = portfolioCache.get(key);
       if (cached && Date.now() - cached.loadedAt < PORTFOLIO_CACHE_MS) return;
       try {
-        const players = await playersForConnection(connection);
+        const players = await loadPlayersForConnection(connection);
         const data = await loadMyHQ(connection, players, controller.signal);
         if (controller.signal.aborted) return;
         portfolioCache.set(key, { loadedAt: Date.now(), data });
