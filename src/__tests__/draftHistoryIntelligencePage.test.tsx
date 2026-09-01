@@ -96,5 +96,3 @@ describe("Draft History Intelligence", () => {
     expect(screen.getByRole("link", { name: "Open filtered Draft Intelligence" })).toHaveAttribute("href", expect.stringContaining("manager=a"));
   });
 });
-
-

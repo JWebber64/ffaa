@@ -114,5 +114,3 @@ describe("draft intelligence", () => {
     expect(receipt?.exclusions).toContain("no-observed-weekly-results");
   });
 });
-
-

@@ -193,4 +193,3 @@ Add a metric-level eligibility helper. Later analytics ask whether their exact r
 - After acceptance and validation: update `DESIGN.md` with the canonical coverage vocabulary, evidence/freshness presentation, and rule that provider lifecycle status is not completeness.
 - After acceptance and validation: update `docs/FANTASY_PRODUCT_ROADMAP.md` to name History Health as the data-trust prerequisite for draft and manager tendencies.
 - After acceptance and validation: mark this plan implemented with the validating commit and exact browser evidence; do not modify the accepted route ownership in `design-plans/2026-09-01-manager-team-first-information-architecture.md`.
-

@@ -171,5 +171,3 @@ export function DraftIntelligencePanel({
     </section>
   );
 }
-
-

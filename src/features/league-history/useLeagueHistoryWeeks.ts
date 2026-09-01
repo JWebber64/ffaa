@@ -55,5 +55,3 @@ export function useLeagueHistoryWeeks(routeId: string, snapshot: LeagueHistorySn
 
   return state;
 }
-
-

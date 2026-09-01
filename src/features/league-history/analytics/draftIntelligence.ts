@@ -208,5 +208,3 @@ export function buildDraftIntelligence(
     exclusions,
   };
 }
-
-

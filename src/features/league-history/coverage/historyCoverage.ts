@@ -241,5 +241,3 @@ export function historyCoverageSummary(coverage: LeagueHistoryCoverage) {
 export function primaryDraftForSeason(snapshot: LeagueHistorySnapshot, seasonId: string): HistoricalDraft | null {
   return snapshot.drafts.find((draft) => draft.leagueSeasonId === seasonId) ?? null;
 }
-
-

@@ -219,4 +219,3 @@ The first release explicitly excludes:
 - After acceptance and validation: add the Draft Receipt and Manager Draft DNA contracts to `DESIGN.md`, including evidence labels, provisional language, keeper treatment, and excluded claims.
 - After acceptance and validation: update `docs/FANTASY_PRODUCT_ROADMAP.md` with delivered historical tendencies and the explicit remaining blockers for nomination/live-draft use.
 - After acceptance and validation: mark this plan implemented with the validating commit and browser evidence. Retain `/league/:leagueId/history/drafts` as the canonical intelligence surface established by the accepted team-first information architecture.
-

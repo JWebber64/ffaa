@@ -83,5 +83,3 @@ describe("League History coverage", () => {
     expect(isHistoryMetricEligible("draft-receipt-observed-return", withWeeks.seasons[0] ?? null)).toMatchObject({ eligible: true, provisional: false });
   });
 });
-
-

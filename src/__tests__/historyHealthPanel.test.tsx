@@ -93,4 +93,3 @@ describe("HistoryHealthPanel", () => {
     expect(screen.queryByText("History source data is missing")).not.toBeInTheDocument();
   });
 });
-

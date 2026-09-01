@@ -82,5 +82,3 @@ export interface DraftIntelligenceFilters {
   season?: number | null;
   managerId?: string | null;
 }
-
-

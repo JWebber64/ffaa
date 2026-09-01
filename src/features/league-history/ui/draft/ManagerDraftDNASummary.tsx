@@ -48,5 +48,3 @@ export function ManagerDraftDNASummary({
     </div>
   );
 }
-
-
