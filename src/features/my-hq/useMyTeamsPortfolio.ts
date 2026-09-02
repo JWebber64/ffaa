@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { buildCurrentToolPlayers } from "../../data/toolPlayerData";
+import type { SleeperPlayerRow } from "../../data/playerStatCategories";
+import { loadSleeperPlayerDirectory } from "../../data/sleeperPlayerDirectory";
 import {
   useSleeperLeagueConnections,
   type SleeperLeagueConnectionSummary,
 } from "../league-hq/sleeperConnections";
 import { loadMyHQ, type MyHQData, type MyHQDecision } from "./myHQ";
-import { loadPlayersForConnection } from "./playerPool";
 
 const PORTFOLIO_CACHE_MS = 2 * 60 * 1000;
 const PORTFOLIO_FETCH_CONCURRENCY = 3;
@@ -21,7 +23,18 @@ export type PortfolioTeam = {
   decision: MyHQDecision | null;
 };
 
+const playerPools = new Map<string, ReturnType<typeof buildCurrentToolPlayers>>();
 const portfolioCache = new Map<string, { loadedAt: number; data: MyHQData }>();
+
+function playersForConnection(connection: SleeperLeagueConnectionSummary, sleeperRows: SleeperPlayerRow[] = []) {
+  const scoring = connection.auctionSettings?.scoring ?? "halfPpr";
+  const cacheKey = `${scoring}:${sleeperRows.length ? "sleeper" : "base"}`;
+  const existing = playerPools.get(cacheKey);
+  if (existing) return existing;
+  const players = buildCurrentToolPlayers(scoring, [], {}, sleeperRows);
+  playerPools.set(cacheKey, players);
+  return players;
+}
 
 function cacheKey(connection: SleeperLeagueConnectionSummary) {
   return `${connection.leagueId}:${connection.managerProviderUserId ?? ""}:${connection.auctionSettings?.scoring ?? "halfPpr"}`;
@@ -114,32 +127,33 @@ export function useMyTeamsPortfolio() {
     setStates(initialStates);
 
     const identifiedConnections = currentConnections.filter((connection) => connection.managerProviderUserId);
-    void runWithConcurrency(identifiedConnections, PORTFOLIO_FETCH_CONCURRENCY, async (connection) => {
-      const key = cacheKey(connection);
-      const cached = portfolioCache.get(key);
-      if (cached && Date.now() - cached.loadedAt < PORTFOLIO_CACHE_MS) return;
-      try {
-        const players = await loadPlayersForConnection(connection);
-        const data = await loadMyHQ(connection, players, controller.signal);
-        if (controller.signal.aborted) return;
-        portfolioCache.set(key, { loadedAt: Date.now(), data });
-        setStates((current) => ({
-          ...current,
-          [connection.leagueId]: { status: "ready", data, error: "" },
-        }));
-        rememberConnection(connectionWithSnapshot(connection, data));
-      } catch (error) {
-        if (controller.signal.aborted) return;
-        setStates((current) => ({
-          ...current,
-          [connection.leagueId]: {
-            status: "error",
-            data: null,
-            error: error instanceof Error ? error.message : "This team could not be refreshed.",
-          },
-        }));
-      }
-    });
+    void loadSleeperPlayerDirectory().catch(() => []).then((sleeperRows) => (
+      runWithConcurrency(identifiedConnections, PORTFOLIO_FETCH_CONCURRENCY, async (connection) => {
+        const key = cacheKey(connection);
+        const cached = portfolioCache.get(key);
+        if (cached && Date.now() - cached.loadedAt < PORTFOLIO_CACHE_MS) return;
+        try {
+          const data = await loadMyHQ(connection, playersForConnection(connection, sleeperRows), controller.signal, sleeperRows);
+          if (controller.signal.aborted) return;
+          portfolioCache.set(key, { loadedAt: Date.now(), data });
+          setStates((current) => ({
+            ...current,
+            [connection.leagueId]: { status: "ready", data, error: "" },
+          }));
+          rememberConnection(connectionWithSnapshot(connection, data));
+        } catch (error) {
+          if (controller.signal.aborted) return;
+          setStates((current) => ({
+            ...current,
+            [connection.leagueId]: {
+              status: "error",
+              data: null,
+              error: error instanceof Error ? error.message : "This team could not be refreshed.",
+            },
+          }));
+        }
+      })
+    ));
     return () => controller.abort();
   }, [loadKey, rememberConnection]);
 

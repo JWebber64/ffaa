@@ -32,6 +32,7 @@ function LeagueWorkspaceChrome() {
   useDismissibleDisclosureMenus(moreMenuRef);
   const { leagueId, connection, connections, switchLeague, teamState, capabilities } = useLeagueWorkspace();
   const base = `/league/${encodeURIComponent(leagueId)}`;
+  const teamSectionActive = location.pathname === `${base}/team` || location.pathname.startsWith(`${base}/team/`);
   const teamName = teamState.status === "ready"
     ? teamState.data.teamName
     : connection?.managerProviderUserId
@@ -54,7 +55,7 @@ function LeagueWorkspaceChrome() {
     : leagueDestinations.filter(({ section }) => section !== "manage");
 
   return (
-    <div className="league-workspace-shell">
+    <div className={`league-workspace-shell${teamSectionActive ? " is-team-focus" : ""}`}>
       <header className="league-workspace-context">
         <div className="league-workspace-identity">
           <span className="league-workspace-mark" aria-hidden="true">{teamName.slice(0, 2).toUpperCase()}</span>

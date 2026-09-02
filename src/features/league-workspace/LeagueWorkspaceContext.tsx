@@ -7,12 +7,13 @@ import {
 } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { buildCurrentToolPlayers } from "../../data/toolPlayerData";
+import { loadSleeperPlayerDirectory } from "../../data/sleeperPlayerDirectory";
 import {
   useSleeperLeagueConnections,
   type SleeperLeagueConnectionSummary,
 } from "../league-hq/sleeperConnections";
 import { loadMyHQ, type MyHQData } from "../my-hq/myHQ";
-import { loadPlayersForConnection } from "../my-hq/playerPool";
 import { useLeagueSeasonManagement } from "../league-season/useLeagueSeasonManagement";
 import {
   LeagueWorkspaceContext,
@@ -41,6 +42,8 @@ export function LeagueWorkspaceProvider({ children }: { children: ReactNode }) {
   const leagueId = routeLeagueId || activeLeagueId;
   const connection = connections.find((candidate) => candidate.leagueId === leagueId) ?? null;
   const management = useLeagueSeasonManagement(leagueId);
+  const scoring = connection?.auctionSettings?.scoring ?? "halfPpr";
+  const players = useMemo(() => buildCurrentToolPlayers(scoring), [scoring]);
   const [teamState, setTeamState] = useState<LeagueWorkspaceTeamState>({
     status: connection ? "loading" : "idle",
     data: null,
@@ -67,8 +70,14 @@ export function LeagueWorkspaceProvider({ children }: { children: ReactNode }) {
 
     const controller = new AbortController();
     setTeamState({ status: "loading", data: null, error: "" });
-    void loadPlayersForConnection(currentConnection)
-      .then((players) => loadMyHQ(currentConnection, players, controller.signal))
+    void loadSleeperPlayerDirectory()
+      .catch(() => [])
+      .then((sleeperRows) => loadMyHQ(
+        currentConnection,
+        sleeperRows.length ? buildCurrentToolPlayers(scoring, [], {}, sleeperRows) : players,
+        controller.signal,
+        sleeperRows,
+      ))
       .then((data) => {
         setTeamState({ status: "ready", data, error: "" });
         if (snapshotChanged(currentConnection, data)) {
@@ -96,7 +105,7 @@ export function LeagueWorkspaceProvider({ children }: { children: ReactNode }) {
       });
 
     return () => controller.abort();
-  }, [connection?.auctionSettings?.scoring, connection?.leagueId, leagueId, managerProviderUserId, rememberConnection]);
+  }, [connection?.leagueId, leagueId, managerProviderUserId, players, rememberConnection, scoring]);
 
   const value = useMemo<LeagueWorkspaceValue>(() => ({
     leagueId,

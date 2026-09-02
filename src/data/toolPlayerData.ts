@@ -175,7 +175,7 @@ export function buildToolPlayers(
 
     return [{
       id: row.player.id,
-      sleeperId: String(row.sleeper?.playerId ?? ""),
+      ...(row.sleeper?.playerId ? { sleeperId: String(row.sleeper.playerId) } : {}),
       name: row.player.name,
       position,
       team: normalizeToolTeam(row.player.nflTeam),

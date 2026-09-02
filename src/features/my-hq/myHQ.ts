@@ -1,4 +1,9 @@
-import type { ToolPlayer } from "../../data/toolPlayerData";
+import {
+  normalizeToolPosition,
+  normalizeToolTeam,
+  type ToolPlayer,
+} from "../../data/toolPlayerData";
+import type { SleeperPlayerRow } from "../../data/playerStatCategories";
 import type { SleeperLeagueConnectionSummary } from "../league-hq/sleeperConnections";
 
 const SLEEPER_API = "https://api.sleeper.app/v1";
@@ -67,6 +72,11 @@ export type MyHQPlayerRecommendation = {
   evidence: string;
 };
 
+export type MyHQLineupEntry = {
+  slot: string;
+  player: ToolPlayer | null;
+};
+
 export type MyHQData = {
   leagueId: string;
   leagueName: string;
@@ -78,6 +88,7 @@ export type MyHQData = {
   standing: number;
   totalTeams: number;
   opponentName: string;
+  opponentRecord: string;
   managerProviderUserId: string;
   leagueOwnerProviderUserId: string;
   opponentProviderUserId: string;
@@ -85,8 +96,11 @@ export type MyHQData = {
   opponentScore: number | null;
   teamBaselinePoints: number | null;
   opponentBaselinePoints: number | null;
+  starterLineup: MyHQLineupEntry[];
+  opponentStarterLineup: MyHQLineupEntry[];
   starters: ToolPlayer[];
   bench: ToolPlayer[];
+  opponentBench: ToolPlayer[];
   starterSlots: string[];
   rosteredPlayerIds: string[];
   alerts: MyHQPlayerAlert[];
@@ -132,6 +146,46 @@ async function sleeperJson<T>(path: string, signal: AbortSignal): Promise<T> {
 
 function playerLabel(playerId: string, playerById: Map<string, ToolPlayer>) {
   return playerById.get(playerId)?.name ?? "an updated roster player";
+}
+
+function sleeperFallbackPlayer(row: SleeperPlayerRow): ToolPlayer | null {
+  const sleeperId = String(row.playerId ?? "").trim();
+  const name = String(row.name ?? "").trim();
+  const position = normalizeToolPosition(row.pos);
+  if (!sleeperId || !name || !position) return null;
+  return {
+    id: `sleeper-${sleeperId}`,
+    sleeperId,
+    name,
+    position,
+    team: normalizeToolTeam(row.team),
+    rank: numberValue(row.searchRank) || null,
+    positionRank: null,
+    byeWeek: null,
+    adp: null,
+    auctionValue: null,
+    marketValue: null,
+    projectedPoints: null,
+    projectedPointsPerGame: null,
+    valueConfidence: null,
+    valueSources: [],
+    status: String(row.status ?? ""),
+    injuryStatus: String(row.injuryStatus ?? ""),
+    historicalGames: 0,
+    historicalPoints: null,
+    historicalPointsPerGame: null,
+    last3PointsPerGame: null,
+    floorPoints: null,
+    ceilingPoints: null,
+    standardDeviation: null,
+    opportunitiesPerGame: null,
+    targetsPerGame: null,
+    carriesPerGame: null,
+    targetShare: null,
+    airYardsShare: null,
+    weeklyPoints: [],
+    summary: null,
+  };
 }
 
 function transactionLabel(transaction: SleeperTransaction, playerById: Map<string, ToolPlayer>) {
@@ -310,6 +364,7 @@ export async function loadMyHQ(
   connection: SleeperLeagueConnectionSummary,
   allPlayers: ToolPlayer[],
   signal: AbortSignal,
+  sleeperRows: SleeperPlayerRow[] = [],
 ): Promise<MyHQData> {
   if (!connection.managerProviderUserId) {
     throw new Error("Reconnect this league with your Sleeper username so GameHQ can identify your roster.");
@@ -333,19 +388,30 @@ export async function loadMyHQ(
   const userRoster = rosters.find((roster) => rosterOwnerIds(roster).includes(connection.managerProviderUserId!));
   if (!userRoster) throw new Error(`${connection.managerDisplayName ?? "Your Sleeper account"} does not own a roster in this league.`);
 
-  const playerById = new Map<string, ToolPlayer>();
-  for (const player of allPlayers) {
-    playerById.set(player.id, player);
-    if (player.sleeperId) playerById.set(player.sleeperId, player);
+  const playerById = new Map(allPlayers.flatMap((player) => [
+    [player.id, player] as const,
+    ...(player.sleeperId ? [[player.sleeperId, player] as const] : []),
+  ]));
+  const sleeperById = new Map(sleeperRows.flatMap((row) => row.playerId ? [[String(row.playerId), row] as const] : []));
+  const relevantPlayerIds = new Set([
+    ...rosters.flatMap((roster) => roster.players ?? []),
+    ...transactions.flatMap((transaction) => [...Object.keys(transaction.adds ?? {}), ...Object.keys(transaction.drops ?? {})]),
+  ]);
+  for (const playerId of relevantPlayerIds) {
+    if (playerById.has(playerId)) continue;
+    const sleeperRow = sleeperById.get(playerId);
+    const fallback = sleeperRow ? sleeperFallbackPlayer(sleeperRow) : null;
+    if (fallback) playerById.set(playerId, fallback);
   }
   const starterIds = userRoster.starters ?? [];
   const starterSlots = (league.roster_positions ?? []).filter(isStarterSlot);
   const rosterPlayerIds = userRoster.players ?? [];
   const starterIdSet = new Set(starterIds.filter((id) => id && id !== "0"));
-  const starterEntries = starterIds.flatMap((id, index) => {
-    const player = playerById.get(id);
-    return player ? [{ player, slot: starterSlots[index] ?? player.position }] : [];
+  const starterLineup = starterIds.map((id, index): MyHQLineupEntry => {
+    const player = playerById.get(id) ?? null;
+    return { player, slot: starterSlots[index] ?? player?.position ?? "FLEX" };
   });
+  const starterEntries = starterLineup.flatMap((entry) => entry.player ? [{ player: entry.player, slot: entry.slot }] : []);
   const starters = starterEntries.map((entry) => entry.player);
   const bench = rosterPlayerIds.flatMap((id) => starterIdSet.has(id) ? [] : playerById.get(id) ?? []);
   const allRosteredIds = new Set(rosters.flatMap((roster) => roster.players ?? []));
@@ -355,7 +421,16 @@ export async function loadMyHQ(
     ? undefined
     : matchups.find((matchup) => matchup.matchup_id === userMatchup.matchup_id && matchup.roster_id !== userRoster.roster_id);
   const opponentRoster = rosters.find((roster) => roster.roster_id === opponentMatchup?.roster_id);
-  const opponentStarters = (opponentRoster?.starters ?? []).flatMap((id) => playerById.get(id) ?? []);
+  const opponentStarterIds = opponentRoster?.starters ?? [];
+  const opponentStarterIdSet = new Set(opponentStarterIds.filter((id) => id && id !== "0"));
+  const opponentStarterLineup = opponentStarterIds.map((id, index): MyHQLineupEntry => {
+    const player = playerById.get(id) ?? null;
+    return { player, slot: starterSlots[index] ?? player?.position ?? "FLEX" };
+  });
+  const opponentStarters = opponentStarterLineup.flatMap((entry) => entry.player ?? []);
+  const opponentBench = (opponentRoster?.players ?? []).flatMap((id) => (
+    opponentStarterIdSet.has(id) ? [] : playerById.get(id) ?? []
+  ));
   const opponentProviderUserId = opponentRoster ? rosterOwnerIds(opponentRoster)[0] ?? "" : "";
   const sortedRosters = [...rosters].sort((left, right) =>
     numberValue(right.settings?.wins) - numberValue(left.settings?.wins)
@@ -400,6 +475,9 @@ export async function loadMyHQ(
     standing: sortedRosters.findIndex((roster) => roster.roster_id === userRoster.roster_id) + 1,
     totalTeams: rosters.length,
     opponentName: teamNameForRoster(opponentRoster, users),
+    opponentRecord: opponentRoster
+      ? `${numberValue(opponentRoster.settings?.wins)}-${numberValue(opponentRoster.settings?.losses)}${numberValue(opponentRoster.settings?.ties) ? `-${numberValue(opponentRoster.settings?.ties)}` : ""}`
+      : "—",
     managerProviderUserId: connection.managerProviderUserId,
     leagueOwnerProviderUserId: league.owner_id?.trim()
       || users.find((user) => user.is_owner)?.user_id
@@ -409,8 +487,11 @@ export async function loadMyHQ(
     opponentScore: scoreValue(opponentMatchup),
     teamBaselinePoints: lineupBaseline(starters),
     opponentBaselinePoints: lineupBaseline(opponentStarters),
+    starterLineup,
+    opponentStarterLineup,
     starters,
     bench,
+    opponentBench,
     starterSlots,
     rosteredPlayerIds: [...allRosteredIds],
     alerts,

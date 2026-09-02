@@ -1,5 +1,6 @@
-import { Activity, AlertTriangle, CheckCircle2, Clock3, History, Radio, ShieldAlert, Sparkles, Swords, Trophy, Users } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle2, Clock3, History, ShieldAlert, Sparkles, Swords, Trophy, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import type { ToolPlayer } from "../data/toolPlayerData";
 import { calculateHeadToHead, calculateManagerCareer } from "../features/league-history/analytics";
 import { useLeagueHistory } from "../features/league-history/useLeagueHistory";
 import type { SleeperLeagueConnectionSummary } from "../features/league-hq/sleeperConnections";
@@ -10,6 +11,62 @@ import "./my-hq.css";
 
 function formatScore(value: number | null) {
   return value === null ? "—" : value.toFixed(2);
+}
+
+function initials(name: string) {
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "FF";
+}
+
+function formatPlayerProjection(player: ToolPlayer | null) {
+  return player?.projectedPointsPerGame === null || !player ? "—" : player.projectedPointsPerGame.toFixed(1);
+}
+
+function TeamRosterRow({ player, slot, bench = false }: { player: ToolPlayer | null; slot: string; bench?: boolean }) {
+  const detail = player
+    ? [player.team || "FA", player.byeWeek ? `Bye ${player.byeWeek}` : "", player.injuryStatus || ""].filter(Boolean).join(" · ")
+    : "No player assigned";
+  return (
+    <div className={`hq-roster-row ${bench ? "is-bench" : ""}`} role="row">
+      <div role="cell"><span className="hq-roster-mobile-label">Slot</span><b className={`hq-position pos-${slot.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>{slot.replace(/_/g, " ")}</b></div>
+      <div className="hq-roster-player" role="cell">
+        <span className="hq-roster-mobile-label">Player</span>
+        <strong>{player?.name ?? "Open slot"}</strong>
+        <small>{detail}</small>
+      </div>
+      <div className="hq-roster-status" role="cell">
+        <span className="hq-roster-mobile-label">Status</span>
+        {player?.injuryStatus || (player?.status && player.status !== "Active" ? player.status : "Active")}
+      </div>
+      <div className="hq-roster-points" role="cell">
+        <span className="hq-roster-mobile-label">Baseline</span>
+        <strong>{formatPlayerProjection(player)}</strong><small> PPG</small>
+      </div>
+    </div>
+  );
+}
+
+function TeamRoster({ data }: { data: MyHQData }) {
+  return (
+    <section className="hq-roster" aria-labelledby="hq-roster-title">
+      <header className="hq-roster-heading">
+        <div><span>Active roster</span><h2 id="hq-roster-title">Starters</h2></div>
+        <Link to={`/league/${encodeURIComponent(data.leagueId)}/team/matchup`}>View matchup</Link>
+      </header>
+      <div className="hq-roster-table" role="table" aria-label={`${data.teamName} roster`}>
+        <div className="hq-roster-columns" role="row">
+          <span role="columnheader">Slot</span><span role="columnheader">Player</span><span role="columnheader">Status</span><span role="columnheader">Baseline</span>
+        </div>
+        <div role="rowgroup">
+          {data.starterLineup.map((entry, index) => <TeamRosterRow key={`${entry.slot}-${entry.player?.id ?? index}`} player={entry.player} slot={entry.slot} />)}
+        </div>
+        <div className="hq-roster-divider"><span>Bench</span><small>{data.bench.length} players</small></div>
+        <div role="rowgroup">
+          {data.bench.map((player, index) => <TeamRosterRow key={player.id} player={player} slot={`BN${index + 1}`} bench />)}
+        </div>
+      </div>
+      <footer>{data.projectionNote}</footer>
+    </section>
+  );
 }
 
 function HistoryMemory({ connection, week }: { connection: SleeperLeagueConnectionSummary; week: MyHQData }) {
@@ -86,20 +143,23 @@ export default function MyHQ() {
   const data = state.data!;
   return (
     <div className="my-hq">
-      <header className="hq-hero">
-        <div>
-          <span className="hq-kicker">My team · {data.week ? `Week ${data.week}` : "Preseason"}</span>
-          <h1 className="ff-display">{data.teamName}</h1>
-          <p>{data.leagueName} · {data.record} · {data.standing} of {data.totalTeams} entering {data.week ? `Week ${data.week}` : data.seasonPhase}.</p>
+      <header className="hq-team-bar">
+        <div className="hq-team-identity">
+          <span className="hq-team-mark" aria-hidden="true">{initials(data.teamName)}</span>
+          <div>
+            <span className="hq-kicker">My team · {data.week ? `Week ${data.week}` : "Preseason"}</span>
+            <h1>{data.teamName}</h1>
+            <p>{data.leagueName} · {data.record} · {data.standing} of {data.totalTeams}</p>
+          </div>
         </div>
-        <div className="hq-matchup-card">
-          <span><Radio aria-hidden="true" /> {data.week ? "Current matchup" : "Next matchup"}</span>
-          <div><strong>{data.teamName}</strong><b>{formatScore(data.teamScore)}</b></div>
-          <div><strong>{data.opponentName}</strong><b>{formatScore(data.opponentScore)}</b></div>
-          {data.teamBaselinePoints !== null || data.opponentBaselinePoints !== null ? <div className="hq-matchup-baseline"><span>Season baseline</span><strong>{data.teamBaselinePoints?.toFixed(1) ?? "—"}–{data.opponentBaselinePoints?.toFixed(1) ?? "—"}</strong></div> : null}
-          <small>{data.projectionNote}</small>
-        </div>
+        <Link className="hq-team-matchup" to={`/league/${encodeURIComponent(data.leagueId)}/team/matchup`}>
+          <span>{data.week ? `Week ${data.week}` : "Next"} vs {data.opponentName}</span>
+          <strong>{formatScore(data.teamScore)} <i>–</i> {formatScore(data.opponentScore)}</strong>
+          <small>Season baseline {data.teamBaselinePoints?.toFixed(1) ?? "—"}–{data.opponentBaselinePoints?.toFixed(1) ?? "—"}</small>
+        </Link>
       </header>
+
+      <TeamRoster data={data} />
 
       <section className="hq-section hq-decisions">
         <div className="hq-section-heading"><div><span>Decision queue</span><h2>What needs your attention</h2></div><Clock3 aria-hidden="true" /></div>
@@ -127,7 +187,7 @@ export default function MyHQ() {
         <section className="hq-section">
           <div className="hq-section-heading"><div><span>League pulse</span><h2>What is moving</h2></div><Activity aria-hidden="true" /></div>
           <div className="hq-pulse-feature"><Swords aria-hidden="true" /><div><span>Closest live margin</span><strong>{data.closestMatchup}</strong></div></div>
-          {data.recentActivity.length ? <ul className="hq-activity-list">{data.recentActivity.map((activity) => <li key={activity}>{activity}</li>)}</ul> : <div className="hq-empty compact"><p>No completed transactions are available for this Sleeper week.</p></div>}
+          {data.recentActivity.length ? <ul className="hq-activity-list">{data.recentActivity.map((activity, index) => <li key={`${activity}-${index}`}>{activity}</li>)}</ul> : <div className="hq-empty compact"><p>No completed transactions are available for this Sleeper week.</p></div>}
         </section>
       </div>
 

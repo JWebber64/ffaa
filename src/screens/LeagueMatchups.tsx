@@ -1,8 +1,7 @@
 import { useMemo } from "react";
-import { CalendarDays, ChevronLeft, ChevronRight, Cloud, CloudOff, Info, Radio } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Info, Radio } from "lucide-react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { buildCurrentToolPlayers } from "../data/toolPlayerData";
-import { LeagueSeasonHero } from "../features/league-season/LeagueSeasonHero";
+import { buildCurrentToolPlayers, type ToolPlayer } from "../data/toolPlayerData";
 import { getLeagueProjectionFreshness, projectionFreshnessSummary } from "../features/league-season/leagueProjectionFreshness";
 import {
   DEFAULT_REGULAR_SEASON_WEEKS,
@@ -16,6 +15,8 @@ import { useLeagueSeasonDraft } from "../features/league-season/useLeagueSeasonD
 import { useLeagueSeasonManagement } from "../features/league-season/useLeagueSeasonManagement";
 import { useLeagueWeekLineups } from "../features/league-season/useLeagueWeekLineups";
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
+import type { MyHQData, MyHQLineupEntry } from "../features/my-hq/myHQ";
+import { useOptionalLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
 import { UniversalSelect } from "../ui/UniversalSelect";
 import "./league-season.css";
 
@@ -39,7 +40,84 @@ function topProjection(lineup: ProjectedLineup) {
     .sort((left, right) => (right.baselinePoints ?? 0) - (left.baselinePoints ?? 0))[0] ?? null;
 }
 
-export default function LeagueMatchups({ personalOnly = false }: { personalOnly?: boolean }) {
+function formatLiveScore(value: number | null) {
+  return value === null ? "—" : value.toFixed(2);
+}
+
+function formatPlayerBaseline(player: ToolPlayer | null) {
+  return player?.projectedPointsPerGame === null || !player ? "—" : player.projectedPointsPerGame.toFixed(1);
+}
+
+function MatchupPlayerSide({ player, side }: { player: ToolPlayer | null; side: "left" | "right" }) {
+  const detail = player
+    ? [player.position, player.team || "FA", player.byeWeek ? `Bye ${player.byeWeek}` : "", player.injuryStatus || ""].filter(Boolean).join(" · ")
+    : "No player assigned";
+  return (
+    <div className={`league-h2h-player is-${side}`}>
+      <div><strong>{player?.name ?? "Open slot"}</strong><small>{detail}</small></div>
+      <b>{formatPlayerBaseline(player)}<small>PPG</small></b>
+    </div>
+  );
+}
+
+function MatchupLineupRows({ left, right, bench = false }: { left: MyHQLineupEntry[]; right: MyHQLineupEntry[]; bench?: boolean }) {
+  const rowCount = Math.max(left.length, right.length);
+  if (!rowCount) return null;
+  return (
+    <div className="league-h2h-rows" role="rowgroup" aria-label={bench ? "Bench" : "Starters"}>
+      {Array.from({ length: rowCount }, (_, index) => {
+        const leftEntry = left[index];
+        const rightEntry = right[index];
+        const slot = leftEntry?.slot ?? rightEntry?.slot ?? (bench ? `BN${index + 1}` : "FLEX");
+        return (
+          <div className={`league-h2h-row ${bench ? "is-bench" : ""}`} role="row" key={`${slot}-${index}`}>
+            <MatchupPlayerSide player={leftEntry?.player ?? null} side="left" />
+            <b className={`league-position pos-${slot.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>{bench ? "BN" : slot.replace(/_/g, " ")}</b>
+            <MatchupPlayerSide player={rightEntry?.player ?? null} side="right" />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ConnectedTeamMatchup({ data }: { data: MyHQData }) {
+  const leftBench = data.bench.map((player, index): MyHQLineupEntry => ({ slot: `BN${index + 1}`, player }));
+  const rightBench = data.opponentBench.map((player, index): MyHQLineupEntry => ({ slot: `BN${index + 1}`, player }));
+  const hasOpponent = data.opponentProviderUserId || data.opponentStarterLineup.length || data.opponentName !== "Opponent not set";
+  return (
+    <div className="league-season-page league-personal-matchup">
+      <header className="league-compact-page-heading">
+        <div><span>My matchup · {data.leagueName}</span><h1>{data.week ? `Week ${data.week}` : "Next matchup"}</h1></div>
+        <small>Current Sleeper rosters · season baselines</small>
+      </header>
+
+      <section className="league-head-to-head" aria-label={`${data.teamName} versus ${data.opponentName}`}>
+        <header className="league-h2h-teams">
+          <div className="is-left"><span>Your team</span><strong>{data.teamName}</strong><small>{data.record} · {data.teamBaselinePoints?.toFixed(1) ?? "—"} baseline</small><b>{formatLiveScore(data.teamScore)}</b></div>
+          <span className="league-h2h-versus" aria-hidden="true">VS</span>
+          <div className="is-right"><span>Opponent</span><strong>{data.opponentName}</strong><small>{data.opponentRecord} · {data.opponentBaselinePoints?.toFixed(1) ?? "—"} baseline</small><b>{formatLiveScore(data.opponentScore)}</b></div>
+        </header>
+
+        {hasOpponent ? (
+          <>
+            <div className="league-h2h-section-label"><span>Starters</span><small>Season baseline PPG</small></div>
+            <MatchupLineupRows left={data.starterLineup} right={data.opponentStarterLineup} />
+            {(leftBench.length || rightBench.length) ? <div className="league-h2h-section-label"><span>Bench</span><small>Roster depth</small></div> : null}
+            <MatchupLineupRows left={leftBench} right={rightBench} bench />
+          </>
+        ) : <div className="league-h2h-empty">Sleeper has not assigned an opponent for this week yet.</div>}
+      </section>
+
+      <div className="league-projection-note">
+        <Info aria-hidden="true" />
+        <p><strong>Scores come from the current Sleeper matchup.</strong> {data.projectionNote}</p>
+      </div>
+    </div>
+  );
+}
+
+function LeagueScheduleMatchups({ personalOnly = false }: { personalOnly?: boolean }) {
   const { leagueId: routeLeagueId = "" } = useParams();
   const { connections, activeLeagueId } = useSleeperLeagueConnections();
   const leagueId = routeLeagueId || activeLeagueId;
@@ -113,17 +191,13 @@ export default function LeagueMatchups({ personalOnly = false }: { personalOnly?
 
   return (
     <div className="league-season-page">
-      <LeagueSeasonHero
-        variant="matchups"
-        eyebrow={`${personalOnly ? "My matchup" : "Matchups"} · ${connection?.leagueName ?? "Active league"}`}
-        title={`Week ${week} ${personalOnly ? "matchup" : "projection board"}`}
-        description={personalOnly ? "Keep the active manager's opponent, lineup state, and weekly baseline in one focused view." : "Compare every team using saved manager lineups when available and legal projected starters everywhere else."}
-        imagePath="images/league-season/matchup-night-v1.png"
-        imageAlt="Rain falls across an empty night stadium with opposing sidelines facing the field."
-        sourceIcon={isPublished || season.source === "shared" ? <Cloud aria-hidden="true" /> : <CloudOff aria-hidden="true" />}
-        sourceLabel={sourceLabel}
-        sourceDetail={isPublished ? `Season revision ${management.record?.revision}` : season.revision ? `Draft revision ${season.revision}` : "Saved on this device"}
-      />
+      <header className="league-compact-page-heading">
+        <div>
+          <span>{personalOnly ? "My matchup" : "Matchups"} · {connection?.leagueName ?? "Active league"}</span>
+          <h1>Week {week} {personalOnly ? "matchup" : "matchups"}</h1>
+        </div>
+        <small>{sourceLabel} · {isPublished ? `season revision ${management.record?.revision}` : season.revision ? `draft revision ${season.revision}` : "saved on this device"}</small>
+      </header>
 
       <section className="league-week-toolbar" aria-label="Matchup week">
         <button type="button" onClick={() => changeWeek(week - 1)} disabled={week === 1} aria-label="Previous week"><ChevronLeft aria-hidden="true" /></button>
@@ -177,4 +251,20 @@ export default function LeagueMatchups({ personalOnly = false }: { personalOnly?
       </section>
     </div>
   );
+}
+
+export default function LeagueMatchups({ personalOnly = false }: { personalOnly?: boolean }) {
+  const workspace = useOptionalLeagueWorkspace();
+  if (personalOnly && workspace) {
+    if (workspace.teamState.status === "ready") return <ConnectedTeamMatchup data={workspace.teamState.data} />;
+    return (
+      <div className="league-season-page">
+        <div className={`league-compact-state ${workspace.teamState.status === "error" ? "is-error" : ""}`} aria-busy={workspace.teamState.status !== "error"}>
+          <CalendarDays aria-hidden="true" />
+          <div><span>My matchup</span><h1>{workspace.teamState.status === "error" ? "Matchup unavailable" : "Loading both lineups…"}</h1><p>{workspace.teamState.status === "error" ? workspace.teamState.error : "Reading the active manager, opponent, and current Sleeper rosters."}</p></div>
+        </div>
+      </div>
+    );
+  }
+  return <LeagueScheduleMatchups personalOnly={personalOnly} />;
 }
