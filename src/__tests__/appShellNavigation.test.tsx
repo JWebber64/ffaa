@@ -5,13 +5,28 @@ import { cleanup, fireEvent, render, screen, within } from "@testing-library/rea
 import { Sparkles } from "lucide-react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it } from "vitest";
-import { DesktopProductNavigation, ProductMenu } from "../layouts/AppShellV2";
+import { AppBrand, DesktopProductNavigation, ProductMenu } from "../layouts/AppShellV2";
 import { getPrimaryDraftAction } from "../layouts/draftAction";
 import { closeParentDisclosure } from "../ui/disclosureMenu";
 
 afterEach(cleanup);
 
 describe("app shell navigation menus", () => {
+  it("renders the approved football artwork in the shared product header", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <AppBrand homeTo="/" />
+      </MemoryRouter>,
+    );
+
+    const brandLink = screen.getByRole("link", { name: "Fantasy Football presented by GameHQ home" });
+    const brandImage = brandLink.querySelector("img");
+
+    expect(brandImage).not.toBeNull();
+    expect(brandImage).toHaveAttribute("src", expect.stringContaining("images/football-header-mark.jpg"));
+    expect(container.querySelector(".app-brand-monogram")).not.toBeInTheDocument();
+  });
+
   it("offers the offline workflow instead of a self-link from host setup", () => {
     expect(getPrimaryDraftAction("/host/setup")).toEqual({ to: "/offline-draft", label: "Offline Draft" });
     expect(getPrimaryDraftAction("/host/setup/")).toEqual({ to: "/offline-draft", label: "Offline Draft" });

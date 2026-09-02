@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build:vercel",
+  "buildCommand": "npm run release:verify",
   "outputDirectory": "dist",
   "functions": {
     "api/league-history/import.js": {

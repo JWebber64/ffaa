@@ -121,7 +121,7 @@ describe("shared green and gray visual system", () => {
   it("keeps the League HQ field and story cards on shared element roles", () => {
     const league = readProjectFile("src/screens/league-hq.css");
 
-    expect(league).toMatch(/\.league-sync-switch select,[\s\S]*?background: var\(--color-surface-field\)/);
+    expect(league).toMatch(/\.league-sync-select,[\s\S]*?background: var\(--color-surface-field\)/);
     expect(league).toMatch(/\.league-pulse \{[^}]*background: var\(--color-surface-card-primary\)/);
     expect(league).toMatch(/\.league-pulse-track article \{[^}]*background: var\(--color-surface-card-secondary\)/);
   });

@@ -1,4 +1,4 @@
-import { Activity, AlertTriangle, ArrowRight, CheckCircle2, Clock3, History, Radio, ShieldAlert, Sparkles, Swords, Trophy, Users } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle2, Clock3, History, Radio, ShieldAlert, Sparkles, Swords, Trophy, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { calculateHeadToHead, calculateManagerCareer } from "../features/league-history/analytics";
 import { useLeagueHistory } from "../features/league-history/useLeagueHistory";
@@ -22,7 +22,7 @@ function HistoryMemory({ connection, week }: { connection: SleeperLeagueConnecti
       <section className="hq-memory-card">
         <History aria-hidden="true" />
         <div><span>League memory</span><h2>History is not available yet</h2><p>Import completed Sleeper seasons in League HQ to unlock career and rivalry context.</p></div>
-        <Link to={`/league/${connection.leagueId}/manage`}>Open league management <ArrowRight aria-hidden="true" /></Link>
+        <Link to={`/league/${connection.leagueId}/manage`}>Open league management</Link>
       </section>
     );
   }
@@ -46,7 +46,7 @@ function HistoryMemory({ connection, week }: { connection: SleeperLeagueConnecti
           <div><span>Record chase</span><strong>{nextWinMark ? `${nextWinMark - career.wins} to ${nextWinMark} wins` : "Unavailable"}</strong><small>Based only on completed imported matchups</small></div>
         </div>
       ) : <p>Your Sleeper identity is not mapped to an imported historical manager yet.</p>}
-      <Link to={`/league/${connection.leagueId}/history/managers${manager ? `/${manager.id}` : ""}`}>Explore league history <ArrowRight aria-hidden="true" /></Link>
+      <Link to={`/league/${connection.leagueId}/history/managers${manager ? `/${manager.id}` : ""}`}>Explore league history</Link>
     </section>
   );
 }
@@ -60,7 +60,7 @@ export default function MyHQ() {
         <span className="hq-kicker">My team</span>
         <h1 className="ff-display">Connect a league to open your team</h1>
         <p>GameHQ needs a Sleeper league and your manager identity before it can show a real roster, matchup, or decision queue.</p>
-        <Link className="hq-primary-link" to="/leagues">Connect leagues <ArrowRight aria-hidden="true" /></Link>
+        <Link className="hq-primary-link" to="/leagues">Connect leagues</Link>
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function MyHQ() {
         <p>{state.error}</p>
         {!connection.managerProviderUserId
           ? <ManagerIdentityForm connection={connection} />
-          : <Link className="hq-primary-link" to="/leagues">Review league connection <ArrowRight aria-hidden="true" /></Link>}
+          : <Link className="hq-primary-link" to="/leagues">Review league connection</Link>}
       </div>
     );
   }
@@ -109,8 +109,8 @@ export default function MyHQ() {
               {decision.urgency === "clear" ? <CheckCircle2 aria-hidden="true" /> : <AlertTriangle aria-hidden="true" />}
               <div><span>{decision.urgency === "now" ? "Act now" : decision.urgency === "watch" ? "Watch" : "Lineup check"}</span><h3>{decision.title}</h3><p>{decision.detail}</p><small className="hq-decision-evidence">{decision.evidence}</small></div>
               {decision.actionTo.startsWith("http")
-                ? <a href={decision.actionTo} target="_blank" rel="noreferrer">{decision.actionLabel}<ArrowRight aria-hidden="true" /></a>
-                : <Link to={decision.actionTo}>{decision.actionLabel}<ArrowRight aria-hidden="true" /></Link>}
+                ? <a href={decision.actionTo} target="_blank" rel="noreferrer">{decision.actionLabel}</a>
+                : <Link to={decision.actionTo}>{decision.actionLabel}</Link>}
             </article>
           ))}
         </div>
@@ -135,8 +135,8 @@ export default function MyHQ() {
 
       <section className="hq-tool-row" aria-label="Recommended next tools">
         <div><Sparkles aria-hidden="true" /><span>Keep working</span><h2>Turn the signal into an answer</h2></div>
-        <Link to="/tools/player-compare">Compare players <ArrowRight aria-hidden="true" /></Link>
-        <Link to="/stats">Research matchups <ArrowRight aria-hidden="true" /></Link>
+        <Link to="/tools/player-compare">Compare players</Link>
+        <Link to="/stats">Research matchups</Link>
         <Link to={`/league/${connection.leagueId}/history`}>Open history <Trophy aria-hidden="true" /></Link>
       </section>
     </div>

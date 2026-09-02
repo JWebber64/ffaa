@@ -14,8 +14,8 @@ describe("app-wide form control surface guard", () => {
   it("uses one neutral gray surface for fields and their arrow controls", () => {
     expect(tokensCss).toMatch(/--color-surface-field:\s*color-mix\([^;]*var\(--gray-/);
     expect(tokensCss).toMatch(/--ffaa-control-surface:\s*var\(--color-surface-field\)/);
-    expect(refinementCss).toMatch(/\.ffaa-number-field > input\[type="number"\],[^}]*\.draft-bid-stepper,[^}]*\{[^}]*background:\s*var\(--color-surface-field\)/s);
-    expect(refinementCss).toMatch(/\.ffaa-custom-select-icon,[^}]*\.ffaa-number-stepper,[^}]*\{[^}]*background-image:\s*none/s);
+    expect(refinementCss).toMatch(/\.ffaa-number-field > input\[type="number"\],[^}]*\.ffaa-number-stepper[^}]*\{[^}]*background:\s*var\(--color-surface-field\)/s);
+    expect(refinementCss).toMatch(/\.ffaa-custom-select-icon,[^}]*\.ffaa-number-stepper\s*\{[^}]*background-image:\s*none/s);
   });
 
   it("applies the shared surface to primitive and raw page controls", () => {
@@ -40,7 +40,7 @@ describe("app-wide form control surface guard", () => {
       ".ffaa-custom-select-trigger",
       ".cui-input",
       ".tool-field input",
-      ".league-connect-form select",
+      ".league-json",
       ".studio-manager-list textarea",
     ]));
   });

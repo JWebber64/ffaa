@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
@@ -6,8 +7,23 @@ import { fileURLToPath } from 'url';
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 // https://vite.dev/config/
-export default defineConfig(() => ({
+const testFirebaseEnv = {
+  VITE_FIREBASE_API_KEY: 'test-api-key',
+  VITE_FIREBASE_AUTH_DOMAIN: 'localhost',
+  VITE_FIREBASE_PROJECT_ID: 'ffaa-test',
+  VITE_FIREBASE_STORAGE_BUCKET: 'ffaa-test.appspot.com',
+  VITE_FIREBASE_MESSAGING_SENDER_ID: '000000000000',
+  VITE_FIREBASE_APP_ID: '1:000000000000:web:test',
+} as const;
+
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
+  define: mode === 'test'
+    ? Object.fromEntries(Object.entries(testFirebaseEnv).map(([key, value]) => [
+      `import.meta.env.${key}`,
+      JSON.stringify(value),
+    ]))
+    : {},
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
@@ -40,6 +56,9 @@ export default defineConfig(() => ({
         },
       },
     },
+  },
+  test: {
+    env: testFirebaseEnv,
   },
   server: {
     host: '127.0.0.1',

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import {
-  ArrowRight,
   Award,
   BookOpen,
   CalendarClock,
@@ -60,6 +59,7 @@ import {
 import { leagueHistoryPath, leagueRivalryPath } from "../features/league-history/ui/leagueRoutes";
 import { HistoryHealthPanel } from "../features/league-history/ui/HistoryHealthPanel";
 import { FANTASY_SEASON } from "../config/fantasySeason";
+import { appUrl } from "../lib/appBasePath";
 import "./league-hq.css";
 
 const VIEWS = [
@@ -653,35 +653,52 @@ export default function LeagueHQ() {
                 </div>
               </section>
 
-              <section className="league-panel">
-                <SectionHeading eyebrow="All-time" title="League leaders" />
-                <div className="league-leader-list">
-                  {leaders.map((leader) => (
-                    <div key={leader.id}>
-                      <span>{leader.label}</span>
-                      <strong>{managerLabel(leader.managerId)}</strong>
-                      <b>{leader.value}</b>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <section className="league-panel">
-                <SectionHeading eyebrow="Last-place archive" title="Wall of shame" />
-                {lastPlaces.length ? (
-                  <div className="league-shame-list">
-                    {lastPlaces.map((season) => (
-                      <div key={season.year}><strong>{season.year}</strong><span>{season.lastPlaceTeam || managerLabel(season.lastPlaceManagerId)}</span><small>{season.lastPlaceRecord}</small></div>
+              <div className="league-overview-side">
+                <section className="league-panel">
+                  <SectionHeading eyebrow="All-time" title="League leaders" />
+                  <div className="league-leader-list">
+                    {leaders.map((leader) => (
+                      <div key={leader.id}>
+                        <span>{leader.label}</span>
+                        <strong>{managerLabel(leader.managerId)}</strong>
+                        <b>{leader.value}</b>
+                      </div>
                     ))}
                   </div>
-                ) : <EmptyState title="The wall is clean" detail="Last-place finishes appear here after seasons are imported." />}
-              </section>
+                </section>
 
-              <section className="league-panel league-draft-card">
-                <SectionHeading eyebrow="Draft Central" title={countdown.label} detail={countdown.detail} />
-                <CalendarClock aria-hidden="true" />
-                <div><Button size="sm" onClick={() => chooseView("draft")}>Open Draft Central</Button></div>
-              </section>
+                <section className="league-panel">
+                  <SectionHeading eyebrow="Last-place archive" title="Wall of shame" />
+                  {lastPlaces.length ? (
+                    <div className="league-shame-list">
+                      {lastPlaces.map((season) => (
+                        <div key={season.year}><strong>{season.year}</strong><span>{season.lastPlaceTeam || managerLabel(season.lastPlaceManagerId)}</span><small>{season.lastPlaceRecord}</small></div>
+                      ))}
+                    </div>
+                  ) : <EmptyState title="The wall is clean" detail="Last-place finishes appear here after seasons are imported." />}
+                </section>
+
+                <section className="league-panel league-draft-card">
+                  <SectionHeading eyebrow="Draft Central" title={countdown.label} detail={countdown.detail} />
+                  <CalendarClock aria-hidden="true" />
+                  <div><Button size="sm" onClick={() => chooseView("draft")}>Open Draft Central</Button></div>
+                </section>
+
+                <figure className="league-overview-editorial">
+                  <img
+                    src={appUrl("images/league-overview-archive.jpg")}
+                    alt="An open championship ledger beside brass football trophies and folded green pennants."
+                    width="1536"
+                    height="1024"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <figcaption>
+                    <span>League archive</span>
+                    <strong>Every season belongs in the record.</strong>
+                  </figcaption>
+                </figure>
+              </div>
             </div>
           </>
         ) : null}
@@ -811,7 +828,7 @@ export default function LeagueHQ() {
               <SectionHeading eyebrow="League lore" title="Rivalries & head-to-head history" detail="Series summaries appear below. Open the all-time matrix or any series to see every recorded score." />
               {data.sleeper ? (
                 <Link className="league-link-button is-secondary" to={leagueHistoryPath(data.sleeper.leagueId, "h2h")}>
-                  View all H2H results <ArrowRight size={15} aria-hidden="true" />
+                  View all H2H results
                 </Link>
               ) : null}
             </div>
@@ -835,7 +852,7 @@ export default function LeagueHQ() {
                           to={leagueRivalryPath(data.sleeper.leagueId, rivalry.managerAId, rivalry.managerBId)}
                           aria-label={`View every result in ${rivalry.name}`}
                         >
-                          View every result <ArrowRight size={15} aria-hidden="true" />
+                          View every result
                         </Link>
                       ) : null}
                     </article>

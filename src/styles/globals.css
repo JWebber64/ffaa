@@ -600,7 +600,7 @@ html, body, #root {
   width: 24px;
   height: 24px;
   border: 1px solid color-mix(in oklch, var(--green-300) 22%, transparent);
-  color: rgba(204,251,241,0.9);
+  color: var(--green-100);
   line-height: 0;
 }
 
@@ -4543,7 +4543,7 @@ p {
   max-width: 100%;
   overflow: hidden;
   font-size: 0.78rem;
-  line-height: 1.15;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -6703,6 +6703,7 @@ p {
 
 .offline-turn-strip > div strong {
   overflow: hidden;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -7219,6 +7220,7 @@ p {
 .offline-roster-return-target small {
   min-width: 0;
   overflow: hidden;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -7226,12 +7228,12 @@ p {
 .offline-roster-return-target strong {
   color: rgba(236,253,245,0.88);
   font-size: 0.7rem;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 .offline-roster-return-target small {
   font-size: 0.58rem;
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 .offline-roster-return-target.is-ready {

@@ -109,6 +109,25 @@ export function DesktopProductNavigation({ children }: { children: ReactNode }) 
   );
 }
 
+export function AppBrand({ homeTo }: { homeTo: string }) {
+  return (
+    <Link to={homeTo} className="app-brand" aria-label="Fantasy Football presented by GameHQ home">
+      <span className="app-brand-image" aria-hidden="true">
+        <img
+          src={appUrl("images/football-header-mark.jpg")}
+          alt=""
+          width="256"
+          height="256"
+        />
+      </span>
+      <span className="app-brand-text">
+        <span className="app-brand-title ff-display">Fantasy Football</span>
+        <span className="app-brand-presenter">Presented by GameHQ</span>
+      </span>
+    </Link>
+  );
+}
+
 export default function AppShellV2() {
   const debugDrawer = useDebugDrawerState();
   const location = useLocation();
@@ -157,6 +176,7 @@ export default function AppShellV2() {
     "--football-hero-image": `url("${appUrl("images/football-night-hero.png")}")`,
     "--football-banner-image": `url("${appUrl("images/football-playbook-banner.png")}")`,
     "--draft-editorial-image": `url("${appUrl("images/draft-room-editorial.png")}")`,
+    "--results-editorial-image": `url("${appUrl("images/results-championship.jpg")}")`,
     "--research-editorial-image": `url("${appUrl("images/research-film-room.png")}")`,
     "--league-editorial-image": `url("${appUrl("images/league-history-trophy-room.png")}")`,
   } as CSSProperties;
@@ -165,13 +185,7 @@ export default function AppShellV2() {
     <div className="product-shell ffaa-bg min-h-screen" style={visualAssets}>
       <header className={`app-header ${isDraft ? "app-header-draft" : ""}`}>
         <div className="app-header-inner">
-          <Link to={connections.length ? "/teams" : "/"} className="app-brand" aria-label="Fantasy Football presented by GameHQ home">
-            <span className="app-brand-monogram" aria-hidden="true">FF</span>
-            <span className="app-brand-text">
-              <span className="app-brand-title ff-display">Fantasy Football</span>
-              <span className="app-brand-presenter">Presented by GameHQ</span>
-            </span>
-          </Link>
+          <AppBrand homeTo={connections.length ? "/teams" : "/"} />
 
           <DesktopProductNavigation>
             <NavLink to="/teams" className={() => `product-nav-link ${isTeams || isWorkspace ? "is-active" : ""}`}>My Teams</NavLink>

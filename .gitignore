@@ -24,6 +24,7 @@ cloudflare/.dev.vars.*
 
 # Generated audit and browser-QA artifacts
 reports/
+test-results/
 codex-*.html
 codex-*.png
 league-desktop.png
