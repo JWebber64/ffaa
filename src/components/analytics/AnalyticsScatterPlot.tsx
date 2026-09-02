@@ -1,5 +1,7 @@
 import { useId, useMemo, useState } from "react";
-import type { KeyboardEvent } from "react";
+import type { CSSProperties, KeyboardEvent } from "react";
+
+import { positionColorKey, positionColorVar } from "@/ui/positionColors";
 
 export type AnalyticsScatterPoint = {
   id: string;
@@ -26,12 +28,13 @@ export type AnalyticsScatterPlotProps = {
   onPointSelect?: (point: AnalyticsScatterPoint) => void;
 };
 
-const POINT_COLORS: Record<string, string> = {
-  QB: "var(--green-400)",
-  RB: "#34d399",
-  WR: "#c084fc",
-  TE: "#fbbf24",
-};
+const CHART_POSITIONS = ["QB", "RB", "WR", "TE"] as const;
+
+function getPositionStyle(position: string) {
+  return {
+    "--position-color": positionColorVar(position),
+  } as CSSProperties;
+}
 
 const CHART = {
   width: 760,
@@ -197,8 +200,9 @@ export function AnalyticsScatterPlot({
                 <circle
                   cx={layout.x(point.x)}
                   cy={layout.y(point.y)}
+                  data-position-color={positionColorKey(point.position) ?? "bench"}
                   r={layout.radius(point.size)}
-                  fill={POINT_COLORS[point.position] ?? "var(--green-200)"}
+                  fill={positionColorVar(point.position)}
                 />
                 {selected || hovered ? (
                   <text x={layout.x(point.x)} y={layout.y(point.y) - layout.radius(point.size) - 9} textAnchor="middle" className="analytics-point-label">
@@ -211,10 +215,12 @@ export function AnalyticsScatterPlot({
         </svg>
       </div>
       <div className="analytics-chart-footer">
-        <span className="analytics-chart-legend"><i className="is-qb" />QB</span>
-        <span className="analytics-chart-legend"><i className="is-rb" />RB</span>
-        <span className="analytics-chart-legend"><i className="is-wr" />WR</span>
-        <span className="analytics-chart-legend"><i className="is-te" />TE</span>
+        {CHART_POSITIONS.map((position) => (
+          <span className="analytics-chart-legend" key={position} style={getPositionStyle(position)}>
+            <i aria-hidden="true" data-position-color={positionColorKey(position)} />
+            {position}
+          </span>
+        ))}
         <div className="analytics-chart-insight" aria-live="polite">
           <strong>{featured.label}</strong>
           <span>{featured.position} · {featured.team} · {formatX(featured.x)} / {formatY(featured.y)}</span>

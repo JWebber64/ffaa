@@ -1287,7 +1287,7 @@
   border: 1px solid color-mix(in oklch, var(--position-color, var(--color-border-default)) 52%, var(--color-border-default));
   border-radius: var(--r-sm);
   background: var(--position-color, var(--pos-bench));
-  color: var(--color-text-primary);
+  color: var(--position-foreground, var(--pos-foreground-light));
   font-size: .65rem;
   font-weight: 850;
 }
@@ -2009,11 +2009,18 @@
     color: #333 !important;
   }
 
-  .auction-position-chip,
   .auction-status-badge {
     border-color: #777 !important;
     background: #fff !important;
     color: #111 !important;
+  }
+
+  .auction-position-chip {
+    border-color: var(--position-color, var(--pos-bench)) !important;
+    background: var(--position-color, var(--pos-bench)) !important;
+    color: var(--position-foreground, var(--pos-foreground-light)) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   .auction-notes-column {

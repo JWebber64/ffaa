@@ -21,6 +21,7 @@ export function PositionBadge({ children, className, position, style, ...props }
         ...style,
         "--position-color": color,
         backgroundColor: color,
+        color: "var(--position-foreground, var(--pos-foreground-light))",
       } as CSSProperties}
     >
       {children ?? position}

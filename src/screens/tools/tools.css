@@ -588,13 +588,6 @@
 .team-player-search { display: grid; gap: 14px; padding: 18px; border: 1px solid var(--color-border-subtle); border-radius: 14px; background: var(--color-surface-card-secondary); }
 .team-slot-grid { display: grid; grid-template-columns: repeat(9, minmax(88px, 1fr)); gap: 8px; }
 .team-slot-control { --slot-color: var(--pos-flex); display: grid; gap: 7px; min-width: 0; padding: 10px; border: 1px solid color-mix(in srgb, var(--slot-color) 22%, rgba(255,255,255,0.07)); border-radius: 10px; background: color-mix(in srgb, var(--slot-color) 6%, rgba(0,0,0,0.15)); }
-.team-slot-control[data-position="qb"] { --slot-color: var(--pos-qb); }
-.team-slot-control[data-position="rb"] { --slot-color: var(--pos-rb); }
-.team-slot-control[data-position="wr"] { --slot-color: var(--pos-wr); }
-.team-slot-control[data-position="te"] { --slot-color: var(--pos-te); }
-.team-slot-control[data-position="k"] { --slot-color: var(--pos-k); }
-.team-slot-control[data-position="dst"] { --slot-color: var(--pos-dst); }
-.team-slot-control[data-position="bench"] { --slot-color: var(--pos-bench); }
 .team-slot-control > span { overflow: hidden; color: color-mix(in srgb, var(--slot-color) 50%, white); font-size: 0.67rem; font-weight: 850; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .team-slot-stepper { width: 100%; }
 .team-slot-stepper input { width: 100%; height: 40px; padding-left: 0; border: 0; border-radius: 0; color: var(--text-0); background: transparent; font: inherit; font-size: 0.78rem; font-weight: 850; }
@@ -614,7 +607,7 @@
 .team-rater-roster li button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 8px; color: var(--text-3); background: transparent; cursor: pointer; }
 .team-rater-roster li button:hover { color: var(--tools-red); background: rgba(251,113,133,0.08); }
 
-.tool-position-tag { display: inline-grid; place-items: center; min-width: 35px; height: 25px; padding: 0 6px; border: 1px solid color-mix(in oklch, var(--position-color) 62%, white 8%); border-radius: 7px; color: white; background: var(--position-color); font-size: 0.64rem; font-weight: 850; }
+.tool-position-tag { display: inline-grid; place-items: center; min-width: 35px; height: 25px; padding: 0 6px; border: 1px solid color-mix(in oklch, var(--position-color) 62%, white 8%); border-radius: 7px; color: var(--position-foreground, var(--pos-foreground-light)); background: var(--position-color); font-size: 0.64rem; font-weight: 850; }
 
 .tool-empty-state { display: grid; place-items: center; min-height: 200px; padding: 24px; color: var(--text-3); text-align: center; font-size: 0.8rem; line-height: 1.55; }
 .team-grade-hero { display: flex; align-items: center; gap: 18px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
@@ -665,13 +658,6 @@
 .auction-builder-settings { display: grid; gap: 14px; padding: 18px; border: 1px solid var(--color-border-subtle); border-radius: 14px; background: var(--color-surface-card-secondary); }
 .auction-slot-grid { display: grid; grid-template-columns: repeat(8, minmax(78px, 1fr)); gap: 8px; }
 .auction-slot-control { --slot-color: var(--pos-flex); display: grid; gap: 8px; padding: 10px; border: 1px solid color-mix(in srgb, var(--slot-color) 22%, rgba(255,255,255,.07)); border-radius: 10px; background: color-mix(in srgb, var(--slot-color) 6%, rgba(0,0,0,.15)); }
-.auction-slot-control[data-position="qb"] { --slot-color: var(--pos-qb); }
-.auction-slot-control[data-position="rb"] { --slot-color: var(--pos-rb); }
-.auction-slot-control[data-position="wr"] { --slot-color: var(--pos-wr); }
-.auction-slot-control[data-position="te"] { --slot-color: var(--pos-te); }
-.auction-slot-control[data-position="k"] { --slot-color: var(--pos-k); }
-.auction-slot-control[data-position="dst"] { --slot-color: var(--pos-dst); }
-.auction-slot-control[data-position="bench"] { --slot-color: var(--pos-bench); }
 .auction-slot-control > span { color: color-mix(in srgb, var(--slot-color) 50%, white); font-size: .66rem; font-weight: 850; }
 .auction-slot-control > div { display: grid; grid-template-columns: 25px 1fr 25px; align-items: center; gap: 4px; }
 .auction-slot-control button { display: grid; place-items: center; width: 25px; height: 25px; border: 1px solid rgba(255,255,255,.1); border-radius: 6px; color: var(--text-2); background: rgba(0,0,0,.18); cursor: pointer; }

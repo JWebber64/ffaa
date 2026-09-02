@@ -154,6 +154,8 @@
   --pos-k: #9333ea;
   --pos-dst: #4b5563;
   --pos-bench: var(--gray-500);
+  --pos-foreground-light: oklch(1 0 0);
+  --pos-foreground-dark: var(--gray-950);
 
   /* IDP and reserve roles reuse darker approved shades. */
   --pos-ir: var(--gray-700);
@@ -301,23 +303,23 @@
 }
 
 /* Canonical position classes expose one component-agnostic color contract. */
-.pos-qb { --position-color: var(--pos-qb); }
-.pos-rb { --position-color: var(--pos-rb); }
-.pos-wr { --position-color: var(--pos-wr); }
-.pos-te { --position-color: var(--pos-te); }
-.pos-flex { --position-color: var(--pos-flex); }
-.pos-k { --position-color: var(--pos-k); }
+.pos-qb { --position-color: var(--pos-qb); --position-foreground: var(--pos-foreground-light); }
+.pos-rb { --position-color: var(--pos-rb); --position-foreground: var(--pos-foreground-dark); }
+.pos-wr { --position-color: var(--pos-wr); --position-foreground: var(--pos-foreground-light); }
+.pos-te { --position-color: var(--pos-te); --position-foreground: var(--pos-foreground-dark); }
+.pos-flex { --position-color: var(--pos-flex); --position-foreground: var(--pos-foreground-dark); }
+.pos-k { --position-color: var(--pos-k); --position-foreground: var(--pos-foreground-light); }
 .pos-def,
-.pos-dst { --position-color: var(--pos-dst); }
-.pos-bench { --position-color: var(--pos-bench); }
-.pos-ir { --position-color: var(--pos-ir); }
-.pos-dl { --position-color: var(--pos-dl); }
-.pos-lb { --position-color: var(--pos-lb); }
-.pos-db { --position-color: var(--pos-db); }
-.pos-idpflex { --position-color: var(--pos-idpflex); }
+.pos-dst { --position-color: var(--pos-dst); --position-foreground: var(--pos-foreground-light); }
+.pos-bench { --position-color: var(--pos-bench); --position-foreground: var(--pos-foreground-light); }
+.pos-ir { --position-color: var(--pos-ir); --position-foreground: var(--pos-foreground-light); }
+.pos-dl { --position-color: var(--pos-dl); --position-foreground: var(--pos-foreground-light); }
+.pos-lb { --position-color: var(--pos-lb); --position-foreground: var(--pos-foreground-light); }
+.pos-db { --position-color: var(--pos-db); --position-foreground: var(--pos-foreground-dark); }
+.pos-idpflex { --position-color: var(--pos-idpflex); --position-foreground: var(--pos-foreground-dark); }
 
 .ffaa-position-badge {
   border-color: color-mix(in oklch, var(--position-color) 72%, white 10%);
   background: var(--position-color);
-  color: white;
+  color: var(--position-foreground, var(--pos-foreground-light));
 }

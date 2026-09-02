@@ -104,6 +104,8 @@ describe("shared green and gray visual system", () => {
       "--pos-k: #9333ea",
       "--pos-dst: #4b5563",
       "--pos-bench: var(--gray-500)",
+      "--pos-foreground-light: oklch(1 0 0)",
+      "--pos-foreground-dark: var(--gray-950)",
     ];
 
     for (const assignment of positionAssignments) expect(tokens).toContain(assignment);

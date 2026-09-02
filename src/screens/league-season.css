@@ -292,7 +292,7 @@
 .league-roster-row > div > small { color: var(--text-2); font-size: .65rem; }
 .league-roster-row > div:last-child { text-align: right; }
 .league-roster-divider { min-height: 38px; padding: 0 12px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line-1); color: var(--text-2); background: var(--surface-raised); font-size: .65rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
-.league-position { min-width: 38px; min-height: 24px; padding: 0 7px; display: inline-grid; place-items: center; border-radius: 5px; color: #fff; background: var(--position-color, var(--pos-bench)); font-size: .62rem; font-weight: 850; }
+.league-position { min-width: 38px; min-height: 24px; padding: 0 7px; display: inline-grid; place-items: center; border-radius: 5px; color: var(--position-foreground, var(--pos-foreground-light)); background: var(--position-color, var(--pos-bench)); font-size: .62rem; font-weight: 850; }
 .league-mobile-label { display: none; }
 
 .league-week-toolbar {

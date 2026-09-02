@@ -1,5 +1,6 @@
 import { BadgeCheck, RotateCcw, Search, Trash2, UserPlus } from "lucide-react";
 import { useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import { useLocation } from "react-router-dom";
 
 import { ToolDataStatus } from "@/components/tools/ToolDataStatus";
@@ -21,7 +22,7 @@ import { useToolData } from "@/screens/tools/useToolData";
 import { PositionToggle } from "@/ui/PositionToggle";
 import { PositionBadge } from "@/ui/PositionBadge";
 import { NumericInput } from "@/ui/NumericInput";
-import { positionColorKey } from "@/ui/positionColors";
+import { positionColorVar } from "@/ui/positionColors";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 import { matchesPositionFilter } from "@/utils/positionFilter";
 import { UniversalSelect } from "@/ui/UniversalSelect";
@@ -72,10 +73,6 @@ function formatNumber(value: number | null) {
 
 function normalizeSlotCount(value: number) {
   return Math.max(0, Math.min(20, Number.isFinite(value) ? Math.trunc(value) : 0));
-}
-
-function slotColorPosition(position: TeamRaterSlotPosition) {
-  return positionColorKey(position) ?? "bench";
 }
 
 function formatLineup(slots: TeamRaterSlot[]) {
@@ -211,7 +208,12 @@ export function TeamRater() {
             const count = slots.find((slot) => slot.position === position)?.count ?? 0;
             const label = SLOT_LABELS[position];
             return (
-              <div className="team-slot-control" data-position={slotColorPosition(position)} key={position}>
+              <div
+                className="team-slot-control"
+                data-position={position}
+                key={position}
+                style={{ "--slot-color": positionColorVar(position) } as CSSProperties}
+              >
                 <span>{label}</span>
                 <div className="team-slot-stepper">
                   <NumericInput

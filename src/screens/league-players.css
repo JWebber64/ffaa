@@ -100,7 +100,7 @@
   place-items: center;
   border-radius: var(--r-sm);
   background: var(--position-color, var(--pos-bench));
-  color: white;
+  color: var(--position-foreground, var(--pos-foreground-light));
   font-size: .7rem;
   font-weight: 850;
 }

@@ -1,4 +1,5 @@
 import { cn } from "@/ui/cn";
+import { positionColorVar } from "@/ui/positionColors";
 
 type AssignedPlayer = {
   name: string;
@@ -55,19 +56,9 @@ export function SlotTile({
   assigned?: AssignedPlayer | null;
   className?: string;
 }) {
-  // Use fallback colors that match tokens.css values for universal color system
-  const fallbackColors = {
-    qb: "color-mix(in oklch, var(--green-500) 55%, transparent)",
-    rb: "rgba(22, 163, 74, 0.55)", 
-    wr: "rgba(16, 185, 129, 0.55)",
-    te: "rgba(217, 119, 6, 0.55)",
-    flex: "color-mix(in oklch, var(--green-500) 55%, transparent)",
-    k: "rgba(190, 18, 60, 0.55)",
-    dst: "rgba(194, 65, 12, 0.55)"
-  };
-  
-  const edge = fallbackColors[slot.toLowerCase() as keyof typeof fallbackColors] || "rgba(255,255,255,0.18)";
-  const glow = fallbackColors[slot.toLowerCase() as keyof typeof fallbackColors]?.replace('0.55', '0.18') || "rgba(255,255,255,0.06)";
+  const positionColor = positionColorVar(slot);
+  const edge = `color-mix(in oklch, ${positionColor} 55%, transparent)`;
+  const glow = `color-mix(in oklch, ${positionColor} 18%, transparent)`;
   const nameParts = assigned?.name ? getPlayerNameParts(assigned.name) : [];
   const metaParts = assigned?.meta ? getMetaParts(assigned.meta) : [];
 
@@ -79,9 +70,10 @@ export function SlotTile({
         className
       )}
       style={{
+        "--slot-color": positionColor,
         borderColor: edge,
         boxShadow: `0 0 0 1px ${glow} inset`,
-      }}
+      } as React.CSSProperties}
     >
       {assigned?.name ? (
         <div

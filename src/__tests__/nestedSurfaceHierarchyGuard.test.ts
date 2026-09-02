@@ -9,6 +9,8 @@ const tokensCss = readFileSync(resolve(projectRoot, "src/styles/tokens.css"), "u
 const refinementCss = readFileSync(resolve(projectRoot, "src/styles/refinement.css"), "utf8");
 const globalsCss = readFileSync(resolve(projectRoot, "src/styles/globals.css"), "utf8");
 const toolsCss = readFileSync(resolve(projectRoot, "src/screens/tools/tools.css"), "utf8");
+const teamRaterSource = readFileSync(resolve(projectRoot, "src/screens/tools/TeamRater.tsx"), "utf8");
+const auctionTeamBuilderSource = readFileSync(resolve(projectRoot, "src/screens/tools/AuctionTeamBuilder.tsx"), "utf8");
 const historyCss = readFileSync(resolve(projectRoot, "src/features/league-history/ui/league-history.css"), "utf8");
 
 describe("app-wide nested surface hierarchy guard", () => {
@@ -55,8 +57,9 @@ describe("app-wide nested surface hierarchy guard", () => {
   it("keeps position-colored outer cards without a nested green Team Rater control", () => {
     expect(toolsCss).toMatch(/\.team-slot-control\s*\{[^}]*padding:\s*10px[^}]*border:\s*1px solid[^}]*var\(--slot-color\)[^}]*background:\s*color-mix[^}]*var\(--slot-color\)/s);
     expect(toolsCss).toMatch(/\.auction-slot-control\s*\{[^}]*padding:\s*10px[^}]*border:\s*1px solid[^}]*var\(--slot-color\)[^}]*background:\s*color-mix[^}]*var\(--slot-color\)/s);
-    expect(toolsCss).toMatch(/\.team-slot-control\[data-position="qb"\]\s*\{[^}]*var\(--pos-qb\)/s);
-    expect(toolsCss).toMatch(/\.auction-slot-control\[data-position="dst"\]\s*\{[^}]*var\(--pos-dst\)/s);
+    expect(teamRaterSource).toContain('"--slot-color": positionColorVar(position)');
+    expect(auctionTeamBuilderSource).toContain('"--slot-color": positionColorVar(slot)');
+    expect(toolsCss).not.toMatch(/\.(?:team|auction)-slot-control\[data-position=/);
     expect(toolsCss).toMatch(/\.team-slot-control\s*>\s*span\s*\{[^}]*var\(--slot-color\)/s);
     expect(toolsCss).toMatch(/\.auction-slot-control\s*>\s*span\s*\{[^}]*var\(--slot-color\)/s);
     expect(toolsCss).toMatch(/\.team-slot-stepper input\s*\{[^}]*border:\s*0[^}]*background:\s*transparent/s);

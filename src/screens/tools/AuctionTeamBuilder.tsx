@@ -1,5 +1,6 @@
 import { ArrowDownAZ, ArrowUpAZ, Gauge, Gavel, Minus, Plus, RotateCcw, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { ToolDataStatus } from "@/components/tools/ToolDataStatus";
@@ -13,7 +14,7 @@ import { useToolData } from "@/screens/tools/useToolData";
 import { PositionToggle } from "@/ui/PositionToggle";
 import { PositionBadge } from "@/ui/PositionBadge";
 import { NumericInput } from "@/ui/NumericInput";
-import { positionColorKey } from "@/ui/positionColors";
+import { positionColorVar } from "@/ui/positionColors";
 import { UniversalSelect } from "@/ui/UniversalSelect";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 import { matchesPositionFilter } from "@/utils/positionFilter";
@@ -223,7 +224,7 @@ export function AuctionTeamBuilder() {
 
       <section className="auction-builder-settings" aria-labelledby="auction-settings-title">
         <div className="tool-subsection-head is-compact"><div><span>Roster card</span><h2 id="auction-settings-title">Choose your positions</h2></div><button type="button" className="tool-button is-quiet" onClick={reset}><RotateCcw size={15} /> Reset board</button></div>
-        <div className="auction-slot-grid">{SLOT_ORDER.map((slot) => <div className="auction-slot-control" data-position={positionColorKey(slot)} key={slot}><span>{SLOT_LABELS[slot]}</span><div><button type="button" aria-label={`Decrease ${SLOT_LABELS[slot]}`} disabled={!slots[slot]} onClick={() => updateSlot(slot, -1)}><Minus size={13} /></button><strong>{slots[slot]}</strong><button type="button" aria-label={`Increase ${SLOT_LABELS[slot]}`} onClick={() => updateSlot(slot, 1)}><Plus size={13} /></button></div></div>)}</div>
+        <div className="auction-slot-grid">{SLOT_ORDER.map((slot) => <div className="auction-slot-control" data-position={slot} key={slot} style={{ "--slot-color": positionColorVar(slot) } as CSSProperties}><span>{SLOT_LABELS[slot]}</span><div><button type="button" aria-label={`Decrease ${SLOT_LABELS[slot]}`} disabled={!slots[slot]} onClick={() => updateSlot(slot, -1)}><Minus size={13} /></button><strong>{slots[slot]}</strong><button type="button" aria-label={`Increase ${SLOT_LABELS[slot]}`} onClick={() => updateSlot(slot, 1)}><Plus size={13} /></button></div></div>)}</div>
       </section>
 
       <ToolDataStatus loading={loading} error={error} label="public auction projections" />
