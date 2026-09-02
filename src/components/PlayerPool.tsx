@@ -87,7 +87,11 @@ const PlayerRow: React.FC<PlayerRowProps> = ({ player, onNominate, nominate, sho
         {showDebugInfo && (
           <HStack spacing={2} ml="auto" pr={2}>
             {player.rank && <Badge colorScheme="purple" title="Overall Rank">{player.rank}</Badge>}
-            {player.posRank && <Badge colorScheme="green" title="Position Rank">{player.pos}{player.posRank}</Badge>}
+            {player.posRank ? (
+              <PositionBadge className="cui-badge" position={player.pos} title="Position Rank">
+                {player.pos}{player.posRank}
+              </PositionBadge>
+            ) : null}
             {player.adp && <Badge colorScheme="orange" title="ADP">{player.adp.toFixed(1)}</Badge>}
           </HStack>
         )}

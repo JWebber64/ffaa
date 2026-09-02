@@ -92,4 +92,11 @@ describe("canonical position color system", () => {
     expect(dynamicClassViolations).toEqual([]);
     expect(tokenOwnerViolations).toEqual([]);
   });
+
+  it("keeps the Player Pool position-rank marker on the shared badge", () => {
+    const playerPool = readFileSync(resolve(projectRoot, "src/components/PlayerPool.tsx"), "utf8");
+
+    expect(playerPool).toMatch(/<PositionBadge[^>]*position=\{player\.pos\}[^>]*title="Position Rank">/s);
+    expect(playerPool).not.toMatch(/<Badge[^>]*title="Position Rank">/s);
+  });
 });
