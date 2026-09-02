@@ -614,7 +614,7 @@
 .team-rater-roster li button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 8px; color: var(--text-3); background: transparent; cursor: pointer; }
 .team-rater-roster li button:hover { color: var(--tools-red); background: rgba(251,113,133,0.08); }
 
-.tool-position-tag { display: inline-grid; place-items: center; min-width: 35px; height: 25px; padding: 0 6px; border: 1px solid color-mix(in oklch, var(--position-color) 62%, white 8%); border-radius: 7px; color: white; background: color-mix(in oklch, var(--position-color) 78%, var(--color-surface-card-primary)); font-size: 0.64rem; font-weight: 850; }
+.tool-position-tag { display: inline-grid; place-items: center; min-width: 35px; height: 25px; padding: 0 6px; border: 1px solid color-mix(in oklch, var(--position-color) 62%, white 8%); border-radius: 7px; color: white; background: var(--position-color); font-size: 0.64rem; font-weight: 850; }
 
 .tool-empty-state { display: grid; place-items: center; min-height: 200px; padding: 24px; color: var(--text-3); text-align: center; font-size: 0.8rem; line-height: 1.55; }
 .team-grade-hero { display: flex; align-items: center; gap: 18px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }

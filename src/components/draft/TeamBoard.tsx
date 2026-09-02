@@ -1,5 +1,6 @@
 import { useRef, useState, type CSSProperties, type DragEvent, type KeyboardEvent } from "react";
 import { cn } from "@/ui/cn";
+import { PositionBadge } from "@/ui/PositionBadge";
 import { getComputerManagerProfile } from "@/engine/autoManager";
 import { getDraftableRosterSlotCount } from "@/multiplayer/bidRules";
 import {
@@ -203,7 +204,9 @@ function SlotLine({
       }
     >
       <span className="team-slot-line-side">
-        <span className="team-slot-line-label">{slot.label}</span>
+        <PositionBadge className="team-slot-line-label" position={slot.label}>
+          {slot.label}
+        </PositionBadge>
         {filled && showPrice ? <span className="team-slot-line-price">{formatPlayerPrice(slot.assigned?.price)}</span> : null}
       </span>
       <span className="team-slot-line-detail">

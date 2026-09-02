@@ -1286,7 +1286,7 @@
   justify-content: center;
   border: 1px solid color-mix(in oklch, var(--position-color, var(--color-border-default)) 52%, var(--color-border-default));
   border-radius: var(--r-sm);
-  background: color-mix(in oklch, var(--position-color, var(--color-surface-card-tertiary)) 18%, var(--color-surface-card-secondary));
+  background: var(--position-color, var(--pos-bench));
   color: var(--color-text-primary);
   font-size: .65rem;
   font-weight: 850;

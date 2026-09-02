@@ -2358,7 +2358,7 @@ p {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  background: color-mix(in srgb, var(--pos-color) 60%, rgba(0,0,0,0.2));
+  background: var(--position-color, var(--pos-bench));
   color: white;
 }
 
@@ -4870,7 +4870,7 @@ p {
   height: 16px;
   padding: 0 3px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--team-slot-color) 72%, rgba(0,0,0,0.14));
+  background: var(--position-color, var(--pos-bench));
   color: white;
   font-size: 0.5rem;
   font-weight: 700;
@@ -5393,7 +5393,7 @@ p {
   justify-content: center;
   min-height: 26px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--team-slot-color) 70%, rgba(0,0,0,0.16));
+  background: var(--position-color, var(--pos-bench));
   color: white;
   font-size: 0.62rem;
   font-weight: 900;
@@ -5941,8 +5941,8 @@ p {
   color: white;
   font-size: 0.72rem;
   font-weight: 900;
-  background: color-mix(in oklch, var(--green-400) 22%, transparent);
-  border: 1px solid color-mix(in oklch, var(--green-400) 28%, transparent);
+  background: var(--position-color, var(--pos-bench));
+  border: 1px solid color-mix(in oklch, var(--position-color, var(--pos-bench)) 62%, white 8%);
 }
 
 .mobile-player-main,
@@ -6017,7 +6017,7 @@ p {
 }
 
 .mobile-roster-slot {
-  background: color-mix(in srgb, var(--mobile-slot-color) 72%, rgba(0,0,0,0.16));
+  background: var(--position-color, var(--pos-bench));
   border-color: color-mix(in srgb, var(--mobile-slot-color) 44%, rgba(255,255,255,0.1));
 }
 
@@ -7710,7 +7710,6 @@ p {
   min-width: 78px;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 9px;
-  background: rgba(255,255,255,0.045);
   color: rgba(238,255,249,0.9);
   font-size: 0.72rem;
   font-weight: 750;
@@ -7720,6 +7719,7 @@ p {
   position: relative;
   display: inline-flex;
   align-items: center;
+  background: rgba(255,255,255,0.045);
 }
 
 .offline-roster-slot-control:focus-within {
@@ -7770,7 +7770,9 @@ p {
   align-items: center;
   justify-content: center;
   padding: 0 10px;
-  color: rgba(255,255,255,0.58);
+  border-color: color-mix(in oklch, var(--position-color, var(--pos-bench)) 62%, white 8%);
+  background: var(--position-color, var(--pos-bench));
+  color: white;
 }
 
 .offline-empty {
@@ -8626,16 +8628,16 @@ p {
   border-radius: 5px;
   padding: 1px 5px;
   color: white;
-  background: rgba(115,115,115,0.72);
+  background: var(--pos-bench);
   font-size: 0.64rem;
 }
 
-.stats-pos-QB { background: color-mix(in oklch, var(--pos-qb) 72%, transparent); }
-.stats-pos-RB { background: color-mix(in oklch, var(--pos-rb) 72%, transparent); }
-.stats-pos-WR { background: color-mix(in oklch, var(--pos-wr) 72%, transparent); }
-.stats-pos-TE { background: color-mix(in oklch, var(--pos-te) 72%, transparent); }
-.stats-pos-K { background: color-mix(in oklch, var(--pos-k) 72%, transparent); }
-.stats-pos-DEF { background: color-mix(in oklch, var(--pos-dst) 82%, transparent); }
+.stats-pos-QB { background: var(--pos-qb); }
+.stats-pos-RB { background: var(--pos-rb); }
+.stats-pos-WR { background: var(--pos-wr); }
+.stats-pos-TE { background: var(--pos-te); }
+.stats-pos-K { background: var(--pos-k); }
+.stats-pos-DEF { background: var(--pos-dst); }
 
 .stats-empty-state {
   position: sticky;

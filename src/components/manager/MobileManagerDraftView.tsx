@@ -13,6 +13,7 @@ import { Badge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
 import { Input } from "@/ui/Input";
 import { NumericInput } from "@/ui/NumericInput";
+import { PositionBadge } from "@/ui/PositionBadge";
 import { PositionToggle } from "@/ui/PositionToggle";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 import { cn } from "@/ui/cn";
@@ -401,7 +402,9 @@ export function MobileManagerDraftView({
                     onClick={() => void onActOnPlayer(player)}
                     disabled={nominationActionLocked}
                   >
-                    <span className="mobile-player-pos">{player.pos ?? "--"}</span>
+                    <PositionBadge className="mobile-player-pos" position={player.pos ?? ""}>
+                      {player.pos ?? "--"}
+                    </PositionBadge>
                     <span className="mobile-player-main">
                       <strong>
                         <TeamMark team={player.team} size="xs" />
@@ -440,7 +443,9 @@ export function MobileManagerDraftView({
                 className={cn("mobile-roster-row", row.assigned?.name ? "is-filled" : "is-open")}
                 style={rosterRowStyle(row)}
               >
-                <span className="mobile-roster-slot">{row.label}</span>
+                <PositionBadge className="mobile-roster-slot" position={row.label}>
+                  {row.label}
+                </PositionBadge>
                 <span className="mobile-roster-player">
                   <strong>{row.assigned?.name ?? "Open"}</strong>
                   <small>

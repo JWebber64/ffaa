@@ -1,4 +1,5 @@
 import { SlotType } from '../../types/draftConfig';
+import { PositionBadge } from '../../ui/PositionBadge';
 import { positionColorVar } from '../../ui/positionColors';
 
 interface RosterRowProps {
@@ -40,7 +41,7 @@ export default function RosterRow({
       } as React.CSSProperties}
     >
       <div className="roster-left">
-        <span className="roster-pill">{slotKey}</span>
+        <PositionBadge className="roster-pill" position={slotKey}>{slotKey}</PositionBadge>
         <div className="roster-slot-label">Slot Count</div>
       </div>
 

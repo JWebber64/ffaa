@@ -19,6 +19,7 @@ import { Badge } from "../ui/Badge";
 import { SectionTitle } from "../ui/SectionTitle";
 import { Input } from "../ui/Input";
 import { NumericInput } from "../ui/NumericInput";
+import { PositionBadge } from "../ui/PositionBadge";
 import { cn } from "../ui/cn";
 import { useToast } from "../ui/toastContext";
 import { DropdownMenu, DropdownMenuItem } from "../ui/DropdownMenu";
@@ -1896,7 +1897,9 @@ function TeamRosterDrawer({
                 className={cn("team-detail-row", row.assigned?.name ? "is-filled" : "is-open")}
                 style={{ "--team-slot-color": row.color } as React.CSSProperties}
               >
-                <span className="team-detail-slot">{row.label}</span>
+                <PositionBadge className="team-detail-slot" position={row.label}>
+                  {row.label}
+                </PositionBadge>
                 <div className="team-detail-player">
                   <strong>{row.assigned?.name ?? "Open"}</strong>
                   {row.assigned?.name ? (

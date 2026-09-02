@@ -10,6 +10,7 @@ type PositionBadgeProps = Omit<HTMLAttributes<HTMLSpanElement>, "children"> & {
 
 export function PositionBadge({ children, className, position, style, ...props }: PositionBadgeProps) {
   const colorKey = positionColorKey(position);
+  const color = positionColorVar(position);
 
   return (
     <span
@@ -17,8 +18,9 @@ export function PositionBadge({ children, className, position, style, ...props }
       className={cn("ffaa-position-badge", positionClassName(position), className)}
       data-position-color={colorKey ?? "bench"}
       style={{
-        "--position-color": positionColorVar(position),
         ...style,
+        "--position-color": color,
+        backgroundColor: color,
       } as CSSProperties}
     >
       {children ?? position}

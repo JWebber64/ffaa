@@ -73,6 +73,60 @@ describe("canonical position color system", () => {
     expect(badge.classList.contains("pos-rb")).toBe(true);
     expect(badge.getAttribute("data-position-color")).toBe("rb");
     expect(badge.style.getPropertyValue("--position-color")).toBe("var(--pos-rb)");
+    expect(badge.style.backgroundColor).toBe("var(--pos-rb)");
+  });
+
+  it("keeps every standalone position marker on the shared badge primitive", () => {
+    const consumers = [
+      ["src/components/manager/MobileManagerDraftView.tsx", "mobile-player-pos"],
+      ["src/components/manager/MobileManagerDraftView.tsx", "mobile-roster-slot"],
+      ["src/components/roster/RosterRow.tsx", "roster-pill"],
+      ["src/components/draft/TeamBoard.tsx", "team-slot-line-label"],
+      ["src/screens_v2/DraftRoomV2.tsx", "team-detail-slot"],
+      ["src/screens_v2/OfflineDraftV2.tsx", "offline-roster-slot-static"],
+      ["src/screens/tools/TeamRater.tsx", "tool-position-tag"],
+      ["src/screens/tools/AuctionTeamBuilder.tsx", "tool-position-tag"],
+      ["src/features/auction-values/SourceSheet.tsx", "auction-position-chip"],
+      ["src/features/auction-values/ComparisonTable.tsx", "auction-position-chip"],
+    ] as const;
+
+    for (const [path, className] of consumers) {
+      const source = readFileSync(resolve(projectRoot, path), "utf8");
+      expect(source, `${path} must render ${className} through PositionBadge`).toMatch(
+        new RegExp(`<PositionBadge[^>]*className=["']${className}["']`, "s"),
+      );
+    }
+  });
+
+  it("does not remix the background of standalone position markers", () => {
+    const markerClasses = [
+      "auction-position-chip",
+      "hq-position",
+      "league-position",
+      "mobile-player-pos",
+      "mobile-roster-slot",
+      "offline-roster-slot-static",
+      "roster-pill",
+      "stats-pos-pill",
+      "team-detail-slot",
+      "team-slot-line-label",
+      "tool-position-tag",
+    ];
+    const remixedRules = sourceFiles("src")
+      .filter((path) => path.endsWith(".css"))
+      .flatMap((path) => {
+        const source = readFileSync(resolve(projectRoot, path), "utf8");
+        return Array.from(source.matchAll(/([^{}]+)\{([^{}]*)\}/g)).flatMap((match) => {
+          const rule = match[0];
+          const selector = match[1] ?? "";
+          const declarations = match[2] ?? "";
+          const isMarkerRule = markerClasses.some((className) => selector.includes(`.${className}`));
+          const remixesBackground = /background(?:-color)?\s*:\s*color-mix\(/.test(declarations);
+          return isMarkerRule && remixesBackground ? [`${path}: ${rule.trim()}`] : [];
+        });
+      });
+
+    expect(remixedRules).toEqual([]);
   });
 
   it("keeps raw values in one token owner and blocks synthesized position classes", () => {

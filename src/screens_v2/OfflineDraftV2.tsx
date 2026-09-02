@@ -44,6 +44,7 @@ import type { Player } from "../types/draft";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { NumericInput } from "../ui/NumericInput";
+import { PositionBadge } from "../ui/PositionBadge";
 import { PositionToggle } from "../ui/PositionToggle";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "../ui/positionToggleOptions";
 import { SelectItem, SelectWrapper } from "../ui/SelectWrapper";
@@ -2308,7 +2309,12 @@ export default function OfflineDraftV2() {
                           </UniversalSelect>
                         </div>
                       ) : (
-                        <span className="offline-roster-slot-static">{currentSlot?.label ?? "Roster"}</span>
+                        <PositionBadge
+                          className="offline-roster-slot-static"
+                          position={currentSlot?.label ?? "BENCH"}
+                        >
+                          {currentSlot?.label ?? "Roster"}
+                        </PositionBadge>
                       )}
                       {offlineConfig.draftType === "auction" ? (
                         <PlayerPriceEditor

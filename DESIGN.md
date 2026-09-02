@@ -130,7 +130,7 @@ Tables use the table-header role, primary table-row role, alternate-row role, an
 
 Primary text, secondary text, muted text, disabled text, placeholder text, links, and on-brand text each use their named shared role. Borders use subtle, default, strong, or brand roles according to hierarchy; page-local border colors are not allowed.
 
-Position identity uses one canonical semantic palette: quarterback red, running back green, wide receiver blue, tight end orange, flex cyan, kicker purple, defense slate, and bench or reserve gray. Every marker consumes the shared `--pos-*` tokens through `src/ui/positionColors.ts`; badges use `src/ui/PositionBadge.tsx`. Numbered slots and provider aliases normalize before styling, so `RB1`, `WR3`, `BN2`, `DEF`, and `D/ST` resolve to their base semantic roles. Position text or abbreviations remain visible so meaning never depends on color alone.
+Position identity uses one canonical semantic palette: quarterback red, running back green, wide receiver blue, tight end orange, flex cyan, kicker purple, defense slate, and bench or reserve gray. Every marker consumes the shared `--pos-*` tokens through `src/ui/positionColors.ts`; badges use `src/ui/PositionBadge.tsx`. A standalone position badge uses its canonical semantic color as an opaque fill; feature-level modifiers may change its geometry and typography but must not tint, mix, fade, or replace that fill. Numbered slots and provider aliases normalize before styling, so `RB1`, `WR3`, `BN2`, `DEF`, and `D/ST` resolve to their base semantic roles. Position text or abbreviations remain visible so meaning never depends on color alone.
 
 Draft pages use the draft editorial image, research and tools pages use the research editorial image, and league, history, and This Week pages use the league editorial image. Images support page identity and remain readable beneath the shared dark-to-green overlay. Photography is darkened or desaturated when necessary so a blue cast does not become an interface surface.
 
@@ -184,6 +184,7 @@ Roster Legacy counts only stored `WeeklyPlayerResult` rows marked as starters an
 - Do use the named text, border, badge, table, overlay, toolbar, and status roles for their matching elements.
 - Do map outer and nested cards to the primary-card and secondary-card roles.
 - Do use the canonical position palette through the shared position utility and badge primitive.
+- Do render every standalone position badge with the exact opaque semantic position fill.
 - Do keep every field fill, border, and focus treatment clipped to one control shell.
 - Do use the shared numeric stepper for every editable number field.
 - Do use the shared custom select trigger and centered control glyph for every visible select field.
@@ -195,6 +196,7 @@ Roster Legacy counts only stored `WeeklyPlayerResult` rows marked as starters an
 - Do communicate clickability through clear labels, hierarchy, borders, underlines, and hover or focus states.
 - Do not use blue, cyan, teal, or navy-blue for general interface chrome; WR blue and FLEX cyan are the explicit position-marker exceptions.
 - Do not synthesize position CSS classes from raw labels or add page-local position color maps.
+- Do not tint, alpha-mix, or surface-mix a standalone position badge's semantic fill.
 - Do not sample an official team or editorial-image color into interface chrome.
 - Do not create an orange or page-local primary-action color.
 - Do not hard-code a new gray or green when an existing ramp step or semantic role fits.
