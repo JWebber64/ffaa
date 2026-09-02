@@ -11,7 +11,9 @@ import type { ToolPlayer, ToolPosition, ToolScoring } from "@/data/toolPlayerDat
 import { buildTeamRaterNavigationState } from "@/screens/tools/teamRaterNavigation";
 import { useToolData } from "@/screens/tools/useToolData";
 import { PositionToggle } from "@/ui/PositionToggle";
+import { PositionBadge } from "@/ui/PositionBadge";
 import { NumericInput } from "@/ui/NumericInput";
+import { positionColorKey } from "@/ui/positionColors";
 import { UniversalSelect } from "@/ui/UniversalSelect";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 import { matchesPositionFilter } from "@/utils/positionFilter";
@@ -221,7 +223,7 @@ export function AuctionTeamBuilder() {
 
       <section className="auction-builder-settings" aria-labelledby="auction-settings-title">
         <div className="tool-subsection-head is-compact"><div><span>Roster card</span><h2 id="auction-settings-title">Choose your positions</h2></div><button type="button" className="tool-button is-quiet" onClick={reset}><RotateCcw size={15} /> Reset board</button></div>
-        <div className="auction-slot-grid">{SLOT_ORDER.map((slot) => <div className="auction-slot-control" data-position={slot.toLowerCase()} key={slot}><span>{SLOT_LABELS[slot]}</span><div><button type="button" aria-label={`Decrease ${SLOT_LABELS[slot]}`} disabled={!slots[slot]} onClick={() => updateSlot(slot, -1)}><Minus size={13} /></button><strong>{slots[slot]}</strong><button type="button" aria-label={`Increase ${SLOT_LABELS[slot]}`} onClick={() => updateSlot(slot, 1)}><Plus size={13} /></button></div></div>)}</div>
+        <div className="auction-slot-grid">{SLOT_ORDER.map((slot) => <div className="auction-slot-control" data-position={positionColorKey(slot)} key={slot}><span>{SLOT_LABELS[slot]}</span><div><button type="button" aria-label={`Decrease ${SLOT_LABELS[slot]}`} disabled={!slots[slot]} onClick={() => updateSlot(slot, -1)}><Minus size={13} /></button><strong>{slots[slot]}</strong><button type="button" aria-label={`Increase ${SLOT_LABELS[slot]}`} onClick={() => updateSlot(slot, 1)}><Plus size={13} /></button></div></div>)}</div>
       </section>
 
       <ToolDataStatus loading={loading} error={error} label="public auction projections" />
@@ -231,7 +233,7 @@ export function AuctionTeamBuilder() {
           <div className="auction-card-header"><div><span>Draft ticket</span><h2 id="auction-team-title">Your team</h2></div><div className="auction-card-total"><strong>{money(spent)}</strong><small>of {money(budget)}</small></div></div>
           <div className="auction-progress"><span style={{ width: `${Math.min(100, (spent / Math.max(1, budget)) * 100)}%` }} /></div>
           <TeamPointsSummary players={draftedPlayers} scoring={scoring} />
-          <div className="auction-card-slots">{SLOT_ORDER.map((slot) => { const slotPicks = cardGroups[slot]; return <div className="auction-card-group" key={slot}><div className="auction-group-label"><span>{SLOT_LABELS[slot]}</span><small>{slot === "FLEX" ? "RB / WR / TE" : `${slotPicks.length}/${slots[slot]}`}</small></div>{slotPicks.map(({ player, bid: playerBid }) => <div className="auction-drafted-player" key={player.id}><span className="tool-player-badges"><TeamMark team={player.team} size="xs" /><span className={`tool-position-tag is-${player.position.toLowerCase()}`}>{player.position}</span></span><div><strong>{player.name}</strong><small>{formatTeamBye(player.team || "FA", player.byeWeek)} · {player.projectedPoints?.toFixed(1) ?? "—"} pts</small></div><b>{money(playerBid)}</b><button type="button" aria-label={`Remove ${player.name}`} onClick={() => setPicks((current) => current.filter((pick) => pick.playerId !== player.id))}><Trash2 size={14} /></button></div>)}{!slotPicks.length && slot !== "BENCH" ? <div className="auction-open-slot">Open slot</div> : null}</div>; })}</div>
+          <div className="auction-card-slots">{SLOT_ORDER.map((slot) => { const slotPicks = cardGroups[slot]; return <div className="auction-card-group" key={slot}><div className="auction-group-label"><span>{SLOT_LABELS[slot]}</span><small>{slot === "FLEX" ? "RB / WR / TE" : `${slotPicks.length}/${slots[slot]}`}</small></div>{slotPicks.map(({ player, bid: playerBid }) => <div className="auction-drafted-player" key={player.id}><span className="tool-player-badges"><TeamMark team={player.team} size="xs" /><PositionBadge className="tool-position-tag" position={player.position} /></span><div><strong>{player.name}</strong><small>{formatTeamBye(player.team || "FA", player.byeWeek)} · {player.projectedPoints?.toFixed(1) ?? "—"} pts</small></div><b>{money(playerBid)}</b><button type="button" aria-label={`Remove ${player.name}`} onClick={() => setPicks((current) => current.filter((pick) => pick.playerId !== player.id))}><Trash2 size={14} /></button></div>)}{!slotPicks.length && slot !== "BENCH" ? <div className="auction-open-slot">Open slot</div> : null}</div>; })}</div>
         </section>
 
         <section className="auction-board" aria-labelledby="auction-board-title">
@@ -276,7 +278,7 @@ export function AuctionTeamBuilder() {
                     && player.projectionHigh !== undefined;
                   return (
                     <tr className={selectedId === player.id ? "is-selected" : ""} key={player.id} onClick={() => selectPlayer(player)}>
-                      <td><span className={`tool-position-tag is-${player.position.toLowerCase()}`}>{player.position}</span></td>
+                      <td><PositionBadge className="tool-position-tag" position={player.position} /></td>
                       <th><span className="auction-player-identity"><TeamMark team={player.team} size="xs" /><span>{player.name}<small>{formatTeamBye(player.team || "FA", player.byeWeek)}</small></span></span></th>
                       <td>{player.rank ?? "—"}</td>
                       <td className="auction-projection-cell" title={hasRange ? `${sourceCount} independent sources: ${player.projectionLow!.toFixed(1)}–${player.projectionHigh!.toFixed(1)} points` : undefined}>

@@ -1,4 +1,5 @@
 import { SlotType } from '../../types/draftConfig';
+import { positionColorVar } from '../../ui/positionColors';
 
 interface RosterRowProps {
   slotKey: SlotType;
@@ -19,7 +20,7 @@ export default function RosterRow({
   onRemove,
   availablePositions = [],
 }: RosterRowProps) {
-  const positionColor = `var(--pos-${slotKey.toLowerCase()})`;
+  const positionColor = positionColorVar(slotKey, "var(--pos-flex)");
 
   const handleIncrement = () => {
     onCountChange(Math.min(count + 1, 20));
@@ -57,7 +58,7 @@ export default function RosterRow({
         {isFlexSlot && onEligibilityToggle && (
           <div className="roster-chips">
             {availablePositions.map((position) => {
-              const posColor = `var(--pos-${position.toLowerCase()})`;
+              const posColor = positionColorVar(position);
               const isActive = eligibility.includes(position);
               return (
                 <button

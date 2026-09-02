@@ -7,6 +7,7 @@ import type { SleeperLeagueConnectionSummary } from "../features/league-hq/sleep
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
 import { ManagerIdentityForm } from "../features/league-workspace/ManagerIdentityForm";
 import type { MyHQData } from "../features/my-hq/myHQ";
+import { PositionBadge } from "../ui/PositionBadge";
 import "./my-hq.css";
 
 function formatScore(value: number | null) {
@@ -27,7 +28,7 @@ function TeamRosterRow({ player, slot, bench = false }: { player: ToolPlayer | n
     : "No player assigned";
   return (
     <div className={`hq-roster-row ${bench ? "is-bench" : ""}`} role="row">
-      <div role="cell"><span className="hq-roster-mobile-label">Slot</span><b className={`hq-position pos-${slot.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>{slot.replace(/_/g, " ")}</b></div>
+      <div role="cell"><span className="hq-roster-mobile-label">Slot</span><PositionBadge className="hq-position" position={slot}>{slot.replace(/_/g, " ")}</PositionBadge></div>
       <div className="hq-roster-player" role="cell">
         <span className="hq-roster-mobile-label">Player</span>
         <strong>{player?.name ?? "Open slot"}</strong>
@@ -180,7 +181,7 @@ export default function MyHQ() {
         <section className="hq-section">
           <div className="hq-section-heading"><div><span>Roster health</span><h2>Starter watch</h2></div><Users aria-hidden="true" /></div>
           {data.alerts.length ? <div className="hq-alert-list">{data.alerts.map((alert) => (
-            <article key={alert.id}><span className={`pos-${alert.position.toLowerCase()}`}>{alert.position}</span><div><strong>{alert.name}</strong><small>{alert.team} · {alert.reason}</small></div><b>{alert.projectedPointsPerGame?.toFixed(1) ?? "—"}<small>season PPG</small></b></article>
+            <article key={alert.id}><PositionBadge position={alert.position} /><div><strong>{alert.name}</strong><small>{alert.team} · {alert.reason}</small></div><b>{alert.projectedPointsPerGame?.toFixed(1) ?? "—"}<small>season PPG</small></b></article>
           ))}</div> : <div className="hq-empty"><CheckCircle2 aria-hidden="true" /><strong>No stored starter alerts</strong><p>No current-week bye or injury designation appears in the connected data. Confirm final statuses before lock.</p></div>}
         </section>
 

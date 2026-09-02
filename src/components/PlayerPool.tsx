@@ -14,6 +14,7 @@ import {
 } from '@/ui/custom';
 import { Search } from 'lucide-react';
 import { PositionToggle } from '../ui/PositionToggle';
+import { PositionBadge } from '../ui/PositionBadge';
 import { DEFAULT_POSITION_TOGGLE_OPTIONS, type DefaultPositionToggleValue } from '../ui/positionToggleOptions';
 import type { Position as PositionType } from '../types/draft';
 import { useDraftStore, useDraftSelectors } from '../store/draftStore';
@@ -37,22 +38,6 @@ const POSITION_NAMES: Record<Pos, string> = {
 };
 
 const ALL_TABS: readonly TabValue[] = DEFAULT_POSITION_TOGGLE_OPTIONS.map((option) => option.value);
-
-// Helper function to map positions to correct color schemes
-const getPositionColorForBadge = (pos: string) => {
-  switch (pos) {
-    case 'QB': return 'red';
-    case 'RB': return 'green';
-    case 'WR': return 'green';
-    case 'TE': return 'orange';
-    case 'K': return 'purple';
-    case 'DEF': return 'gray';
-    case 'FLEX': return 'green';
-    case 'BENCH': return 'gray'; // Will be overridden by CSS
-    case 'IR': return 'gray';    // Will be overridden by CSS
-    default: return 'gray';
-  }
-};
 
 export interface PlayerPoolProps {
   onNominate?: (playerId: string, playerName?: string) => void;
@@ -86,22 +71,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({ player, onNominate, nominate, sho
           <TeamMark team={player.nflTeam} size="xs" />
           <Text fontWeight="semibold" isTruncated>{player.name}</Text>
         </HStack>
-        {player.pos && (
-          player.pos === 'BENCH' || player.pos === 'IR' ? (
-            <Badge 
-              minW="2.5em" 
-              textAlign="center"
-              style={{ 
-                background: player.pos === 'BENCH' ? 'var(--pos-bench)' : 'var(--pos-ir)',
-                color: 'white'
-              }}
-            >
-              {player.pos}
-            </Badge>
-          ) : (
-            <Badge colorScheme={getPositionColorForBadge(player.pos)} minW="2.5em" textAlign="center">{player.pos}</Badge>
-          )
-        )}
+        {player.pos ? <PositionBadge className="cui-badge" position={player.pos} /> : null}
         {player.nflTeam && <Badge colorScheme="gray" minW="2.5em" textAlign="center">{player.nflTeam}</Badge>}
         {player.byeWeek && <Badge colorScheme="gray" minW="3.5em" textAlign="center">Bye {player.byeWeek}</Badge>}
         {typeof player.auctionValue === 'number' && (

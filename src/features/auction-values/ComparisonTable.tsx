@@ -1,5 +1,6 @@
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 
+import { PositionBadge } from "../../ui/PositionBadge";
 import type { AuctionComparisonRow, AuctionSortKey, AuctionValueMode, AuctionValueSource } from "./auctionValueTypes";
 
 const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
@@ -125,7 +126,7 @@ export function ComparisonTable(props: Props) {
                 <tr key={row.playerId}>
                   <td className="auction-rank-column">{index + 1}</td>
                   <th className="auction-player-column" scope="row"><strong>{row.playerName}</strong><small>{row.position} · {row.nflTeam ?? "FA"}</small></th>
-                  <td><span className={`auction-position-chip pos-${row.position.toLowerCase()}`}>{row.position}</span></td>
+                  <td><PositionBadge className="auction-position-chip" position={row.position} /></td>
                   <td>{row.nflTeam ?? "—"}</td>
                   <td>{row.byeWeek ?? "—"}</td>
                   <td className="auction-gamehq-fair-value" title={row.fairValuePublishers.length ? `Publishers: ${row.fairValuePublishers.join(", ")}` : undefined}>

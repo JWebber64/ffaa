@@ -300,14 +300,24 @@
   --accent-highlight: var(--green-500);
 }
 
-/* Position chips keep their semantic color without global class-name matching. */
-.pos-bench,
-.pos-ir {
-  background-color: var(--pos-bench);
-  border-color: var(--pos-bench);
-}
+/* Canonical position classes expose one component-agnostic color contract. */
+.pos-qb { --position-color: var(--pos-qb); }
+.pos-rb { --position-color: var(--pos-rb); }
+.pos-wr { --position-color: var(--pos-wr); }
+.pos-te { --position-color: var(--pos-te); }
+.pos-flex { --position-color: var(--pos-flex); }
+.pos-k { --position-color: var(--pos-k); }
+.pos-def,
+.pos-dst { --position-color: var(--pos-dst); }
+.pos-bench { --position-color: var(--pos-bench); }
+.pos-ir { --position-color: var(--pos-ir); }
+.pos-dl { --position-color: var(--pos-dl); }
+.pos-lb { --position-color: var(--pos-lb); }
+.pos-db { --position-color: var(--pos-db); }
+.pos-idpflex { --position-color: var(--pos-idpflex); }
 
-.pos-bench *,
-.pos-ir * {
+.ffaa-position-badge {
+  border-color: color-mix(in oklch, var(--position-color) 72%, white 10%);
+  background: var(--position-color);
   color: white;
 }

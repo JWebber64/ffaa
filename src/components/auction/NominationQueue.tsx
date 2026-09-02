@@ -2,6 +2,7 @@ import { VStack, HStack, Text, Box, Badge, Button } from '@/ui/custom';
 import { Player } from '../../store/draftStore';
 import { formatPositionForDisplay } from '../../utils/positionUtils';
 import type { Position } from '../../types/draft';
+import { PositionBadge } from '../../ui/PositionBadge';
 import { TeamMark } from '../player/TeamMark';
 
 interface Nomination {
@@ -25,19 +26,6 @@ export const NominationQueue = ({
   onRemoveFromQueue,
 }: NominationQueueProps) => {
   const getPlayerById = (id: string) => players.find(p => p.id === id);
-  
-  // Map positions to color schemes that match our corrected colors.
-  const getPositionColorScheme = (pos: string) => {
-    switch (pos) {
-      case 'QB': return 'red';
-      case 'RB': return 'green';
-      case 'WR': return 'green';
-      case 'TE': return 'orange';
-      case 'K': return 'purple';
-      case 'DEF': return 'gray';
-      default: return 'gray';
-    }
-  };
   
   if (queue.length === 0) {
     return (
@@ -77,9 +65,9 @@ export const NominationQueue = ({
                   <HStack gap={2}>
                     <TeamMark team={player.nflTeam} size="xs" />
                     <Text fontWeight="medium">{player.name}</Text>
-                    <Badge colorScheme={getPositionColorScheme(player.pos)}>
+                    <PositionBadge className="cui-badge" position={player.pos}>
                       {formatPositionForDisplay(player.pos as Position)}
-                    </Badge>
+                    </PositionBadge>
                     {player.nflTeam && (
                       <Badge variant="outline" colorScheme="gray">{player.nflTeam}</Badge>
                     )}

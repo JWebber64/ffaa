@@ -99,7 +99,7 @@
   height: 26px;
   place-items: center;
   border-radius: var(--r-sm);
-  background: var(--surface-overlay);
+  background: var(--position-color, var(--pos-bench));
   color: white;
   font-size: .7rem;
   font-weight: 850;

@@ -19,7 +19,9 @@ import {
 import { readTeamRaterNavigationState } from "@/screens/tools/teamRaterNavigation";
 import { useToolData } from "@/screens/tools/useToolData";
 import { PositionToggle } from "@/ui/PositionToggle";
+import { PositionBadge } from "@/ui/PositionBadge";
 import { NumericInput } from "@/ui/NumericInput";
+import { positionColorKey } from "@/ui/positionColors";
 import { DEFAULT_POSITION_TOGGLE_OPTIONS } from "@/ui/positionToggleOptions";
 import { matchesPositionFilter } from "@/utils/positionFilter";
 import { UniversalSelect } from "@/ui/UniversalSelect";
@@ -73,10 +75,7 @@ function normalizeSlotCount(value: number) {
 }
 
 function slotColorPosition(position: TeamRaterSlotPosition) {
-  if (position === "DEF") return "dst";
-  if (position === "SUPERFLEX") return "qb";
-  if (position === "BENCH") return "all";
-  return position.toLowerCase();
+  return positionColorKey(position) ?? "bench";
 }
 
 function formatLineup(slots: TeamRaterSlot[]) {
@@ -291,7 +290,7 @@ export function TeamRater() {
                 <li key={player.id}>
                   <span className="tool-player-badges">
                     <TeamMark team={player.team} size="xs" />
-                    <span className={`tool-position-tag is-${player.position.toLowerCase()}`}>{player.position}</span>
+                    <PositionBadge className="tool-position-tag" position={player.position} />
                   </span>
                   <div><strong>{player.name}</strong><small>{formatTeamBye(player.team || "FA", player.byeWeek)} · Proj {formatNumber(player.projectedPoints)}</small></div>
                   <button type="button" aria-label={`Remove ${player.name}`} onClick={() => setRosterIds((current) => current.filter((id) => id !== player.id))}>

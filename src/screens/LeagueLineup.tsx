@@ -22,6 +22,7 @@ import { useLeagueSeasonManagement } from "../features/league-season/useLeagueSe
 import { useLeagueWeekLineups } from "../features/league-season/useLeagueWeekLineups";
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import { appUrl } from "../lib/appBasePath";
+import { PositionBadge } from "../ui/PositionBadge";
 import { UniversalSelect } from "../ui/UniversalSelect";
 import "./league-season.css";
 
@@ -254,7 +255,7 @@ export default function LeagueLineup() {
             const selectedPlayer = projectedById.get(selectedPlayerId);
             return (
               <div className="league-lineup-row" key={slot.key}>
-                <b className={`league-position pos-${positionLabel(slot.label).toLowerCase()}`}>{positionLabel(slot.label)}</b>
+                <PositionBadge className="league-position" position={slot.label}>{positionLabel(slot.label)}</PositionBadge>
                 <UniversalSelect value={selectedPlayerId} onValueChange={(value) => assign(slot.key, value)} aria-label={`${slot.label} starter`} disabled={isReadOnly}>
                   <option value="">Open slot</option>
                   {eligible.map((player) => {
@@ -273,7 +274,7 @@ export default function LeagueLineup() {
 
       <section className="league-lineup-bench" aria-labelledby="lineup-bench-title">
         <header><div><span>Available depth</span><h2 id="lineup-bench-title">Bench</h2></div><b>{displayed?.bench.length ?? 0}</b></header>
-        <div>{displayed?.bench.map((player) => <article key={player.id}><b className={`league-position pos-${positionLabel(player.position).toLowerCase()}`}>{positionLabel(player.position)}</b><div><strong>{player.name}</strong><small>{player.nflTeam || "FA"}{player.isOnBye ? " · Bye" : ""}</small></div><span>{player.baselinePoints?.toFixed(1) ?? "—"}</span></article>)}</div>
+        <div>{displayed?.bench.map((player) => <article key={player.id}><PositionBadge className="league-position" position={player.position}>{positionLabel(player.position)}</PositionBadge><div><strong>{player.name}</strong><small>{player.nflTeam || "FA"}{player.isOnBye ? " · Bye" : ""}</small></div><span>{player.baselinePoints?.toFixed(1) ?? "—"}</span></article>)}</div>
       </section>
     </div>
   );

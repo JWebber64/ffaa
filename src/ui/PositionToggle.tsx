@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { cn } from "./cn";
+import { positionColorVar } from "./positionColors";
 import type { PositionToggleOption } from "./positionToggleOptions";
 
 type PositionToggleProps<TValue extends string = string> = {
@@ -11,19 +12,8 @@ type PositionToggleProps<TValue extends string = string> = {
   disabled?: boolean | undefined;
 };
 
-function normalizePositionToken(value: string | undefined) {
-  if (!value) return undefined;
-
-  const token = value.toUpperCase().replace(/[^A-Z]/g, "");
-  if (!token || token === "ALL") return undefined;
-  if (token === "DEF" || token === "DST") return "dst";
-
-  return token.toLowerCase();
-}
-
 function getPositionToggleColor(option: PositionToggleOption) {
-  const token = normalizePositionToken(option.position ?? option.value);
-  return token ? `var(--pos-${token})` : "var(--a2)";
+  return positionColorVar(option.position ?? option.value, "var(--a2)");
 }
 
 function getToggleStyle(option: PositionToggleOption) {

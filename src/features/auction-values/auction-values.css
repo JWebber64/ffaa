@@ -1292,13 +1292,6 @@
   font-weight: 850;
 }
 
-.auction-position-chip.pos-qb { --position-color: var(--pos-qb); }
-.auction-position-chip.pos-rb { --position-color: var(--pos-rb); }
-.auction-position-chip.pos-wr { --position-color: var(--pos-wr); }
-.auction-position-chip.pos-te { --position-color: var(--pos-te); }
-.auction-position-chip.pos-k { --position-color: var(--pos-k); }
-.auction-position-chip.pos-def { --position-color: var(--pos-dst); }
-
 .auction-notes-column {
   min-width: 150px !important;
 }

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 
 import { createPortal } from "react-dom";
 import { cn } from "./cn";
 import { ControlChevron } from "./ControlChevron";
+import { positionColorKey, positionColorVar } from "./positionColors";
 
 type SelectOption = {
   value: string;
@@ -47,7 +48,7 @@ function extractOptions(children: React.ReactNode): SelectOption[] {
         position?: string;
         value?: string | number;
       };
-      const position = normalizePositionToken(props.position ?? props["data-position"]);
+      const position = positionColorKey(props.position ?? props["data-position"]);
 
       return {
         value: String(props.value ?? ""),
@@ -58,18 +59,11 @@ function extractOptions(children: React.ReactNode): SelectOption[] {
     });
 }
 
-function normalizePositionToken(value: string | undefined) {
-  const token = String(value ?? "").trim().toUpperCase();
-  if (!token || token === "ALL") return undefined;
-  if (token === "DEF" || token === "D/ST") return "DST";
-  return token.replace(/[^A-Z0-9_-]/g, "");
-}
-
 function getPositionStyle(position: string | undefined) {
   if (!position) return undefined;
 
   return {
-    "--select-position-color": `var(--pos-${position.toLowerCase()})`,
+    "--select-position-color": positionColorVar(position),
   } as React.CSSProperties;
 }
 

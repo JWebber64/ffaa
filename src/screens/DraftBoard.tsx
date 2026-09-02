@@ -10,6 +10,8 @@ import PositionPickerModal from '../components/modals/PositionPickerModal';
 import { getValidSlotsForPlayer } from '../store/draftStore';
 import { toastError } from '../utils/toastError';
 import DraftStateIO from '../components/DraftStateIO';
+import { PositionBadge } from '../ui/PositionBadge';
+import { positionColorVar } from '../ui/positionColors';
 
 import type { Position, Player as BasePlayer, Team as BaseTeam, DraftStore as DraftStoreType } from '../types/draft';
 
@@ -89,33 +91,15 @@ interface SlotBoxProps {
 }
 
 const SlotBox = ({ label, player }: SlotBoxProps) => {
-  // Use universal color system from tokens.css
-  const getPositionColor = (pos: string) => {
-    switch (pos) {
-      case 'QB': return 'red';
-      case 'RB': return 'green';
-      case 'WR': return 'green';
-      case 'TE': return 'orange';
-      case 'K': return 'purple';
-      case 'DEF': return 'gray';
-      case 'FLEX': return 'green';
-      case 'BENCH': return 'gray';
-      case 'IR': return 'gray';
-      default: return 'gray';
-    }
-  };
-
-  const positionColor = getPositionColor(label);
-  // Use appropriate shades for each position
-  const bgColor = label === 'BENCH' ? 'var(--pos-bench)' : label === 'IR' ? 'var(--pos-ir)' : label === 'K' ? 'purple.600' : label === 'DEF' ? 'gray.600' : `${positionColor}.900`;
-  const borderColor = label === 'BENCH' ? 'var(--pos-bench)' : label === 'IR' ? 'var(--pos-ir)' : label === 'K' ? 'purple.400' : label === 'DEF' ? 'gray.300' : `${positionColor}.600`;
+  const positionColor = positionColorVar(label, "var(--pos-flex)");
+  const bgColor = `color-mix(in oklch, ${positionColor} 24%, var(--color-surface-card-primary))`;
   
   if (player) {
     return (
       <Box
         bg={bgColor}
         border="1px solid"
-        borderColor={borderColor}
+        borderColor={positionColor}
         rounded="md"
         height="56px"
         display="flex"
@@ -143,13 +127,13 @@ const SlotBox = ({ label, player }: SlotBoxProps) => {
         
         {/* Bottom row: Badges evenly spaced */}
         <HStack justify="space-between" spacing={0.5} mt={0.5}>
-          <Badge colorScheme={getPositionColor(player.pos)} fontSize="0.55rem" px={1} minW="24px" textAlign="center">
+          <PositionBadge className="cui-badge" position={player.pos} style={{ fontSize: "0.55rem", minWidth: 24, paddingInline: 4 }}>
             {player.pos}
-          </Badge>
+          </PositionBadge>
           {player.slot && player.slot !== player.pos && (
-            <Badge colorScheme={getPositionColor(player.slot)} fontSize="0.55rem" px={1} minW="24px" textAlign="center">
+            <PositionBadge className="cui-badge" position={player.slot} style={{ fontSize: "0.55rem", minWidth: 24, paddingInline: 4 }}>
               {player.slot}
-            </Badge>
+            </PositionBadge>
           )}
           {player.nflTeam ? (
             <Badge variant="outline" fontSize="0.55rem" px={1} minW="24px" textAlign="center" color="whiteAlpha.900">
@@ -172,7 +156,7 @@ const SlotBox = ({ label, player }: SlotBoxProps) => {
     <Box
       bg={bgColor}
       border="1px solid"
-      borderColor={borderColor}
+      borderColor={positionColor}
       rounded="md"
       height="56px"
       display="flex"

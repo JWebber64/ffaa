@@ -17,6 +17,7 @@ import { useState } from 'react';
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import { formatPositionForDisplay } from '../../utils/positionUtils';
 import type { Position } from '../../types/draft';
+import { PositionBadge } from '../../ui/PositionBadge';
 import { TeamMark } from '../player/TeamMark';
 
 interface AuctionControlsProps {
@@ -119,9 +120,9 @@ export const AuctionControls = ({
               <Text fontSize="xl" fontWeight="bold" color="white">{currentPlayer.name}</Text>
             </HStack>
             <HStack gap={2} alignItems="center">
-              <Badge colorScheme={currentPlayer.pos === 'QB' ? 'green' : currentPlayer.pos === 'RB' ? 'green' : 'purple'}>
+              <PositionBadge className="cui-badge" position={currentPlayer.pos}>
                 {currentPlayer.pos}
-              </Badge>
+              </PositionBadge>
               <Text fontSize="sm" color="gray.300">{currentPlayer.nflTeam || 'FA'}</Text>
               {currentPlayer.byeWeek && (
                 <Badge variant="outline" colorScheme="gray">Bye {currentPlayer.byeWeek}</Badge>

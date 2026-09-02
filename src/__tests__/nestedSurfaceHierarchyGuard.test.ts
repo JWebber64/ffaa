@@ -56,7 +56,7 @@ describe("app-wide nested surface hierarchy guard", () => {
     expect(toolsCss).toMatch(/\.team-slot-control\s*\{[^}]*padding:\s*10px[^}]*border:\s*1px solid[^}]*var\(--slot-color\)[^}]*background:\s*color-mix[^}]*var\(--slot-color\)/s);
     expect(toolsCss).toMatch(/\.auction-slot-control\s*\{[^}]*padding:\s*10px[^}]*border:\s*1px solid[^}]*var\(--slot-color\)[^}]*background:\s*color-mix[^}]*var\(--slot-color\)/s);
     expect(toolsCss).toMatch(/\.team-slot-control\[data-position="qb"\]\s*\{[^}]*var\(--pos-qb\)/s);
-    expect(toolsCss).toMatch(/\.auction-slot-control\[data-position="def"\]\s*\{[^}]*var\(--pos-dst\)/s);
+    expect(toolsCss).toMatch(/\.auction-slot-control\[data-position="dst"\]\s*\{[^}]*var\(--pos-dst\)/s);
     expect(toolsCss).toMatch(/\.team-slot-control\s*>\s*span\s*\{[^}]*var\(--slot-color\)/s);
     expect(toolsCss).toMatch(/\.auction-slot-control\s*>\s*span\s*\{[^}]*var\(--slot-color\)/s);
     expect(toolsCss).toMatch(/\.team-slot-stepper input\s*\{[^}]*border:\s*0[^}]*background:\s*transparent/s);

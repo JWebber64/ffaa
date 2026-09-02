@@ -292,22 +292,7 @@
 .league-roster-row > div > small { color: var(--text-2); font-size: .65rem; }
 .league-roster-row > div:last-child { text-align: right; }
 .league-roster-divider { min-height: 38px; padding: 0 12px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line-1); color: var(--text-2); background: var(--surface-raised); font-size: .65rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
-.league-position { min-width: 38px; min-height: 24px; padding: 0 7px; display: inline-grid; place-items: center; border-radius: 5px; color: #fff; background: var(--pos-flex); font-size: .62rem; }
-.league-position.pos-qb { background: var(--pos-qb); }
-.league-position.pos-rb { background: var(--pos-rb); }
-.league-position.pos-wr { background: var(--pos-wr); }
-.league-position.pos-te { background: var(--pos-te); }
-.league-position.pos-k { background: var(--pos-k); }
-.league-position.pos-def,
-.league-position.pos-dst { background: var(--pos-dst); }
-.league-position.pos-bn1,
-.league-position.pos-bn2,
-.league-position.pos-bn3,
-.league-position.pos-bn4,
-.league-position.pos-bn5,
-.league-position.pos-bn6,
-.league-position.pos-bn7,
-.league-position.pos-bn8 { background: var(--pos-bench); }
+.league-position { min-width: 38px; min-height: 24px; padding: 0 7px; display: inline-grid; place-items: center; border-radius: 5px; color: #fff; background: var(--position-color, var(--pos-bench)); font-size: .62rem; font-weight: 850; }
 .league-mobile-label { display: none; }
 
 .league-week-toolbar {

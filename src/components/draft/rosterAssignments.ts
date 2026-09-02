@@ -1,3 +1,5 @@
+import { positionColorVar } from "../../ui/positionColors";
+
 export type RosterSlot = { slot: string; count: number; flexEligible?: string[] };
 
 export type RosterPlayer = {
@@ -32,22 +34,6 @@ export type SlotAssignment = {
   assigned: RosterPlayer | null;
 };
 
-const POSITION_COLORS: Record<string, string> = {
-  QB: "var(--pos-qb)",
-  RB: "var(--pos-rb)",
-  WR: "var(--pos-wr)",
-  TE: "var(--pos-te)",
-  FLEX: "var(--pos-flex)",
-  K: "var(--pos-k)",
-  DST: "var(--pos-dst)",
-  BENCH: "var(--pos-bench)",
-  IR: "var(--pos-ir)",
-  DL: "var(--pos-dl)",
-  LB: "var(--pos-lb)",
-  DB: "var(--pos-db)",
-  IDP_FLEX: "var(--pos-idpflex)",
-};
-
 const POSITION_ALIASES: Record<string, string> = {
   DEF: "DST",
   "D/ST": "DST",
@@ -65,7 +51,7 @@ function normalizePosition(value: string | null | undefined) {
 }
 
 function getSlotColor(slot: string) {
-  return POSITION_COLORS[slot] ?? "var(--pos-flex)";
+  return positionColorVar(slot, "var(--pos-flex)");
 }
 
 function getDefaultFlexEligibility(slot: string) {

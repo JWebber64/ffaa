@@ -1,6 +1,7 @@
 import { ExternalLink, Plus, Printer } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
+import { PositionBadge } from "../../ui/PositionBadge";
 import type { AuctionPlayerValue, AuctionValueMode, AuctionValueSource, ScoringFormat } from "./auctionValueTypes";
 
 type SheetRow = AuctionPlayerValue & { normalizedValue: number };
@@ -88,7 +89,7 @@ export function SourceSheet(props: Props) {
             <tbody>{visibleRows.map((row, index) => <tr key={`${row.sourceId}-${row.playerId}`}>
               <td>{row.rank ?? index + 1}</td>
               <th className="auction-player-column" scope="row"><strong>{row.playerName}</strong><small>{row.position} · {row.nflTeam ?? "FA"}</small></th>
-              <td><span className={`auction-position-chip pos-${row.position.toLowerCase()}`}>{row.position}</span></td>
+              <td><PositionBadge className="auction-position-chip" position={row.position} /></td>
               <td>{row.nflTeam ?? "—"}</td><td>{row.byeWeek ?? "—"}</td>
               <td>{currency.format(row.rawValue)}</td><td className={props.valueMode === "normalized" ? "auction-consensus-cell" : ""}>{currency.format(row.normalizedValue)}</td>
             </tr>)}</tbody>

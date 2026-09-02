@@ -16,6 +16,7 @@ import { Link, useParams } from "react-router-dom";
 import { buildCurrentToolPlayers } from "../data/toolPlayerData";
 import { LeagueAccountPanel } from "../features/league-season/LeagueAccountPanel";
 import { LeagueSeasonHero } from "../features/league-season/LeagueSeasonHero";
+import { PositionBadge } from "../ui/PositionBadge";
 import { getLeagueProjectionFreshness, projectionFreshnessSummary } from "../features/league-season/leagueProjectionFreshness";
 import {
   approveFranchiseClaim,
@@ -76,7 +77,7 @@ function LeagueSeasonGate({ status, message }: { status: string; message: string
 function PlayerRow({ player, slot, group }: { player: ProjectedRosterPlayer | null; slot: string; group: "starter" | "bench" }) {
   return (
     <div className={`league-roster-row ${group === "bench" ? "is-bench" : ""}`} role="row">
-      <div role="cell"><span className="league-mobile-label">Slot</span><b className={`league-position pos-${positionLabel(slot).toLowerCase()}`}>{positionLabel(slot)}</b></div>
+      <div role="cell"><span className="league-mobile-label">Slot</span><PositionBadge className="league-position" position={slot}>{positionLabel(slot)}</PositionBadge></div>
       <div className="league-roster-player" role="cell">
         <span className="league-mobile-label">Player</span>
         {player ? <><strong>{player.name}</strong><small>{player.nflTeam || "FA"}{player.isOnBye ? " · Bye" : player.projection?.injuryStatus ? ` · ${player.projection.injuryStatus}` : ""}</small></> : <><strong>Open slot</strong><small>No eligible player</small></>}

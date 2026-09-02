@@ -2,6 +2,7 @@ import { CheckCircle2, Info, ListChecks } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
+import { PositionBadge } from "../ui/PositionBadge";
 import StatsExplorer from "./StatsExplorer";
 import "./league-players.css";
 
@@ -28,7 +29,7 @@ export default function LeaguePlayers() {
               <div className="league-player-recommendation-head" aria-hidden="true"><span>Available player</span><span>Roster fit</span><span>Baseline</span><span>Evidence</span></div>
               {data.availableRecommendations.slice(0, 6).map((recommendation) => (
                 <article key={recommendation.id}>
-                  <div><span className={`pos-${recommendation.player.position.toLowerCase()}`}>{recommendation.player.position}</span><strong>{recommendation.player.name}</strong><small>{recommendation.player.team || "FA"}</small></div>
+                  <div><PositionBadge position={recommendation.player.position} /><strong>{recommendation.player.name}</strong><small>{recommendation.player.team || "FA"}</small></div>
                   <div><strong>{recommendation.eligibleSlots.map((slot) => slot.replace(/_/g, " ")).join(" / ")}</strong><small>{recommendation.dropPlayer ? `Compare with ${recommendation.dropPlayer.name}` : "No bench comparison available"}</small></div>
                   <div><strong>{recommendation.player.projectedPointsPerGame?.toFixed(1) ?? "—"} PPG</strong><small>{recommendation.baselineGain === null ? "No comparable drop" : `${recommendation.baselineGain >= 0 ? "+" : ""}${recommendation.baselineGain.toFixed(1)} vs suggested drop`}</small></div>
                   <div><strong>{recommendation.confidence} confidence</strong><small>{recommendation.evidence}</small></div>

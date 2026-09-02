@@ -8630,12 +8630,12 @@ p {
   font-size: 0.64rem;
 }
 
-.stats-pos-QB { background: rgba(220,38,38,0.72); }
-.stats-pos-RB { background: rgba(22,163,74,0.72); }
-.stats-pos-WR { background: color-mix(in oklch, var(--green-600) 72%, transparent); }
-.stats-pos-TE { background: rgba(234,88,12,0.72); }
-.stats-pos-K { background: rgba(147,51,234,0.72); }
-.stats-pos-DEF { background: rgba(82,82,82,0.82); }
+.stats-pos-QB { background: color-mix(in oklch, var(--pos-qb) 72%, transparent); }
+.stats-pos-RB { background: color-mix(in oklch, var(--pos-rb) 72%, transparent); }
+.stats-pos-WR { background: color-mix(in oklch, var(--pos-wr) 72%, transparent); }
+.stats-pos-TE { background: color-mix(in oklch, var(--pos-te) 72%, transparent); }
+.stats-pos-K { background: color-mix(in oklch, var(--pos-k) 72%, transparent); }
+.stats-pos-DEF { background: color-mix(in oklch, var(--pos-dst) 82%, transparent); }
 
 .stats-empty-state {
   position: sticky;
@@ -11072,6 +11072,12 @@ body,
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1;
+}
+
+.cui-badge.ffaa-position-badge {
+  border-color: color-mix(in oklch, var(--position-color) 72%, white 10%);
+  background: var(--position-color);
+  color: white;
 }
 
 .cui-button {

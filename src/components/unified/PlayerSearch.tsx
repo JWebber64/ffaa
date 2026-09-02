@@ -32,6 +32,8 @@ import {
 import { FaSearch } from 'react-icons/fa';
 import { useDraftStore } from '../../store/draftStore';
 import type { Player } from '../../store/draftStore';
+import { PositionBadge } from '../../ui/PositionBadge';
+import { positionColorVar } from '../../ui/positionColors';
 import { TeamMark } from '../player/TeamMark';
 import { formatByeWeek } from '../player/teamMarkUtils';
 
@@ -60,18 +62,6 @@ type PlayerSearchProps = {
   showBidButton?: boolean;
   /** Show starting bid input (default: false) */
   showStartingBid?: boolean;
-};
-
-const POSITION_COLORS: Record<string, string> = {
-  QB: 'green',
-  RB: 'red',
-  WR: 'green',
-  TE: 'orange',
-  K: 'yellow',
-  DEF: 'green',
-  FLEX: 'purple',
-  BENCH: 'var(--pos-bench)',
-  IR: 'var(--pos-ir)',
 };
 
 export const PlayerSearch: React.FC<PlayerSearchProps> = ({
@@ -360,8 +350,8 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                 <ListItem
                   key={player.id}
                   p={2}
-                  bg={focusedIndex === index ? 'gray.700' : `${POSITION_COLORS[player.pos] || 'gray'}.900`}
-                  _hover={{ bg: `${POSITION_COLORS[player.pos] || 'gray'}.700`, cursor: 'pointer' }}
+                  bg={focusedIndex === index ? 'gray.700' : `color-mix(in oklch, ${positionColorVar(player.pos)} 10%, var(--color-surface-card-primary))`}
+                  _hover={{ bg: `color-mix(in oklch, ${positionColorVar(player.pos)} 18%, var(--color-surface-card-secondary))`, cursor: 'pointer' }}
                   onClick={() => handleSelect(player)}
                   onMouseEnter={() => setFocusedIndex(index)}
                   onMouseLeave={() => setFocusedIndex(-1)}
@@ -377,24 +367,9 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                         <Text fontWeight="medium" color="white">{player.name}</Text>
                       </HStack>
                       <HStack spacing={2} mt={1}>
-                        <Badge 
-                          colorScheme={
-                            player.pos === 'BENCH' || player.pos === 'IR' 
-                              ? undefined 
-                              : POSITION_COLORS[player.pos] || 'gray'
-                          }
-                          style={
-                            player.pos === 'BENCH' || player.pos === 'IR'
-                              ? {
-                                  background: player.pos === 'BENCH' ? 'var(--pos-bench)' : 'var(--pos-ir)',
-                                  color: 'white',
-                                  border: 'none'
-                                }
-                              : undefined
-                          }
-                        >
+                        <PositionBadge className="cui-badge" position={player.pos}>
                           {player.pos}
-                        </Badge>
+                        </PositionBadge>
                         {player.nflTeam && <Badge variant="outline">{player.nflTeam}</Badge>}
                         {player.byeWeek && <Badge variant="outline">Bye {player.byeWeek}</Badge>}
                         {player.rank && <Text fontSize="sm" color="whiteAlpha.700">#{player.rank}</Text>}

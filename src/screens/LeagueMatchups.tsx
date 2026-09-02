@@ -17,6 +17,7 @@ import { useLeagueWeekLineups } from "../features/league-season/useLeagueWeekLin
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import type { MyHQData, MyHQLineupEntry } from "../features/my-hq/myHQ";
 import { useOptionalLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
+import { PositionBadge } from "../ui/PositionBadge";
 import { UniversalSelect } from "../ui/UniversalSelect";
 import "./league-season.css";
 
@@ -72,7 +73,7 @@ function MatchupLineupRows({ left, right, bench = false }: { left: MyHQLineupEnt
         return (
           <div className={`league-h2h-row ${bench ? "is-bench" : ""}`} role="row" key={`${slot}-${index}`}>
             <MatchupPlayerSide player={leftEntry?.player ?? null} side="left" />
-            <b className={`league-position pos-${slot.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>{bench ? "BN" : slot.replace(/_/g, " ")}</b>
+            <PositionBadge className="league-position" position={slot}>{bench ? "BN" : slot.replace(/_/g, " ")}</PositionBadge>
             <MatchupPlayerSide player={rightEntry?.player ?? null} side="right" />
           </div>
         );
