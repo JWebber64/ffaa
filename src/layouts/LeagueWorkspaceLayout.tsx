@@ -9,6 +9,7 @@ import {
   Settings2,
   ShieldCheck,
   Trophy,
+  Gavel,
   Users,
 } from "lucide-react";
 import { useRef } from "react";
@@ -24,6 +25,7 @@ const leagueDestinations = [
   { section: "standings", label: "Standings", icon: Trophy },
   { section: "schedule", label: "Schedule", icon: CalendarDays },
   { section: "teams", label: "All teams", icon: Users },
+  { section: "draft", label: "Draft", icon: Gavel },
   { section: "history", label: "History", icon: History },
   { section: "rules", label: "Rules", icon: BookOpen },
   { section: "commissioner", label: "Commissioner", icon: Settings2 },

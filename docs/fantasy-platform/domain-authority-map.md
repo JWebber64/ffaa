@@ -258,6 +258,7 @@ leagues/{gamehqLeagueId}
     seasonTeams/{seasonTeamId}
     lineups/{lineupId}
     scheduleVersions/{scheduleVersionId}
+    drafts/{draftId}
     assetLocks/player__{playerId}
     rosterTransactions/{transactionId}
   franchises/{franchiseId}
@@ -273,6 +274,7 @@ leagues/{gamehqLeagueId}
   readModelInvalidations/{eventId}
 
 externalLeagueMappings/{provider__externalLeagueId}
+nativeDraftShares/{shareToken}
 ```
 
 `externalLeagueMappings` is a lookup index, not a second league model. Its only authoritative payload is `{ leagueId, connectionId, provider, externalLeagueId, mappingRevision }`, written atomically with the connection. A uniqueness transaction prevents one provider league from mapping to two canonical leagues unless an explicit migration workflow replaces the mapping.
@@ -339,5 +341,7 @@ An imported league owner ID is display context. It never changes these labels or
 | Roster ledger | `seasons/{seasonId}/rosterTransactions/{transactionId}` | Drafts, waivers, trades, commissioner correction, keepers, and contracts must enter through this model as their phases activate |
 | Private audit metadata | `leagues/{id}/auditPrivate/{auditId}` | Current commissioner/co-commissioner read only; ordinary members receive the public audit receipt without administrative source metadata |
 | Downstream effects | `notificationOutbox` and `readModelInvalidations` | Durable server-written pending hooks; they are rebuildable/consumable and never a second mutation authority |
+| Native draft | `seasons/{seasonId}/drafts/{draftId}` through draft commands | Settings/franchise IDs and exact draft revision govern turns; each result co-commits its universal roster transaction |
+| Draft spectator state | `nativeDraftShares/{shareToken}` | Redacted rebuildable projection only; it omits queues/actors and never accepts browser writes |
 
 The first implementation does not infer authority from `managerProviderUserId`, `leagueOwnerProviderUserId`, Sleeper roster ownership, or any other imported profile field.

@@ -12,6 +12,12 @@ import {
   executeRevokeLeagueInvitation,
 } from "./membershipCommands";
 import { executeApplyRosterTransaction, executeReverseRosterTransaction } from "./rosterTransactionCommands";
+import {
+  executeApplyNativeDraftAction,
+  executeCreateNativeDraft,
+  executeRevertNativeDraftAction,
+  executeStartNativeDraft,
+} from "./nativeDraftCommands";
 import type { LeagueCommandStore } from "./store";
 
 const COMMAND_TYPES = new Set<LeagueCommandType>([
@@ -28,6 +34,10 @@ const COMMAND_TYPES = new Set<LeagueCommandType>([
   "remove_league_member",
   "apply_roster_transaction",
   "reverse_roster_transaction",
+  "create_native_draft",
+  "start_native_draft",
+  "apply_native_draft_action",
+  "revert_native_draft_action",
 ]);
 
 function normalizeCommand(value: unknown): LeagueCommand {
@@ -127,5 +137,17 @@ export async function executeLeagueCommand(input: {
   if (command.commandType === "apply_roster_transaction") {
     return executeApplyRosterTransaction(shared as Parameters<typeof executeApplyRosterTransaction>[0]);
   }
-  return executeReverseRosterTransaction(shared as Parameters<typeof executeReverseRosterTransaction>[0]);
+  if (command.commandType === "reverse_roster_transaction") {
+    return executeReverseRosterTransaction(shared as Parameters<typeof executeReverseRosterTransaction>[0]);
+  }
+  if (command.commandType === "create_native_draft") {
+    return executeCreateNativeDraft(shared as Parameters<typeof executeCreateNativeDraft>[0]);
+  }
+  if (command.commandType === "start_native_draft") {
+    return executeStartNativeDraft(shared as Parameters<typeof executeStartNativeDraft>[0]);
+  }
+  if (command.commandType === "apply_native_draft_action") {
+    return executeApplyNativeDraftAction(shared as Parameters<typeof executeApplyNativeDraftAction>[0]);
+  }
+  return executeRevertNativeDraftAction(shared as Parameters<typeof executeRevertNativeDraftAction>[0]);
 }

@@ -60,6 +60,11 @@ service cloud.firestore {
       allow list, create, update, delete: if false;
     }
 
+    match /nativeDraftShares/{shareToken} {
+      allow get: if shareToken.size() >= 20 && shareToken.size() <= 80;
+      allow list, create, update, delete: if false;
+    }
+
     match /leagues/{leagueId} {
       function canonicalMembershipPath(userId) {
         return /databases/$(database)/documents/leagues/$(leagueId)/memberships/$(userId);
@@ -109,6 +114,11 @@ service cloud.firestore {
         }
 
         match /assetLocks/{assetLockId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /drafts/{draftId} {
           allow get, list: if isCanonicalMember();
           allow create, update, delete: if false;
         }

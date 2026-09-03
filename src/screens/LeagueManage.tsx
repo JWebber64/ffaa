@@ -47,8 +47,10 @@ export default function LeagueManage() {
     ? "settings"
     : location.pathname.endsWith("/teams")
       ? "teams"
-      : location.pathname.endsWith("/audit")
-        ? "audit"
+      : location.pathname.endsWith("/draft")
+        ? "draft"
+        : location.pathname.endsWith("/audit")
+          ? "audit"
         : "overview";
   return <CommissionerSettingsWorkspace workspace={canonicalWorkspace} section={section} onWorkspaceChanged={refreshWorkspace} />;
 }

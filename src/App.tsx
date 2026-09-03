@@ -30,6 +30,7 @@ const LeagueOverview = lazy(() => import("./screens/LeagueOverview"));
 const LeaguePlayers = lazy(() => import("./screens/LeaguePlayers"));
 const LeagueManage = lazy(() => import("./screens/LeagueManage"));
 const LeagueRules = lazy(() => import("./screens/LeagueRules"));
+const LeagueDraft = lazy(() => import("./screens/LeagueDraft"));
 const LeagueInvitationAccept = lazy(() => import("./screens/LeagueInvitationAccept"));
 const LeagueWorkspaceLayout = lazy(() => import("./layouts/LeagueWorkspaceLayout"));
 const DraftOrderShowdown = lazy(() => import("./features/draft-order/DraftOrderShowdown"));
@@ -132,6 +133,7 @@ function AppRoutes() {
             <Route path="transactions" element={<LeagueSectionRedirect destination="history/transactions" />} />
             <Route path="history/*" element={<LeagueHistoryApp />} />
             <Route path="rules" element={<LeagueRules />} />
+            <Route path="draft" element={<LeagueDraft />} />
             <Route path="join" element={<LeagueInvitationAccept />} />
             <Route path="manage" element={<LeagueManage />} />
             <Route path="commissioner/*" element={<LeagueManage />} />

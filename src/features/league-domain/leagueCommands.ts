@@ -7,6 +7,10 @@ import {
   type SaveSettingsDraftPayload,
   type CreateLeagueInvitationPayload,
   type ReverseRosterTransactionPayload,
+  type ApplyNativeDraftActionPayload,
+  type CreateNativeDraftPayload,
+  type RevertNativeDraftActionPayload,
+  type StartNativeDraftPayload,
 } from "../../../shared/leagueCommandProtocol";
 import { ensurePermanentFirebaseUserId } from "../../lib/authSession";
 import { httpLeagueCommandService } from "./httpLeagueCommandService";
@@ -275,6 +279,92 @@ export async function reverseRosterTransactionCommand(input: {
   return httpLeagueCommandService.execute({
     commandId: input.commandId ?? createLeagueCommandId(),
     commandType: "reverse_roster_transaction",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: input.payload,
+    reason: input.reason.trim().replace(/\s+/gu, " ").slice(0, 240),
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function createNativeDraftCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: CreateNativeDraftPayload;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "create_native_draft",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: input.payload,
+    reason: "Configure the native league draft",
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function startNativeDraftCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: StartNativeDraftPayload;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "start_native_draft",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: input.payload,
+    reason: "Launch the native league draft",
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function applyNativeDraftActionCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: ApplyNativeDraftActionPayload;
+  reason?: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "apply_native_draft_action",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: input.payload,
+    reason: (input.reason ?? `Native draft ${input.payload.action.type}`).trim().replace(/\s+/gu, " ").slice(0, 240),
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function revertNativeDraftActionCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: RevertNativeDraftActionPayload;
+  reason: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "revert_native_draft_action",
     actorUserId,
     leagueId: input.leagueId,
     seasonId: input.seasonId,

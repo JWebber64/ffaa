@@ -213,6 +213,67 @@ export type RosterTransaction = {
   reversedByTransactionId: string | null;
 };
 
+export type NativeDraftStatus = "lobby" | "live" | "paused" | "complete";
+
+export type NativeDraftSelection = {
+  id: string;
+  playerId: string;
+  franchiseId: string;
+  overallPick: number;
+  round: number;
+  price: number;
+  rosterTransactionId: string;
+  selectedAt: string;
+  source: "pick" | "autopick" | "auction";
+};
+
+export type NativeDraftTeamState = {
+  franchiseId: string;
+  budget: number;
+  spent: number;
+  picks: number;
+};
+
+export type NativeDraft = {
+  id: string;
+  leagueId: string;
+  seasonId: string;
+  settingsVersionId: string;
+  format: "auction" | "snake" | "linear" | "third_round_reversal";
+  mode: "live" | "slow";
+  status: NativeDraftStatus;
+  revision: number;
+  seasonRevision: number;
+  orderFranchiseIds: string[];
+  rosterSize: number;
+  pickSeconds: number;
+  nominationSeconds: number;
+  bidSeconds: number;
+  antiSnipeSeconds: number;
+  minimumBid: number;
+  auctionBudget: number;
+  spectatorEnabled: boolean;
+  spectatorCode: string;
+  teamStates: NativeDraftTeamState[];
+  selections: NativeDraftSelection[];
+  queues: Record<string, string[]>;
+  overallPick: number;
+  currentFranchiseId: string | null;
+  currentDeadlineAt: string | null;
+  auctionState: {
+    playerId: string;
+    nominatedByFranchiseId: string;
+    highBidderFranchiseId: string;
+    currentBid: number;
+    startedAt: string;
+    endsAt: string;
+  } | null;
+  createdAt: string;
+  startedAt: string | null;
+  completedAt: string | null;
+  updatedAt: string;
+};
+
 export type LeagueAuthorityLabel =
   | "Native GameHQ League — read/write"
   | "Connected Sleeper League — read-only"

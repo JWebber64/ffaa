@@ -353,3 +353,14 @@ leagues/{gamehqLeagueId}/commands/{commandId}
 The asset-lock document is the unique player-ownership index and uses a Firestore update-time/create-only precondition. Team rosters, locks, transaction, season revision, audit, receipt, and pipeline hooks commit together. A drop deletes its lock with the lock's exact update-time precondition. A reversal creates a new transaction and marks the original transaction `reversed` with `reversed_by_transaction_id`; it never deletes either ledger entry.
 
 Legacy `leagueSeasons` roster payloads are deliberately not dual-written or indexed. Their authority remains the compatibility source until the native draft/migration handoff establishes a complete roster transaction ledger.
+
+## Implemented Phase 4 native draft persistence
+
+```text
+leagues/{gamehqLeagueId}/seasons/{seasonId}/drafts/{draftId}
+nativeDraftShares/{unguessableShareToken}
+```
+
+The season draft is the single native authority for format, mode, current turn, persisted deadlines, team budgets/spend, private queues, auction state, result order, roster-transaction references, status, and draft/season revisions. Browser members may read it; all mutations are server-command only. The spectator document is a rebuildable read projection containing the public draft state without queues, command actors, or private audit data. Exact-token reads are public; list and browser writes are denied.
+
+Each draft selection or auction sale co-commits the draft revision with the existing `seasonTeams`, `assetLocks`, `rosterTransactions`, season, audit, receipt, notification, and invalidation paths. Standalone `drafts`, `offlineDrafts`, and `offlineLeagueDrafts` are not rewritten, copied, or deleted.

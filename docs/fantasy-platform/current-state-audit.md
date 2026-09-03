@@ -1,6 +1,6 @@
 # Fantasy platform current-state audit
 
-Status: Phase 0 baseline plus Phases 1–3 implementation deltas, 2026-09-03. The baseline audit remains below for provenance; the implemented branch facts are recorded at the end.
+Status: Phase 0 baseline plus Phases 1–4 implementation deltas, 2026-09-03. The baseline audit remains below for provenance; the implemented branch facts are recorded at the end.
 
 ## Evidence boundary
 
@@ -306,3 +306,11 @@ Deliberate remaining direct legacy writes are season publication, claims/members
 - Reversals create inverse transactions and preserve the original receipt and audit lineage. A reversal is rejected when the current asset state no longer matches the original transaction result.
 - `/league/:gamehqLeagueId/commissioner/audit` is the operational ledger view. Browser writes to canonical rosters, locks, transactions, private audit metadata, and pipeline hooks are denied by `firestore.rules`.
 - Legacy-backed roster snapshots remain compatibility authority until an explicit native draft/import cutover. Phase 3 does not infer locks from imported provider rosters.
+
+## Phase 4 implementation delta
+
+- Native drafts now live under the canonical season and reference the published settings version and permanent franchise IDs. Live and slow clocks, draft order, team queues, auction state, results, and revisions survive refresh/reconnect.
+- Snake, linear, third-round reversal, and auction actions are server commands. A pick or sale and its roster lock/transaction are one commit; two stale clients cannot both win the same turn or player.
+- Commissioner and co-commissioner controls pause/resume, settle expired auctions, and revert the last untouched result with a required reason and inverse roster receipt.
+- Manager and commissioner routes use the canonical draft subscription. Tokenized public spectator projections omit manager queues and actor identity; direct browser writes to drafts and projections are denied.
+- Existing live-room and offline-draft collections remain usable and unchanged. They remain non-authoritative until a commissioner explicitly chooses a future validated import workflow.

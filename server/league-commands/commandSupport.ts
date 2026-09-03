@@ -92,6 +92,10 @@ export function auditPrivatePath(leagueId: string, auditId: string) {
   return `leagues/${leagueId}/auditPrivate/${auditId}`;
 }
 
+export function nativeDraftPath(leagueId: string, seasonId: string, draftId: string) {
+  return `leagues/${leagueId}/seasons/${seasonId}/drafts/${draftId}`;
+}
+
 export function createOnlyWrite(store: LeagueCommandStore, path: string, data: Record<string, unknown>): FirestoreWrite {
   return { update: store.document(path, data), currentDocument: { exists: false } };
 }
@@ -146,6 +150,10 @@ export function normalizeReceipt(document: LeagueCommandStoredDocument | null): 
     "remove_league_member",
     "apply_roster_transaction",
     "reverse_roster_transaction",
+    "create_native_draft",
+    "start_native_draft",
+    "apply_native_draft_action",
+    "revert_native_draft_action",
   ].includes(commandType)) return null;
   const error = record(data.error);
   return {

@@ -10,8 +10,8 @@ The roadmap follows the requested phases in order. Each phase is a bounded chang
 | 1A | First vertical native-league foundation | Implemented; exact Preview verified; Production unchanged | First-slice evidence and limits below |
 | 2 | Creation wizard and full Commissioner workspace/settings publication | Native redraft exit gate implemented locally through 2A and 2B | Valid native redraft league, immutable settings, and assigned managers |
 | 3 | Universal command, roster transaction, and audit expansion | Implemented for canonical player ownership, commissioner correction/reversal, and pipeline hooks | Concurrent ownership is atomic and every roster mutation has a receipt |
-| 4 | Native-league draft integration | Next phase; ledger and settings gates are available | Draft completion creates roster transactions |
-| 5 | Weekly operation and player-level locks | Blocked on settings/commands | Cross-device lineups and settings-derived lock behavior |
+| 4 | Native-league draft integration | Implemented for authoritative auction, snake, linear, and third-round-reversal rooms | Draft completion creates roster transactions |
+| 5 | Weekly operation and player-level locks | Next phase; settings, rosters, and command gates are available | Cross-device lineups and settings-derived lock behavior |
 | 6 | Provider-agnostic scoring | Blocked on settings/schedule/lineups | Deterministic replay/corrections and live freshness UI |
 | 7 | Free agents and waivers | Blocked on roster/scoring state | Atomic reproducible processing and receipts |
 | 8 | Two-team trades | Blocked on roster transaction ledger | Atomic asset locks/review/receipts |
@@ -274,6 +274,19 @@ Phase 3 compatibility/rollback: existing legacy published rosters remain authori
 - Preserve standalone Offline Draft and Showdown.
 
 Gate: completed native draft publishes authoritative rosters without manual JSON and survives reconnect.
+
+### Implemented Phase 4 — canonical native draft handoff
+
+- `create_native_draft`, `start_native_draft`, `apply_native_draft_action`, and `revert_native_draft_action` run through the authenticated league command service with exact season and draft revisions. Duplicate commands return one receipt; concurrent stale clients cannot both select the current player.
+- The native draft aggregate stores the active settings version, permanent franchise order, auction budgets, roster capacity, pick/nomination/bid/anti-snipe clocks, slow-draft mode, team queues, immutable result references, and current turn. Snake, linear, third-round reversal, and auction ordering are server-derived.
+- Every accepted pick, autopick, or expired auction sale creates the Phase 3 asset lock, team roster revision, `RosterTransaction`, public/private audit records, receipt, and downstream invalidations in the same commit as the draft state. The last legal result can be reverted only by a commissioner with a reason; the inverse roster transaction pauses the room.
+- Completing every roster automatically marks the draft complete, publishes the canonical rosters, advances the season to `regular_season`, and activates the league. Refresh and reconnect subscribe to the same server document; no manual JSON handoff exists.
+- `/league/:gamehqLeagueId/draft` is the mobile/desktop manager room. `/commissioner/draft` configures order and clocks, starts the room, pauses/resumes, settles auctions, and performs guarded correction. Co-commissioners inherit host controls. Public spectators use a tokenized, read-only `nativeDraftShares` projection that omits private queues and actor data.
+- Existing top-level live rooms, Offline Draft, practice/CPU modes, Draft Order Showdown, roster builder, and standalone result routes remain unchanged. They do not acquire native authority merely because they contain the same external league ID.
+
+Exact Phase 4 implementation files: `shared/leagueCommandProtocol.ts`; `server/league-commands/nativeDraftCommands.ts`, `executeLeagueCommand.ts`, and `commandSupport.ts`; `src/features/native-draft/NativeDraftBoard.tsx`, `CommissionerDraftWorkspace.tsx`, `nativeDraft.ts`, `useNativeDraft.ts`, and `native-draft.css`; `src/features/league-domain/leagueCommands.ts` and `types.ts`; `src/screens/LeagueDraft.tsx` and `LeagueManage.tsx`; `src/features/league-settings/CommissionerSettingsWorkspace.tsx`; `src/layouts/LeagueWorkspaceLayout.tsx`; `src/App.tsx`; `src/lib/routeMetadata.ts`; and `firestore.rules`. Coverage is in `nativeDraftCommands.test.ts`, `nativeDraftWorkspace.test.tsx`, `nativeLeagueFirestoreRules.test.ts`, and `routeMetadata.test.ts`.
+
+Phase 4 compatibility/rollback: route/UI entry can be disabled without deleting an accepted draft, roster transaction, or receipt. Legacy `drafts`, `offlineDrafts`, and `offlineLeagueDrafts` remain separate compatibility aggregates; no saved standalone result is silently imported into canonical ownership. A future explicit import must prove franchise/player parity before emitting native transactions.
 
 ## Phase 5 — weekly lineups and player locks
 

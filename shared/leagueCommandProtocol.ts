@@ -15,7 +15,11 @@ export type LeagueCommandType =
   | "revoke_league_invitation"
   | "remove_league_member"
   | "apply_roster_transaction"
-  | "reverse_roster_transaction";
+  | "reverse_roster_transaction"
+  | "create_native_draft"
+  | "start_native_draft"
+  | "apply_native_draft_action"
+  | "revert_native_draft_action";
 
 export type CreateNativeLeaguePayload = {
   name: string;
@@ -103,6 +107,46 @@ export type ReverseRosterTransactionPayload = {
   transactionId: string;
 };
 
+export type NativeDraftFormat = "auction" | "snake" | "linear" | "third_round_reversal";
+export type NativeDraftMode = "live" | "slow";
+
+export type CreateNativeDraftPayload = {
+  format: NativeDraftFormat;
+  mode: NativeDraftMode;
+  draftOrderFranchiseIds: string[];
+  pickSeconds: number;
+  nominationSeconds: number;
+  bidSeconds: number;
+  antiSnipeSeconds: number;
+  spectatorEnabled: boolean;
+};
+
+export type StartNativeDraftPayload = {
+  draftId: string;
+};
+
+export type NativeDraftAction =
+  | { type: "pick"; playerId: string }
+  | { type: "autopick"; playerId?: string }
+  | { type: "set_queue"; franchiseId: string; playerIds: string[] }
+  | { type: "nominate"; playerId: string; openingBid: number }
+  | { type: "bid"; franchiseId: string; amount: number }
+  | { type: "settle" }
+  | { type: "pause" }
+  | { type: "resume" }
+  | { type: "complete" };
+
+export type ApplyNativeDraftActionPayload = {
+  draftId: string;
+  expectedDraftRevision: number;
+  action: NativeDraftAction;
+};
+
+export type RevertNativeDraftActionPayload = {
+  draftId: string;
+  expectedDraftRevision: number;
+};
+
 export type LeagueCommandPayloadByType = {
   create_native_league: CreateNativeLeaguePayload;
   connect_external_league: ConnectExternalLeaguePayload;
@@ -117,6 +161,10 @@ export type LeagueCommandPayloadByType = {
   remove_league_member: RemoveLeagueMemberPayload;
   apply_roster_transaction: ApplyRosterTransactionPayload;
   reverse_roster_transaction: ReverseRosterTransactionPayload;
+  create_native_draft: CreateNativeDraftPayload;
+  start_native_draft: StartNativeDraftPayload;
+  apply_native_draft_action: ApplyNativeDraftActionPayload;
+  revert_native_draft_action: RevertNativeDraftActionPayload;
 };
 
 export type LeagueCommand<TType extends LeagueCommandType = LeagueCommandType> = {
