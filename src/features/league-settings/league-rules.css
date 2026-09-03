@@ -1,0 +1,16 @@
+.league-rules-shell { width: min(760px, calc(100% - 28px)); margin: var(--space-6) auto; padding: var(--space-6); border: 1px solid var(--line-1); border-radius: var(--r-xl); background: var(--color-surface-card-primary); text-align: center; }
+.league-rules-shell > svg { width: 28px; height: 28px; margin: 0 auto var(--space-3); color: var(--green-400); }
+.league-rules-shell h1 { margin: 5px 0 var(--space-2); font-size: 1.8rem; }
+.league-rules-shell p { margin: 0 auto var(--space-4); color: var(--text-secondary); }
+.league-constitution { width: min(900px, calc(100% - 28px)); margin: var(--space-6) auto var(--space-8); }
+.league-constitution > header { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: var(--space-5); margin-bottom: var(--space-5); }
+.league-constitution h1 { margin: 5px 0 0; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1; letter-spacing: -.04em; }
+.league-constitution > header > p { display: flex; margin: 0; align-items: center; gap: 7px; color: var(--text-muted); font-size: .72rem; }
+.league-constitution > header svg { width: 14px; }
+.league-constitution > ol { margin: 0; padding: 0; border-top: 1px solid var(--line-1); list-style: none; }
+.league-constitution > ol > li { display: grid; grid-template-columns: 46px 1fr; gap: var(--space-4); padding: var(--space-4) 0; border-bottom: 1px solid var(--line-1); }
+.league-constitution > ol > li > span { color: var(--green-400); font-size: .7rem; font-weight: 900; letter-spacing: .08em; }
+.league-constitution h2 { margin: 0 0 7px; font-size: 1rem; }
+.league-constitution li p { margin: 0 0 7px; color: var(--text-secondary); font-size: .82rem; line-height: 1.6; }
+.league-constitution li p:last-child { margin-bottom: 0; }
+@media (max-width: 600px) { .league-constitution > header { grid-template-columns: 1fr; gap: var(--space-2); } .league-constitution > ol > li { grid-template-columns: 32px 1fr; gap: var(--space-2); } }

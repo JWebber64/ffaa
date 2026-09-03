@@ -20,9 +20,19 @@ describe("route metadata", () => {
       "/league/teams/offline-t3",
       "/league/matchups",
       "/league/123456789012/team",
+      "/league/11111111-1111-4111-8111-111111111111",
       "/league/123456789012/team/matchup",
+      "/league/123456789012/matchup",
       "/league/123456789012/players",
       "/league/123456789012/standings",
+      "/league/123456789012/schedule",
+      "/league/123456789012/commissioner",
+      "/league/123456789012/commissioner/teams",
+      "/league/123456789012/commissioner/audit",
+      "/league/123456789012/commissioner/draft",
+      "/league/123456789012/draft",
+      "/league/123456789012/rules",
+      "/league/123456789012/join",
       "/offline-draft",
       "/host/setup",
       "/join",
@@ -31,5 +41,8 @@ describe("route metadata", () => {
     ];
 
     expect(paths.map(metadataForPath).every((entry) => entry.indexable === false)).toBe(true);
+    expect(metadataForPath("/league/123456789012/commissioner/audit").title).toBe("Commissioner Audit");
+    expect(metadataForPath("/league/123456789012/commissioner/draft").title).toBe("Commissioner Draft");
+    expect(metadataForPath("/league/123456789012/draft").title).toBe("Native League Draft");
   });
 });

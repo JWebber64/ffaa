@@ -1,12 +1,13 @@
 import { Settings2, ShieldAlert } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
-import LeagueHQ from "./LeagueHQ";
+import { CommissionerSettingsWorkspace } from "../features/league-settings/CommissionerSettingsWorkspace";
 import "./my-hq.css";
 
 export default function LeagueManage() {
-  const { leagueId, capabilities } = useLeagueWorkspace();
+  const location = useLocation();
+  const { leagueId, capabilities, canonicalWorkspace, refreshWorkspace } = useLeagueWorkspace();
   if (capabilities.status === "loading") {
     return (
       <section className="my-hq my-hq-gate" aria-busy="true">
@@ -31,5 +32,25 @@ export default function LeagueManage() {
       </section>
     );
   }
-  return <LeagueHQ />;
+  if (!canonicalWorkspace?.season || canonicalWorkspace.league.authorityMode !== "native") {
+    return (
+      <section className="my-hq my-hq-gate">
+        <Settings2 aria-hidden="true" />
+        <span className="hq-kicker">Commissioner workspace</span>
+        <h1 className="ff-display">Native settings begin after migration</h1>
+        <p>This connected league still takes its rules from the external source. Complete native migration before publishing GameHQ rules.</p>
+        <Link className="hq-primary-link" to="/leagues">Review league connections</Link>
+      </section>
+    );
+  }
+  const section = location.pathname.endsWith("/settings")
+    ? "settings"
+    : location.pathname.endsWith("/teams")
+      ? "teams"
+      : location.pathname.endsWith("/draft")
+        ? "draft"
+        : location.pathname.endsWith("/audit")
+          ? "audit"
+        : "overview";
+  return <CommissionerSettingsWorkspace workspace={canonicalWorkspace} section={section} onWorkspaceChanged={refreshWorkspace} />;
 }

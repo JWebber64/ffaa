@@ -185,7 +185,7 @@ describeWithEmulator("league season Firestore security", () => {
     await assertFails(secondBatch.commit());
   });
 
-  it("allows approved managers to save an open lineup and rejects them after the commissioner locks the week", async () => {
+  it("routes every weekly lineup and audit mutation through the server command boundary", async () => {
     const commissioner = firestoreFor(commissionerId);
     await publishSeason(commissioner);
     await requestAndApproveTeam();
@@ -194,7 +194,15 @@ describeWithEmulator("league season Firestore security", () => {
     const openBatch = manager.batch();
     openBatch.set(manager.doc(`leagueSeasons/${leagueId}/lineups/team-1_week_1`), lineupDocument(managerId, "audit-open-1"));
     openBatch.set(manager.doc(`leagueSeasons/${leagueId}/auditEvents/audit-open-1`), auditDocument(managerId, "audit-open-1", "lineup_saved"));
-    await assertSucceeds(openBatch.commit());
+    await assertFails(openBatch.commit());
+
+    await testEnvironment.withSecurityRulesDisabled(async (context: RulesTestContext) => {
+      const admin = context.firestore();
+      const seedBatch = admin.batch();
+      seedBatch.set(admin.doc(`leagueSeasons/${leagueId}/lineups/team-1_week_1`), lineupDocument(managerId, "audit-open-1"));
+      seedBatch.set(admin.doc(`leagueSeasons/${leagueId}/auditEvents/audit-open-1`), auditDocument(managerId, "audit-open-1", "lineup_saved"));
+      await seedBatch.commit();
+    });
 
     await assertSucceeds(commissioner.doc(`leagueSeasons/${leagueId}/weekSettings/week-1`).set({
       league_id: leagueId,
@@ -214,7 +222,7 @@ describeWithEmulator("league season Firestore security", () => {
     const overrideBatch = commissioner.batch();
     overrideBatch.set(commissioner.doc(`leagueSeasons/${leagueId}/lineups/team-1_week_1`), lineupDocument(commissionerId, "audit-override-1", 2));
     overrideBatch.set(commissioner.doc(`leagueSeasons/${leagueId}/auditEvents/audit-override-1`), auditDocument(commissionerId, "audit-override-1", "lineup_override", "Correcting an injured starter"));
-    await assertSucceeds(overrideBatch.commit());
+    await assertFails(overrideBatch.commit());
 
     await assertFails(commissioner.doc(`leagueSeasons/${leagueId}/auditEvents/audit-override-1`).update({ reason: "Changed" }));
     await assertFails(commissioner.doc(`leagueSeasons/${leagueId}/auditEvents/audit-override-1`).delete());

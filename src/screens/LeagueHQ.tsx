@@ -60,6 +60,8 @@ import { leagueHistoryPath, leagueRivalryPath } from "../features/league-history
 import { HistoryHealthPanel } from "../features/league-history/ui/HistoryHealthPanel";
 import { FANTASY_SEASON } from "../config/fantasySeason";
 import { appUrl } from "../lib/appBasePath";
+import { featureFlags } from "../config/featureFlags";
+import { NativeLeagueFoundationPanel } from "../features/league-domain/NativeLeagueFoundationPanel";
 import "./league-hq.css";
 
 const VIEWS = [
@@ -187,6 +189,7 @@ export default function LeagueHQ() {
   const draftManagers = data.sleeper
     ? data.managers.filter((manager) => manager.currentRosterId != null)
     : data.managers;
+  const activeConnection = connections.find((candidate) => candidate.leagueId === activeLeagueId) ?? null;
   const sortedManagers = useMemo(() => {
     const rows = [...data.managers];
     return rows.sort((a, b) => {
@@ -374,6 +377,7 @@ export default function LeagueHQ() {
 
   return (
     <div className="league-hq">
+      {featureFlags.nativeLeagueFoundation ? <NativeLeagueFoundationPanel activeConnection={activeConnection} /> : null}
       <section className="league-hero">
         <div className="league-hero-copy">
           <span className="league-kicker"><Trophy size={15} aria-hidden="true" /> {data.identity.shortName} League HQ</span>

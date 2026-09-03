@@ -1,13 +1,18 @@
 import { Activity, CalendarDays, History, Settings2, Trophy, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { NativeStandingsWorkspace } from "../features/native-competition/NativeStandingsWorkspace";
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
 import "./league-overview.css";
 
 export default function LeagueOverview() {
-  const { leagueId, connection, teamState, capabilities } = useLeagueWorkspace();
+  const { leagueId, connection, teamState, capabilities, canonicalWorkspace, refreshWorkspace } = useLeagueWorkspace();
   const base = `/league/${encodeURIComponent(leagueId)}`;
   const data = teamState.status === "ready" ? teamState.data : null;
+
+  if (canonicalWorkspace?.authority.mode === "native" && canonicalWorkspace.season) {
+    return <NativeStandingsWorkspace workspace={canonicalWorkspace} onWorkspaceChanged={refreshWorkspace} />;
+  }
 
   return (
     <div className="league-overview-page">

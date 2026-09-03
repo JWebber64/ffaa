@@ -20,17 +20,24 @@ const AnalyticsLab = lazy(() =>
 );
 const Tools = lazy(() => import("./screens/Tools"));
 const LeagueHQ = lazy(() => import("./screens/LeagueHQ"));
+const LeagueHome = lazy(() => import("./screens/LeagueHome"));
 const LeagueTeams = lazy(() => import("./screens/LeagueTeams"));
 const LeagueMatchups = lazy(() => import("./screens/LeagueMatchups"));
+const LeagueSchedule = lazy(() => import("./screens/LeagueSchedule"));
+const LeagueTeam = lazy(() => import("./screens/LeagueTeam"));
 const LeagueLineup = lazy(() => import("./screens/LeagueLineup"));
-const MyHQ = lazy(() => import("./screens/MyHQ"));
 const MyTeams = lazy(() => import("./screens/MyTeams"));
 const LeagueOverview = lazy(() => import("./screens/LeagueOverview"));
 const LeaguePlayers = lazy(() => import("./screens/LeaguePlayers"));
+const LeagueTransactions = lazy(() => import("./screens/LeagueTransactions"));
 const LeagueManage = lazy(() => import("./screens/LeagueManage"));
+const LeagueRules = lazy(() => import("./screens/LeagueRules"));
+const LeagueDraft = lazy(() => import("./screens/LeagueDraft"));
+const LeaguePulse = lazy(() => import("./screens/LeaguePulse"));
+const LeagueInvitationAccept = lazy(() => import("./screens/LeagueInvitationAccept"));
 const LeagueWorkspaceLayout = lazy(() => import("./layouts/LeagueWorkspaceLayout"));
 const DraftOrderShowdown = lazy(() => import("./features/draft-order/DraftOrderShowdown"));
-const LeagueHistoryApp = lazy(() => import("./features/league-history/ui/LeagueHistoryApp"));
+const LeagueHistory = lazy(() => import("./screens/LeagueHistory"));
 const OfflineDraftV2 = lazy(() => import("./screens_v2/OfflineDraftV2"));
 const LandingV2 = lazy(() => import("./screens_v2/LandingV2"));
 const AuthenticatedApp = lazy(() => import("./routes/AuthenticatedApp"));
@@ -50,12 +57,6 @@ function ActiveLeagueRedirect({ destination }: { destination: string }) {
 function ActiveLeagueTeamRedirect() {
   const { teamId = "" } = useParams();
   return <ActiveLeagueRedirect destination={`teams/${encodeURIComponent(teamId)}`} />;
-}
-
-function LeagueSectionRedirect({ destination }: { destination: string }) {
-  const location = useLocation();
-  const { leagueId = "" } = useParams();
-  return <Navigate to={`/league/${encodeURIComponent(leagueId)}/${destination}${location.search}`} replace />;
 }
 
 function LegacyHistoryRedirect({ section }: { section: string }) {
@@ -115,18 +116,25 @@ function AppRoutes() {
           <Route path="/my-hq" element={<ActiveLeagueRedirect destination="team" />} />
           <Route path="/draft-order" element={<DraftOrderShowdown />} />
           <Route path="/league/:leagueId" element={<LeagueWorkspaceLayout />}>
-            <Route index element={<LeagueSectionRedirect destination="history" />} />
-            <Route path="team" element={<MyHQ />} />
+            <Route index element={<LeagueHome />} />
+            <Route path="team" element={<LeagueTeam />} />
             <Route path="team/roster" element={<LeagueLineup />} />
             <Route path="team/matchup" element={<LeagueMatchups personalOnly />} />
+            <Route path="matchup" element={<LeagueMatchups personalOnly />} />
             <Route path="players" element={<LeaguePlayers />} />
             <Route path="standings" element={<LeagueOverview />} />
             <Route path="teams" element={<LeagueTeams />} />
             <Route path="teams/:teamId" element={<LeagueTeams />} />
             <Route path="matchups" element={<LeagueMatchups />} />
-            <Route path="transactions" element={<LeagueSectionRedirect destination="history/transactions" />} />
-            <Route path="history/*" element={<LeagueHistoryApp />} />
+            <Route path="schedule" element={<LeagueSchedule />} />
+            <Route path="transactions" element={<LeagueTransactions />} />
+            <Route path="history/*" element={<LeagueHistory />} />
+            <Route path="rules" element={<LeagueRules />} />
+            <Route path="draft" element={<LeagueDraft />} />
+            <Route path="pulse" element={<LeaguePulse />} />
+            <Route path="join" element={<LeagueInvitationAccept />} />
             <Route path="manage" element={<LeagueManage />} />
+            <Route path="commissioner/*" element={<LeagueManage />} />
             <Route path="managers/*" element={<LegacyHistoryRedirect section="managers" />} />
             <Route path="h2h/*" element={<LegacyHistoryRedirect section="h2h" />} />
             <Route path="records/*" element={<LegacyHistoryRedirect section="records" />} />
@@ -135,6 +143,7 @@ function AppRoutes() {
             <Route path="leaderboards/*" element={<LegacyHistoryRedirect section="leaderboards" />} />
             <Route path="drafts/*" element={<LegacyHistoryRedirect section="drafts" />} />
             <Route path="payouts/*" element={<LegacyHistoryRedirect section="payouts" />} />
+            <Route path="trades" element={<LeagueTransactions />} />
             <Route path="trades/*" element={<LegacyHistoryRedirect section="trades" />} />
             <Route path="waivers/*" element={<LegacyHistoryRedirect section="waivers" />} />
             <Route path="rivalries/*" element={<LegacyHistoryRedirect section="rivalries" />} />

@@ -52,6 +52,371 @@ service cloud.firestore {
       }
     }
 
+    // GameHQ league identity and role state is written only by authenticated
+    // server commands. Browser clients may resolve a route and read the parts
+    // of the workspace that apply to their own signed-in account.
+    match /externalLeagueMappings/{mappingId} {
+      allow get: if signedIn();
+      allow list, create, update, delete: if false;
+    }
+
+    match /nativeDraftShares/{shareToken} {
+      allow get: if shareToken.size() >= 20 && shareToken.size() <= 80;
+      allow list, create, update, delete: if false;
+    }
+
+    match /leagues/{leagueId} {
+      function canonicalMembershipPath(userId) {
+        return /databases/$(database)/documents/leagues/$(leagueId)/memberships/$(userId);
+      }
+
+      function isCanonicalMember() {
+        return permanentUser()
+          && exists(canonicalMembershipPath(request.auth.uid))
+          && get(canonicalMembershipPath(request.auth.uid)).data.status == 'active';
+      }
+
+      function canonicalRoleGrantPath(grantId) {
+        return /databases/$(database)/documents/leagues/$(leagueId)/roleGrants/$(grantId);
+      }
+
+      function hasCurrentCanonicalRole(grantId, role) {
+        return exists(canonicalRoleGrantPath(grantId))
+          && get(canonicalRoleGrantPath(grantId)).data.user_id == request.auth.uid
+          && get(canonicalRoleGrantPath(grantId)).data.role == role
+          && (!('revoked_at' in get(canonicalRoleGrantPath(grantId)).data)
+            || get(canonicalRoleGrantPath(grantId)).data.revoked_at == '')
+          && (!('expires_at' in get(canonicalRoleGrantPath(grantId)).data)
+            || get(canonicalRoleGrantPath(grantId)).data.expires_at == '');
+      }
+
+      function isCanonicalManager() {
+        return isCanonicalMember()
+          && (hasCurrentCanonicalRole(request.auth.uid + '__commissioner', 'commissioner')
+            || hasCurrentCanonicalRole(request.auth.uid + '__co_commissioner', 'co_commissioner'));
+      }
+
+      allow get: if signedIn();
+      allow list, create, update, delete: if false;
+
+      match /seasons/{seasonId} {
+        allow get: if signedIn();
+        allow list, create, update, delete: if false;
+
+        match /seasonTeams/{seasonTeamId} {
+          allow get, list: if signedIn();
+          allow create, update, delete: if false;
+        }
+
+        match /rosterTransactions/{transactionId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /assetLocks/{assetLockId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /drafts/{draftId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /lineupWeeks/{weekId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /lineups/{lineupId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /scoringWeeks/{weekId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /scoringEvents/{eventId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+
+        match /scoringEventRevisions/{revisionId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+
+        match /waiverState/{stateId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /playerStates/{playerId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /waiverTeamStates/{franchiseId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        // Pending alternatives and bids are private to their submitting manager
+        // and commissioners. Completed public outcomes use waiverReceipts.
+        match /waiverClaims/{claimId} {
+          allow get, list: if isCanonicalManager()
+            || (isCanonicalMember() && resource.data.actor_user_id == request.auth.uid);
+          allow create, update, delete: if false;
+        }
+
+        match /waiverRuns/{runId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+
+        match /waiverReceipts/{receiptId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        // Active offers and immutable completed receipts are visible to league
+        // members. Every mutation is performed by the authenticated command
+        // service so asset reservations and two-team transfers stay atomic.
+        match /tradeOffers/{offerId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /tradeReceipts/{receiptId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /tradeAssetLocks/{lockId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+
+        match /draftPickStates/{assetId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /tradeableAssets/{assetId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        // The published competition graph is readable by every active league
+        // member. Immutable versions and correction history remain
+        // commissioner-only; all writes go through the command service.
+        match /schedule/{scheduleId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /scheduleVersions/{versionId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+
+        match /standings/{standingId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /matchupResults/{resultId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /matchupResultRevisions/{revisionId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+
+        match /playoffBrackets/{bracketId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /playoffBracketVersions/{versionId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+
+        // Keeper/dynasty/cap projections are server-owned and readable by
+        // active league members. Published settings decide whether they are
+        // active; browser clients never create or edit an asset directly.
+        match /advancedLeagueState/{stateId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /futureDraftPicks/{pickId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /keeperAssignments/{assignmentId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /playerContracts/{contractId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /deadCapCharges/{chargeId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /salaryLedgers/{ledgerId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /taxiAssignments/{assignmentId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /rfaTenders/{tenderId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /franchiseTags/{tagId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /orphanTeamStates/{franchiseId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /compensatoryPicks/{pickId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /advancedDraftPlans/{planId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /seasonAwards/{awardId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+      }
+
+      match /franchises/{franchiseId} {
+        allow get, list: if signedIn();
+        allow create, update, delete: if false;
+      }
+
+      match /settingsVersions/{settingsVersionId} {
+        allow get: if signedIn();
+        allow list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
+      match /externalConnections/{connectionId} {
+        allow get: if signedIn();
+        allow list, create, update, delete: if false;
+      }
+
+      match /memberships/{userId} {
+        allow get: if permanentUser() && (request.auth.uid == userId || isCanonicalManager());
+        allow list: if isCanonicalManager();
+        allow create, update, delete: if false;
+      }
+
+      match /roleGrants/{grantId} {
+        allow get: if permanentUser()
+          && (resource.data.user_id == request.auth.uid || isCanonicalManager());
+        allow list: if isCanonicalManager();
+        allow create, update, delete: if false;
+      }
+
+      match /invitations/{invitationId} {
+        allow get, list: if isCanonicalManager();
+        allow create, update, delete: if false;
+      }
+
+      match /commands/{commandId} {
+        allow get: if permanentUser()
+          && resource.data.actor_user_id == request.auth.uid;
+        allow list, create, update, delete: if false;
+      }
+
+      match /auditEvents/{eventId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
+      match /pulseEvents/{eventId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
+      match /pulseReactions/{reactionId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
+      match /pulseComments/{commentId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
+      match /ruleProposals/{proposalId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
+      match /seasonArchives/{seasonId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
+      // Exports can contain private commissioner context. Only current
+      // commissioners may read the immutable manifest and ordered chunks.
+      match /leagueExports/{exportId} {
+        allow get, list: if isCanonicalManager();
+        allow create, update, delete: if false;
+
+        match /chunks/{chunkId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+      }
+
+      match /auditPrivate/{eventId} {
+        allow get, list: if isCanonicalManager();
+        allow create, update, delete: if false;
+      }
+
+      match /notificationOutbox/{eventId} {
+        allow read, create, update, delete: if false;
+      }
+
+      match /readModelInvalidations/{eventId} {
+        allow read, create, update, delete: if false;
+      }
+
+      match /lineups/{lineupId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+    }
+
     // Draft-order audit records stay private to their creator. A public replay
     // is copied into a separate, unguessable token document below.
     match /draftOrderDraws/{drawId} {
@@ -541,32 +906,7 @@ service cloud.firestore {
         }
 
         allow read: if signedIn();
-        allow create: if permanentUser()
-          && validLineupDocument()
-          && matchingAuditAfter()
-          && (
-            isCommissioner()
-            || (
-              controlsFranchise(request.resource.data.franchise_id)
-              && lineupIsOpen(request.resource.data.week_key)
-            )
-          );
-        allow update: if permanentUser()
-          && validLineupDocument()
-          && matchingAuditAfter()
-          && request.resource.data.league_id == resource.data.league_id
-          && request.resource.data.franchise_id == resource.data.franchise_id
-          && request.resource.data.week == resource.data.week
-          && request.resource.data.created_at == resource.data.created_at
-          && request.resource.data.revision > resource.data.revision
-          && (
-            isCommissioner()
-            || (
-              controlsFranchise(resource.data.franchise_id)
-              && lineupIsOpen(request.resource.data.week_key)
-            )
-          );
-        allow delete: if isCommissioner();
+        allow create, update, delete: if false;
       }
 
       match /auditEvents/{eventId} {
@@ -630,10 +970,7 @@ service cloud.firestore {
 
         allow read: if isCommissioner()
           || (permanentUser() && controlsFranchise(resource.data.franchise_id));
-        allow create: if permanentUser()
-          && validAuditEvent()
-          && (isCommissioner() || controlsFranchise(request.resource.data.franchise_id));
-        allow update, delete: if false;
+        allow create, update, delete: if false;
       }
     }
 

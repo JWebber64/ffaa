@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 
 import type { SleeperLeagueConnectionSummary } from "../league-hq/sleeperConnections";
+import type { CanonicalLeagueWorkspace, LeagueAuthority } from "../league-domain/types";
 import type { MyHQData } from "../my-hq/myHQ";
 
 export type LeagueWorkspaceTeamState =
@@ -10,15 +11,25 @@ export type LeagueWorkspaceTeamState =
 
 export type LeagueWorkspaceValue = {
   leagueId: string;
+  routeLeagueId: string;
+  dataLeagueId: string;
   connection: SleeperLeagueConnectionSummary | null;
   connections: SleeperLeagueConnectionSummary[];
+  canonicalWorkspace: CanonicalLeagueWorkspace | null;
+  authority: LeagueAuthority | null;
+  routeState: {
+    status: "loading" | "ready" | "error";
+    message: string;
+  };
   teamState: LeagueWorkspaceTeamState;
   capabilities: {
     canManage: boolean;
-    source: "gamehq" | "sleeper" | null;
+    canSaveLineup: boolean;
+    source: "gamehq" | null;
     status: "loading" | "ready";
   };
   switchLeague: (leagueId: string) => void;
+  refreshWorkspace: () => void;
 };
 
 export const LeagueWorkspaceContext = createContext<LeagueWorkspaceValue | null>(null);

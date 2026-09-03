@@ -220,10 +220,10 @@ export default function AppShellV2() {
       <nav className="product-mobile-nav" aria-label="Mobile navigation">
         {workspaceBase ? (
           <>
-            <NavLink to={`${workspaceBase}/team`}><Users aria-hidden="true" /><span>Team</span></NavLink>
+            <NavLink end to={workspaceBase}><Home aria-hidden="true" /><span>Home</span></NavLink>
             <NavLink to={`${workspaceBase}/team/matchup`}><CalendarDays aria-hidden="true" /><span>Matchup</span></NavLink>
+            <NavLink to={`${workspaceBase}/team`}><Users aria-hidden="true" /><span>Team</span></NavLink>
             <NavLink to={`${workspaceBase}/players`}><Search aria-hidden="true" /><span>Players</span></NavLink>
-            <NavLink to={`${workspaceBase}/standings`} className={() => isWorkspace && !location.pathname.startsWith(`${workspaceBase}/team`) && !location.pathname.startsWith(`${workspaceBase}/players`) ? "active" : ""}><Trophy aria-hidden="true" /><span>League</span></NavLink>
           </>
         ) : (
           <>

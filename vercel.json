@@ -6,8 +6,22 @@
     "api/league-history/import.js": {
       "maxDuration": 300,
       "includeFiles": "api/league-history/.generated/import.js"
+    },
+    "api/league-commands/execute.js": {
+      "maxDuration": 60,
+      "includeFiles": "api/league-commands/.generated/execute.js"
+    },
+    "api/league-commands/waiver-cron.js": {
+      "maxDuration": 300,
+      "includeFiles": "api/league-commands/.generated/waiver-cron.js"
     }
   },
+  "crons": [
+    {
+      "path": "/api/league-commands/waiver-cron",
+      "schedule": "0 0 * * *"
+    }
+  ],
   "redirects": [
     {
       "source": "/",
@@ -28,6 +42,10 @@
     {
       "source": "/ff/api/league-history/import",
       "destination": "/api/league-history/import"
+    },
+    {
+      "source": "/ff/api/league-commands/execute",
+      "destination": "/api/league-commands/execute"
     },
     {
       "source": "/ff/sleeper-api/:path*",

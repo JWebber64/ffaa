@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AlertCircle, CalendarDays, ChevronLeft, ChevronRight, LockKeyhole, RotateCcw, Save, ShieldCheck, Unlock } from "lucide-react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { buildCurrentToolPlayers } from "../data/toolPlayerData";
 import { LeagueAccountPanel } from "../features/league-season/LeagueAccountPanel";
 import { LeagueSeasonHero } from "../features/league-season/LeagueSeasonHero";
 import { getLeagueProjectionFreshness, projectionFreshnessSummary } from "../features/league-season/leagueProjectionFreshness";
-import { saveLeagueLineup, setLeagueWeekLocked } from "../features/league-season/leagueSeasonPersistence";
+import { setLeagueWeekLocked } from "../features/league-season/leagueSeasonPersistence";
 import {
   buildLineupSlotDefinitions,
   isPlayerEligibleForLineupSlot,
@@ -20,7 +20,11 @@ import {
 } from "../features/league-season/leagueSeasonModel";
 import { useLeagueSeasonManagement } from "../features/league-season/useLeagueSeasonManagement";
 import { useLeagueWeekLineups } from "../features/league-season/useLeagueWeekLineups";
-import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
+import { connectExternalLeague, saveWeeklyLineupCommand } from "../features/league-domain/leagueCommands";
+import { LeagueCommandError } from "../features/league-domain/LeagueCommandService";
+import { isGamehqLeagueId } from "../features/league-domain/types";
+import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
+import { NativeLineupWorkspace } from "../features/native-lineup/NativeLineupWorkspace";
 import { appUrl } from "../lib/appBasePath";
 import { PositionBadge } from "../ui/PositionBadge";
 import { UniversalSelect } from "../ui/UniversalSelect";
@@ -74,20 +78,29 @@ function LeagueLineupGate({
 }
 
 export default function LeagueLineup() {
-  const { leagueId: routeLeagueId = "" } = useParams();
-  const { connections, activeLeagueId } = useSleeperLeagueConnections();
-  const leagueId = routeLeagueId || activeLeagueId;
-  const connection = connections.find((candidate) => candidate.leagueId === leagueId) ?? null;
-  const management = useLeagueSeasonManagement(leagueId);
+  const navigate = useNavigate();
+  const {
+    canonicalWorkspace,
+    capabilities,
+    connection,
+    dataLeagueId,
+    leagueId,
+    refreshWorkspace,
+  } = useLeagueWorkspace();
+  const management = useLeagueSeasonManagement(dataLeagueId);
   const [searchParams, setSearchParams] = useSearchParams();
   const week = clampWeek(searchParams.get("week"));
-  const weekLineups = useLeagueWeekLineups(leagueId, week, Boolean(management.record), management.record?.revision ?? 0);
+  const weekLineups = useLeagueWeekLineups(dataLeagueId, week, Boolean(management.record), management.record?.revision ?? 0);
   const [assignments, setAssignments] = useState<LeagueLineupAssignments>({});
   const [dirty, setDirty] = useState(false);
   const [overrideReason, setOverrideReason] = useState("");
   const [saveState, setSaveState] = useState<{ status: "idle" | "saving" | "success" | "error"; message: string }>({ status: "idle", message: "" });
+  const connectAttemptRef = useRef<{ commandId: string; fingerprint: string } | null>(null);
+  const saveAttemptRef = useRef<{ commandId: string; fingerprint: string } | null>(null);
   const season = management.record?.season ?? null;
-  const isCommissioner = Boolean(management.record && management.record.commissionerUserId === management.currentUserId);
+  const isCommissioner = canonicalWorkspace
+    ? capabilities.canManage
+    : Boolean(management.record && management.record.commissionerUserId === management.currentUserId);
   const manageableFranchiseIds = useMemo(() => {
     if (!season) return new Set<string>();
     if (isCommissioner) return new Set(season.franchises.map((franchise) => franchise.id));
@@ -133,13 +146,19 @@ export default function LeagueLineup() {
     setSaveState({ status: "idle", message: "" });
   }, [optimized, saved]);
 
+  if (canonicalWorkspace?.league.authorityMode === "native" && canonicalWorkspace.season) {
+    return <NativeLineupWorkspace workspace={canonicalWorkspace} initialWeek={week} onWeekChange={changeWeek} onWorkspaceChanged={refreshWorkspace} />;
+  }
+
   function changeWeek(nextWeek: number) {
+    saveAttemptRef.current = null;
     const next = new URLSearchParams(searchParams);
     next.set("week", String(Math.min(18, Math.max(1, nextWeek))));
     setSearchParams(next, { replace: true });
   }
 
   function changeTeam(franchiseId: string) {
+    saveAttemptRef.current = null;
     const next = new URLSearchParams(searchParams);
     next.set("team", franchiseId);
     setSearchParams(next, { replace: true });
@@ -153,6 +172,7 @@ export default function LeagueLineup() {
       return next;
     });
     setDirty(true);
+    saveAttemptRef.current = null;
     setSaveState({ status: "idle", message: "" });
   }
 
@@ -160,25 +180,86 @@ export default function LeagueLineup() {
     if (!optimized) return;
     setAssignments(lineupAssignmentsFromProjection(optimized));
     setDirty(true);
+    saveAttemptRef.current = null;
     setSaveState({ status: "idle", message: "" });
   }
 
   async function save() {
-    if (!selected) return;
+    if (!selected || !dataLeagueId) return;
     setSaveState({ status: "saving", message: "Saving weekly lineup…" });
     try {
-      await saveLeagueLineup(leagueId, selected.id, week, assignments, overrideReason);
+      let commandLeagueId = canonicalWorkspace?.league.id ?? "";
+      let commandSeasonId = canonicalWorkspace?.season?.id ?? "";
+      let attachedDuringSave = false;
+      if (!isGamehqLeagueId(commandLeagueId) || !isGamehqLeagueId(commandSeasonId)) {
+        const fingerprint = dataLeagueId;
+        if (connectAttemptRef.current?.fingerprint !== fingerprint) {
+          connectAttemptRef.current = {
+            commandId: crypto.randomUUID(),
+            fingerprint,
+          };
+        }
+        const attachReceipt = await connectExternalLeague({
+          provider: "sleeper",
+          externalLeagueId: dataLeagueId,
+          leagueName: connection?.leagueName || `Sleeper League ${dataLeagueId}`,
+          season: connection?.season || String(new Date().getUTCFullYear()),
+        }, connectAttemptRef.current);
+        commandLeagueId = attachReceipt.leagueId;
+        commandSeasonId = attachReceipt.seasonId;
+        attachedDuringSave = true;
+      }
+      if (!isGamehqLeagueId(commandLeagueId) || !isGamehqLeagueId(commandSeasonId)) {
+        throw new LeagueCommandError({
+          code: "migration_required",
+          message: "This connected league has no published GameHQ season to receive lineup changes.",
+        });
+      }
+      const expectedRevision = saved?.revision ?? 0;
+      const fingerprint = JSON.stringify([
+        commandLeagueId,
+        commandSeasonId,
+        selected.id,
+        week,
+        expectedRevision,
+        assignments,
+        overrideReason.trim(),
+      ]);
+      if (saveAttemptRef.current?.fingerprint !== fingerprint) {
+        saveAttemptRef.current = { commandId: crypto.randomUUID(), fingerprint };
+      }
+      const receipt = await saveWeeklyLineupCommand({
+        commandId: saveAttemptRef.current.commandId,
+        leagueId: commandLeagueId,
+        seasonId: commandSeasonId,
+        expectedRevision,
+        payload: {
+          legacyLeagueId: dataLeagueId,
+          franchiseId: selected.id,
+          week,
+          assignments,
+          overrideReason,
+        },
+      });
+      saveAttemptRef.current = null;
+      connectAttemptRef.current = null;
       setDirty(false);
-      setSaveState({ status: "success", message: `Week ${week} lineup saved.` });
+      setSaveState({ status: "success", message: `Week ${week} lineup saved at revision ${receipt.resultingRevision}.` });
+      if (attachedDuringSave) {
+        navigate(`/league/${encodeURIComponent(commandLeagueId)}/team/roster?${searchParams.toString()}`, { replace: true });
+      }
     } catch (error) {
-      setSaveState({ status: "error", message: error instanceof Error ? error.message : "The weekly lineup could not be saved." });
+      const conflict = error instanceof LeagueCommandError && error.code === "stale_revision"
+        ? `${error.message} Reloaded lineup data will be required before retrying.`
+        : error instanceof Error ? error.message : "The weekly lineup could not be saved.";
+      setSaveState({ status: "error", message: conflict });
     }
   }
 
   async function changeWeekLock(locked: boolean) {
     setSaveState({ status: "saving", message: locked ? `Locking Week ${week}…` : `Reopening Week ${week}…` });
     try {
-      await setLeagueWeekLocked(leagueId, week, locked);
+      await setLeagueWeekLocked(dataLeagueId, week, locked);
       setSaveState({ status: "success", message: locked ? `Week ${week} lineups locked.` : `Week ${week} lineups reopened.` });
     } catch (error) {
       setSaveState({ status: "error", message: error instanceof Error ? error.message : "The lineup lock could not be changed." });
@@ -203,13 +284,15 @@ export default function LeagueLineup() {
       .map((player) => [player.id, player]),
   );
   const isLocked = Boolean(weekLineups.settings?.locked);
-  const isReadOnly = isLocked && !isCommissioner;
+  const roleReadOnly = Boolean(canonicalWorkspace && !capabilities.canSaveLineup);
+  const isReadOnly = roleReadOnly || (isLocked && !isCommissioner);
+  const accessBlocked = roleReadOnly || isLocked;
 
   return (
     <div className="league-season-page">
       <LeagueSeasonHero
         variant="lineup"
-        eyebrow={`Weekly lineup · ${connection?.leagueName ?? "Active league"}`}
+        eyebrow={`Weekly lineup · ${canonicalWorkspace?.league.name ?? connection?.leagueName ?? "Active league"}`}
         title={`Set ${selected.displayName}`}
         description="Choose legal starters, save the week, and feed the manager lineup directly into the matchup board."
         imagePath="images/football-playbook-banner.png"
@@ -235,9 +318,9 @@ export default function LeagueLineup() {
         </div>
       </section>
 
-      <div className={`league-lineup-lock ${isLocked ? "is-locked" : "is-open"}`}>
-        {isLocked ? <LockKeyhole aria-hidden="true" /> : <Unlock aria-hidden="true" />}
-        <div><strong>{isLocked ? `Week ${week} is locked` : `Week ${week} is open`}</strong><small>{isReadOnly ? "Managers can view this lineup, but only the commissioner can override it." : isLocked ? "Commissioner overrides are recorded with a reason." : "Approved managers can save changes until the commissioner locks the week."}</small></div>
+      <div className={`league-lineup-lock ${accessBlocked ? "is-locked" : "is-open"}`}>
+        {accessBlocked ? <LockKeyhole aria-hidden="true" /> : <Unlock aria-hidden="true" />}
+        <div><strong>{roleReadOnly ? "Your GameHQ role is read-only" : isLocked ? `Week ${week} is locked` : `Week ${week} is open`}</strong><small>{roleReadOnly ? "A commissioner must grant lineup access for this franchise." : isReadOnly ? "Managers can view this lineup, but only the commissioner can override it." : isLocked ? "Commissioner overrides are recorded with a reason." : "Approved managers can save changes until the commissioner locks the week."}</small></div>
         {isLocked && isCommissioner ? <label><span>Override reason</span><input value={overrideReason} onChange={(event) => setOverrideReason(event.target.value)} maxLength={240} placeholder="Required for a locked-lineup change" /></label> : null}
       </div>
 
@@ -269,7 +352,7 @@ export default function LeagueLineup() {
             );
           })}
         </div>
-        <footer><AlertCircle aria-hidden="true" /><p>GameHQ validates account ownership, one-team membership, roster ownership, position eligibility, duplicate starters, season revision, and the week lock before saving. Every save creates an immutable audit event. Projection data: {projectionFreshnessSummary(projectionFreshness)}.</p></footer>
+        <footer><AlertCircle aria-hidden="true" /><p>GameHQ validates the signed-in account, active role grants, franchise scope, position eligibility, duplicate starters, exact lineup revision, published settings, and the week lock before one atomic save. Every accepted command creates an immutable audit event and idempotent receipt. Projection data: {projectionFreshnessSummary(projectionFreshness)}.</p></footer>
       </section>
 
       <section className="league-lineup-bench" aria-labelledby="lineup-bench-title">

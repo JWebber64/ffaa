@@ -14,7 +14,6 @@ import { firestore } from "../../lib/firebase";
 import { normalizeSharedOfflineDraftRecord } from "../offline-draft/offlineDraftSync";
 import {
   buildRoundRobinSchedule,
-  normalizeLineupAssignments,
   parseLeagueSeasonDraft,
   type LeagueLineupAssignments,
   type LeagueScheduleMatchup,
@@ -160,14 +159,6 @@ function weekSettingsRef(leagueId: string, week: number) {
   return doc(firestore, "leagueSeasons", normalizeLeagueId(leagueId), "weekSettings", weekKey(week));
 }
 
-function auditEventsRef(leagueId: string) {
-  return collection(firestore, "leagueSeasons", normalizeLeagueId(leagueId), "auditEvents");
-}
-
-function lineupRef(leagueId: string, franchiseId: string, week: number) {
-  return doc(lineupsRef(leagueId), `${normalizeFranchiseId(franchiseId)}_week_${normalizeWeek(week)}`);
-}
-
 function normalizeWeek(value: number) {
   const week = Math.round(Number(value));
   if (!Number.isFinite(week) || week < 1 || week > 18) throw new Error("League week must be between 1 and 18.");
@@ -194,7 +185,6 @@ function normalizeSchedule(value: unknown, season: LeagueSeasonDraft): LeagueSch
     return [{ id, week, homeFranchiseId, awayFranchiseId }];
   });
 }
-
 export function normalizePublishedLeagueSeasonRecord(
   value: unknown,
   expectedLeagueId = "",
@@ -496,7 +486,6 @@ export async function requestFranchiseClaim(leagueIdValue: string, franchiseIdVa
     });
   });
 }
-
 export async function assignFranchiseToCommissioner(leagueIdValue: string, franchiseIdValue: string, displayNameValue: string) {
   const leagueId = normalizeLeagueId(leagueIdValue);
   const franchiseId = normalizeFranchiseId(franchiseIdValue);
@@ -697,85 +686,4 @@ export async function setLeagueWeekLocked(leagueIdValue: string, weekValue: numb
       updated_at: timestamp,
     });
   });
-}
-
-export async function saveLeagueLineup(
-  leagueIdValue: string,
-  franchiseIdValue: string,
-  weekValue: number,
-  assignmentsValue: unknown,
-  overrideReasonValue = "",
-) {
-  const leagueId = normalizeLeagueId(leagueIdValue);
-  const franchiseId = normalizeFranchiseId(franchiseIdValue);
-  const week = normalizeWeek(weekValue);
-  const currentUserId = await ensurePermanentFirebaseUserId();
-  const reference = lineupRef(leagueId, franchiseId, week);
-  const auditReference = doc(auditEventsRef(leagueId));
-  let saved: SavedLeagueLineup | null = null;
-
-  await runTransaction(firestore, async (transaction) => {
-    const [seasonSnapshot, claimSnapshot, lineupSnapshot, settingsSnapshot] = await Promise.all([
-      transaction.get(seasonRef(leagueId)),
-      transaction.get(claimRef(leagueId, franchiseId)),
-      transaction.get(reference),
-      transaction.get(weekSettingsRef(leagueId, week)),
-    ]);
-    const published = seasonSnapshot.exists()
-      ? normalizePublishedLeagueSeasonRecord(seasonSnapshot.data(), leagueId)
-      : null;
-    const { record, franchise } = requirePublishedFranchise(published, franchiseId);
-    const claim = claimSnapshot.exists() ? normalizeFranchiseClaim(claimSnapshot.data(), leagueId) : null;
-    const isCommissioner = record.commissionerUserId === currentUserId;
-    const canManage = isCommissioner
-      || (claim?.status === "approved" && claim.approvedUserId === currentUserId);
-    if (!canManage) throw new Error("The commissioner must approve this team before you can save its lineup.");
-    const settings = settingsSnapshot.exists()
-      ? normalizeLeagueWeekSettings(settingsSnapshot.data(), leagueId)
-      : null;
-    if (settingsSnapshot.exists() && !settings) throw new Error("This week's lineup lock settings are invalid.");
-    const isLocked = Boolean(settings?.locked);
-    if (isLocked && !isCommissioner) throw new Error(`Week ${week} lineups are locked by the commissioner.`);
-    const overrideReason = overrideReasonValue.trim().replace(/\s+/g, " ").slice(0, 240);
-    if (isLocked && isCommissioner && overrideReason.length < 4) {
-      throw new Error("Enter an override reason before changing a locked lineup.");
-    }
-    const assignments = normalizeLineupAssignments(franchise, record.season.rosterSlots, assignmentsValue);
-    const existing = lineupSnapshot.exists() ? normalizeSavedLeagueLineup(lineupSnapshot.data(), leagueId) : null;
-    if (lineupSnapshot.exists() && !existing) throw new Error("The current saved lineup is invalid and was not overwritten.");
-    const timestamp = new Date().toISOString();
-    const nextRecord = {
-      league_id: leagueId,
-      franchise_id: franchiseId,
-      week,
-      week_key: weekKey(week),
-      season_revision: record.revision,
-      assignments: clone(assignments),
-      revision: (existing?.revision ?? 0) + 1,
-      audit_event_id: auditReference.id,
-      updated_by_user_id: currentUserId,
-      created_at: existing?.createdAt || timestamp,
-      updated_at: timestamp,
-    };
-    transaction.set(reference, nextRecord);
-    transaction.set(auditReference, {
-      league_id: leagueId,
-      event_id: auditReference.id,
-      lineup_id: reference.id,
-      type: isLocked ? "lineup_override" : "lineup_saved",
-      actor_user_id: currentUserId,
-      franchise_id: franchiseId,
-      week,
-      week_key: weekKey(week),
-      season_revision: record.revision,
-      before_assignments: clone(existing?.assignments ?? {}),
-      after_assignments: clone(assignments),
-      reason: overrideReason,
-      created_at: timestamp,
-    });
-    saved = normalizeSavedLeagueLineup(nextRecord, leagueId);
-  });
-
-  if (!saved) throw new Error("The weekly lineup could not be saved.");
-  return saved;
 }
