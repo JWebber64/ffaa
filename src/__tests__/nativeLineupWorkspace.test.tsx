@@ -34,6 +34,7 @@ vi.mock("../features/native-lineup/useNativeLineup", () => ({
 }));
 
 vi.mock("../data/toolPlayerData", () => ({
+  normalizeToolTeam: (team: string) => team,
   buildCurrentToolPlayers: () => [
     { id: "qb-thu", name: "Thursday QB", position: "QB", team: "KC", projectedPoints: 20, projectedPointsPerGame: 20, byeWeek: 6, status: "", injuryStatus: "" },
     { id: "qb-late", name: "Late QB", position: "QB", team: "BUF", projectedPoints: 10, projectedPointsPerGame: 10, byeWeek: 7, status: "", injuryStatus: "" },

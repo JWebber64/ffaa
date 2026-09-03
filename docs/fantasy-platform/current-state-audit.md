@@ -358,3 +358,12 @@ Deliberate remaining direct legacy writes are season publication, claims/members
 - Standings expose physical, division, median, and all-play records plus PF, PA, potential points, efficiency, streak, remaining SOS, playoff probability/state, and the rule that first separated each seed.
 - The playoff builder publishes arbitrary-size fields, byes, fixed/reseeded rules, round duration, placement formats, and manual qualifier disclosure into a current bracket plus an immutable bracket version.
 - Native `/schedule` and `/standings` now own operations and display respectively. Existing connected-league readers remain the compatibility path and are not promoted by viewing either route.
+
+## Phase 10 implementation delta
+
+- Native League Home answers the five immediate manager questions from canonical competition, lineup, scoring, waiver, trade, draft, membership, and authority state. Its lineup status validates every required slot, unique assignment, and player-position eligibility.
+- Native Team no longer falls through to the connected My HQ screen. It owns weekly lineup work while the connected provider keeps its existing route behavior.
+- Native Transactions consolidates the activity ledger, waiver workspace, trade workspace, and a current team/FAAB market table under keyboard-operable tabs whose selected state is reflected in the URL.
+- A single league player side sheet is available from lineup, live matchup, draft, waiver, and trade rows. The sheet provides the same evidence structure and dismissal/focus contract in every consumer.
+- League mobile navigation is Home, Matchup, Team, Players, and More. State is never conveyed by color alone; live/status surfaces expose source/freshness language and retain the last rendered projection while hooks refresh.
+- Phase 10 adds no datastore and grants no new client write capability. It is a projection and route consolidation over Phase 1–9 authority.

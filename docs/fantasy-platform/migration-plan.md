@@ -230,9 +230,10 @@ Migration is explicit and on-demand, not a page-load bulk conversion.
 9. Phase 7 initializes canonical native player states only by reconciling the GameHQ player pool with native `assetLocks`. Connected-provider claims, priorities, FAAB, and ownership are not imported or dual-written; a future migration must provide an explicit parity report before cutover.
 10. Phase 8 creates and processes trades only inside canonical native seasons. Imported provider trades remain historical evidence; they are not reconstructed as open offers, used to infer current asset ownership, or dual-written. Future advanced-asset migration must establish explicit pick/contract/right owner states before those assets can be offered.
 11. Phase 9 generates and edits schedules only for canonical native seasons. External schedules, scores, standings, and brackets remain connected-provider read models; migration requires an explicit team/game/result parity report before any native competition command becomes authoritative.
-12. When no published legacy season exists, the command records `connected_read_only` / `mapped_read_only`; the actor receives membership but no write role.
-13. Concurrent attach commands race on the mapping precondition. The winner's GameHQ league ID becomes canonical; the loser returns an idempotent receipt pointing to that same winner.
-14. Old numeric routes resolve through the mapping; an unmapped route still loads compatibility readers.
+12. Phase 10 changes projections and navigation only. It copies no provider data, creates no dual-write, and leaves authority-mode routing as the complete rollback seam for Home, Team, and Transactions.
+13. When no published legacy season exists, the command records `connected_read_only` / `mapped_read_only`; the actor receives membership but no write role.
+14. Concurrent attach commands race on the mapping precondition. The winner's GameHQ league ID becomes canonical; the loser returns an idempotent receipt pointing to that same winner.
+15. Old numeric routes resolve through the mapping; an unmapped route still loads compatibility readers.
 
 A standalone bulk migration script was intentionally not added in this slice: bulk attachment cannot safely infer which permanent GameHQ account should initiate a connection, and it would expand authority scope beyond the user's explicit action. The command itself is the idempotent backfill unit and can be orchestrated by a separately authorized batch job later without changing the schema.
 

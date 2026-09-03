@@ -6,6 +6,7 @@ import type { LeagueRosterSlot, LeagueSettingsV1 } from "../../../shared/leagueS
 import { buildCurrentToolPlayers, type ToolPlayer } from "../../data/toolPlayerData";
 import { configureLineupWeekCommand, saveWeeklyLineupCommand, setLineupLockOverrideCommand } from "../league-domain/leagueCommands";
 import type { CanonicalLeagueWorkspace, NativeLineupWeekPlayer, SeasonTeam } from "../league-domain/types";
+import { useLeaguePlayerSheet } from "../player-sheet/leaguePlayerSheetContext";
 import { PositionBadge } from "../../ui/PositionBadge";
 import { UniversalSelect } from "../../ui/UniversalSelect";
 import { getNativePlayerLock } from "./nativeLineup";
@@ -90,6 +91,7 @@ export function NativeLineupWorkspace({ workspace, initialWeek, onWeekChange, on
 }) {
   const season = workspace.season!;
   const state = useNativeLineup(workspace.league.id, season.id, season.settingsVersionId, initialWeek, workspace.league.timezone);
+  const { openPlayer } = useLeaguePlayerSheet();
   const [selectedFranchiseId, setSelectedFranchiseId] = useState("");
   const [assignments, setAssignments] = useState<Record<string, string>>({});
   const [fallbackText, setFallbackText] = useState("");
@@ -141,7 +143,13 @@ export function NativeLineupWorkspace({ workspace, initialWeek, onWeekChange, on
   const byeCount = [...starterIds].filter((id) => directory.get(id)?.byeWeek === initialWeek).length;
   const injuryCount = [...starterIds].filter((id) => ["questionable", "doubtful", "inactive", "out", "ir"].includes(weekById.get(id)?.availability ?? "active")).length;
   const nextDeadline = [...locks.values()].filter((lock) => !lock.locked && lock.lockAt && Date.parse(lock.lockAt) > renderedAt).sort((left, right) => Date.parse(left.lockAt) - Date.parse(right.lockAt))[0]?.lockAt ?? "";
-  const complete = slots.length > 0 && slots.every((slot) => assignments[slot.key]) && new Set(Object.values(assignments)).size === Object.values(assignments).length;
+  const complete = slots.length > 0
+    && slots.every((slot) => {
+      const playerId = assignments[slot.key];
+      const playerPosition = playerId ? weekById.get(playerId)?.position ?? directory.get(playerId)?.position ?? "" : "";
+      return Boolean(playerId && eligible(playerPosition, slot));
+    })
+    && new Set(Object.values(assignments)).size === Object.values(assignments).length;
 
   function assign(slot: SlotDefinition, playerId: string) {
     const currentId = assignments[slot.key];
@@ -257,7 +265,7 @@ export function NativeLineupWorkspace({ workspace, initialWeek, onWeekChange, on
             const selectedLock = selectedPlayerId ? locks.get(selectedPlayerId) : null;
             return <div className={`native-lineup-row ${selectedLock?.locked ? "is-locked" : ""}`} key={slot.key}>
               <PositionBadge position={slot.slot}>{slot.slot}</PositionBadge>
-              <div><UniversalSelect aria-label={`${slot.key} starter`} value={selectedPlayerId} disabled={state.settings!.lineup.automaticMode === "best_ball" || Boolean(selectedLock?.locked)} onValueChange={(value) => assign(slot, value)}><option value="">Open slot</option>{team.rosterPlayerIds.filter((id) => eligible(weekById.get(id)?.position ?? directory.get(id)?.position ?? "", slot)).map((id) => { const lock = locks.get(id); return <option key={id} value={id} disabled={(starterIds.has(id) && id !== selectedPlayerId) || Boolean(lock?.locked && id !== selectedPlayerId)}>{playerName(id, directory)} · {weekById.get(id)?.nflTeam || directory.get(id)?.team || "FA"}</option>; })}</UniversalSelect><small>{selectedPlayerId ? selectedLock?.reason ?? "Game state unavailable." : "Choose an eligible rostered player."}</small></div>
+              <div><UniversalSelect aria-label={`${slot.key} starter`} value={selectedPlayerId} disabled={state.settings!.lineup.automaticMode === "best_ball" || Boolean(selectedLock?.locked)} onValueChange={(value) => assign(slot, value)}><option value="">Open slot</option>{team.rosterPlayerIds.filter((id) => eligible(weekById.get(id)?.position ?? directory.get(id)?.position ?? "", slot)).map((id) => { const lock = locks.get(id); return <option key={id} value={id} disabled={(starterIds.has(id) && id !== selectedPlayerId) || Boolean(lock?.locked && id !== selectedPlayerId)}>{playerName(id, directory)} · {weekById.get(id)?.nflTeam || directory.get(id)?.team || "FA"}</option>; })}</UniversalSelect><small>{selectedPlayerId ? selectedLock?.reason ?? "Game state unavailable." : "Choose an eligible rostered player."}</small>{selectedPlayerId ? <button type="button" className="league-player-view" onClick={() => openPlayer({ playerId: selectedPlayerId, currentWeek: initialWeek, leagueState: selectedLock?.locked ? "locked" : "owned", ownership: team.name, rosterFit: `${slot.slot} starter`, actionLabel: "Manage this lineup", actionTo: `/league/${workspace.league.id}/team?week=${initialWeek}` })}>View player</button> : null}</div>
               <div><strong>{selectedPlayerId ? (weekById.get(selectedPlayerId)?.projectedPoints ?? directory.get(selectedPlayerId)?.projectedPoints ?? 0).toFixed(1) : "—"}</strong><small>{selectedPlayerId && locks.get(selectedPlayerId)?.lockAt ? formatTime(locks.get(selectedPlayerId)!.lockAt, workspace.league.timezone) : "No lock time"}</small></div>
               {selectedLock?.locked ? <LockKeyhole aria-label="Player locked" /> : null}
             </div>;

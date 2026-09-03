@@ -370,6 +370,17 @@ Phase 9 compatibility/rollback: no connected-provider schedule, score, standing,
 
 Gate: complete manager and commissioner workflows pass at desktop and mobile widths. No invented metrics or decorative empty pages.
 
+Implemented Phase 10:
+
+- Native League Home is now an operational dashboard: the current week, controlled team, opponent, position-valid lineup state, nearest published deadline, data freshness, and required action queue appear before matchup, activity, roster-health, playoff-race, and deadline detail.
+- Native Team is the authoritative weekly lineup workspace. Native Transactions now has route-stable Activity, Waivers, Trades, and Trade Market tabs while connected-provider routes retain their existing adapters.
+- One accessible player side sheet is shared by native lineup, matchup, draft, waiver, and trade surfaces. It exposes identity/status, projections and source context, NFL schedule, recent production, ownership, roster fit, and the next valid league action; Escape/backdrop dismissal, focus return, visible focus, and reduced-motion behavior are consistent.
+- Mobile league navigation is exactly Home, Matchup, Team, Players, and More. Operational data uses compact tables/rows, explicit labels plus color for state, stable row geometry, and freshness timestamps rather than editorial heroes or invented summary metrics.
+
+Exact Phase 10 implementation files: `src/features/league-home/**`, `src/features/native-transactions/**`, `src/features/player-sheet/**`, `src/features/native-lineup/NativeLineupWorkspace.tsx`, `src/features/native-scoring/NativeLiveMatchupWorkspace.tsx`, `src/features/native-draft/NativeDraftBoard.tsx`, `src/features/native-waivers/NativeWaiverWorkspace.tsx`, `src/features/native-trades/NativeTradeWorkspace.tsx`, `src/layouts/AppShellV2.tsx`, `src/layouts/LeagueWorkspaceLayout.tsx`, `src/screens/LeagueHome.tsx`, `src/screens/LeagueTeam.tsx`, `src/screens/LeagueTransactions.tsx`, and `src/App.tsx`. Coverage is in `nativeOperationalUi.test.tsx` plus the existing native domain workspace and app-shell suites.
+
+Phase 10 compatibility/rollback: this phase introduces no new persistence and performs no data copy. Authority routing remains the rollback seam: removing the native Home, Team, or Transactions branch restores the connected-provider surface, while every native command and stored projection remains untouched. The player sheet consumes current read models only and never mutates league state itself.
+
 ## Phase 11 — Pulse, native history, and decision systems
 
 - Rebuildable event stream from commands/transactions/audits/scoring.

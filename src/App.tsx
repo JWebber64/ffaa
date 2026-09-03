@@ -24,8 +24,8 @@ const LeagueHome = lazy(() => import("./screens/LeagueHome"));
 const LeagueTeams = lazy(() => import("./screens/LeagueTeams"));
 const LeagueMatchups = lazy(() => import("./screens/LeagueMatchups"));
 const LeagueSchedule = lazy(() => import("./screens/LeagueSchedule"));
+const LeagueTeam = lazy(() => import("./screens/LeagueTeam"));
 const LeagueLineup = lazy(() => import("./screens/LeagueLineup"));
-const MyHQ = lazy(() => import("./screens/MyHQ"));
 const MyTeams = lazy(() => import("./screens/MyTeams"));
 const LeagueOverview = lazy(() => import("./screens/LeagueOverview"));
 const LeaguePlayers = lazy(() => import("./screens/LeaguePlayers"));
@@ -116,7 +116,7 @@ function AppRoutes() {
           <Route path="/draft-order" element={<DraftOrderShowdown />} />
           <Route path="/league/:leagueId" element={<LeagueWorkspaceLayout />}>
             <Route index element={<LeagueHome />} />
-            <Route path="team" element={<MyHQ />} />
+            <Route path="team" element={<LeagueTeam />} />
             <Route path="team/roster" element={<LeagueLineup />} />
             <Route path="team/matchup" element={<LeagueMatchups personalOnly />} />
             <Route path="matchup" element={<LeagueMatchups personalOnly />} />

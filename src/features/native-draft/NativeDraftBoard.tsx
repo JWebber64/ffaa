@@ -5,6 +5,7 @@ import {
   revertNativeDraftActionCommand,
 } from "../league-domain/leagueCommands";
 import type { CanonicalLeagueWorkspace, NativeDraft, SeasonTeam } from "../league-domain/types";
+import { useLeaguePlayerSheet } from "../player-sheet/leaguePlayerSheetContext";
 import { NumericInput } from "../../ui/NumericInput";
 import { UniversalSelect } from "../../ui/UniversalSelect";
 import "./native-draft.css";
@@ -35,6 +36,7 @@ export function NativeDraftBoard({
   teams: SeasonTeam[];
   commissionerControls?: boolean;
 }) {
+  const { openPlayer } = useLeaguePlayerSheet();
   const [playerId, setPlayerId] = useState("");
   const [bidAmount, setBidAmount] = useState(draft.minimumBid);
   const [actingFranchiseId, setActingFranchiseId] = useState("");
@@ -166,7 +168,7 @@ export function NativeDraftBoard({
 
       <section className="native-draft-ledger" aria-labelledby="native-draft-ledger-title">
         <header><div><span>Authoritative results</span><h2 id="native-draft-ledger-title">Draft ledger</h2></div><strong>{draft.selections.length} selections</strong></header>
-        {draft.selections.length ? <><ol>{[...draft.selections].reverse().slice(0, visibleSelections).map((selection) => <li key={selection.id}><span>#{selection.overallPick}</span><div><strong>{playerLabel(selection.playerId)}</strong><small>{teamById.get(selection.franchiseId)?.name ?? selection.franchiseId} · Round {selection.round}{selection.price ? ` · $${selection.price}` : ""}</small></div><code>{selection.rosterTransactionId}</code></li>)}</ol>{visibleSelections < draft.selections.length ? <button className="native-draft-load-more" type="button" onClick={() => setVisibleSelections((count) => count + 100)}>Show 100 older selections</button> : null}</> : <p>No selections have been published yet.</p>}
+        {draft.selections.length ? <><ol>{[...draft.selections].reverse().slice(0, visibleSelections).map((selection) => <li key={selection.id}><span>#{selection.overallPick}</span><div><button type="button" className="league-player-view" onClick={() => openPlayer({ playerId: selection.playerId, leagueState: "drafted", ownership: teamById.get(selection.franchiseId)?.name ?? selection.franchiseId, rosterFit: `Round ${selection.round} selection`, actionLabel: "View draft room", actionTo: `/league/${workspace.league.id}/draft` })}>{playerLabel(selection.playerId)}</button><small>{teamById.get(selection.franchiseId)?.name ?? selection.franchiseId} · Round {selection.round}{selection.price ? ` · $${selection.price}` : ""}</small></div><code>{selection.rosterTransactionId}</code></li>)}</ol>{visibleSelections < draft.selections.length ? <button className="native-draft-load-more" type="button" onClick={() => setVisibleSelections((count) => count + 100)}>Show 100 older selections</button> : null}</> : <p>No selections have been published yet.</p>}
       </section>
     </section>
   );

@@ -436,3 +436,7 @@ leagues/{gamehqLeagueId}/seasons/{seasonId}/playoffBracketVersions/{bracketVersi
 `matchupResults` contains one current final/corrected record per published game. Replacing a score requires a disclosed reason and creates an immutable `matchupResultRevisions` row before `standings/current` is rebuilt from the complete current result set. The standings projection contains no independently editable wins, points, seeds, or playoff flags.
 
 `playoffBrackets/current` is the member-readable field and game graph tied to a standings revision and settings version. Each publish also creates `playoffBracketVersions`; manual qualifier IDs require a reason preserved on the bracket and universal audit.
+
+## Phase 10 operational projection contract
+
+Phase 10 adds no Firestore collections and no browser-owned authoritative state. Native League Home, the consolidated Transactions route, and the shared player side sheet join the existing Phase 1–9 member-readable projections in memory. URL tab state is navigational only. All mutations still cross the authenticated command boundary, and connected-provider routes continue to use their established read adapters.

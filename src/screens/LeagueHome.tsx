@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 
 import { AppStateScreen } from "../components/AppStateScreen";
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
+import { NativeLeagueHomeWorkspace } from "../features/league-home/NativeLeagueHomeWorkspace";
 import "./league-home.css";
 
 function valueOrFallback(value: string | number | null | undefined, fallback: string) {
@@ -34,6 +35,10 @@ export default function LeagueHome() {
   }
   if (routeState.status === "error") {
     return <AppStateScreen title="League unavailable" message={routeState.message} />;
+  }
+
+  if (canonicalWorkspace?.authority.mode === "native" && canonicalWorkspace.season) {
+    return <NativeLeagueHomeWorkspace workspace={canonicalWorkspace} />;
   }
 
   const league = canonicalWorkspace?.league ?? null;

@@ -17,6 +17,7 @@ import { NavLink, Outlet, useLocation } from "react-router-dom";
 
 import { LeagueWorkspaceProvider } from "../features/league-workspace/LeagueWorkspaceContext";
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
+import { LeaguePlayerSheetProvider } from "../features/player-sheet/LeaguePlayerSheet";
 import { UniversalSelect } from "../ui/UniversalSelect";
 import { closeParentDisclosure, useDismissibleDisclosureMenus } from "../ui/disclosureMenu";
 import "./league-workspace.css";
@@ -73,7 +74,7 @@ function LeagueWorkspaceChrome() {
   const authorityLabel = authority?.label ?? "Connected Sleeper League — read-only";
 
   return (
-    <div className="league-workspace-shell">
+    <LeaguePlayerSheetProvider><div className="league-workspace-shell">
       <header className="league-workspace-context">
         <div className="league-workspace-identity">
           <span className="league-workspace-mark" aria-hidden="true">{teamName.slice(0, 2).toUpperCase()}</span>
@@ -140,7 +141,7 @@ function LeagueWorkspaceChrome() {
       </nav>
 
       <Outlet />
-    </div>
+    </div></LeaguePlayerSheetProvider>
   );
 }
 
