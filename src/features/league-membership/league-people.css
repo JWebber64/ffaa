@@ -85,7 +85,8 @@
 .league-invitation-accept h1 { margin: 8px 0 10px; font-size: clamp(1.75rem, 5vw, 2.55rem); line-height: 1.04; letter-spacing: -.035em; text-wrap: balance; }
 .league-invitation-accept > p:not(.commissioner-message) { color: var(--text-secondary); line-height: 1.55; }
 .league-invitation-accept > div { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
-.league-invitation-accept > div > a { color: var(--text-secondary); font-size: .78rem; font-weight: 800; }
+.league-invitation-accept > a, .league-invitation-accept > div > a { display: inline-flex; min-height: 40px; align-items: center; color: var(--green-300); font-size: .78rem; font-weight: 800; }
+.league-invitation-accept > a { margin-top: 8px; }
 .league-invitation-accept > small { display: block; margin-top: 18px; color: var(--text-muted); font-size: .68rem; line-height: 1.45; }
 .league-invitation-accept.is-error > svg { color: var(--accent-danger); }
-@media (max-width: 500px) { .league-invitation-accept > div { align-items: stretch; flex-direction: column; } .league-invitation-accept > div > a { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; } }
+@media (max-width: 500px) { .league-invitation-accept > div { align-items: stretch; flex-direction: column; } .league-invitation-accept > a, .league-invitation-accept > div > a { justify-content: center; } }
