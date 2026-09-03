@@ -377,3 +377,15 @@ leagues/{gamehqLeagueId}/seasons/{seasonId}/lineups/{franchiseId}_week-{week}
 Each native lineup stores assignments, ordered fallbacks, selection mode, automatic substitution trace, lineup/week/season/roster revisions, active settings version, actor, audit reference, and timestamps. Saves use a document update-time precondition and do not advance the shared season revision, so managers on different teams do not create needless conflicts. A same-team stale save fails against the exact lineup revision.
 
 These collections do not replace legacy `leagueSeasons/{externalId}/weekSettings` or `lineups` during compatibility mode. Browser members can subscribe to canonical native records; all browser mutation remains denied.
+
+## Implemented Phase 6 scoring persistence
+
+```text
+leagues/{gamehqLeagueId}/seasons/{seasonId}/scoringEvents/{providerEventKey}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/scoringEventRevisions/{providerEventKey}__r-{revision}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/scoringWeeks/week-{week}
+```
+
+`scoringEvents` stores the current normalized provider event, stable provider ID/timestamp, player, NFL game, normalized statistics, correction target/reason, ingestion version, and event revision. `scoringEventRevisions` is the immutable source/correction history. Provider retries with identical semantic content do not create another revision or another fantasy point delta.
+
+`scoringWeeks` is a rebuildable realtime projection tied to the exact published settings version and lineup-week revision. It contains player/game totals, lineup current/projected/bench/optimal totals, matchup totals and win probabilities, Week standings projection, game states, provider freshness/fallback context, scoring feed explanations, lead changes, top active performer, correction state, and cached-last-known status. Active members may subscribe to the projection; raw events and revisions are commissioner-only. All three collections reject browser mutation.

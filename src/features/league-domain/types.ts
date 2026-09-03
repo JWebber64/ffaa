@@ -318,6 +318,78 @@ export type NativeWeeklyLineup = {
   updatedAt: string;
 };
 
+export type NativeScoringLineupTotal = {
+  franchiseId: string;
+  assignments: Record<string, string>;
+  currentScore: number;
+  projectedFinal: number;
+  pointsRemaining: number;
+  playersRemaining: number;
+  benchPoints: number;
+  optimalScore: number;
+  optimalDelta: number;
+};
+
+export type NativeScoringMatchup = {
+  matchupId: string;
+  homeFranchiseId: string;
+  awayFranchiseId: string;
+  homeScore: number;
+  awayScore: number;
+  homeProjectedFinal: number;
+  awayProjectedFinal: number;
+  homeWinProbability: number;
+  awayWinProbability: number;
+  playersRemaining: number;
+  pointsRemaining: number;
+};
+
+export type NativeScoringFeedEvent = {
+  eventKey: string;
+  providerEventId: string;
+  occurredAt: string;
+  playerId: string;
+  nflGameId: string;
+  description: string;
+  fantasyPointDelta: number;
+  resultingPlayerTotal: number;
+  scoringRuleIds: string[];
+  explanations: string[];
+  corrected: boolean;
+};
+
+export type NativeScoringWeek = {
+  id: string;
+  leagueId: string;
+  seasonId: string;
+  week: number;
+  settingsVersionId: string;
+  scoringRuleVersionId: string;
+  lineupWeekRevision: number;
+  revision: number;
+  ingestionVersion: string;
+  providerKey: string;
+  fallbackProviderKey: string;
+  providerState: "live" | "delayed" | "unavailable";
+  freshness: { state: "live" | "delayed" | "stale"; ageSeconds: number | null; message: string };
+  lastProviderTimestamp: string;
+  eventCount: number;
+  duplicateEventCount: number;
+  correctionCount: number;
+  statCorrectionState: "none" | "corrected";
+  playerTotals: Record<string, number>;
+  lineupTotals: NativeScoringLineupTotal[];
+  matchups: NativeScoringMatchup[];
+  standingsProjection: Array<{ franchiseId: string; projectedOutcome: "win" | "loss" | "tie" }>;
+  gameStatuses: Record<string, string>;
+  activeNflGameIds: string[];
+  scoringFeed: NativeScoringFeedEvent[];
+  leadChanges: Array<{ matchupId: string; eventKey: string; occurredAt: string; leaderFranchiseId: string; homeScore: number; awayScore: number }>;
+  topActivePerformer: { playerId: string; points: number } | null;
+  cachedLastKnownScore: boolean;
+  updatedAt: string;
+};
+
 export type LeagueAuthorityLabel =
   | "Native GameHQ League — read/write"
   | "Connected Sleeper League — read-only"

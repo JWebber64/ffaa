@@ -8,6 +8,8 @@ export type LeagueCommandType =
   | "save_weekly_lineup"
   | "configure_lineup_week"
   | "set_lineup_lock_override"
+  | "ingest_scoring_events"
+  | "recalculate_scoring_week"
   | "save_settings_draft"
   | "publish_settings"
   | "restore_settings_version"
@@ -75,6 +77,50 @@ export type SetLineupLockOverridePayload = {
   expectedWeekRevision: number;
   playerIds: string[];
   reopenedUntil: string | null;
+};
+
+export type NativeScoringStatistic =
+  | "passing_yards"
+  | "passing_touchdowns"
+  | "interceptions"
+  | "rushing_yards"
+  | "rushing_touchdowns"
+  | "receiving_yards"
+  | "receptions"
+  | "receiving_touchdowns";
+
+export type NativeScoringEventInput = {
+  providerEventId: string;
+  providerTimestamp: string;
+  occurredAt: string;
+  playerId: string;
+  nflGameId: string;
+  statistics: Array<{ statistic: NativeScoringStatistic; value: number }>;
+  description: string;
+  correctionOfProviderEventId?: string;
+};
+
+export type NativeScoringMatchupInput = {
+  matchupId: string;
+  homeFranchiseId: string;
+  awayFranchiseId: string;
+};
+
+export type IngestScoringEventsPayload = {
+  week: number;
+  expectedScoringWeekRevision: number;
+  providerKey: string;
+  fallbackProviderKey?: string;
+  providerState: "live" | "delayed" | "unavailable";
+  ingestionVersion: string;
+  matchups?: NativeScoringMatchupInput[];
+  gameStatuses?: Array<{ nflGameId: string; status: "scheduled" | "in_progress" | "final" | "postponed" | "canceled" }>;
+  events: NativeScoringEventInput[];
+};
+
+export type RecalculateScoringWeekPayload = {
+  week: number;
+  expectedScoringWeekRevision: number;
 };
 
 export type SaveSettingsDraftPayload = {
@@ -188,6 +234,8 @@ export type LeagueCommandPayloadByType = {
   save_weekly_lineup: SaveWeeklyLineupPayload;
   configure_lineup_week: ConfigureLineupWeekPayload;
   set_lineup_lock_override: SetLineupLockOverridePayload;
+  ingest_scoring_events: IngestScoringEventsPayload;
+  recalculate_scoring_week: RecalculateScoringWeekPayload;
   save_settings_draft: SaveSettingsDraftPayload;
   publish_settings: PublishSettingsPayload;
   restore_settings_version: RestoreSettingsVersionPayload;

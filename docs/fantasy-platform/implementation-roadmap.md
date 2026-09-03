@@ -12,8 +12,8 @@ The roadmap follows the requested phases in order. Each phase is a bounded chang
 | 3 | Universal command, roster transaction, and audit expansion | Implemented for canonical player ownership, commissioner correction/reversal, and pipeline hooks | Concurrent ownership is atomic and every roster mutation has a receipt |
 | 4 | Native-league draft integration | Implemented for authoritative auction, snake, linear, and third-round-reversal rooms | Draft completion creates roster transactions |
 | 5 | Weekly operation and player-level locks | Implemented for native lineups, week game states, ordered fallbacks, and emergency reopenings | Cross-device lineups and settings-derived lock behavior |
-| 6 | Provider-agnostic scoring | Next phase; normalized week/player state and scoring settings are available | Deterministic replay/corrections and live freshness UI |
-| 7 | Free agents and waivers | Blocked on roster/scoring state | Atomic reproducible processing and receipts |
+| 6 | Provider-agnostic scoring | Implemented with normalized events, deterministic replay, corrections, freshness, and native live matchup UI | Deterministic replay/corrections and live freshness UI |
+| 7 | Free agents and waivers | Next phase; canonical roster and scoring state are available | Atomic reproducible processing and receipts |
 | 8 | Two-team trades | Blocked on roster transaction ledger | Atomic asset locks/review/receipts |
 | 9 | Schedule, standings, playoffs | Blocked on scoring/results/settings | Reproducible standings, explainable seeds, valid brackets |
 | 10 | Operational UI consolidation | Iterative after each operational domain, final pass after 9 | Desktop/mobile parity and dense operational surfaces |
@@ -302,12 +302,16 @@ Phase 5 compatibility/rollback: canonical native seasons use season-scoped `line
 
 ## Phase 6 — live scoring
 
-- Approve/provider-contract a normalized NFL event source.
-- Persist provider event IDs, normalized stats, scoring-rule IDs, deltas, correction lineage, freshness.
-- Replay deterministic scores and update matchup/standings read models.
-- Build live UI with clear live/projected/stale states and calculation explanations.
+- Implemented a provider-neutral adapter contract and authenticated fixture/manual ingress; no undocumented external provider is hard-coded.
+- Provider event IDs, immutable event revisions, normalized stats, scoring-rule IDs, deltas, correction lineage, ingestion version, fallback provider, and freshness are persisted.
+- Every ingestion or explicit replay deterministically rebuilds player/game totals, lineup/bench/optimal totals, matchup totals, lead changes, and the Week standings projection against the exact active settings version.
+- Native Matchup renders sticky current scores, live/projected and stale/cached states, win probability, remaining players/points, active games, projected finals, scoring explanations, lead chronology, active performer, bench/optimal comparison, corrections, and provider update time.
 
 Gate: complete fixture replay is deterministic; duplicates/corrections propagate without silent changes.
+
+Exact Phase 6 implementation files: `shared/nativeScoring.ts` and `shared/leagueCommandProtocol.ts`; `server/league-commands/nativeScoringCommands.ts`, `executeLeagueCommand.ts`, and `commandSupport.ts`; `src/features/native-scoring/**`; `src/features/league-domain/leagueCommands.ts` and `types.ts`; `src/screens/LeagueMatchups.tsx`; and `firestore.rules`. Coverage is in `nativeScoringEngine.test.ts`, `nativeScoringCommands.test.ts`, `nativeLiveMatchupWorkspace.test.tsx`, and `nativeLeagueFirestoreRules.test.ts`.
+
+Phase 6 compatibility/rollback: native scoring reads only canonical `lineupWeeks`, `lineups`, and `seasonTeams`; connected Sleeper matchups retain their existing adapter. Disabling the native matchup branch leaves the normalized ledger and rebuildable read models intact. No external source is contacted by the engine; an approved adapter can implement the published contract later without changing score calculation.
 
 ## Phase 7 — free agents and waivers
 

@@ -19,6 +19,7 @@ import {
   executeStartNativeDraft,
 } from "./nativeDraftCommands";
 import { executeConfigureLineupWeek, executeSetLineupLockOverride } from "./nativeLineupCommands";
+import { executeIngestScoringEvents, executeRecalculateScoringWeek } from "./nativeScoringCommands";
 import type { LeagueCommandStore } from "./store";
 
 const COMMAND_TYPES = new Set<LeagueCommandType>([
@@ -27,6 +28,8 @@ const COMMAND_TYPES = new Set<LeagueCommandType>([
   "save_weekly_lineup",
   "configure_lineup_week",
   "set_lineup_lock_override",
+  "ingest_scoring_events",
+  "recalculate_scoring_week",
   "save_settings_draft",
   "publish_settings",
   "restore_settings_version",
@@ -118,6 +121,12 @@ export async function executeLeagueCommand(input: {
   }
   if (command.commandType === "set_lineup_lock_override") {
     return executeSetLineupLockOverride(shared as Parameters<typeof executeSetLineupLockOverride>[0]);
+  }
+  if (command.commandType === "ingest_scoring_events") {
+    return executeIngestScoringEvents(shared as Parameters<typeof executeIngestScoringEvents>[0]);
+  }
+  if (command.commandType === "recalculate_scoring_week") {
+    return executeRecalculateScoringWeek(shared as Parameters<typeof executeRecalculateScoringWeek>[0]);
   }
   if (command.commandType === "save_settings_draft") {
     return executeSaveSettingsDraft(shared as Parameters<typeof executeSaveSettingsDraft>[0]);

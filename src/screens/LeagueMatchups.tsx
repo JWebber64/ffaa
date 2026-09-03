@@ -20,6 +20,7 @@ import { useOptionalLeagueWorkspace } from "../features/league-workspace/leagueW
 import { PositionBadge } from "../ui/PositionBadge";
 import { UniversalSelect } from "../ui/UniversalSelect";
 import "./league-season.css";
+import { NativeLiveMatchupWorkspace } from "../features/native-scoring/NativeLiveMatchupWorkspace";
 
 function clampWeek(value: string | null) {
   const parsed = Number(value);
@@ -256,6 +257,9 @@ function LeagueScheduleMatchups({ personalOnly = false }: { personalOnly?: boole
 
 export default function LeagueMatchups({ personalOnly = false }: { personalOnly?: boolean }) {
   const workspace = useOptionalLeagueWorkspace();
+  if (workspace?.canonicalWorkspace?.league.authorityMode === "native" && workspace.canonicalWorkspace.season) {
+    return <NativeLiveMatchupWorkspace workspace={workspace.canonicalWorkspace} personalOnly={personalOnly} />;
+  }
   if (personalOnly && workspace) {
     if (workspace.teamState.status === "ready") return <ConnectedTeamMatchup data={workspace.teamState.data} />;
     return (

@@ -229,12 +229,12 @@ This navigation change follows the canonical workspace seam and is not permissio
 |---|---|
 | `/league/:gamehqLeagueId` | Operational League Home with real league/season/team/role/source state and explicit unavailable states |
 | `/league/:numericSleeperId/*` | Resolves `externalLeagueMappings/sleeper__{id}`; mapped routes replace the league segment and preserve suffix, query, and hash |
-| `/league/:gamehqLeagueId/matchup` | Personal matchup alias |
+| `/league/:gamehqLeagueId/matchup` | Native seasons show the current manager's replayable live matchup; connected leagues keep the existing Sleeper adapter |
 | `/league/:gamehqLeagueId/team` | Existing team workspace through the external-source adapter when present |
 | `/league/:gamehqLeagueId/team/roster` | Native seasons use player-level locks, ordered fallbacks, exact revision saves, and commissioner week controls; legacy-backed seasons retain the compatibility editor |
 | `/league/:gamehqLeagueId/players` | Existing player research surface |
 | `/league/:gamehqLeagueId/transactions` | Existing imported transaction/history compatibility route |
-| `/league/:gamehqLeagueId/schedule` | Existing all-matchups schedule alias |
+| `/league/:gamehqLeagueId/schedule` | Native seasons show all Week scoring matchups; connected leagues keep the generated compatibility schedule |
 | `/league/:gamehqLeagueId/{standings,teams,history}` | Existing league readers under canonical identity |
 | `/league/:gamehqLeagueId/commissioner/*` | Existing management surface behind canonical GameHQ capability resolution |
 

@@ -13,6 +13,8 @@ import {
   type StartNativeDraftPayload,
   type ConfigureLineupWeekPayload,
   type SetLineupLockOverridePayload,
+  type IngestScoringEventsPayload,
+  type RecalculateScoringWeekPayload,
 } from "../../../shared/leagueCommandProtocol";
 import { ensurePermanentFirebaseUserId } from "../../lib/authSession";
 import { httpLeagueCommandService } from "./httpLeagueCommandService";
@@ -118,6 +120,50 @@ export async function setLineupLockOverrideCommand(input: {
     expectedRevision: input.expectedRevision,
     payload: input.payload,
     reason: input.reason,
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function ingestScoringEventsCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: IngestScoringEventsPayload;
+  reason?: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "ingest_scoring_events",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: input.payload,
+    reason: input.reason ?? `Ingest Week ${input.payload.week} normalized scoring events`,
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function recalculateScoringWeekCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: RecalculateScoringWeekPayload;
+  reason?: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "recalculate_scoring_week",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: input.payload,
+    reason: input.reason ?? `Replay Week ${input.payload.week} scoring`,
     clientCreatedAt: nowIso(),
   });
 }

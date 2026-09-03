@@ -323,3 +323,11 @@ Deliberate remaining direct legacy writes are season publication, claims/members
 - A locked Thursday player can remain fixed while an unlocked Sunday player changes. Postponed games use original, rescheduled, or actual-start timing; canceled games lock or unlock according to the active settings.
 - Commissioner emergency reopenings are player-scoped, time-bounded, reason-required, and immutable in the universal audit. Multiple managers subscribe to the same authoritative week and lineup documents.
 - The manager UI shows legality, starter count, bye/injury warnings, projected total, exact per-player lock reason/time in league timezone, next deadline, roster/settings revisions, save state, and ordered fallbacks. Commissioner controls publish kickoff groups without JSON and expose audited emergency reopening.
+
+## Phase 6 implementation delta
+
+- Native leagues now have a provider-neutral NFL event contract. The release does not call or name an undocumented live-data source; an authenticated fixture/manual ingress and fallback-provider field prove the boundary without pretending an unapproved feed is live.
+- Each stable provider event is normalized once, scored by the exact published settings version, and preserved through immutable revisions. Duplicate semantic retries do not add points. Reordered source events are sorted deterministically; replacement and superseding corrections require a reason and remain visible.
+- Every accepted batch and explicit full replay rebuilds player/game totals, lineup and bench totals, optimal comparison, matchup totals, win probabilities, scoring feed, lead changes, active-game context, and Week standings projection in one server commit.
+- Native `/matchup`, `/team/matchup`, `/matchups`, and `/schedule` consumers use the canonical realtime scoring projection. Connected Sleeper leagues keep their existing read-only path.
+- The matchup UI distinguishes current score from projected final, never labels season PPG as a weekly score, and explicitly identifies delayed/stale data and cached last-known totals. Stat corrections include count and replay disclosure.

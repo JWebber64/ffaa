@@ -346,5 +346,7 @@ An imported league owner ID is display context. It never changes these labels or
 | Draft spectator state | `nativeDraftShares/{shareToken}` | Redacted rebuildable projection only; it omits queues/actors and never accepts browser writes |
 | Native weekly player/game state | `leagues/{leagueId}/seasons/{seasonId}/lineupWeeks/week-{week}` | Authoritative lock input version; commissioner/scheduler command only |
 | Native weekly lineup | `leagues/{leagueId}/seasons/{seasonId}/lineups/{franchiseId}_week-{week}` | Authoritative assignments and ordered fallback trace; exact revisions and server command only |
+| Normalized NFL stat event | `seasons/{seasonId}/scoringEvents/{providerEventKey}` plus immutable `scoringEventRevisions` | Provider-neutral input with stable ID, correction lineage, and ingestion version; commissioner/historian command only |
+| Native live scoring projection | `seasons/{seasonId}/scoringWeeks/week-{week}` | Rebuildable player/lineup/matchup/Week-standing output tied to the published settings version; member-readable and server-written |
 
 The first implementation does not infer authority from `managerProviderUserId`, `leagueOwnerProviderUserId`, Sleeper roster ownership, or any other imported profile field.

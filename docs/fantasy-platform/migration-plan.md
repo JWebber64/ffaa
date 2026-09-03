@@ -226,9 +226,10 @@ Migration is explicit and on-demand, not a page-load bulk conversion.
 5. Phase 3 creates asset locks only from accepted native roster transactions. It does not infer a complete canonical ownership index from an imported legacy roster.
 6. Phase 4 native drafts start only from empty canonical rosters and emit the complete ownership ledger pick by pick. Existing live/offline drafts remain compatibility records; importing one later requires an explicit franchise/player parity report and never occurs on page load.
 7. Phase 5 native seasons store weekly player/game inputs and lineups only under the canonical season. Legacy-backed seasons keep their existing `weekSettings`/`lineups` write owner; no dual-write or page-view copy is introduced.
-8. When no published legacy season exists, the command records `connected_read_only` / `mapped_read_only`; the actor receives membership but no write role.
-9. Concurrent attach commands race on the mapping precondition. The winner's GameHQ league ID becomes canonical; the loser returns an idempotent receipt pointing to that same winner.
-10. Old numeric routes resolve through the mapping; an unmapped route still loads compatibility readers.
+8. Phase 6 scores only canonical native `lineupWeeks` and `lineups`. The normalized event ledger and `scoringWeeks` projection are additive; connected-provider scores are not copied, dual-written, or promoted to native authority.
+9. When no published legacy season exists, the command records `connected_read_only` / `mapped_read_only`; the actor receives membership but no write role.
+10. Concurrent attach commands race on the mapping precondition. The winner's GameHQ league ID becomes canonical; the loser returns an idempotent receipt pointing to that same winner.
+11. Old numeric routes resolve through the mapping; an unmapped route still loads compatibility readers.
 
 A standalone bulk migration script was intentionally not added in this slice: bulk attachment cannot safely infer which permanent GameHQ account should initiate a connection, and it would expand authority scope beyond the user's explicit action. The command itself is the idempotent backfill unit and can be orchestrated by a separately authorized batch job later without changing the schema.
 

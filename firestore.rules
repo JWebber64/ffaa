@@ -132,6 +132,21 @@ service cloud.firestore {
           allow get, list: if isCanonicalMember();
           allow create, update, delete: if false;
         }
+
+        match /scoringWeeks/{weekId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /scoringEvents/{eventId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+
+        match /scoringEventRevisions/{revisionId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
       }
 
       match /franchises/{franchiseId} {
