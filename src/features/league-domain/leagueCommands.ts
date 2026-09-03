@@ -3,6 +3,7 @@ import {
   type ConnectExternalLeaguePayload,
   type CreateNativeLeaguePayload,
   type SaveWeeklyLineupPayload,
+  type SaveSettingsDraftPayload,
 } from "../../../shared/leagueCommandProtocol";
 import { ensurePermanentFirebaseUserId } from "../../lib/authSession";
 import { httpLeagueCommandService } from "./httpLeagueCommandService";
@@ -64,6 +65,69 @@ export async function saveWeeklyLineupCommand(input: {
     expectedRevision: input.expectedRevision,
     payload: input.payload,
     reason: input.payload.overrideReason,
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function saveSettingsDraftCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: SaveSettingsDraftPayload;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "save_settings_draft",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: input.payload,
+    reason: "Save league settings draft",
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function publishSettingsCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  draftVersionId: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "publish_settings",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: { draftVersionId: input.draftVersionId },
+    reason: "Publish complete league settings",
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function restoreSettingsVersionCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  sourceVersionId: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "restore_settings_version",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: { sourceVersionId: input.sourceVersionId },
+    reason: "Restore prior league settings as a new version",
     clientCreatedAt: nowIso(),
   });
 }

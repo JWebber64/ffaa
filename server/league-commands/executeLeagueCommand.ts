@@ -3,12 +3,16 @@ import { commandPath, commandRequestHash, deriveGamehqUuid, LeagueCommandFailure
 import { executeConnectExternalLeague } from "./connectExternalLeague";
 import { executeCreateNativeLeague } from "./createNativeLeague";
 import { executeSaveWeeklyLineup } from "./saveWeeklyLineup";
+import { executePublishSettings, executeRestoreSettingsVersion, executeSaveSettingsDraft } from "./settingsCommands";
 import type { LeagueCommandStore } from "./store";
 
 const COMMAND_TYPES = new Set<LeagueCommandType>([
   "create_native_league",
   "connect_external_league",
   "save_weekly_lineup",
+  "save_settings_draft",
+  "publish_settings",
+  "restore_settings_version",
 ]);
 
 function normalizeCommand(value: unknown): LeagueCommand {
@@ -21,7 +25,7 @@ function normalizeCommand(value: unknown): LeagueCommand {
   const clientCreatedAt = text(data.clientCreatedAt);
   if (!COMMAND_TYPES.has(commandType)) throw new LeagueCommandFailure("invalid_command_type", "Choose a supported league command.");
   if (!/^[0-9a-f-]{36}$/iu.test(commandId)) throw new LeagueCommandFailure("invalid_command_id", "The command idempotency key is invalid.");
-  if (commandType === "save_weekly_lineup" && !leagueId) throw new LeagueCommandFailure("invalid_league_id", "A GameHQ league ID is required.");
+  if (!["create_native_league", "connect_external_league"].includes(commandType) && !leagueId) throw new LeagueCommandFailure("invalid_league_id", "A GameHQ league ID is required.");
   if (!actorUserId) throw new LeagueCommandFailure("invalid_actor", "The command actor is missing.");
   if (!Number.isFinite(Date.parse(clientCreatedAt))) throw new LeagueCommandFailure("invalid_client_time", "The command creation time is invalid.");
   const expectedRevision = wholeNumber(data.expectedRevision, -1);
@@ -77,5 +81,14 @@ export async function executeLeagueCommand(input: {
   if (command.commandType === "connect_external_league") {
     return executeConnectExternalLeague(shared as Parameters<typeof executeConnectExternalLeague>[0]);
   }
-  return executeSaveWeeklyLineup(shared as Parameters<typeof executeSaveWeeklyLineup>[0]);
+  if (command.commandType === "save_weekly_lineup") {
+    return executeSaveWeeklyLineup(shared as Parameters<typeof executeSaveWeeklyLineup>[0]);
+  }
+  if (command.commandType === "save_settings_draft") {
+    return executeSaveSettingsDraft(shared as Parameters<typeof executeSaveSettingsDraft>[0]);
+  }
+  if (command.commandType === "publish_settings") {
+    return executePublishSettings(shared as Parameters<typeof executePublishSettings>[0]);
+  }
+  return executeRestoreSettingsVersion(shared as Parameters<typeof executeRestoreSettingsVersion>[0]);
 }

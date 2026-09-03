@@ -128,6 +128,7 @@ beforeEach(() => {
     teamState: { status: "idle", data: null, error: "" },
     capabilities: { canManage: false, canSaveLineup: false, source: null, status: "ready" },
     switchLeague: vi.fn(),
+    refreshWorkspace: vi.fn(),
   });
   vi.mocked(useLeagueWeekLineups).mockReturnValue(lockedWeek());
 });

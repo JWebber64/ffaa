@@ -5,6 +5,7 @@ import {
   House,
   History,
   ListChecks,
+  BookOpen,
   Settings2,
   ShieldCheck,
   Trophy,
@@ -24,6 +25,7 @@ const leagueDestinations = [
   { section: "schedule", label: "Schedule", icon: CalendarDays },
   { section: "teams", label: "All teams", icon: Users },
   { section: "history", label: "History", icon: History },
+  { section: "rules", label: "Rules", icon: BookOpen },
   { section: "commissioner", label: "Commissioner", icon: Settings2 },
 ] as const;
 

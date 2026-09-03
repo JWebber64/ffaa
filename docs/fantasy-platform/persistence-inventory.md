@@ -299,3 +299,12 @@ leagues/{gamehqLeagueId}/auditEvents/{auditEventId}
 For `legacy_backed_native`, weekly lineup state deliberately remains at `leagueSeasons/{externalLeagueId}/lineups/{legacyFranchiseId}_week-{week}` until a future canonical lineup cutover. That path has one writer: the server command. Its current document update-time is an atomic precondition, while the caller's `expectedRevision` is checked before validation. The same commit creates the canonical receipt and audit plus the compatibility audit.
 
 `ffaa.sleeperLeagueConnections.v1`, `ffaa.activeSleeperLeague.v1`, imported history, Offline Draft keys, and all existing Firestore collections remain intact. No batch data mutation or Production write was run from this branch.
+
+## Implemented Phase 2A settings persistence
+
+Native seasons now keep separate pointers:
+
+- `settings_version_id` is the one active published rules version.
+- `draft_settings_version_id` is the latest commissioner working draft and never governs live operations.
+
+Every draft save creates a new `settingsVersions/{settingsVersionId}` document. Publish and restore create another immutable version, update the season and league using update-time preconditions, create the command receipt and audit event, and supersede the prior published version's status in the same commit. Invalid publication performs no writes. Active canonical members may list this version history; browser clients cannot create, update, or delete it.

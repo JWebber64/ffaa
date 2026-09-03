@@ -29,6 +29,7 @@ export type LeagueWorkspaceValue = {
     status: "loading" | "ready";
   };
   switchLeague: (leagueId: string) => void;
+  refreshWorkspace: () => void;
 };
 
 export const LeagueWorkspaceContext = createContext<LeagueWorkspaceValue | null>(null);

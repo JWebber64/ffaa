@@ -91,7 +91,8 @@ service cloud.firestore {
 
       match /settingsVersions/{settingsVersionId} {
         allow get: if signedIn();
-        allow list, create, update, delete: if false;
+        allow list: if isCanonicalMember();
+        allow create, update, delete: if false;
       }
 
       match /externalConnections/{connectionId} {

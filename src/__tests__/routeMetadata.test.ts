@@ -27,6 +27,7 @@ describe("route metadata", () => {
       "/league/123456789012/standings",
       "/league/123456789012/schedule",
       "/league/123456789012/commissioner",
+      "/league/123456789012/rules",
       "/offline-draft",
       "/host/setup",
       "/join",

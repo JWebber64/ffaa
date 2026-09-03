@@ -109,7 +109,7 @@ export function normalizeReceipt(document: LeagueCommandStoredDocument | null): 
   if (!document) return null;
   const data = document.data;
   const commandType = text(data.command_type);
-  if (!["create_native_league", "connect_external_league", "save_weekly_lineup"].includes(commandType)) return null;
+  if (!["create_native_league", "connect_external_league", "save_weekly_lineup", "save_settings_draft", "publish_settings", "restore_settings_version"].includes(commandType)) return null;
   const error = record(data.error);
   return {
     commandId: text(data.command_id),

@@ -7,8 +7,8 @@ The roadmap follows the requested phases in order. Each phase is a bounded chang
 | Phase | Scope | Status | Exit gate |
 |---|---|---|---|
 | 0 | Exact current-state, authority, route, persistence, migration, and implementation audit | Complete in this document set | Six documents present; no application/schema mutation |
-| 1A | First vertical native-league foundation | Implemented on `codex/native-league-foundation`; not deployed | First-slice evidence and limits below |
-| 2 | Creation wizard and full Commissioner workspace/settings publication | Blocked on 1A | Valid native redraft league and immutable settings publication |
+| 1A | First vertical native-league foundation | Implemented; exact Preview verified; Production unchanged | First-slice evidence and limits below |
+| 2 | Creation wizard and full Commissioner workspace/settings publication | Settings publication implemented locally; roles/invitations remain | Valid native redraft league and immutable settings publication |
 | 3 | Universal command, roster transaction, and audit expansion | Blocked on 2; lineup proof begins in 1A | All authoritative mutations use command boundary |
 | 4 | Native-league draft integration | Blocked on commands/settings | Draft completion creates roster transactions |
 | 5 | Weekly operation and player-level locks | Blocked on settings/commands | Cross-device lineups and settings-derived lock behavior |
@@ -221,6 +221,17 @@ Then render and verify the important canonical/mapped routes at desktop and mobi
 
 Gate: a commissioner creates and publishes a valid native redraft league; invalid settings cannot publish; no partial field publication.
 
+### Implemented Phase 2A — native rulebook and publication
+
+- Native creation now lands in the full-page commissioner rulebook with a functional redraft template.
+- `save_settings_draft`, `publish_settings`, and `restore_settings_version` use the authenticated command boundary, exact season revision, idempotency receipt, audit event, and one atomic Firestore commit.
+- Drafts are immutable documents. Publishing creates a new active version, supersedes only the prior version status, advances the season pointer, and activates the league. Restore is a forward publication, not a history rewrite.
+- Full-document server validation blocks invalid publication without changing the season, league, version pointer, receipt, or audit state.
+- The deterministic rule-impact preview calculates roster size, draft population, matchups, byes, and auction pool. The same settings generate `/league/:gamehqLeagueId/rules` as a plain-English constitution.
+- Firestore permits active canonical members to list settings history and continues to deny every direct browser settings write.
+
+Phase 2A verification: TypeScript application/API checks, lint, focused settings/command tests, Firestore emulator rules tests, and the Vercel artifact build pass. Roles, invitations, team assignment, and the remaining commissioner domains stay in Phase 2B; no empty placeholder pages were added. Midseason publication is intentionally locked until the required material-impact reason workflow exists.
+
 ## Phase 3 — command, transaction, and audit expansion
 
 - Generalize the lineup proof to membership/settings/schedule/roster/commissioner commands.
@@ -361,7 +372,7 @@ Implementation differences from the proposed file list:
 Known limits:
 
 - No waivers, trades, live scoring, native standings, playoffs, chat, or provider writes were introduced.
-- Native leagues created in this phase stop at draft/setup state; the full settings and commissioner wizard remains Phase 2.
+- Native leagues now continue directly into the Phase 2A rulebook and can atomically publish a playable redraft rules version. Team invitations and role assignment remain Phase 2B.
 - Legacy season publication, team-claim administration, and whole-week lock mutation still use their existing direct rules and are Phase 3 command-expansion work.
 - The Firestore emulator test files passed locally with the isolated Java runtime; the host still has no system-wide Java installation or `PATH` change.
 - Preview was deployed for review on September 3, 2026. Production was not promoted or changed.

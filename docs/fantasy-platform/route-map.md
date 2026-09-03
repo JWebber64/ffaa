@@ -160,7 +160,7 @@ The canonical path parameter is always `gamehqLeagueId`, never a provider ID.
 | `/league/:gamehqLeagueId/schedule` | Season schedule | Adapter to existing generated schedule initially |
 | `/league/:gamehqLeagueId/teams` | Teams/franchises | Compatibility route retained |
 | `/league/:gamehqLeagueId/chat` | League chat | Planned; do not add a decorative empty page |
-| `/league/:gamehqLeagueId/rules` | Published settings/constitution | Planned until settings version exists |
+| `/league/:gamehqLeagueId/rules` | Published settings/constitution | Implemented from the active immutable settings version |
 | `/league/:gamehqLeagueId/history/*` | Native/imported history | Reuse current history with canonical mapping |
 
 The requested inside-league nav is Home, Matchup, Team, Players, Transactions, and League; the League disclosure contains Standings, Schedule, Teams, Chat, Rules, and History. Mobile exposes Home, Matchup, Team, Players, and More without removing any action.
@@ -169,8 +169,8 @@ The requested inside-league nav is Home, Matchup, Team, Players, Transactions, a
 
 | Route | Planned page |
 |---|---|
-| `/league/:gamehqLeagueId/commissioner` | Commissioner overview/mode |
-| `/league/:gamehqLeagueId/commissioner/settings` | Settings draft/publish workspace |
+| `/league/:gamehqLeagueId/commissioner` | Implemented commissioner overview with active/draft revision state |
+| `/league/:gamehqLeagueId/commissioner/settings` | Implemented redraft rulebook, validation, impact preview, publication, and restore history |
 | `/league/:gamehqLeagueId/commissioner/teams` | Teams, memberships, and roles |
 | `/league/:gamehqLeagueId/commissioner/scoring` | Scoring settings |
 | `/league/:gamehqLeagueId/commissioner/schedule` | Schedule settings/editor |
@@ -235,6 +235,6 @@ This navigation change follows the canonical workspace seam and is not permissio
 | `/league/:gamehqLeagueId/{standings,teams,history}` | Existing league readers under canonical identity |
 | `/league/:gamehqLeagueId/commissioner/*` | Existing management surface behind canonical GameHQ capability resolution |
 
-The league workspace navigation now exposes Home, Matchup, Team, Players, Transactions, and a real disclosure menu for Standings, Schedule, Teams, History, and Commissioner. Existing legacy aliases remain valid; no route was deleted.
+The league workspace navigation now exposes Home, Matchup, Team, Players, Transactions, and a real disclosure menu for Standings, Schedule, Teams, History, Rules, and Commissioner. Existing legacy aliases remain valid; no route was deleted.
 
 Global AppShell regrouping was not required to prove the identity/command slice and was intentionally left unchanged to avoid broad navigation churn.

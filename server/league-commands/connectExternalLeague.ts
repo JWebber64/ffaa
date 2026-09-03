@@ -357,6 +357,7 @@ export async function executeConnectExternalLeague(input: {
       material_differences: { connected: true, legacy_season_mapped: hasNativeSeason },
       reason: command.reason,
       settings_version_id: settingsVersionId,
+      draft_settings_version_id: "",
       command_id: command.commandId,
       transaction_id: "",
       public_summary: `${leagueName} was connected from Sleeper in ${hasNativeSeason ? "mirror" : "read-only"} mode.`,

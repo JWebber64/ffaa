@@ -1,6 +1,14 @@
+import type { LeagueSettingsV1 } from "./leagueSettings";
+
 export const LEAGUE_COMMAND_ENDPOINT = "/ff/api/league-commands/execute";
 
-export type LeagueCommandType = "create_native_league" | "connect_external_league" | "save_weekly_lineup";
+export type LeagueCommandType =
+  | "create_native_league"
+  | "connect_external_league"
+  | "save_weekly_lineup"
+  | "save_settings_draft"
+  | "publish_settings"
+  | "restore_settings_version";
 
 export type CreateNativeLeaguePayload = {
   name: string;
@@ -23,10 +31,25 @@ export type SaveWeeklyLineupPayload = {
   overrideReason: string;
 };
 
+export type SaveSettingsDraftPayload = {
+  settings: LeagueSettingsV1;
+};
+
+export type PublishSettingsPayload = {
+  draftVersionId: string;
+};
+
+export type RestoreSettingsVersionPayload = {
+  sourceVersionId: string;
+};
+
 export type LeagueCommandPayloadByType = {
   create_native_league: CreateNativeLeaguePayload;
   connect_external_league: ConnectExternalLeaguePayload;
   save_weekly_lineup: SaveWeeklyLineupPayload;
+  save_settings_draft: SaveSettingsDraftPayload;
+  publish_settings: PublishSettingsPayload;
+  restore_settings_version: RestoreSettingsVersionPayload;
 };
 
 export type LeagueCommand<TType extends LeagueCommandType = LeagueCommandType> = {

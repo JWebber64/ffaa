@@ -1,6 +1,8 @@
 import {
+  collection,
   doc,
   getDoc,
+  getDocs,
 } from "firebase/firestore";
 
 import { firebaseAuth, firestore } from "../../lib/firebase";
@@ -15,6 +17,7 @@ import {
   type LeagueMembership,
   type RoleGrant,
   type Season,
+  type SettingsVersion,
 } from "./types";
 
 function text(value: unknown) {
@@ -83,12 +86,48 @@ function normalizeSeason(value: unknown, leagueId: string, expectedId: string): 
     phase: (["setup", "draft", "regular_season", "playoffs", "complete", "archived"].includes(text(data.phase)) ? text(data.phase) : "setup") as Season["phase"],
     revision: Math.max(1, Math.round(numberValue(data.revision, 1))),
     settingsVersionId: text(data.settings_version_id),
+    draftSettingsVersionId: text(data.draft_settings_version_id),
     draftId: text(data.draft_id) || null,
     scheduleVersionId: text(data.schedule_version_id) || null,
     startAt: text(data.start_at) || null,
     endAt: text(data.end_at) || null,
     legacySourceLeagueId: text(data.legacy_source_league_id) || null,
   };
+}
+
+export function normalizeSettingsVersion(value: unknown, leagueId: string, expectedId = ""): SettingsVersion | null {
+  const data = recordValue(value);
+  const id = text(data.id);
+  const status = text(data.status);
+  if (!id || (expectedId && id !== expectedId) || text(data.league_id) !== leagueId || !["draft", "published", "superseded"].includes(status)) return null;
+  return {
+    id,
+    leagueId,
+    seasonId: text(data.season_id),
+    revision: Math.max(1, Math.round(numberValue(data.revision, 1))),
+    status: status as SettingsVersion["status"],
+    effectiveAt: text(data.effective_at),
+    settings: recordValue(data.settings),
+    publishedBy: text(data.published_by) || null,
+    publishedAt: text(data.published_at) || null,
+    createdAt: text(data.created_at),
+    updatedAt: text(data.updated_at),
+  };
+}
+
+export async function getSettingsVersion(leagueId: string, settingsVersionId: string) {
+  if (!leagueId || !settingsVersionId) return null;
+  const snapshot = await getDoc(doc(firestore, "leagues", leagueId, "settingsVersions", settingsVersionId));
+  return snapshot.exists() ? normalizeSettingsVersion(snapshot.data(), leagueId, settingsVersionId) : null;
+}
+
+export async function listSettingsVersions(leagueId: string) {
+  if (!leagueId) return [];
+  const snapshot = await getDocs(collection(firestore, "leagues", leagueId, "settingsVersions"));
+  return snapshot.docs
+    .map((document) => normalizeSettingsVersion(document.data(), leagueId, document.id))
+    .filter((version): version is SettingsVersion => Boolean(version))
+    .sort((left, right) => right.revision - left.revision || right.createdAt.localeCompare(left.createdAt));
 }
 
 function normalizeMembership(value: unknown, leagueId: string, userId: string): LeagueMembership | null {

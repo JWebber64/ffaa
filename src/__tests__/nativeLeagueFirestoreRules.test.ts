@@ -56,6 +56,13 @@ describeWithEmulator("native league Firestore security", () => {
           user_id: commissionerId,
           role: "commissioner",
         }),
+        firestore.doc(`leagues/${leagueId}/settingsVersions/settings-1`).set({
+          id: "settings-1",
+          league_id: leagueId,
+          season_id: seasonId,
+          status: "published",
+          revision: 1,
+        }),
         firestore.doc(`leagues/${leagueId}/auditEvents/audit-1`).set({
           league_id: leagueId,
           actor_user_id: commissionerId,
@@ -80,7 +87,9 @@ describeWithEmulator("native league Firestore security", () => {
     await assertSucceeds(commissioner.doc(`leagues/${leagueId}/memberships/${commissionerId}`).get());
     await assertSucceeds(commissioner.doc(`leagues/${leagueId}/roleGrants/${commissionerId}__commissioner`).get());
     await assertSucceeds(commissioner.doc(`leagues/${leagueId}/auditEvents/audit-1`).get());
+    await assertSucceeds(commissioner.collection(`leagues/${leagueId}/settingsVersions`).get());
     await assertFails(firestoreFor("outsider-1").doc(`leagues/${leagueId}/memberships/${commissionerId}`).get());
+    await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/settingsVersions`).get());
   });
 
   it("rejects direct browser writes even from the commissioner", async () => {
@@ -89,5 +98,6 @@ describeWithEmulator("native league Firestore security", () => {
     await assertFails(commissioner.doc(`leagues/${leagueId}/commands/browser-command`).set({ actor_user_id: commissionerId }));
     await assertFails(commissioner.doc(`leagues/${leagueId}/auditEvents/browser-audit`).set({ actor_user_id: commissionerId }));
     await assertFails(commissioner.doc(`leagues/${leagueId}/lineups/team-1_week-1`).set({ revision: 1 }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/settingsVersions/browser-settings`).set({ league_id: leagueId, status: "draft" }));
   });
 });

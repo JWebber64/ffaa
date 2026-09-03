@@ -1,5 +1,6 @@
 import type { FirestoreWrite } from "../league-history/firestoreRest";
 import type { LeagueCommand, LeagueCommandReceipt } from "../../shared/leagueCommandProtocol";
+import { createRedraftLeagueSettings } from "../../shared/leagueSettings";
 import { isGamehqLeagueId } from "../../src/features/league-domain/types";
 import {
   auditPath,
@@ -93,7 +94,8 @@ export async function executeCreateNativeLeague(input: {
       year,
       phase: "setup",
       revision: 1,
-      settings_version_id: settingsVersionId,
+      settings_version_id: "",
+      draft_settings_version_id: settingsVersionId,
       draft_id: "",
       schedule_version_id: "",
       start_at: "",
@@ -110,7 +112,8 @@ export async function executeCreateNativeLeague(input: {
       revision: 1,
       status: "draft",
       effective_at: processedAt,
-      settings: { setup_complete: false },
+      settings: createRedraftLeagueSettings(timezone),
+      validation_errors: [],
       published_by: "",
       published_at: "",
       created_at: processedAt,

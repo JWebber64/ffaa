@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -61,6 +62,8 @@ export function LeagueWorkspaceProvider({ children }: { children: ReactNode }) {
     status: requestedLeagueId ? "loading" : "error",
     message: requestedLeagueId ? "Resolving the GameHQ league workspace." : "Choose a league to continue.",
   });
+  const [workspaceRevision, setWorkspaceRevision] = useState(0);
+  const refreshWorkspace = useCallback(() => setWorkspaceRevision((current) => current + 1), []);
   const leagueId = resolvedLeague.canonicalLeagueId || requestedLeagueId;
   const dataLeagueId = resolvedLeague.legacyExternalLeagueId;
   const connection = connections.find((candidate) => candidate.leagueId === dataLeagueId) ?? null;
@@ -166,7 +169,7 @@ export function LeagueWorkspaceProvider({ children }: { children: ReactNode }) {
         });
       });
     return () => { disposed = true; };
-  }, [navigate, requestedLeagueId, sessionUserId]);
+  }, [navigate, requestedLeagueId, sessionUserId, workspaceRevision]);
 
   useEffect(() => {
     connectionRef.current = connection;
@@ -252,7 +255,8 @@ export function LeagueWorkspaceProvider({ children }: { children: ReactNode }) {
       setActiveLeagueId(nextLeagueId);
       navigate(`/league/${encodeURIComponent(nextLeagueId)}/team`);
     },
-  }), [connection, connections, dataLeagueId, leagueId, management.currentUserId, management.record, management.status, navigate, requestedLeagueId, resolvedLeague, setActiveLeagueId, teamState]);
+    refreshWorkspace,
+  }), [connection, connections, dataLeagueId, leagueId, management.currentUserId, management.record, management.status, navigate, refreshWorkspace, requestedLeagueId, resolvedLeague, setActiveLeagueId, teamState]);
 
   return <LeagueWorkspaceContext.Provider value={value}>{children}</LeagueWorkspaceContext.Provider>;
 }

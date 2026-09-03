@@ -34,6 +34,7 @@ export type Season = {
   phase: SeasonPhase;
   revision: number;
   settingsVersionId: string;
+  draftSettingsVersionId: string;
   draftId: string | null;
   scheduleVersionId: string | null;
   startAt: string | null;

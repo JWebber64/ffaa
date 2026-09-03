@@ -46,7 +46,7 @@ export function NativeLeagueFoundationPanel({
     try {
       const receipt = await createNativeLeague({ name: normalizedName, timezone: normalizedTimezone, year }, attempt);
       createAttemptRef.current = null;
-      navigate(`/league/${encodeURIComponent(receipt.leagueId)}`, { replace: false });
+      navigate(`/league/${encodeURIComponent(receipt.leagueId)}/commissioner/settings`, { replace: false });
     } catch (error) {
       setState({ status: "error", message: error instanceof Error ? error.message : "The native league could not be created." });
     }
