@@ -1,10 +1,12 @@
 import {
   createLeagueCommandId,
+  type ApplyRosterTransactionPayload,
   type ConnectExternalLeaguePayload,
   type CreateNativeLeaguePayload,
   type SaveWeeklyLineupPayload,
   type SaveSettingsDraftPayload,
   type CreateLeagueInvitationPayload,
+  type ReverseRosterTransactionPayload,
 } from "../../../shared/leagueCommandProtocol";
 import { ensurePermanentFirebaseUserId } from "../../lib/authSession";
 import { httpLeagueCommandService } from "./httpLeagueCommandService";
@@ -234,6 +236,50 @@ export async function removeLeagueMemberCommand(input: {
     seasonId: input.seasonId,
     expectedRevision: input.expectedRevision,
     payload: { userId: input.userId },
+    reason: input.reason.trim().replace(/\s+/gu, " ").slice(0, 240),
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function applyRosterTransactionCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: ApplyRosterTransactionPayload;
+  reason: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "apply_roster_transaction",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: input.payload,
+    reason: input.reason.trim().replace(/\s+/gu, " ").slice(0, 240),
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function reverseRosterTransactionCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: ReverseRosterTransactionPayload;
+  reason: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "reverse_roster_transaction",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: input.payload,
     reason: input.reason.trim().replace(/\s+/gu, " ").slice(0, 240),
     clientCreatedAt: nowIso(),
   });

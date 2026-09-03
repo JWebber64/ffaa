@@ -7,6 +7,7 @@ import {
 import { isGamehqLeagueId } from "../../src/features/league-domain/types";
 import {
   auditPath,
+  auditPrivatePath,
   commandPath,
   createOnlyWrite,
   grantPath,
@@ -198,8 +199,21 @@ export async function executeSaveWeeklyLineup(input: {
       command_id: command.commandId,
       transaction_id: "",
       public_summary: `${sourceFranchise.displayName}'s Week ${week} lineup was ${locked ? "overridden" : "saved"}.`,
-      private_metadata: { legacy_league_id: legacyLeagueId, legacy_franchise_id: legacyFranchiseId },
+      private_metadata: {},
       reversal_of_audit_event_id: "",
+    }),
+    createOnlyWrite(store, auditPrivatePath(command.leagueId, auditEventId), {
+      schema_version: 1,
+      id: auditEventId,
+      league_id: command.leagueId,
+      season_id: command.seasonId,
+      actor_user_id: actorUserId,
+      command_id: command.commandId,
+      transaction_id: "",
+      reason: overrideReason,
+      legacy_league_id: legacyLeagueId,
+      legacy_franchise_id: legacyFranchiseId,
+      created_at: processedAt,
     }),
     createOnlyWrite(store, commandPath(command.leagueId, command.commandId), receiptRecord(receipt)),
   ];

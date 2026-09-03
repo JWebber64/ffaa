@@ -17,6 +17,7 @@ vi.mock("../features/league-domain/leagueCommands", () => ({
   publishSettingsCommand: vi.fn(),
   provisionSeasonTeamsCommand: vi.fn(),
   removeLeagueMemberCommand: vi.fn(),
+  reverseRosterTransactionCommand: vi.fn(),
   revokeLeagueInvitationCommand: vi.fn(),
   restoreSettingsVersionCommand: vi.fn(),
   saveSettingsDraftCommand: vi.fn(),

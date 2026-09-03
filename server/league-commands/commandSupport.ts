@@ -80,6 +80,18 @@ export function invitationPath(leagueId: string, invitationId: string) {
   return `leagues/${leagueId}/invitations/${invitationId}`;
 }
 
+export function rosterTransactionPath(leagueId: string, seasonId: string, transactionId: string) {
+  return `leagues/${leagueId}/seasons/${seasonId}/rosterTransactions/${transactionId}`;
+}
+
+export function assetLockPath(leagueId: string, seasonId: string, assetType: string, assetId: string) {
+  return `leagues/${leagueId}/seasons/${seasonId}/assetLocks/${assetType}__${assetId}`;
+}
+
+export function auditPrivatePath(leagueId: string, auditId: string) {
+  return `leagues/${leagueId}/auditPrivate/${auditId}`;
+}
+
 export function createOnlyWrite(store: LeagueCommandStore, path: string, data: Record<string, unknown>): FirestoreWrite {
   return { update: store.document(path, data), currentDocument: { exists: false } };
 }
@@ -88,6 +100,13 @@ export function replaceWrite(store: LeagueCommandStore, document: LeagueCommandS
   return {
     update: store.document(path, data),
     currentDocument: document?.updateTime ? { updateTime: document.updateTime } : { exists: false },
+  };
+}
+
+export function deleteWrite(store: LeagueCommandStore, document: LeagueCommandStoredDocument, path: string): FirestoreWrite {
+  return {
+    delete: store.document(path, {}).name,
+    currentDocument: document.updateTime ? { updateTime: document.updateTime } : { exists: true },
   };
 }
 
@@ -125,6 +144,8 @@ export function normalizeReceipt(document: LeagueCommandStoredDocument | null): 
     "accept_league_invitation",
     "revoke_league_invitation",
     "remove_league_member",
+    "apply_roster_transaction",
+    "reverse_roster_transaction",
   ].includes(commandType)) return null;
   const error = record(data.error);
   return {

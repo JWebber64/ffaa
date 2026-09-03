@@ -75,6 +75,10 @@ describeWithEmulator("native league Firestore security", () => {
           status: "pending",
           email: "manager@example.com",
         }),
+        firestore.doc(`leagues/${leagueId}/memberships/member-1`).set({ league_id: leagueId, user_id: "member-1", status: "active", role_grant_ids: [] }),
+        firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/rosterTransactions/tx-1`).set({ league_id: leagueId, season_id: seasonId, id: "tx-1" }),
+        firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/assetLocks/player__player-1`).set({ league_id: leagueId, season_id: seasonId, asset_id: "player-1", franchise_id: "team-1" }),
+        firestore.doc(`leagues/${leagueId}/auditPrivate/audit-1`).set({ league_id: leagueId, season_id: seasonId, id: "audit-1", reason: "Private commissioner context" }),
       ]);
     });
   });
@@ -107,6 +111,9 @@ describeWithEmulator("native league Firestore security", () => {
     await assertFails(commissioner.doc(`leagues/${leagueId}/lineups/team-1_week-1`).set({ revision: 1 }));
     await assertFails(commissioner.doc(`leagues/${leagueId}/settingsVersions/browser-settings`).set({ league_id: leagueId, status: "draft" }));
     await assertFails(commissioner.doc(`leagues/${leagueId}/invitations/browser-invite`).set({ league_id: leagueId, status: "pending" }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/rosterTransactions/browser-transaction`).set({ league_id: leagueId }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/assetLocks/player__player-2`).set({ league_id: leagueId }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/auditPrivate/browser-audit`).set({ league_id: leagueId }));
   });
 
   it("lets only canonical commissioners list people and invitations", async () => {
@@ -119,5 +126,16 @@ describeWithEmulator("native league Firestore security", () => {
     await assertFails(outsider.collection(`leagues/${leagueId}/memberships`).get());
     await assertFails(outsider.collection(`leagues/${leagueId}/roleGrants`).get());
     await assertFails(outsider.collection(`leagues/${leagueId}/invitations`).get());
+  });
+
+  it("separates member-readable roster receipts from commissioner-only audit metadata", async () => {
+    const member = firestoreFor("member-1");
+    await assertSucceeds(member.collection(`leagues/${leagueId}/seasons/${seasonId}/rosterTransactions`).get());
+    await assertSucceeds(member.collection(`leagues/${leagueId}/seasons/${seasonId}/assetLocks`).get());
+    await assertFails(member.doc(`leagues/${leagueId}/auditPrivate/audit-1`).get());
+
+    const commissioner = firestoreFor(commissionerId);
+    await assertSucceeds(commissioner.doc(`leagues/${leagueId}/auditPrivate/audit-1`).get());
+    await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/seasons/${seasonId}/rosterTransactions`).get());
   });
 });

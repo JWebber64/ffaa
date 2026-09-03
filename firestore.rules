@@ -80,7 +80,9 @@ service cloud.firestore {
           && get(canonicalRoleGrantPath(grantId)).data.user_id == request.auth.uid
           && get(canonicalRoleGrantPath(grantId)).data.role == role
           && (!('revoked_at' in get(canonicalRoleGrantPath(grantId)).data)
-            || get(canonicalRoleGrantPath(grantId)).data.revoked_at == '');
+            || get(canonicalRoleGrantPath(grantId)).data.revoked_at == '')
+          && (!('expires_at' in get(canonicalRoleGrantPath(grantId)).data)
+            || get(canonicalRoleGrantPath(grantId)).data.expires_at == '');
       }
 
       function isCanonicalManager() {
@@ -98,6 +100,16 @@ service cloud.firestore {
 
         match /seasonTeams/{seasonTeamId} {
           allow get, list: if signedIn();
+          allow create, update, delete: if false;
+        }
+
+        match /rosterTransactions/{transactionId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /assetLocks/{assetLockId} {
+          allow get, list: if isCanonicalMember();
           allow create, update, delete: if false;
         }
       }
@@ -145,6 +157,19 @@ service cloud.firestore {
       match /auditEvents/{eventId} {
         allow get, list: if isCanonicalMember();
         allow create, update, delete: if false;
+      }
+
+      match /auditPrivate/{eventId} {
+        allow get, list: if isCanonicalManager();
+        allow create, update, delete: if false;
+      }
+
+      match /notificationOutbox/{eventId} {
+        allow read, create, update, delete: if false;
+      }
+
+      match /readModelInvalidations/{eventId} {
+        allow read, create, update, delete: if false;
       }
 
       match /lineups/{lineupId} {

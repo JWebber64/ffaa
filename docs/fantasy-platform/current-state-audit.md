@@ -1,6 +1,6 @@
 # Fantasy platform current-state audit
 
-Status: Phase 0 baseline plus Phase 1A implementation delta, 2026-09-02. The baseline audit remains below for provenance; the implemented branch facts are recorded at the end.
+Status: Phase 0 baseline plus Phases 1–3 implementation deltas, 2026-09-03. The baseline audit remains below for provenance; the implemented branch facts are recorded at the end.
 
 ## Evidence boundary
 
@@ -298,3 +298,11 @@ Deliberate remaining direct legacy writes are season publication, claims/members
 - Canonical manager invitations, acceptance, revocation, and membership removal use email-bound expiring tokens and canonical role grants. Provider ownership is not consulted.
 - `/league/:gamehqLeagueId/commissioner/teams` and `/league/:gamehqLeagueId/join` expose the native administration/acceptance workflows. The commissioner overview calculates setup health from actual canonical reads.
 - Existing `franchiseClaims`, `managerMemberships`, and Sleeper connection storage remain compatibility data. Phase 2 does not delete, rewrite, or use them to silently grant canonical access.
+
+## Phase 3 implementation delta
+
+- Native player ownership now has one atomic authority: `seasonTeams.roster_player_ids` plus update-time-guarded `assetLocks/player__{playerId}` documents. Duplicate and stale acquisitions fail instead of creating split ownership.
+- `apply_roster_transaction` and `reverse_roster_transaction` atomically persist roster revisions, the immutable transaction ledger, season revision, command receipt, public audit, commissioner-private audit metadata, notification outbox, and read-model invalidation.
+- Reversals create inverse transactions and preserve the original receipt and audit lineage. A reversal is rejected when the current asset state no longer matches the original transaction result.
+- `/league/:gamehqLeagueId/commissioner/audit` is the operational ledger view. Browser writes to canonical rosters, locks, transactions, private audit metadata, and pipeline hooks are denied by `firestore.rules`.
+- Legacy-backed roster snapshots remain compatibility authority until an explicit native draft/import cutover. Phase 3 does not infer locks from imported provider rosters.

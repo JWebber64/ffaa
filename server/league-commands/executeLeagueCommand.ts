@@ -11,6 +11,7 @@ import {
   executeRemoveLeagueMember,
   executeRevokeLeagueInvitation,
 } from "./membershipCommands";
+import { executeApplyRosterTransaction, executeReverseRosterTransaction } from "./rosterTransactionCommands";
 import type { LeagueCommandStore } from "./store";
 
 const COMMAND_TYPES = new Set<LeagueCommandType>([
@@ -25,6 +26,8 @@ const COMMAND_TYPES = new Set<LeagueCommandType>([
   "accept_league_invitation",
   "revoke_league_invitation",
   "remove_league_member",
+  "apply_roster_transaction",
+  "reverse_roster_transaction",
 ]);
 
 function normalizeCommand(value: unknown): LeagueCommand {
@@ -118,5 +121,11 @@ export async function executeLeagueCommand(input: {
   if (command.commandType === "revoke_league_invitation") {
     return executeRevokeLeagueInvitation(shared as Parameters<typeof executeRevokeLeagueInvitation>[0]);
   }
-  return executeRemoveLeagueMember(shared as Parameters<typeof executeRemoveLeagueMember>[0]);
+  if (command.commandType === "remove_league_member") {
+    return executeRemoveLeagueMember(shared as Parameters<typeof executeRemoveLeagueMember>[0]);
+  }
+  if (command.commandType === "apply_roster_transaction") {
+    return executeApplyRosterTransaction(shared as Parameters<typeof executeApplyRosterTransaction>[0]);
+  }
+  return executeReverseRosterTransaction(shared as Parameters<typeof executeReverseRosterTransaction>[0]);
 }

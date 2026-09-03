@@ -64,8 +64,8 @@ const workspace: CanonicalLeagueWorkspace = {
 
 const snapshot: LeaguePeopleSnapshot = {
   teams: [
-    { id: "team-1", leagueId, seasonId, franchiseId: "team-1", name: "Team 1", logoUrl: null, colors: { primary: "", secondary: "" }, divisionId: null, draftPosition: 1, budget: null, cap: null, rosterRevision: 1, status: "active" },
-    { id: "team-2", leagueId, seasonId, franchiseId: "team-2", name: "Team 2", logoUrl: null, colors: { primary: "", secondary: "" }, divisionId: null, draftPosition: 2, budget: null, cap: null, rosterRevision: 1, status: "active" },
+    { id: "team-1", leagueId, seasonId, franchiseId: "team-1", name: "Team 1", logoUrl: null, colors: { primary: "", secondary: "" }, divisionId: null, draftPosition: 1, budget: null, cap: null, rosterRevision: 1, rosterPlayerIds: [], status: "active" },
+    { id: "team-2", leagueId, seasonId, franchiseId: "team-2", name: "Team 2", logoUrl: null, colors: { primary: "", secondary: "" }, divisionId: null, draftPosition: 2, budget: null, cap: null, rosterRevision: 1, rosterPlayerIds: [], status: "active" },
   ],
   memberships: [
     workspace.membership!,

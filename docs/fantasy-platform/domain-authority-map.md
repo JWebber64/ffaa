@@ -258,6 +258,7 @@ leagues/{gamehqLeagueId}
     seasonTeams/{seasonTeamId}
     lineups/{lineupId}
     scheduleVersions/{scheduleVersionId}
+    assetLocks/player__{playerId}
     rosterTransactions/{transactionId}
   franchises/{franchiseId}
   memberships/{userId}
@@ -267,6 +268,9 @@ leagues/{gamehqLeagueId}
   settingsVersions/{settingsVersionId}
   commands/{commandId}
   auditEvents/{auditEventId}
+  auditPrivate/{auditEventId}
+  notificationOutbox/{eventId}
+  readModelInvalidations/{eventId}
 
 externalLeagueMappings/{provider__externalLeagueId}
 ```
@@ -331,5 +335,9 @@ An imported league owner ID is display context. It never changes these labels or
 | Native team seats | Published SettingsVersion plus server reconciliation of `franchises` and seasonal `seasonTeams` | Team count changes never delete franchise identity; assigned seats cannot be retired |
 | Manager invitation | `leagues/{id}/invitations/{invitationId}` through authenticated commands | Random token hash, invited Firebase email, expiry, role, and optional franchise are verified before grants are created |
 | Manager removal | `remove_league_member` command | Revokes every active grant and the membership in one audited season-revision commit; primary commissioner cannot be removed through this path |
+| Native player ownership | `seasonTeams.roster_player_ids` plus one `assetLocks/player__{playerId}` document | Both change in the same server commit; a create/update/delete precondition makes the lock the concurrency authority |
+| Roster ledger | `seasons/{seasonId}/rosterTransactions/{transactionId}` | Drafts, waivers, trades, commissioner correction, keepers, and contracts must enter through this model as their phases activate |
+| Private audit metadata | `leagues/{id}/auditPrivate/{auditId}` | Current commissioner/co-commissioner read only; ordinary members receive the public audit receipt without administrative source metadata |
+| Downstream effects | `notificationOutbox` and `readModelInvalidations` | Durable server-written pending hooks; they are rebuildable/consumable and never a second mutation authority |
 
 The first implementation does not infer authority from `managerProviderUserId`, `leagueOwnerProviderUserId`, Sleeper roster ownership, or any other imported profile field.

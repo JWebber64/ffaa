@@ -34,6 +34,21 @@
 .commissioner-state.is-pending { color: var(--accent-warning); }
 .commissioner-team-access { display: flex; flex-wrap: wrap; gap: 5px; }
 .commissioner-team-access > button { min-height: 30px; padding-inline: 8px; }
+.commissioner-audit-ledger { border: 1px solid var(--line-1); border-radius: var(--r-lg); background: var(--color-surface-card-primary); overflow: hidden; }
+.commissioner-audit-ledger > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line-1); }
+.commissioner-audit-ledger > header > div { display: flex; align-items: center; gap: 9px; }
+.commissioner-audit-ledger > header svg { width: 17px; color: var(--green-400); }
+.commissioner-audit-ledger h2, .commissioner-audit-ledger p { margin: 0; }
+.commissioner-audit-ledger h2 { font-size: .88rem; }
+.commissioner-audit-ledger header p, .commissioner-audit-ledger header > span { color: var(--text-muted); font-size: .65rem; }
+.commissioner-audit-ledger table { width: 100%; border-collapse: collapse; font-size: .69rem; }
+.commissioner-audit-ledger th, .commissioner-audit-ledger td { padding: 9px 12px; border-bottom: 1px solid var(--line-1); text-align: left; vertical-align: middle; }
+.commissioner-audit-ledger tbody tr:last-child > * { border-bottom: 0; }
+.commissioner-audit-ledger thead th { color: var(--text-muted); font-size: .61rem; letter-spacing: .055em; text-transform: uppercase; background: color-mix(in oklch, var(--color-surface-card-secondary) 52%, transparent); }
+.commissioner-audit-ledger tbody th { min-width: 230px; }
+.commissioner-audit-ledger tbody th strong, .commissioner-audit-ledger tbody th small, .commissioner-audit-ledger td small { display: block; }
+.commissioner-audit-ledger tbody th small, .commissioner-audit-ledger td small { margin-top: 2px; color: var(--text-muted); font-size: .6rem; }
+.commissioner-audit-ledger code { color: var(--text-secondary); font-size: .62rem; }
 .commissioner-people-columns { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: var(--space-3); }
 .commissioner-role-list, .commissioner-audit-list { margin: 0; padding: 0; list-style: none; }
 .commissioner-role-list li { display: flex; min-height: 52px; padding: 9px 12px 9px 14px; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line-1); }
@@ -79,6 +94,7 @@
 @media (prefers-reduced-motion: reduce) { .commissioner-health-meter span { transition: none; } }
 @media (max-width: 960px) { .commissioner-invite-fields { grid-template-columns: 1fr 1fr; } .commissioner-invite-fields > button { width: 100%; } .commissioner-health ol { grid-template-columns: 1fr 1fr; } .commissioner-health li:nth-child(2) { border-right: 0; } .commissioner-health li:nth-child(-n+2) { border-bottom: 1px solid var(--line-1); } }
 @media (max-width: 700px) { .commissioner-people-gate { grid-template-columns: auto 1fr; } .commissioner-people-gate > a, .commissioner-people-gate > button { grid-column: 1 / -1; width: 100%; } .commissioner-people-columns, .commissioner-operations-grid { grid-template-columns: 1fr; } .commissioner-team-table table, .commissioner-team-table tbody, .commissioner-team-table tr, .commissioner-team-table th, .commissioner-team-table td { display: block; } .commissioner-team-table thead { display: none; } .commissioner-team-table tr { padding: 8px 12px; border-bottom: 1px solid var(--line-1); } .commissioner-team-table tr:last-child { border-bottom: 0; } .commissioner-team-table th, .commissioner-team-table td { display: grid; grid-template-columns: minmax(105px, .42fr) 1fr; gap: 10px; padding: 6px 2px; border: 0; } .commissioner-team-table th::before, .commissioner-team-table td::before { content: attr(data-label); color: var(--text-muted); font-size: .64rem; font-weight: 700; } .commissioner-team-table tbody th { grid-template-columns: minmax(105px, .42fr) auto 1fr; } .commissioner-team-table tbody th::before { align-self: center; } }
+@media (max-width: 700px) { .commissioner-audit-ledger table, .commissioner-audit-ledger tbody, .commissioner-audit-ledger tr, .commissioner-audit-ledger th, .commissioner-audit-ledger td { display: block; } .commissioner-audit-ledger thead { display: none; } .commissioner-audit-ledger tr { padding: 8px 12px; border-bottom: 1px solid var(--line-1); } .commissioner-audit-ledger tbody tr:last-child { border-bottom: 0; } .commissioner-audit-ledger th, .commissioner-audit-ledger td { display: grid; grid-template-columns: minmax(92px, .34fr) 1fr; gap: 9px; min-width: 0; padding: 6px 2px; border: 0; } .commissioner-audit-ledger th::before, .commissioner-audit-ledger td::before { content: attr(data-label); color: var(--text-muted); font-size: .62rem; font-weight: 800; } }
 @media (max-width: 500px) { .commissioner-invite-fields { grid-template-columns: 1fr; } .commissioner-share-link { grid-template-columns: 1fr; } .commissioner-share-link > svg { display: none; } .commissioner-share-link button { width: 100%; } .commissioner-health ol { grid-template-columns: 1fr; } .commissioner-health li { border-right: 0; border-bottom: 1px solid var(--line-1); } .commissioner-health li:last-child { border-bottom: 0; } }
 .league-invitation-accept { width: min(620px, calc(100% - 24px)); margin: clamp(36px, 8vh, 88px) auto; padding: clamp(22px, 5vw, 38px); border: 1px solid var(--line-1); border-radius: var(--r-xl); background: var(--color-surface-card-primary); color: var(--text-primary); }
 .league-invitation-accept > svg { width: 25px; color: var(--green-400); }

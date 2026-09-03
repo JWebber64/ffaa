@@ -332,3 +332,24 @@ leagues/{gamehqLeagueId}/auditEvents/{auditEventId}
 ```
 
 Invitation documents contain the normalized email, display label, role, optional franchise, expiry, status, and a SHA-256 token hash. The plaintext token is returned only in the accepted creation command receipt. Accept, revoke, and remove commands update invitation/membership/grants, season revision, receipt, and audit atomically. Browser writes remain denied.
+
+## Implemented Phase 3 roster ledger persistence
+
+Native player ownership is now one atomic graph:
+
+```text
+leagues/{gamehqLeagueId}/seasons/{seasonId}/seasonTeams/{franchiseId}
+  roster_player_ids[]
+  roster_revision
+leagues/{gamehqLeagueId}/seasons/{seasonId}/assetLocks/player__{playerId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/rosterTransactions/{transactionId}
+leagues/{gamehqLeagueId}/auditEvents/{auditId}
+leagues/{gamehqLeagueId}/auditPrivate/{auditId}
+leagues/{gamehqLeagueId}/notificationOutbox/{eventId}
+leagues/{gamehqLeagueId}/readModelInvalidations/{eventId}
+leagues/{gamehqLeagueId}/commands/{commandId}
+```
+
+The asset-lock document is the unique player-ownership index and uses a Firestore update-time/create-only precondition. Team rosters, locks, transaction, season revision, audit, receipt, and pipeline hooks commit together. A drop deletes its lock with the lock's exact update-time precondition. A reversal creates a new transaction and marks the original transaction `reversed` with `reversed_by_transaction_id`; it never deletes either ledger entry.
+
+Legacy `leagueSeasons` roster payloads are deliberately not dual-written or indexed. Their authority remains the compatibility source until the native draft/migration handoff establishes a complete roster transaction ledger.

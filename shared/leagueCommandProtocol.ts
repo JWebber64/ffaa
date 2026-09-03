@@ -13,7 +13,9 @@ export type LeagueCommandType =
   | "create_league_invitation"
   | "accept_league_invitation"
   | "revoke_league_invitation"
-  | "remove_league_member";
+  | "remove_league_member"
+  | "apply_roster_transaction"
+  | "reverse_roster_transaction";
 
 export type CreateNativeLeaguePayload = {
   name: string;
@@ -73,6 +75,34 @@ export type RemoveLeagueMemberPayload = {
   userId: string;
 };
 
+export type RosterTransactionType =
+  | "draft_selection"
+  | "auction_win"
+  | "add"
+  | "drop"
+  | "waiver_award"
+  | "trade"
+  | "commissioner_add_drop"
+  | "keeper_assignment"
+  | "contract_assignment"
+  | "roster_correction";
+
+export type RosterAssetMove = {
+  assetType: "player";
+  assetId: string;
+  fromFranchiseId: string | null;
+  toFranchiseId: string | null;
+};
+
+export type ApplyRosterTransactionPayload = {
+  transactionType: RosterTransactionType;
+  moves: RosterAssetMove[];
+};
+
+export type ReverseRosterTransactionPayload = {
+  transactionId: string;
+};
+
 export type LeagueCommandPayloadByType = {
   create_native_league: CreateNativeLeaguePayload;
   connect_external_league: ConnectExternalLeaguePayload;
@@ -85,6 +115,8 @@ export type LeagueCommandPayloadByType = {
   accept_league_invitation: AcceptLeagueInvitationPayload;
   revoke_league_invitation: RevokeLeagueInvitationPayload;
   remove_league_member: RemoveLeagueMemberPayload;
+  apply_roster_transaction: ApplyRosterTransactionPayload;
+  reverse_roster_transaction: ReverseRosterTransactionPayload;
 };
 
 export type LeagueCommand<TType extends LeagueCommandType = LeagueCommandType> = {

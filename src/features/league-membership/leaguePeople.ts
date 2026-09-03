@@ -108,6 +108,7 @@ export function normalizeSeasonTeam(value: unknown, leagueId: string, seasonId: 
       dead: numberValue(cap.dead),
     } : null,
     rosterRevision: Math.max(1, Math.round(numberValue(data.roster_revision, 1))),
+    rosterPlayerIds: strings(data.roster_player_ids),
     status: text(data.status) === "retired" ? "retired" : "active",
   };
 }
@@ -138,7 +139,7 @@ export function normalizeLeagueInvitation(value: unknown, leagueId: string): Lea
   };
 }
 
-function normalizeAuditEvent(value: unknown, leagueId: string): AuditEvent | null {
+export function normalizeAuditEvent(value: unknown, leagueId: string): AuditEvent | null {
   const data = record(value);
   const id = text(data.id);
   if (!id || text(data.league_id) !== leagueId) return null;

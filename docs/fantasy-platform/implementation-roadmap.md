@@ -9,8 +9,8 @@ The roadmap follows the requested phases in order. Each phase is a bounded chang
 | 0 | Exact current-state, authority, route, persistence, migration, and implementation audit | Complete in this document set | Six documents present; no application/schema mutation |
 | 1A | First vertical native-league foundation | Implemented; exact Preview verified; Production unchanged | First-slice evidence and limits below |
 | 2 | Creation wizard and full Commissioner workspace/settings publication | Native redraft exit gate implemented locally through 2A and 2B | Valid native redraft league, immutable settings, and assigned managers |
-| 3 | Universal command, roster transaction, and audit expansion | Next phase; lineup, settings, and membership commands are working proofs | All authoritative mutations use command boundary |
-| 4 | Native-league draft integration | Blocked on commands/settings | Draft completion creates roster transactions |
+| 3 | Universal command, roster transaction, and audit expansion | Implemented for canonical player ownership, commissioner correction/reversal, and pipeline hooks | Concurrent ownership is atomic and every roster mutation has a receipt |
+| 4 | Native-league draft integration | Next phase; ledger and settings gates are available | Draft completion creates roster transactions |
 | 5 | Weekly operation and player-level locks | Blocked on settings/commands | Cross-device lineups and settings-derived lock behavior |
 | 6 | Provider-agnostic scoring | Blocked on settings/schedule/lineups | Deterministic replay/corrections and live freshness UI |
 | 7 | Free agents and waivers | Blocked on roster/scoring state | Atomic reproducible processing and receipts |
@@ -251,6 +251,20 @@ Phase 2B rollback is code/flag based and never deletes canonical teams, membersh
 - Remove direct browser writes to all canonical roster/score/standings/playoff state.
 
 Gate: concurrent/duplicate/stale mutations are deterministic, every action has a receipt, and one player cannot be placed on two teams.
+
+### Implemented Phase 3 — universal roster ledger and audit boundary
+
+- `apply_roster_transaction` and `reverse_roster_transaction` extend the authenticated `LeagueCommandService` contract. Direct browser use is limited to reasoned commissioner add/drop and correction types; draft, waiver, and trade phases must call the same server ledger rather than claim those command types from the client.
+- Canonical `seasonTeams` now hold the authoritative sorted `roster_player_ids` and `roster_revision`. Each player also has one update-time-guarded `assetLocks/player__{playerId}` ownership document, so concurrent acquisitions cannot put one player on two teams.
+- An accepted command atomically updates every affected roster and lock, the season revision, immutable `rosterTransactions/{transactionId}`, public audit, commissioner-only audit metadata, command receipt, notification outbox event, and read-model invalidation.
+- Roster transactions preserve assets leaving/entering, exact settings version, actor, effective time, before/after roster revisions, approval/review state, audit ID, and reversal lineage. The schema names future pick, FAAB, keeper, contract, and salary-cap assets without enabling unfinished engines.
+- Reversal creates a new inverse transaction and audit receipt. It never edits the original command receipt, and it fails safely if any asset has moved since the original transaction.
+- `/league/:gamehqLeagueId/commissioner/audit` renders a dense immutable ledger with actor, command receipt, transaction, revision delta, reason, and eligible reversal action. Mobile collapses the table into labeled rows.
+- Public `auditEvents` no longer receive private source metadata for new lineup/roster commands. `auditPrivate/{auditId}` is readable only by an active commissioner or co-commissioner; browser writes remain denied.
+
+Exact Phase 3 implementation files: `shared/leagueCommandProtocol.ts`; `server/league-commands/commandSupport.ts`, `executeLeagueCommand.ts`, `rosterTransactionCommands.ts`, `saveWeeklyLineup.ts`, `teamProvisioning.ts`, and `connectExternalLeague.ts`; `src/features/league-domain/leagueCommands.ts` and `types.ts`; `src/features/league-membership/CommissionerAuditWorkspace.tsx`, `commissionerAudit.ts`, `leaguePeople.ts`, and `league-people.css`; `src/features/league-settings/CommissionerSettingsWorkspace.tsx`; `src/screens/LeagueManage.tsx`; `src/lib/routeMetadata.ts`; and `firestore.rules`. Phase-specific coverage is in `src/__tests__/rosterTransactionCommands.test.ts`, `commissionerAuditWorkspace.test.tsx`, `nativeLeagueFirestoreRules.test.ts`, `routeMetadata.test.ts`, and the updated command/UI fixtures.
+
+Phase 3 compatibility/rollback: existing legacy published rosters remain authoritative for `legacy_backed_native` seasons and are not copied into the native asset-lock index. Disabling the native feature returns to compatibility reads without deleting canonical transactions. Notification and read-model outbox records are durable pending hooks; their consumers arrive with the operational domains.
 
 ## Phase 4 — native draft integration
 

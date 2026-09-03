@@ -305,6 +305,7 @@ export async function executeConnectExternalLeague(input: {
           budget: { initial: budget, remaining: Math.max(0, budget - spent), currency: "USD" },
           cap: {},
           roster_revision: Math.max(1, wholeNumber(legacySeason.data.revision, 1)),
+          roster_player_ids: roster.map((player) => text(record(player).id)).filter(Boolean),
           legacy_franchise_id: legacyFranchiseId,
         }),
       );

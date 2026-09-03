@@ -134,6 +134,7 @@ export async function reconcileSeasonTeams(input: {
         budget: teamBudget(settings),
         cap: {},
         roster_revision: 1,
+        roster_player_ids: [],
         status: "active",
         created_at: processedAt,
         updated_at: processedAt,

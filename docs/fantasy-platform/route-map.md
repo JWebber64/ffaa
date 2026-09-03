@@ -176,7 +176,7 @@ The requested inside-league nav is Home, Matchup, Team, Players, Transactions, a
 | `/league/:gamehqLeagueId/commissioner/schedule` | Schedule settings/editor |
 | `/league/:gamehqLeagueId/commissioner/transactions` | Reviews/corrections |
 | `/league/:gamehqLeagueId/commissioner/imports` | Provider import/mirror status |
-| `/league/:gamehqLeagueId/commissioner/audit` | Universal audit log |
+| `/league/:gamehqLeagueId/commissioner/audit` | Implemented universal command/roster ledger with public receipt context, commissioner-private metadata, and guarded reversal |
 | `/league/:gamehqLeagueId/join` | Implemented email-bound native invitation acceptance; requires Firebase sign-in and the one-time token query parameters |
 
 Only the overview shell and route contract need to exist in the first vertical slice. Empty feature pages must not be added ahead of their domains.

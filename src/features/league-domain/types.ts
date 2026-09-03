@@ -63,6 +63,7 @@ export type SeasonTeam = {
   budget: { initial: number; remaining: number; currency: string } | null;
   cap: { limit: number; committed: number; dead: number } | null;
   rosterRevision: number;
+  rosterPlayerIds: string[];
   status: "active" | "retired";
 };
 
@@ -178,6 +179,38 @@ export type AuditEvent = {
   publicSummary: string;
   privateMetadata: Record<string, unknown> | null;
   reversalOfAuditEventId: string | null;
+};
+
+export type RosterTransactionAsset = {
+  type: "player" | "draft_pick" | "faab" | "contract" | "keeper_right";
+  id: string;
+  amount: number | null;
+  metadata: Record<string, unknown>;
+};
+
+export type RosterTransactionParty = {
+  franchiseId: string;
+  assets: RosterTransactionAsset[];
+};
+
+export type RosterTransaction = {
+  id: string;
+  leagueId: string;
+  seasonId: string;
+  transactionType: string;
+  assetsLeaving: RosterTransactionParty[];
+  assetsEntering: RosterTransactionParty[];
+  effectiveAt: string;
+  sourceCommandId: string;
+  settingsVersionId: string;
+  actorUserId: string;
+  approvalState: "accepted" | "pending" | "rejected" | "reversed";
+  reviewState: string;
+  beforeRosterRevisions: Record<string, number>;
+  afterRosterRevisions: Record<string, number>;
+  auditEventId: string;
+  reversalOfTransactionId: string | null;
+  reversedByTransactionId: string | null;
 };
 
 export type LeagueAuthorityLabel =

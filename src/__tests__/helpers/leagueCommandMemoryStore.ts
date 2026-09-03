@@ -49,8 +49,8 @@ export class LeagueCommandMemoryStore implements LeagueCommandStore {
 
   async commit(writes: FirestoreWrite[]) {
     for (const write of writes) {
-      if (!write.update) continue;
-      const path = pathFromName(write.update.name);
+      const path = write.update ? pathFromName(write.update.name) : write.delete ? pathFromName(write.delete) : "";
+      if (!path) continue;
       const current = this.documents.get(path);
       if (write.currentDocument?.exists === false && current) throw new Error(`ALREADY_EXISTS: ${path}`);
       if (write.currentDocument?.updateTime && current?.updateTime !== write.currentDocument.updateTime) {

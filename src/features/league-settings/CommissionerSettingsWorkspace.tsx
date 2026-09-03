@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, ClipboardList, History, Settings2, Users } from "lucide-react";
+import { CheckCircle2, ClipboardList, History, ScrollText, Settings2, Users } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 import {
@@ -27,6 +27,7 @@ import {
   CommissionerOperationsOverview,
   CommissionerTeamsWorkspace,
 } from "../league-membership/CommissionerPeopleWorkspace";
+import { CommissionerAuditWorkspace } from "../league-membership/CommissionerAuditWorkspace";
 import { defaultCommissionerPeopleService, type CommissionerPeopleService } from "../league-membership/commissionerPeopleService";
 import "./commissioner-settings.css";
 
@@ -341,13 +342,16 @@ export function CommissionerSettingsWorkspace({
         <NavLink end to={base}><Settings2 aria-hidden="true" />Overview</NavLink>
         <NavLink to={`${base}/teams`}><Users aria-hidden="true" />Teams &amp; roles</NavLink>
         <NavLink to={`${base}/settings`}><ClipboardList aria-hidden="true" />Rulebook</NavLink>
+        <NavLink to={`${base}/audit`}><ScrollText aria-hidden="true" />Audit log</NavLink>
         {workspace.season?.settingsVersionId ? <NavLink to={`/league/${encodeURIComponent(workspace.league.id)}/rules`}><History aria-hidden="true" />Published rules</NavLink> : null}
       </nav>
       {section === "settings"
         ? <SettingsEditor workspace={workspace} onWorkspaceChanged={onWorkspaceChanged} service={service} />
         : section === "teams"
           ? <CommissionerTeamsWorkspace workspace={workspace} onWorkspaceChanged={onWorkspaceChanged} service={peopleService} />
-          : <CommissionerOperationsOverview workspace={workspace} service={peopleService} />}
+          : section === "audit"
+            ? <CommissionerAuditWorkspace workspace={workspace} onWorkspaceChanged={onWorkspaceChanged} />
+            : <CommissionerOperationsOverview workspace={workspace} service={peopleService} />}
     </main>
   );
 }
