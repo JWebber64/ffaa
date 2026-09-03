@@ -8,19 +8,18 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { parseLeagueSeasonDraft } from "../features/league-season/leagueSeasonModel";
 import { useLeagueSeasonManagement } from "../features/league-season/useLeagueSeasonManagement";
 import { useLeagueWeekLineups } from "../features/league-season/useLeagueWeekLineups";
-import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
+import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
 import { setLeagueWeekLocked } from "../features/league-season/leagueSeasonPersistence";
 import LeagueLineup from "../screens/LeagueLineup";
 
 vi.mock("../features/league-season/useLeagueSeasonManagement", () => ({ useLeagueSeasonManagement: vi.fn() }));
 vi.mock("../features/league-season/useLeagueWeekLineups", () => ({ useLeagueWeekLineups: vi.fn() }));
-vi.mock("../features/league-hq/sleeperConnections", () => ({ useSleeperLeagueConnections: vi.fn() }));
+vi.mock("../features/league-workspace/leagueWorkspaceState", () => ({ useLeagueWorkspace: vi.fn() }));
 vi.mock("../features/league-season/LeagueAccountPanel", () => ({ LeagueAccountPanel: () => null }));
 vi.mock("../features/league-season/leagueSeasonPersistence", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../features/league-season/leagueSeasonPersistence")>();
   return {
     ...actual,
-    saveLeagueLineup: vi.fn(),
     setLeagueWeekLocked: vi.fn(),
   };
 });
@@ -101,7 +100,10 @@ function renderLineup() {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(useSleeperLeagueConnections).mockReturnValue({
+  vi.mocked(useLeagueWorkspace).mockReturnValue({
+    leagueId,
+    routeLeagueId: leagueId,
+    dataLeagueId: leagueId,
     connections: [{
       leagueId,
       leagueName: "G.O.A.T. League",
@@ -111,11 +113,21 @@ beforeEach(() => {
       sourceUrl: "https://sleeper.com",
       lastUsedAt: "2026-08-31T00:00:00.000Z",
     }],
-    activeLeagueId: leagueId,
-    rememberConnection: vi.fn(),
-    rememberConnections: vi.fn(),
-    forgetConnection: vi.fn(),
-    setActiveLeagueId: vi.fn(),
+    connection: {
+      leagueId,
+      leagueName: "G.O.A.T. League",
+      season: "2026",
+      status: "pre_draft",
+      totalRosters: 12,
+      sourceUrl: "https://sleeper.com",
+      lastUsedAt: "2026-08-31T00:00:00.000Z",
+    },
+    canonicalWorkspace: null,
+    authority: null,
+    routeState: { status: "ready", message: "Compatibility route loaded." },
+    teamState: { status: "idle", data: null, error: "" },
+    capabilities: { canManage: false, canSaveLineup: false, source: null, status: "ready" },
+    switchLeague: vi.fn(),
   });
   vi.mocked(useLeagueWeekLineups).mockReturnValue(lockedWeek());
 });
@@ -132,6 +144,10 @@ describe("weekly lineup locks", () => {
 
   it("lets the commissioner reopen the week and exposes the override reason", async () => {
     vi.mocked(useLeagueSeasonManagement).mockReturnValue(management("commissioner-1"));
+    vi.mocked(useLeagueWorkspace).mockReturnValue({
+      ...vi.mocked(useLeagueWorkspace)(),
+      capabilities: { canManage: true, canSaveLineup: true, source: "gamehq", status: "ready" },
+    });
     renderLineup();
 
     expect(screen.getByLabelText("Override reason")).toBeInTheDocument();

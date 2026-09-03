@@ -52,6 +52,81 @@ service cloud.firestore {
       }
     }
 
+    // GameHQ league identity and role state is written only by authenticated
+    // server commands. Browser clients may resolve a route and read the parts
+    // of the workspace that apply to their own signed-in account.
+    match /externalLeagueMappings/{mappingId} {
+      allow get: if signedIn();
+      allow list, create, update, delete: if false;
+    }
+
+    match /leagues/{leagueId} {
+      function canonicalMembershipPath(userId) {
+        return /databases/$(database)/documents/leagues/$(leagueId)/memberships/$(userId);
+      }
+
+      function isCanonicalMember() {
+        return permanentUser()
+          && exists(canonicalMembershipPath(request.auth.uid))
+          && get(canonicalMembershipPath(request.auth.uid)).data.status == 'active';
+      }
+
+      allow get: if signedIn();
+      allow list, create, update, delete: if false;
+
+      match /seasons/{seasonId} {
+        allow get: if signedIn();
+        allow list, create, update, delete: if false;
+
+        match /seasonTeams/{seasonTeamId} {
+          allow get, list: if signedIn();
+          allow create, update, delete: if false;
+        }
+      }
+
+      match /franchises/{franchiseId} {
+        allow get, list: if signedIn();
+        allow create, update, delete: if false;
+      }
+
+      match /settingsVersions/{settingsVersionId} {
+        allow get: if signedIn();
+        allow list, create, update, delete: if false;
+      }
+
+      match /externalConnections/{connectionId} {
+        allow get: if signedIn();
+        allow list, create, update, delete: if false;
+      }
+
+      match /memberships/{userId} {
+        allow get: if permanentUser() && request.auth.uid == userId;
+        allow list, create, update, delete: if false;
+      }
+
+      match /roleGrants/{grantId} {
+        allow get: if permanentUser()
+          && resource.data.user_id == request.auth.uid;
+        allow list, create, update, delete: if false;
+      }
+
+      match /commands/{commandId} {
+        allow get: if permanentUser()
+          && resource.data.actor_user_id == request.auth.uid;
+        allow list, create, update, delete: if false;
+      }
+
+      match /auditEvents/{eventId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
+      match /lineups/{lineupId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+    }
+
     // Draft-order audit records stay private to their creator. A public replay
     // is copied into a separate, unguessable token document below.
     match /draftOrderDraws/{drawId} {
@@ -541,32 +616,7 @@ service cloud.firestore {
         }
 
         allow read: if signedIn();
-        allow create: if permanentUser()
-          && validLineupDocument()
-          && matchingAuditAfter()
-          && (
-            isCommissioner()
-            || (
-              controlsFranchise(request.resource.data.franchise_id)
-              && lineupIsOpen(request.resource.data.week_key)
-            )
-          );
-        allow update: if permanentUser()
-          && validLineupDocument()
-          && matchingAuditAfter()
-          && request.resource.data.league_id == resource.data.league_id
-          && request.resource.data.franchise_id == resource.data.franchise_id
-          && request.resource.data.week == resource.data.week
-          && request.resource.data.created_at == resource.data.created_at
-          && request.resource.data.revision > resource.data.revision
-          && (
-            isCommissioner()
-            || (
-              controlsFranchise(resource.data.franchise_id)
-              && lineupIsOpen(request.resource.data.week_key)
-            )
-          );
-        allow delete: if isCommissioner();
+        allow create, update, delete: if false;
       }
 
       match /auditEvents/{eventId} {
@@ -630,10 +680,7 @@ service cloud.firestore {
 
         allow read: if isCommissioner()
           || (permanentUser() && controlsFranchise(resource.data.franchise_id));
-        allow create: if permanentUser()
-          && validAuditEvent()
-          && (isCommissioner() || controlsFranchise(request.resource.data.franchise_id));
-        allow update, delete: if false;
+        allow create, update, delete: if false;
       }
     }
 

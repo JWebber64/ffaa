@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 api/league-history/.generated/
+api/league-commands/.generated/
 dist
 dist-ssr
 *.tsbuildinfo

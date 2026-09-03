@@ -20,6 +20,7 @@ const AnalyticsLab = lazy(() =>
 );
 const Tools = lazy(() => import("./screens/Tools"));
 const LeagueHQ = lazy(() => import("./screens/LeagueHQ"));
+const LeagueHome = lazy(() => import("./screens/LeagueHome"));
 const LeagueTeams = lazy(() => import("./screens/LeagueTeams"));
 const LeagueMatchups = lazy(() => import("./screens/LeagueMatchups"));
 const LeagueLineup = lazy(() => import("./screens/LeagueLineup"));
@@ -115,18 +116,21 @@ function AppRoutes() {
           <Route path="/my-hq" element={<ActiveLeagueRedirect destination="team" />} />
           <Route path="/draft-order" element={<DraftOrderShowdown />} />
           <Route path="/league/:leagueId" element={<LeagueWorkspaceLayout />}>
-            <Route index element={<LeagueSectionRedirect destination="history" />} />
+            <Route index element={<LeagueHome />} />
             <Route path="team" element={<MyHQ />} />
             <Route path="team/roster" element={<LeagueLineup />} />
             <Route path="team/matchup" element={<LeagueMatchups personalOnly />} />
+            <Route path="matchup" element={<LeagueMatchups personalOnly />} />
             <Route path="players" element={<LeaguePlayers />} />
             <Route path="standings" element={<LeagueOverview />} />
             <Route path="teams" element={<LeagueTeams />} />
             <Route path="teams/:teamId" element={<LeagueTeams />} />
             <Route path="matchups" element={<LeagueMatchups />} />
+            <Route path="schedule" element={<LeagueMatchups />} />
             <Route path="transactions" element={<LeagueSectionRedirect destination="history/transactions" />} />
             <Route path="history/*" element={<LeagueHistoryApp />} />
             <Route path="manage" element={<LeagueManage />} />
+            <Route path="commissioner/*" element={<LeagueManage />} />
             <Route path="managers/*" element={<LegacyHistoryRedirect section="managers" />} />
             <Route path="h2h/*" element={<LegacyHistoryRedirect section="h2h" />} />
             <Route path="records/*" element={<LegacyHistoryRedirect section="records" />} />

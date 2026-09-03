@@ -5,5 +5,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["server", "shared"]
+  "include": ["server", "shared", "src/vite-env.d.ts"]
 }

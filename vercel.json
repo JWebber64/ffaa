@@ -6,6 +6,10 @@
     "api/league-history/import.js": {
       "maxDuration": 300,
       "includeFiles": "api/league-history/.generated/import.js"
+    },
+    "api/league-commands/execute.js": {
+      "maxDuration": 60,
+      "includeFiles": "api/league-commands/.generated/execute.js"
     }
   },
   "redirects": [
@@ -28,6 +32,10 @@
     {
       "source": "/ff/api/league-history/import",
       "destination": "/api/league-history/import"
+    },
+    {
+      "source": "/ff/api/league-commands/execute",
+      "destination": "/api/league-commands/execute"
     },
     {
       "source": "/ff/sleeper-api/:path*",

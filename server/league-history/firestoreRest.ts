@@ -147,6 +147,22 @@ export async function listFirestoreDocumentNames(path: string, oidcToken?: strin
   return names;
 }
 
+export async function listFirestoreDocuments(path: string, oidcToken?: string) {
+  const documents: FirestoreDocument[] = [];
+  let pageToken = "";
+  do {
+    const query = new URLSearchParams({ pageSize: "300" });
+    if (pageToken) query.set("pageToken", pageToken);
+    const response = await authorizedFetch(`${DOCUMENTS_ROOT}/${path}?${query}`, {}, oidcToken);
+    if (response.status === 404) return documents;
+    if (!response.ok) throw new Error(await errorMessage(response));
+    const payload = await response.json() as { documents?: FirestoreDocument[]; nextPageToken?: string };
+    documents.push(...(payload.documents ?? []));
+    pageToken = payload.nextPageToken ?? "";
+  } while (pageToken);
+  return documents;
+}
+
 export function splitFirestoreWrites(writes: FirestoreWrite[]) {
   const groups: FirestoreWrite[][] = [];
   let group: FirestoreWrite[] = [];
@@ -177,4 +193,20 @@ export async function commitFirestoreWrites(writes: FirestoreWrite[], oidcToken?
       throw error;
     }
   }
+}
+
+export async function commitFirestoreWritesAtomically(writes: FirestoreWrite[], oidcToken?: string) {
+  if (writes.length > MAX_COMMIT_WRITES || Buffer.byteLength(JSON.stringify(writes)) > MAX_COMMIT_BYTES) {
+    throw new Error("The atomic Firestore command exceeds the supported write limit.");
+  }
+  const response = await authorizedFetch(`${DOCUMENTS_ROOT}:commit`, {
+    method: "POST",
+    body: JSON.stringify({ writes }),
+  }, oidcToken);
+  if (!response.ok) {
+    const error = new Error(await errorMessage(response)) as Error & { status?: number };
+    error.status = response.status;
+    throw error;
+  }
+  return response.json() as Promise<{ commitTime?: string; writeResults?: Array<{ updateTime?: string }> }>;
 }

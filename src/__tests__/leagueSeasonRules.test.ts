@@ -29,13 +29,11 @@ describe("league season Firestore rules", () => {
     expect(rules).toMatch(/matchingMembershipAfter\(\)/);
   });
 
-  it("limits weekly lineup writes to the commissioner or approved franchise manager", () => {
+  it("routes weekly lineup writes through the server command boundary", () => {
     expect(rules).toMatch(/match \/lineups\/\{lineupId\}/);
-    expect(rules).toMatch(/request\.resource\.data\.week >= 1[\s\S]*?request\.resource\.data\.week <= 18/);
-    expect(rules).toMatch(/isCommissioner\(\)[\s\S]*?controlsFranchise\(request\.resource\.data\.franchise_id\)/);
-    expect(rules).toMatch(/request\.resource\.data\.revision > resource\.data\.revision/);
-    expect(rules).toMatch(/request\.resource\.data\.season_revision == get\(seasonPath\(\)\)\.data\.revision/);
-    expect(rules).toMatch(/lineupIsOpen\(request\.resource\.data\.week_key\)/);
+    expect(rules).toMatch(/match \/leagueSeasons\/\{leagueId\}[\s\S]*?match \/lineups\/\{lineupId\}[\s\S]*?allow create, update, delete: if false/);
+    expect(rules).toMatch(/match \/leagues\/\{leagueId\}[\s\S]*?match \/commands\/\{commandId\}[\s\S]*?allow list, create, update, delete: if false/);
+    expect(rules).toMatch(/match \/leagues\/\{leagueId\}[\s\S]*?match \/lineups\/\{lineupId\}[\s\S]*?allow create, update, delete: if false/);
     expect(rules).toMatch(/match \/auditEvents\/\{eventId\}/);
   });
 });
