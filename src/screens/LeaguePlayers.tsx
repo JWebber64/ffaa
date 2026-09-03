@@ -2,12 +2,16 @@ import { CheckCircle2, Info, ListChecks } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
+import { NativeWaiverWorkspace } from "../features/native-waivers/NativeWaiverWorkspace";
 import { PositionBadge } from "../ui/PositionBadge";
 import StatsExplorer from "./StatsExplorer";
 import "./league-players.css";
 
 export default function LeaguePlayers() {
-  const { leagueId, connection, teamState } = useLeagueWorkspace();
+  const { leagueId, connection, teamState, canonicalWorkspace } = useLeagueWorkspace();
+  if (canonicalWorkspace?.authority.mode === "native" && canonicalWorkspace.season) {
+    return <NativeWaiverWorkspace workspace={canonicalWorkspace} />;
+  }
   const data = teamState.status === "ready" ? teamState.data : null;
   return (
     <div className="league-players-page">

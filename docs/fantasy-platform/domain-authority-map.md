@@ -348,5 +348,9 @@ An imported league owner ID is display context. It never changes these labels or
 | Native weekly lineup | `leagues/{leagueId}/seasons/{seasonId}/lineups/{franchiseId}_week-{week}` | Authoritative assignments and ordered fallback trace; exact revisions and server command only |
 | Normalized NFL stat event | `seasons/{seasonId}/scoringEvents/{providerEventKey}` plus immutable `scoringEventRevisions` | Provider-neutral input with stable ID, correction lineage, and ingestion version; commissioner/historian command only |
 | Native live scoring projection | `seasons/{seasonId}/scoringWeeks/week-{week}` | Rebuildable player/lineup/matchup/Week-standing output tied to the published settings version; member-readable and server-written |
+| Native player acquisition state | `seasons/{seasonId}/playerStates/{playerId}` plus `waiverState/current` | Queryable free-agent/waiver/special-state projection reconciled against the unique player asset lock; server-written only |
+| Team waiver economy | `seasons/{seasonId}/waiverTeamStates/{franchiseId}` | FAAB, rolling priority, standings rank, weekly counts, and revision under the exact published settings version |
+| Conditional waiver claim | `seasons/{seasonId}/waiverClaims/{claimId}` | Ordered alternatives and secret bids; readable only by submitter and current commissioners until converted to a receipt |
+| Waiver processing and receipt | `seasons/{seasonId}/waiverRuns/{runId}` and `waiverReceipts/{receiptId}` | Idempotent atomic run trace and member-readable explanation of each claim outcome |
 
 The first implementation does not infer authority from `managerProviderUserId`, `leagueOwnerProviderUserId`, Sleeper roster ownership, or any other imported profile field.

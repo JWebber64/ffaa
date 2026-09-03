@@ -20,6 +20,12 @@ import {
 } from "./nativeDraftCommands";
 import { executeConfigureLineupWeek, executeSetLineupLockOverride } from "./nativeLineupCommands";
 import { executeIngestScoringEvents, executeRecalculateScoringWeek } from "./nativeScoringCommands";
+import {
+  executeAcquireFreeAgent,
+  executeInitializeWaiverPlayerPool,
+  executeProcessWaiverRun,
+  executeSubmitWaiverClaimGroup,
+} from "./nativeWaiverCommands";
 import type { LeagueCommandStore } from "./store";
 
 const COMMAND_TYPES = new Set<LeagueCommandType>([
@@ -30,6 +36,10 @@ const COMMAND_TYPES = new Set<LeagueCommandType>([
   "set_lineup_lock_override",
   "ingest_scoring_events",
   "recalculate_scoring_week",
+  "initialize_waiver_player_pool",
+  "submit_waiver_claim_group",
+  "process_waiver_run",
+  "acquire_free_agent",
   "save_settings_draft",
   "publish_settings",
   "restore_settings_version",
@@ -127,6 +137,18 @@ export async function executeLeagueCommand(input: {
   }
   if (command.commandType === "recalculate_scoring_week") {
     return executeRecalculateScoringWeek(shared as Parameters<typeof executeRecalculateScoringWeek>[0]);
+  }
+  if (command.commandType === "initialize_waiver_player_pool") {
+    return executeInitializeWaiverPlayerPool(shared as Parameters<typeof executeInitializeWaiverPlayerPool>[0]);
+  }
+  if (command.commandType === "submit_waiver_claim_group") {
+    return executeSubmitWaiverClaimGroup(shared as Parameters<typeof executeSubmitWaiverClaimGroup>[0]);
+  }
+  if (command.commandType === "process_waiver_run") {
+    return executeProcessWaiverRun(shared as Parameters<typeof executeProcessWaiverRun>[0]);
+  }
+  if (command.commandType === "acquire_free_agent") {
+    return executeAcquireFreeAgent(shared as Parameters<typeof executeAcquireFreeAgent>[0]);
   }
   if (command.commandType === "save_settings_draft") {
     return executeSaveSettingsDraft(shared as Parameters<typeof executeSaveSettingsDraft>[0]);

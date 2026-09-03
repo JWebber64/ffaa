@@ -35,7 +35,7 @@ export function commandRequestHash(command: LeagueCommand) {
   return createHash("sha256").update(JSON.stringify(sortedValue(idempotentRequest))).digest("hex");
 }
 
-export function deriveGamehqUuid(actorUserId: string, commandId: string, domain: "league" | "season" | "franchise") {
+export function deriveGamehqUuid(actorUserId: string, commandId: string, domain: "league" | "season" | "franchise" | "scheduled-waiver-run") {
   const bytes = createHash("sha256").update(`${domain}:${actorUserId}:${commandId}`).digest().subarray(0, 16);
   bytes[6] = ((bytes[6] ?? 0) & 0x0f) | 0x40;
   bytes[8] = ((bytes[8] ?? 0) & 0x3f) | 0x80;
@@ -144,6 +144,10 @@ export function normalizeReceipt(document: LeagueCommandStoredDocument | null): 
     "set_lineup_lock_override",
     "ingest_scoring_events",
     "recalculate_scoring_week",
+    "initialize_waiver_player_pool",
+    "submit_waiver_claim_group",
+    "process_waiver_run",
+    "acquire_free_agent",
     "save_settings_draft",
     "publish_settings",
     "restore_settings_version",

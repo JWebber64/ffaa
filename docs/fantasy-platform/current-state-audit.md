@@ -331,3 +331,13 @@ Deliberate remaining direct legacy writes are season publication, claims/members
 - Every accepted batch and explicit full replay rebuilds player/game totals, lineup and bench totals, optimal comparison, matchup totals, win probabilities, scoring feed, lead changes, active-game context, and Week standings projection in one server commit.
 - Native `/matchup`, `/team/matchup`, `/matchups`, and `/schedule` consumers use the canonical realtime scoring projection. Connected Sleeper leagues keep their existing read-only path.
 - The matchup UI distinguishes current score from projected final, never labels season PPG as a weekly score, and explicitly identifies delayed/stale data and cached last-known totals. Stat corrections include count and replay disclosure.
+
+## Phase 7 implementation delta
+
+- Canonical native seasons now own the player market through queryable player/waiver/team/run/receipt documents layered over the unique roster asset locks. Initialization preserves current owners and special locked/protected/ineligible/trade-block states.
+- Published redraft settings cover all requested acquisition modes, FAAB/zero bids, league-timezone run cadence, dropped-player holds, weekly and positional limits, deterministic tiebreakers, optional commissioner review, and optional runner-up bid disclosure.
+- Claim submission stores ordered conditional alternatives and an exact settings/roster snapshot. Structural errors reject the command, while an individually illegal alternative is preserved with a reason so later fallbacks can still be evaluated.
+- Processing compares claims deterministically, prevents duplicate awards, applies multiple winning groups for a franchise through one final roster/team-state write, and enters every successful add/drop through the universal transaction and lock ledger.
+- The protected scheduler endpoint is cadence-independent and has deterministic retry IDs. Vercel Hobby currently permits only the configured daily recovery invocation; the Players screen exposes immediate commissioner processing at each league's stored custom due time. Exact unattended sub-daily cadence requires upgrading the scheduler host/plan, not rewriting claim logic.
+- Pending bids are readable only by the submitting account and commissioners. Completed receipts show the outcome and allowed explanation fields to league members; all player-market browser writes remain denied.
+- Native `/players` is now an operational player market. Connected leagues keep the existing read-only recommendation and Stats Explorer behavior.

@@ -36,8 +36,17 @@ export type LeagueSettingsV1 = {
     playoffTeams: number;
   };
   transactions: {
-    waiverMode: "faab" | "rolling";
+    waiverMode: "faab" | "rolling" | "reverse_standings" | "weekly_reset" | "continuous" | "first_come_first_served";
     faabBudget: number;
+    allowZeroDollarBids: boolean;
+    processingDays: number[];
+    processingTime: string;
+    droppedPlayerWaiverHours: number;
+    weeklyAcquisitionLimit: number;
+    positionLimits: Record<"QB" | "RB" | "WR" | "TE" | "K" | "DST", number>;
+    waiverTiebreaker: "priority" | "earliest_claim" | "lowest_standing";
+    commissionerWaiverReview: boolean;
+    revealNextHighestBid: boolean;
     tradeReview: "commissioner" | "league_vote" | "none";
     tradeDeadlineWeek: number;
   };
@@ -132,6 +141,15 @@ export function createRedraftLeagueSettings(timezone = "UTC"): LeagueSettingsV1 
     transactions: {
       waiverMode: "faab",
       faabBudget: 100,
+      allowZeroDollarBids: true,
+      processingDays: [2, 4, 6],
+      processingTime: "09:00",
+      droppedPlayerWaiverHours: 48,
+      weeklyAcquisitionLimit: 0,
+      positionLimits: { QB: 4, RB: 10, WR: 10, TE: 5, K: 3, DST: 3 },
+      waiverTiebreaker: "priority",
+      commissionerWaiverReview: false,
+      revealNextHighestBid: false,
       tradeReview: "commissioner",
       tradeDeadlineWeek: 11,
     },
@@ -182,7 +200,8 @@ export function parseLeagueSettings(value: unknown, timezoneFallback = "UTC") {
   if (source.leagueType !== "redraft") schemaIssues.push({ field: "leagueType", message: "Only the redraft template is available in this release." });
   if (!["standard", "half_ppr", "ppr"].includes(String(scoring.preset ?? ""))) schemaIssues.push({ field: "scoring.preset", message: "Choose a supported scoring preset." });
   if (!["snake", "auction"].includes(String(draft.format ?? ""))) schemaIssues.push({ field: "draft.format", message: "Choose snake or auction draft format." });
-  if (!["faab", "rolling"].includes(String(transactions.waiverMode ?? ""))) schemaIssues.push({ field: "transactions.waiverMode", message: "Choose FAAB or rolling waivers." });
+  if (!["faab", "rolling", "reverse_standings", "weekly_reset", "continuous", "first_come_first_served"].includes(String(transactions.waiverMode ?? ""))) schemaIssues.push({ field: "transactions.waiverMode", message: "Choose a supported waiver or free-agent mode." });
+  if (transactions.waiverTiebreaker !== undefined && !["priority", "earliest_claim", "lowest_standing"].includes(String(transactions.waiverTiebreaker))) schemaIssues.push({ field: "transactions.waiverTiebreaker", message: "Choose a supported waiver tiebreaker." });
   if (!["commissioner", "league_vote", "none"].includes(String(transactions.tradeReview ?? ""))) schemaIssues.push({ field: "transactions.tradeReview", message: "Choose a supported trade review policy." });
   if (!["player_start", "scheduled_start", "actual_start", "first_game", "thursday_split"].includes(String(lineup.lockPolicy ?? ""))) schemaIssues.push({ field: "lineup.lockPolicy", message: "Choose a supported lineup lock policy." });
   if (lineup.postponedGamePolicy !== undefined && !["original_start", "rescheduled_start", "unlock_until_actual"].includes(String(lineup.postponedGamePolicy))) schemaIssues.push({ field: "lineup.postponedGamePolicy", message: "Choose a supported postponed-game policy." });
@@ -217,8 +236,24 @@ export function parseLeagueSettings(value: unknown, timezoneFallback = "UTC") {
       playoffTeams: numberValue(schedule.playoffTeams, defaults.schedule.playoffTeams),
     },
     transactions: {
-      waiverMode: enumValue(transactions.waiverMode, ["faab", "rolling"] as const, defaults.transactions.waiverMode),
+      waiverMode: enumValue(transactions.waiverMode, ["faab", "rolling", "reverse_standings", "weekly_reset", "continuous", "first_come_first_served"] as const, defaults.transactions.waiverMode),
       faabBudget: numberValue(transactions.faabBudget, defaults.transactions.faabBudget),
+      allowZeroDollarBids: booleanValue(transactions.allowZeroDollarBids, defaults.transactions.allowZeroDollarBids),
+      processingDays: Array.isArray(transactions.processingDays) ? transactions.processingDays.map((day) => numberValue(day, -1)) : defaults.transactions.processingDays,
+      processingTime: typeof transactions.processingTime === "string" ? transactions.processingTime.trim() : defaults.transactions.processingTime,
+      droppedPlayerWaiverHours: numberValue(transactions.droppedPlayerWaiverHours, defaults.transactions.droppedPlayerWaiverHours),
+      weeklyAcquisitionLimit: numberValue(transactions.weeklyAcquisitionLimit, defaults.transactions.weeklyAcquisitionLimit),
+      positionLimits: {
+        QB: numberValue(record(transactions.positionLimits).QB, defaults.transactions.positionLimits.QB),
+        RB: numberValue(record(transactions.positionLimits).RB, defaults.transactions.positionLimits.RB),
+        WR: numberValue(record(transactions.positionLimits).WR, defaults.transactions.positionLimits.WR),
+        TE: numberValue(record(transactions.positionLimits).TE, defaults.transactions.positionLimits.TE),
+        K: numberValue(record(transactions.positionLimits).K, defaults.transactions.positionLimits.K),
+        DST: numberValue(record(transactions.positionLimits).DST, defaults.transactions.positionLimits.DST),
+      },
+      waiverTiebreaker: enumValue(transactions.waiverTiebreaker, ["priority", "earliest_claim", "lowest_standing"] as const, defaults.transactions.waiverTiebreaker),
+      commissionerWaiverReview: booleanValue(transactions.commissionerWaiverReview, defaults.transactions.commissionerWaiverReview),
+      revealNextHighestBid: booleanValue(transactions.revealNextHighestBid, defaults.transactions.revealNextHighestBid),
       tradeReview: enumValue(transactions.tradeReview, ["commissioner", "league_vote", "none"] as const, defaults.transactions.tradeReview),
       tradeDeadlineWeek: numberValue(transactions.tradeDeadlineWeek, defaults.transactions.tradeDeadlineWeek),
     },
@@ -254,6 +289,8 @@ export function validateLeagueSettings(settings: LeagueSettingsV1): LeagueSettin
     integerIssue("draft.auctionBudget", "Auction budget", settings.draft.auctionBudget, 20, 10000),
     integerIssue("draft.minimumBid", "Minimum bid", settings.draft.minimumBid, 1, 100),
     integerIssue("transactions.faabBudget", "FAAB budget", settings.transactions.faabBudget, 1, 10000),
+    integerIssue("transactions.droppedPlayerWaiverHours", "Dropped-player waiver hours", settings.transactions.droppedPlayerWaiverHours, 0, 336),
+    integerIssue("transactions.weeklyAcquisitionLimit", "Weekly acquisition limit", settings.transactions.weeklyAcquisitionLimit, 0, 99),
   ];
   issues.push(...candidates.filter((issue): issue is LeagueSettingsIssue => Boolean(issue)));
   for (const row of settings.rosterSlots) {
@@ -271,6 +308,12 @@ export function validateLeagueSettings(settings: LeagueSettingsV1): LeagueSettin
   if (settings.schedule.playoffTeams % 2 !== 0) issues.push({ field: "schedule.playoffTeams", message: "Playoff team count must be even." });
   if (settings.transactions.tradeDeadlineWeek > settings.schedule.regularSeasonWeeks) issues.push({ field: "transactions.tradeDeadlineWeek", message: "Trade deadline must fall within the regular season." });
   if (settings.lineup.lineupWeekCount < settings.schedule.regularSeasonWeeks) issues.push({ field: "lineup.lineupWeekCount", message: "Lineup weeks must include the entire regular season." });
+  if (!settings.transactions.processingDays.length || settings.transactions.processingDays.some((day) => !Number.isInteger(day) || day < 0 || day > 6) || new Set(settings.transactions.processingDays).size !== settings.transactions.processingDays.length) issues.push({ field: "transactions.processingDays", message: "Choose unique waiver processing weekdays from 0 through 6." });
+  if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/u.test(settings.transactions.processingTime)) issues.push({ field: "transactions.processingTime", message: "Waiver processing time must use 24-hour HH:mm format." });
+  for (const [position, limit] of Object.entries(settings.transactions.positionLimits)) {
+    const issue = integerIssue(`transactions.positionLimits.${position}`, `${position} roster limit`, limit, 1, 30);
+    if (issue) issues.push(issue);
+  }
   if (settings.draft.format === "auction" && settings.draft.auctionBudget < rosterSize * settings.draft.minimumBid) {
     issues.push({ field: "draft.auctionBudget", message: "Auction budget must cover the minimum bid for every drafted roster spot." });
   }
@@ -325,7 +368,7 @@ export function buildLeagueConstitution(settings: LeagueSettingsV1): LeagueConst
     { title: "Roster and draft", paragraphs: [`Each team uses ${rosterSummary(settings)}. That produces ${impact.draftedPlayers} drafted players league-wide, excluding IR.`, draftText] },
     { title: "Scoring", paragraphs: [`The league uses ${scoringLabel} scoring: ${settings.scoring.receptionPoints} points per reception, 1 point per ${settings.scoring.passingYardsPerPoint} passing yards, ${settings.scoring.passingTouchdown} per passing touchdown, ${settings.scoring.interception} per interception, 1 point per ${settings.scoring.rushingReceivingYardsPerPoint} rushing or receiving yards, and ${settings.scoring.rushingReceivingTouchdown} per rushing or receiving touchdown.`] },
     { title: "Schedule and playoffs", paragraphs: [`The regular season lasts ${settings.schedule.regularSeasonWeeks} weeks. ${settings.schedule.playoffTeams} teams qualify for the playoffs${impact.playoffByes ? `, with ${impact.playoffByes} first-round bye${impact.playoffByes === 1 ? "" : "s"}` : ""}.`] },
-    { title: "Waivers and trades", paragraphs: [`Waivers use ${settings.transactions.waiverMode === "faab" ? `$${settings.transactions.faabBudget} FAAB` : "rolling priority"}. Trades are reviewed by ${settings.transactions.tradeReview === "league_vote" ? "league vote" : settings.transactions.tradeReview === "commissioner" ? "the commissioner" : "no review period"}, and the deadline is Week ${settings.transactions.tradeDeadlineWeek}.`] },
+    { title: "Waivers and trades", paragraphs: [`Player acquisition uses ${settings.transactions.waiverMode === "faab" ? `$${settings.transactions.faabBudget} FAAB` : settings.transactions.waiverMode.replace(/_/gu, " ")}. Claims process on weekdays ${settings.transactions.processingDays.join(", ")} at ${settings.transactions.processingTime} ${settings.timezone}; dropped players remain on waivers for ${settings.transactions.droppedPlayerWaiverHours} hours. ${settings.transactions.weeklyAcquisitionLimit ? `Teams may make ${settings.transactions.weeklyAcquisitionLimit} acquisitions per week.` : "Weekly acquisitions are unlimited."} Trades are reviewed by ${settings.transactions.tradeReview === "league_vote" ? "league vote" : settings.transactions.tradeReview === "commissioner" ? "the commissioner" : "no review period"}, and the deadline is Week ${settings.transactions.tradeDeadlineWeek}.`] },
     { title: "Lineups and time", paragraphs: [`${lineupPolicyText(settings)} League deadlines use ${settings.timezone}. ${settings.lineup.inactiveSubstitution === "ordered_fallback" ? "Inactive starters may be replaced from each team's ordered fallback list." : "Inactive-player automatic substitution is disabled."} ${settings.lineup.automaticMode === "best_ball" ? "Best-ball optimization is active." : settings.lineup.lateSwap ? "Late swap remains available for players whose games have not locked." : "Late swap is disabled."}`] },
   ];
 }

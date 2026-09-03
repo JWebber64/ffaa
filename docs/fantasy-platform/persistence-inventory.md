@@ -389,3 +389,18 @@ leagues/{gamehqLeagueId}/seasons/{seasonId}/scoringWeeks/week-{week}
 `scoringEvents` stores the current normalized provider event, stable provider ID/timestamp, player, NFL game, normalized statistics, correction target/reason, ingestion version, and event revision. `scoringEventRevisions` is the immutable source/correction history. Provider retries with identical semantic content do not create another revision or another fantasy point delta.
 
 `scoringWeeks` is a rebuildable realtime projection tied to the exact published settings version and lineup-week revision. It contains player/game totals, lineup current/projected/bench/optimal totals, matchup totals and win probabilities, Week standings projection, game states, provider freshness/fallback context, scoring feed explanations, lead changes, top active performer, correction state, and cached-last-known status. Active members may subscribe to the projection; raw events and revisions are commissioner-only. All three collections reject browser mutation.
+
+## Implemented Phase 7 player-market persistence
+
+```text
+leagues/{gamehqLeagueId}/seasons/{seasonId}/waiverState/current
+leagues/{gamehqLeagueId}/seasons/{seasonId}/playerStates/{playerId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/waiverTeamStates/{franchiseId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/waiverClaims/{claimId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/waiverRuns/{runId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/waiverReceipts/{receiptId}
+```
+
+`playerStates` is the queryable acquisition-state projection over the unique Phase 3 player asset locks. It carries position, owner, free-agent/waiver/protected/locked/ineligible/trade-block status, dropped-until eligibility, and revision. `waiverTeamStates` carries FAAB, priority, standings rank, weekly acquisition counts, and revision. Pool initialization reconciles rather than overwrites existing ownership and protected states.
+
+Pending `waiverClaims` keep ordered conditional alternatives and bids private to the submitting user and commissioners. `waiverRuns` records the exact processing boundary and is commissioner-only. Member-readable `waiverReceipts` explain evaluated alternatives, award/failure, winning and optionally next-highest bid, priority before/after, tiebreaker, failed alternatives, add/drop, remaining FAAB, processing time, and settings version. All mutations are server commands and ownership changes co-commit `seasonTeams`, `assetLocks`, `rosterTransactions`, public/private audit, and command receipts.

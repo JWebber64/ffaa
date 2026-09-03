@@ -147,6 +147,39 @@ service cloud.firestore {
           allow get, list: if isCanonicalManager();
           allow create, update, delete: if false;
         }
+
+        match /waiverState/{stateId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /playerStates/{playerId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /waiverTeamStates/{franchiseId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        // Pending alternatives and bids are private to their submitting manager
+        // and commissioners. Completed public outcomes use waiverReceipts.
+        match /waiverClaims/{claimId} {
+          allow get, list: if isCanonicalManager()
+            || (isCanonicalMember() && resource.data.actor_user_id == request.auth.uid);
+          allow create, update, delete: if false;
+        }
+
+        match /waiverRuns/{runId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+
+        match /waiverReceipts/{receiptId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
       }
 
       match /franchises/{franchiseId} {

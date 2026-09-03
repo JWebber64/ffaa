@@ -232,7 +232,7 @@ This navigation change follows the canonical workspace seam and is not permissio
 | `/league/:gamehqLeagueId/matchup` | Native seasons show the current manager's replayable live matchup; connected leagues keep the existing Sleeper adapter |
 | `/league/:gamehqLeagueId/team` | Existing team workspace through the external-source adapter when present |
 | `/league/:gamehqLeagueId/team/roster` | Native seasons use player-level locks, ordered fallbacks, exact revision saves, and commissioner week controls; legacy-backed seasons retain the compatibility editor |
-| `/league/:gamehqLeagueId/players` | Existing player research surface |
+| `/league/:gamehqLeagueId/players` | Native seasons use the canonical free-agent/waiver market, conditional claim builder, and receipts; connected leagues keep the existing research surface |
 | `/league/:gamehqLeagueId/transactions` | Existing imported transaction/history compatibility route |
 | `/league/:gamehqLeagueId/schedule` | Native seasons show all Week scoring matchups; connected leagues keep the generated compatibility schedule |
 | `/league/:gamehqLeagueId/{standings,teams,history}` | Existing league readers under canonical identity |

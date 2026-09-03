@@ -10,6 +10,10 @@ export type LeagueCommandType =
   | "set_lineup_lock_override"
   | "ingest_scoring_events"
   | "recalculate_scoring_week"
+  | "initialize_waiver_player_pool"
+  | "submit_waiver_claim_group"
+  | "process_waiver_run"
+  | "acquire_free_agent"
   | "save_settings_draft"
   | "publish_settings"
   | "restore_settings_version"
@@ -121,6 +125,44 @@ export type IngestScoringEventsPayload = {
 export type RecalculateScoringWeekPayload = {
   week: number;
   expectedScoringWeekRevision: number;
+};
+
+export type WaiverPlayerPosition = "QB" | "RB" | "WR" | "TE" | "K" | "DST";
+export type WaiverPlayerState = "free_agent" | "on_waivers" | "owned" | "locked" | "ineligible" | "protected" | "trade_block";
+
+export type InitializeWaiverPlayerPoolPayload = {
+  expectedWaiverStateRevision: number;
+  players: Array<{ playerId: string; position: WaiverPlayerPosition }>;
+};
+
+export type WaiverClaimAlternative = {
+  addPlayerId: string;
+  dropPlayerId: string;
+  bid: number;
+};
+
+export type SubmitWaiverClaimGroupPayload = {
+  franchiseId: string;
+  week: number;
+  expectedRosterRevision: number;
+  settingsVersionId: string;
+  alternatives: WaiverClaimAlternative[];
+};
+
+export type ProcessWaiverRunPayload = {
+  week: number;
+  expectedWaiverStateRevision: number;
+  processThrough: string;
+  approvePendingReview?: boolean;
+};
+
+export type AcquireFreeAgentPayload = {
+  franchiseId: string;
+  week: number;
+  expectedRosterRevision: number;
+  settingsVersionId: string;
+  addPlayerId: string;
+  dropPlayerId: string;
 };
 
 export type SaveSettingsDraftPayload = {
@@ -236,6 +278,10 @@ export type LeagueCommandPayloadByType = {
   set_lineup_lock_override: SetLineupLockOverridePayload;
   ingest_scoring_events: IngestScoringEventsPayload;
   recalculate_scoring_week: RecalculateScoringWeekPayload;
+  initialize_waiver_player_pool: InitializeWaiverPlayerPoolPayload;
+  submit_waiver_claim_group: SubmitWaiverClaimGroupPayload;
+  process_waiver_run: ProcessWaiverRunPayload;
+  acquire_free_agent: AcquireFreeAgentPayload;
   save_settings_draft: SaveSettingsDraftPayload;
   publish_settings: PublishSettingsPayload;
   restore_settings_version: RestoreSettingsVersionPayload;

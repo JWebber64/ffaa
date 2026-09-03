@@ -390,6 +390,64 @@ export type NativeScoringWeek = {
   updatedAt: string;
 };
 
+export type NativeWaiverPlayerState = {
+  playerId: string;
+  position: "QB" | "RB" | "WR" | "TE" | "K" | "DST";
+  state: "free_agent" | "on_waivers" | "owned" | "locked" | "ineligible" | "protected" | "trade_block";
+  ownerFranchiseId: string;
+  droppedUntil: string;
+  revision: number;
+};
+
+export type NativeWaiverTeamState = {
+  franchiseId: string;
+  faabRemaining: number;
+  priority: number;
+  standingsRank: number;
+  priorityWeek: number;
+  weeklyAcquisitions: Record<string, number>;
+  revision: number;
+};
+
+export type NativeWaiverState = {
+  revision: number;
+  playerCount: number;
+  settingsVersionId: string;
+  nextProcessingAt: string;
+  lastRunId: string;
+  updatedAt: string;
+};
+
+export type NativeWaiverClaim = {
+  id: string;
+  franchiseId: string;
+  week: number;
+  status: "pending" | "pending_review" | "won" | "failed";
+  processAt: string;
+  alternatives: Array<{ addPlayerId: string; dropPlayerId: string; bid: number; order: number; submissionIssue: string }>;
+  failures: string[];
+  createdAt: string;
+};
+
+export type NativeWaiverReceipt = {
+  id: string;
+  runId: string;
+  claimId: string;
+  franchiseId: string;
+  status: "won" | "failed";
+  claimsEvaluated: number;
+  winningBid: number | null;
+  nextHighestBid: number | null;
+  priorityBefore: number;
+  priorityAfter: number;
+  tiebreakerUsed: string;
+  failures: string[];
+  addPlayerId: string;
+  dropPlayerId: string;
+  remainingFaab: number;
+  processedAt: string;
+};
+
 export type LeagueAuthorityLabel =
   | "Native GameHQ League — read/write"
   | "Connected Sleeper League — read-only"

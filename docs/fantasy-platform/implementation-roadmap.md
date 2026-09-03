@@ -13,8 +13,8 @@ The roadmap follows the requested phases in order. Each phase is a bounded chang
 | 4 | Native-league draft integration | Implemented for authoritative auction, snake, linear, and third-round-reversal rooms | Draft completion creates roster transactions |
 | 5 | Weekly operation and player-level locks | Implemented for native lineups, week game states, ordered fallbacks, and emergency reopenings | Cross-device lineups and settings-derived lock behavior |
 | 6 | Provider-agnostic scoring | Implemented with normalized events, deterministic replay, corrections, freshness, and native live matchup UI | Deterministic replay/corrections and live freshness UI |
-| 7 | Free agents and waivers | Next phase; canonical roster and scoring state are available | Atomic reproducible processing and receipts |
-| 8 | Two-team trades | Blocked on roster transaction ledger | Atomic asset locks/review/receipts |
+| 7 | Free agents and waivers | Implemented with canonical player states, complete redraft waiver settings, ordered claim groups, atomic processing, and receipts | Atomic reproducible processing and receipts |
+| 8 | Two-team trades | Next phase; the roster transaction and asset-lock authorities are available | Atomic asset locks/review/receipts |
 | 9 | Schedule, standings, playoffs | Blocked on scoring/results/settings | Reproducible standings, explainable seeds, valid brackets |
 | 10 | Operational UI consolidation | Iterative after each operational domain, final pass after 9 | Desktop/mobile parity and dense operational surfaces |
 | 11 | League Pulse, native history, decision tools, mirror/migrate | Blocked on event/audit/read models | Native actions feed history and explainable activity |
@@ -315,12 +315,17 @@ Phase 6 compatibility/rollback: native scoring reads only canonical `lineupWeeks
 
 ## Phase 7 — free agents and waivers
 
-- Canonical player ownership/waiver state.
-- Settings-derived FAAB/priority/processing/conditional claims.
-- Server scheduled job with job idempotency and atomic asset acquisition.
-- Manager and commissioner receipts.
+- Implemented canonical free-agent, waiver, owned, locked, ineligible, protected, and trade-block player states reconciled against the existing player asset locks.
+- Published settings now support FAAB, rolling, reverse standings, weekly reset, continuous, and first-come-first-served modes; zero-dollar bids; league-timezone processing days/time; dropped-player holds; weekly and position limits; tiebreakers; commissioner review; and next-highest-bid disclosure.
+- Manager claim groups preserve up to 12 ordered add/drop/bid alternatives and the exact roster/settings snapshot. An illegal or unavailable alternative records its reason and advances without poisoning later valid fallbacks.
+- A protected server scheduler processes due ordinary claims idempotently; commissioner-review claims remain pending until an explicit commissioner run. The current Vercel Hobby deployment invokes the scheduler as a daily recovery sweep because sub-daily cron expressions are rejected by that plan; commissioners retain an immediate due-queue action, and moving the same endpoint to a sub-daily scheduler requires no domain change. One player cannot be won twice, rolling priority and FAAB are updated deterministically, every ownership move uses the Phase 3 lock/transaction ledger, and each claim gets an explainable receipt.
+- Native Players renders the canonical market, conditional claim builder, FAAB/priority/deadline context, pending claims, commissioner run control, and receipts. Connected leagues retain their read-only research surface.
 
 Gate: competing/conditional/retry scenarios reproduce exactly.
+
+Exact Phase 7 implementation files: `shared/leagueSettings.ts` and `shared/leagueCommandProtocol.ts`; `server/league-commands/nativeWaiverCommands.ts`, `nativeWaiverScheduler.ts`, `waiverCronHandler.ts`, `executeLeagueCommand.ts`, and `commandSupport.ts`; `api/league-commands/waiver-cron.js`, `vercel.json`, and the function bundler; `src/features/native-waivers/**`; `src/features/league-domain/leagueCommands.ts` and `types.ts`; `src/features/league-settings/CommissionerSettingsWorkspace.tsx`; `src/screens/LeaguePlayers.tsx`; and `firestore.rules`. Coverage is in `nativeWaiverCommands.test.ts`, `nativeWaiverWorkspace.test.tsx`, `leagueSettings.test.ts`, and `nativeLeagueFirestoreRules.test.ts`.
+
+Phase 7 compatibility/rollback: no connected-provider roster, waiver, or FAAB data is copied or written. Removing the native Players branch restores the existing connected research UI while canonical player states, claim receipts, universal roster transactions, and audits remain intact as immutable evidence.
 
 ## Phase 8 — trades
 

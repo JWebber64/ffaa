@@ -15,6 +15,10 @@ import {
   type SetLineupLockOverridePayload,
   type IngestScoringEventsPayload,
   type RecalculateScoringWeekPayload,
+  type InitializeWaiverPlayerPoolPayload,
+  type SubmitWaiverClaimGroupPayload,
+  type ProcessWaiverRunPayload,
+  type AcquireFreeAgentPayload,
 } from "../../../shared/leagueCommandProtocol";
 import { ensurePermanentFirebaseUserId } from "../../lib/authSession";
 import { httpLeagueCommandService } from "./httpLeagueCommandService";
@@ -166,6 +170,51 @@ export async function recalculateScoringWeekCommand(input: {
     reason: input.reason ?? `Replay Week ${input.payload.week} scoring`,
     clientCreatedAt: nowIso(),
   });
+}
+
+export async function initializeWaiverPlayerPoolCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: InitializeWaiverPlayerPoolPayload;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({ commandId: input.commandId ?? createLeagueCommandId(), commandType: "initialize_waiver_player_pool", actorUserId, leagueId: input.leagueId, seasonId: input.seasonId, expectedRevision: input.expectedRevision, payload: input.payload, reason: "Initialize native waiver player states", clientCreatedAt: nowIso() });
+}
+
+export async function submitWaiverClaimGroupCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: SubmitWaiverClaimGroupPayload;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({ commandId: input.commandId ?? createLeagueCommandId(), commandType: "submit_waiver_claim_group", actorUserId, leagueId: input.leagueId, seasonId: input.seasonId, expectedRevision: input.expectedRevision, payload: input.payload, reason: "Submit ordered native waiver claim", clientCreatedAt: nowIso() });
+}
+
+export async function processWaiverRunCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: ProcessWaiverRunPayload;
+  reason?: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({ commandId: input.commandId ?? createLeagueCommandId(), commandType: "process_waiver_run", actorUserId, leagueId: input.leagueId, seasonId: input.seasonId, expectedRevision: input.expectedRevision, payload: input.payload, reason: input.reason ?? "Process native waiver claims", clientCreatedAt: nowIso() });
+}
+
+export async function acquireFreeAgentCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: AcquireFreeAgentPayload;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({ commandId: input.commandId ?? createLeagueCommandId(), commandType: "acquire_free_agent", actorUserId, leagueId: input.leagueId, seasonId: input.seasonId, expectedRevision: input.expectedRevision, payload: input.payload, reason: "Acquire a free agent", clientCreatedAt: nowIso() });
 }
 
 export async function saveSettingsDraftCommand(input: {
