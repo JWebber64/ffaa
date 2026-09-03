@@ -356,5 +356,14 @@ An imported league owner ID is display context. It never changes these labels or
 | Accepted-trade reservation | `seasons/{seasonId}/tradeAssetLocks/{assetKey}` | Create-only temporary lock prevents one asset or team FAAB balance from entering two accepted pending-review trades |
 | Trade receipt | `seasons/{seasonId}/tradeReceipts/{offerId}` | Immutable member-readable assets, parties, timestamps, policy/votes, disclosed approval, roster/cap effects, settings version, result, and ledger linkage |
 | Transferable advanced asset | `seasons/{seasonId}/draftPickStates/{assetId}` or `tradeableAssets/{assetId}` | Explicit ownership authority for picks, salary, contracts, keeper rights, and conditional assets; never inferred by the trade UI |
+| Phase 12 permanent future pick | `seasons/{seasonId}/futureDraftPicks/{year__round__originalFranchise}` | Initial owner equals permanent original franchise; only audited commands may transfer current ownership |
+| Keeper and contract rules | Active immutable SettingsVersion | Simple keeper controls are separate; advanced controls require the Dynasty type and never activate in redraft |
+| Contract/cap authority | `playerContracts`, `deadCapCharges`, and rebuildable `salaryLedgers` | Published multi-season terms, retention, and dead money are validated against every affected season cap |
+| Taxi/RFA/tag authority | `taxiAssignments`, `rfaTenders`, and `franchiseTags` | Stable revisioned assets constrained by the active Dynasty settings version |
+| Orphan/comp/special-draft authority | `orphanTeamStates`, `compensatoryPicks`, and `advancedDraftPlans` | Commissioner commands require explicit reasons and never replace permanent franchise identity |
+| Champion award | `seasons/{seasonId}/seasonAwards/champion` | Exact standings/bracket revisions and active playoff qualifiers; reasoned commissioner command only |
+| Season archive | `seasonArchives/{seasonId}` plus archived `Season` | Immutable summary references; original canonical ledgers remain in place |
+| League renewal | `League.current_season_id` plus a new UUID `Season` | Permanent franchises carry forward; roster/settings authority restarts as empty seasonal state and a draft rule version |
+| Private export | `leagueExports/{exportId}` plus ordered chunks | Commissioner-only read; server command snapshot and browser download, never a second write authority |
 
 The first implementation does not infer authority from `managerProviderUserId`, `leagueOwnerProviderUserId`, Sleeper roster ownership, or any other imported profile field.

@@ -232,9 +232,11 @@ Migration is explicit and on-demand, not a page-load bulk conversion.
 11. Phase 9 generates and edits schedules only for canonical native seasons. External schedules, scores, standings, and brackets remain connected-provider read models; migration requires an explicit team/game/result parity report before any native competition command becomes authoritative.
 12. Phase 10 changes projections and navigation only. It copies no provider data, creates no dual-write, and leaves authority-mode routing as the complete rollback seam for Home, Team, and Transactions.
 13. Phase 11 rebuilds automatic Pulse/history cards from canonical commands, audits, scores, lineups, drafts, waivers, and trades. Human Pulse conversation and proposals are native-only; provider history remains a named imported source. Mirror parity reports missing/mismatched evidence and never changes `authority_mode` or writes either source.
-14. When no published legacy season exists, the command records `connected_read_only` / `mapped_read_only`; the actor receives membership but no write role.
-15. Concurrent attach commands race on the mapping precondition. The winner's GameHQ league ID becomes canonical; the loser returns an idempotent receipt pointing to that same winner.
-16. Old numeric routes resolve through the mapping; an unmapped route still loads compatibility readers.
+14. Phase 12 initializes advanced assets only for a canonical native season using its active published Dynasty settings. It creates new GameHQ pick/cap/orphan/draft-plan authority and never infers ownership from provider rosters, drafts, trades, or commissioner identity. Migrating an existing advanced league therefore remains a future explicit parity workflow, not an initializer side effect.
+15. Final lifecycle commands apply only to canonical native seasons. Champion/archive/renew/export never infer provider winners, rewrite imported history, or move provider records; imported championships remain named historical evidence until an explicit parity migration.
+16. When no published legacy season exists, the command records `connected_read_only` / `mapped_read_only`; the actor receives membership but no write role.
+17. Concurrent attach commands race on the mapping precondition. The winner's GameHQ league ID becomes canonical; the loser returns an idempotent receipt pointing to that same winner.
+18. Old numeric routes resolve through the mapping; an unmapped route still loads compatibility readers.
 
 A standalone bulk migration script was intentionally not added in this slice: bulk attachment cannot safely infer which permanent GameHQ account should initiate a connection, and it would expand authority scope beyond the user's explicit action. The command itself is the idempotent backfill unit and can be orchestrated by a separately authorized batch job later without changing the schema.
 

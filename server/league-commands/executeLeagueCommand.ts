@@ -29,6 +29,8 @@ import {
 import { executeCounterTradeOffer, executeCreateTradeOffer, executeExpireTradeOffer, executeRespondTradeOffer, executeReviewTradeOffer } from "./nativeTradeCommands";
 import { executeBuildNativePlayoffs, executeGenerateNativeSchedule, executeRecordNativeMatchupResults, executeSaveNativeSchedule } from "./nativeCompetitionCommands";
 import { executeCommentOnPulseEvent, executeCreateRuleProposal, executePublishPulseEvent, executeReactToPulseEvent, executeVoteRuleProposal } from "./nativePulseCommands";
+import { executeInitializeAdvancedLeagueAssets } from "./nativeAdvancedLeagueCommands";
+import { executeArchiveNativeSeason, executeAwardNativeChampion, executeExportNativeLeague, executeRenewNativeLeague } from "./nativeSeasonLifecycleCommands";
 import type { LeagueCommandStore } from "./store";
 
 const COMMAND_TYPES = new Set<LeagueCommandType>([
@@ -57,6 +59,11 @@ const COMMAND_TYPES = new Set<LeagueCommandType>([
   "comment_on_pulse_event",
   "create_rule_proposal",
   "vote_rule_proposal",
+  "initialize_advanced_league_assets",
+  "award_native_champion",
+  "archive_native_season",
+  "renew_native_league",
+  "export_native_league",
   "save_settings_draft",
   "publish_settings",
   "restore_settings_version",
@@ -181,6 +188,11 @@ export async function executeLeagueCommand(input: {
   if (command.commandType === "comment_on_pulse_event") return executeCommentOnPulseEvent(shared as Parameters<typeof executeCommentOnPulseEvent>[0]);
   if (command.commandType === "create_rule_proposal") return executeCreateRuleProposal(shared as Parameters<typeof executeCreateRuleProposal>[0]);
   if (command.commandType === "vote_rule_proposal") return executeVoteRuleProposal(shared as Parameters<typeof executeVoteRuleProposal>[0]);
+  if (command.commandType === "initialize_advanced_league_assets") return executeInitializeAdvancedLeagueAssets(shared as Parameters<typeof executeInitializeAdvancedLeagueAssets>[0]);
+  if (command.commandType === "award_native_champion") return executeAwardNativeChampion(shared as Parameters<typeof executeAwardNativeChampion>[0]);
+  if (command.commandType === "archive_native_season") return executeArchiveNativeSeason(shared as Parameters<typeof executeArchiveNativeSeason>[0]);
+  if (command.commandType === "renew_native_league") return executeRenewNativeLeague(shared as Parameters<typeof executeRenewNativeLeague>[0]);
+  if (command.commandType === "export_native_league") return executeExportNativeLeague(shared as Parameters<typeof executeExportNativeLeague>[0]);
   if (command.commandType === "save_settings_draft") {
     return executeSaveSettingsDraft(shared as Parameters<typeof executeSaveSettingsDraft>[0]);
   }

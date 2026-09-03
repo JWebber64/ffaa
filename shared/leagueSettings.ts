@@ -4,10 +4,11 @@ export const ROSTER_SLOT_KEYS = ["QB", "RB", "WR", "TE", "FLEX", "K", "DST", "BE
 export type LeagueRosterSlot = typeof ROSTER_SLOT_KEYS[number];
 export type LeagueScoringPreset = "standard" | "half_ppr" | "ppr";
 export type LeagueDraftFormat = "snake" | "auction";
+export type LeagueType = "redraft" | "keeper" | "dynasty";
 
 export type LeagueSettingsV1 = {
   schemaVersion: typeof LEAGUE_SETTINGS_SCHEMA_VERSION;
-  leagueType: "redraft";
+  leagueType: LeagueType;
   teamCount: number;
   allowMultipleTeamsPerUser: boolean;
   allowMultipleManagersPerTeam: boolean;
@@ -78,6 +79,35 @@ export type LeagueSettingsV1 = {
     lateSwap: boolean;
     lineupWeekCount: number;
   };
+  keeper: {
+    enabled: boolean;
+    maxKeepers: number;
+    declarationDeadline: string;
+    costMode: "none" | "draft_round" | "auction_salary";
+    baseCost: number;
+    annualEscalation: number;
+  };
+  advanced: {
+    enabled: boolean;
+    futurePickYears: number;
+    rookieDraftRounds: number;
+    supplementalDrafts: boolean;
+    taxiSquadSlots: number;
+    taxiMaxExperienceSeasons: number;
+    salaryCap: number;
+    defaultContractYears: number;
+    maxContractYears: number;
+    optionYears: number;
+    extensions: boolean;
+    deadCapPercent: number;
+    maxSalaryRetentionPercent: number;
+    rookieWageScale: number[];
+    restrictedFreeAgency: boolean;
+    franchiseTagsPerTeam: number;
+    orphanTeams: boolean;
+    dispersalDrafts: boolean;
+    compensatoryPicks: boolean;
+  };
   timezone: string;
 };
 
@@ -114,6 +144,10 @@ function numberValue(value: unknown, fallback: number) {
 
 function booleanValue(value: unknown, fallback: boolean) {
   return typeof value === "boolean" ? value : fallback;
+}
+
+function textValue(value: unknown, fallback: string) {
+  return typeof value === "string" ? value.trim() : fallback;
 }
 
 function enumValue<T extends string>(value: unknown, options: readonly T[], fallback: T) {
@@ -200,6 +234,35 @@ export function createRedraftLeagueSettings(timezone = "UTC"): LeagueSettingsV1 
       lateSwap: true,
       lineupWeekCount: 18,
     },
+    keeper: {
+      enabled: false,
+      maxKeepers: 0,
+      declarationDeadline: "",
+      costMode: "none",
+      baseCost: 0,
+      annualEscalation: 0,
+    },
+    advanced: {
+      enabled: false,
+      futurePickYears: 3,
+      rookieDraftRounds: 4,
+      supplementalDrafts: false,
+      taxiSquadSlots: 4,
+      taxiMaxExperienceSeasons: 2,
+      salaryCap: 200,
+      defaultContractYears: 3,
+      maxContractYears: 5,
+      optionYears: 1,
+      extensions: true,
+      deadCapPercent: 25,
+      maxSalaryRetentionPercent: 50,
+      rookieWageScale: [20, 14, 9, 5],
+      restrictedFreeAgency: true,
+      franchiseTagsPerTeam: 1,
+      orphanTeams: true,
+      dispersalDrafts: true,
+      compensatoryPicks: true,
+    },
     timezone,
   };
 }
@@ -231,11 +294,13 @@ export function parseLeagueSettings(value: unknown, timezoneFallback = "UTC") {
   const schedule = record(source.schedule);
   const transactions = record(source.transactions);
   const lineup = record(source.lineup);
+  const keeper = record(source.keeper);
+  const advanced = record(source.advanced);
   const schemaIssues: LeagueSettingsIssue[] = [];
   if (source.schemaVersion !== LEAGUE_SETTINGS_SCHEMA_VERSION) {
     schemaIssues.push({ field: "schemaVersion", message: "Choose and save the current redraft rules template." });
   }
-  if (source.leagueType !== "redraft") schemaIssues.push({ field: "leagueType", message: "Only the redraft template is available in this release." });
+  if (!["redraft", "keeper", "dynasty"].includes(String(source.leagueType ?? ""))) schemaIssues.push({ field: "leagueType", message: "Choose redraft, keeper, or dynasty league rules." });
   if (!["standard", "half_ppr", "ppr"].includes(String(scoring.preset ?? ""))) schemaIssues.push({ field: "scoring.preset", message: "Choose a supported scoring preset." });
   if (!["snake", "auction"].includes(String(draft.format ?? ""))) schemaIssues.push({ field: "draft.format", message: "Choose snake or auction draft format." });
   if (!["faab", "rolling", "reverse_standings", "weekly_reset", "continuous", "first_come_first_served"].includes(String(transactions.waiverMode ?? ""))) schemaIssues.push({ field: "transactions.waiverMode", message: "Choose a supported waiver or free-agent mode." });
@@ -251,7 +316,7 @@ export function parseLeagueSettings(value: unknown, timezoneFallback = "UTC") {
 
   const settings: LeagueSettingsV1 = {
     schemaVersion: LEAGUE_SETTINGS_SCHEMA_VERSION,
-    leagueType: "redraft",
+    leagueType: enumValue(source.leagueType, ["redraft", "keeper", "dynasty"] as const, defaults.leagueType),
     teamCount: numberValue(source.teamCount, defaults.teamCount),
     allowMultipleTeamsPerUser: booleanValue(source.allowMultipleTeamsPerUser, defaults.allowMultipleTeamsPerUser),
     allowMultipleManagersPerTeam: booleanValue(source.allowMultipleManagersPerTeam, defaults.allowMultipleManagersPerTeam),
@@ -325,6 +390,35 @@ export function parseLeagueSettings(value: unknown, timezoneFallback = "UTC") {
       lateSwap: booleanValue(lineup.lateSwap, defaults.lineup.lateSwap),
       lineupWeekCount: numberValue(lineup.lineupWeekCount, defaults.lineup.lineupWeekCount),
     },
+    keeper: {
+      enabled: booleanValue(keeper.enabled, defaults.keeper.enabled),
+      maxKeepers: numberValue(keeper.maxKeepers, defaults.keeper.maxKeepers),
+      declarationDeadline: textValue(keeper.declarationDeadline, defaults.keeper.declarationDeadline),
+      costMode: enumValue(keeper.costMode, ["none", "draft_round", "auction_salary"] as const, defaults.keeper.costMode),
+      baseCost: numberValue(keeper.baseCost, defaults.keeper.baseCost),
+      annualEscalation: numberValue(keeper.annualEscalation, defaults.keeper.annualEscalation),
+    },
+    advanced: {
+      enabled: booleanValue(advanced.enabled, defaults.advanced.enabled),
+      futurePickYears: numberValue(advanced.futurePickYears, defaults.advanced.futurePickYears),
+      rookieDraftRounds: numberValue(advanced.rookieDraftRounds, defaults.advanced.rookieDraftRounds),
+      supplementalDrafts: booleanValue(advanced.supplementalDrafts, defaults.advanced.supplementalDrafts),
+      taxiSquadSlots: numberValue(advanced.taxiSquadSlots, defaults.advanced.taxiSquadSlots),
+      taxiMaxExperienceSeasons: numberValue(advanced.taxiMaxExperienceSeasons, defaults.advanced.taxiMaxExperienceSeasons),
+      salaryCap: numberValue(advanced.salaryCap, defaults.advanced.salaryCap),
+      defaultContractYears: numberValue(advanced.defaultContractYears, defaults.advanced.defaultContractYears),
+      maxContractYears: numberValue(advanced.maxContractYears, defaults.advanced.maxContractYears),
+      optionYears: numberValue(advanced.optionYears, defaults.advanced.optionYears),
+      extensions: booleanValue(advanced.extensions, defaults.advanced.extensions),
+      deadCapPercent: numberValue(advanced.deadCapPercent, defaults.advanced.deadCapPercent),
+      maxSalaryRetentionPercent: numberValue(advanced.maxSalaryRetentionPercent, defaults.advanced.maxSalaryRetentionPercent),
+      rookieWageScale: Array.isArray(advanced.rookieWageScale) ? advanced.rookieWageScale.map((value) => numberValue(value, 0)) : defaults.advanced.rookieWageScale,
+      restrictedFreeAgency: booleanValue(advanced.restrictedFreeAgency, defaults.advanced.restrictedFreeAgency),
+      franchiseTagsPerTeam: numberValue(advanced.franchiseTagsPerTeam, defaults.advanced.franchiseTagsPerTeam),
+      orphanTeams: booleanValue(advanced.orphanTeams, defaults.advanced.orphanTeams),
+      dispersalDrafts: booleanValue(advanced.dispersalDrafts, defaults.advanced.dispersalDrafts),
+      compensatoryPicks: booleanValue(advanced.compensatoryPicks, defaults.advanced.compensatoryPicks),
+    },
     timezone: typeof source.timezone === "string" && source.timezone.trim() ? source.timezone.trim() : defaults.timezone,
   };
   return { settings, issues: [...schemaIssues, ...validateLeagueSettings(settings)] };
@@ -355,6 +449,9 @@ export function validateLeagueSettings(settings: LeagueSettingsV1): LeagueSettin
     integerIssue("transactions.weeklyAcquisitionLimit", "Weekly acquisition limit", settings.transactions.weeklyAcquisitionLimit, 0, 99),
     integerIssue("transactions.tradeReviewPeriodHours", "Trade review period", settings.transactions.tradeReviewPeriodHours, 1, 168),
     integerIssue("transactions.tradeRosterGraceHours", "Post-trade roster grace period", settings.transactions.tradeRosterGraceHours, 1, 168),
+    integerIssue("keeper.maxKeepers", "Keeper limit", settings.keeper.maxKeepers, 0, 30),
+    integerIssue("keeper.baseCost", "Keeper base cost", settings.keeper.baseCost, 0, 10000),
+    integerIssue("keeper.annualEscalation", "Annual keeper escalation", settings.keeper.annualEscalation, 0, 10000),
   ];
   issues.push(...candidates.filter((issue): issue is LeagueSettingsIssue => Boolean(issue)));
   for (const row of settings.rosterSlots) {
@@ -380,6 +477,40 @@ export function validateLeagueSettings(settings: LeagueSettingsV1): LeagueSettin
   }
   if (settings.draft.format === "auction" && settings.draft.auctionBudget < rosterSize * settings.draft.minimumBid) {
     issues.push({ field: "draft.auctionBudget", message: "Auction budget must cover the minimum bid for every drafted roster spot." });
+  }
+  if (settings.leagueType === "redraft" && (settings.keeper.enabled || settings.advanced.enabled)) {
+    issues.push({ field: "leagueType", message: "Redraft leagues cannot publish keeper or contract controls." });
+  }
+  if (settings.leagueType === "keeper" && !settings.keeper.enabled) {
+    issues.push({ field: "keeper.enabled", message: "Keeper leagues must enable the simple keeper rules." });
+  }
+  if (settings.leagueType !== "dynasty" && settings.advanced.enabled) {
+    issues.push({ field: "advanced.enabled", message: "Advanced contract controls require the dynasty league type." });
+  }
+  if (settings.leagueType === "dynasty" && !settings.advanced.enabled) {
+    issues.push({ field: "advanced.enabled", message: "Dynasty leagues must enable the advanced asset and contract ledger." });
+  }
+  if (settings.keeper.enabled) {
+    if (settings.keeper.maxKeepers < 1) issues.push({ field: "keeper.maxKeepers", message: "Keeper leagues need at least one keeper slot." });
+    if (!Number.isFinite(Date.parse(settings.keeper.declarationDeadline))) issues.push({ field: "keeper.declarationDeadline", message: "Choose a valid keeper declaration deadline." });
+  }
+  if (settings.advanced.enabled) {
+    const advancedIntegers = [
+      integerIssue("advanced.futurePickYears", "Future pick years", settings.advanced.futurePickYears, 1, 8),
+      integerIssue("advanced.rookieDraftRounds", "Rookie draft rounds", settings.advanced.rookieDraftRounds, 1, 12),
+      integerIssue("advanced.taxiSquadSlots", "Taxi squad slots", settings.advanced.taxiSquadSlots, 0, 20),
+      integerIssue("advanced.taxiMaxExperienceSeasons", "Taxi experience limit", settings.advanced.taxiMaxExperienceSeasons, 0, 4),
+      integerIssue("advanced.salaryCap", "Salary cap", settings.advanced.salaryCap, 1, 100000),
+      integerIssue("advanced.defaultContractYears", "Default contract years", settings.advanced.defaultContractYears, 1, 10),
+      integerIssue("advanced.maxContractYears", "Maximum contract years", settings.advanced.maxContractYears, 1, 10),
+      integerIssue("advanced.optionYears", "Option years", settings.advanced.optionYears, 0, 5),
+      integerIssue("advanced.deadCapPercent", "Dead cap percent", settings.advanced.deadCapPercent, 0, 100),
+      integerIssue("advanced.maxSalaryRetentionPercent", "Salary retention percent", settings.advanced.maxSalaryRetentionPercent, 0, 100),
+      integerIssue("advanced.franchiseTagsPerTeam", "Franchise tags per team", settings.advanced.franchiseTagsPerTeam, 0, 5),
+    ].filter((issue): issue is LeagueSettingsIssue => Boolean(issue));
+    issues.push(...advancedIntegers);
+    if (settings.advanced.defaultContractYears > settings.advanced.maxContractYears) issues.push({ field: "advanced.defaultContractYears", message: "Default contract length cannot exceed the maximum contract length." });
+    if (settings.advanced.rookieWageScale.length !== settings.advanced.rookieDraftRounds || settings.advanced.rookieWageScale.some((amount) => !Number.isInteger(amount) || amount < 0)) issues.push({ field: "advanced.rookieWageScale", message: "Rookie wage scale must provide one non-negative whole-number salary for every rookie round." });
   }
   const receptionByPreset = { standard: 0, half_ppr: 0.5, ppr: 1 } as const;
   if (settings.scoring.receptionPoints !== receptionByPreset[settings.scoring.preset]) {
@@ -427,13 +558,17 @@ export function buildLeagueConstitution(settings: LeagueSettingsV1): LeagueConst
   const draftText = settings.draft.format === "auction"
     ? `The league uses an auction draft with a $${settings.draft.auctionBudget} budget and a $${settings.draft.minimumBid} minimum bid.`
     : `The league uses a snake draft with ${settings.draft.pickSeconds} seconds per pick.`;
+  const keeperSections: LeagueConstitutionSection[] = settings.keeper.enabled ? [{ title: "Keepers", paragraphs: [`Each franchise may declare up to ${settings.keeper.maxKeepers} keepers by ${settings.keeper.declarationDeadline}. Keeper cost uses ${settings.keeper.costMode.replace(/_/gu, " ")}${settings.keeper.costMode === "none" ? "" : ` with a base cost of ${settings.keeper.baseCost} and an annual escalation of ${settings.keeper.annualEscalation}`}.`] }] : [];
+  const advancedSections: LeagueConstitutionSection[] = settings.advanced.enabled ? [{ title: "Dynasty contracts and assets", paragraphs: [`Teams may trade picks ${settings.advanced.futurePickYears} years out and conduct a ${settings.advanced.rookieDraftRounds}-round rookie draft${settings.advanced.supplementalDrafts ? " plus supplemental drafts" : ""}. Taxi squads hold ${settings.advanced.taxiSquadSlots} eligible players with at most ${settings.advanced.taxiMaxExperienceSeasons} experience seasons.`, `The salary cap is ${settings.advanced.salaryCap}. Contracts default to ${settings.advanced.defaultContractYears} years and may run at most ${settings.advanced.maxContractYears} years with ${settings.advanced.optionYears} option year${settings.advanced.optionYears === 1 ? "" : "s"}. Dead cap is ${settings.advanced.deadCapPercent}% and salary retention is capped at ${settings.advanced.maxSalaryRetentionPercent}%.`, `${settings.advanced.restrictedFreeAgency ? "Restricted free agency is enabled." : "Restricted free agency is disabled."} Each team may use ${settings.advanced.franchiseTagsPerTeam} franchise tag${settings.advanced.franchiseTagsPerTeam === 1 ? "" : "s"}. ${settings.advanced.orphanTeams ? "Orphan-team state is tracked." : "Orphan-team state is disabled."} ${settings.advanced.dispersalDrafts ? "Dispersal drafts are available." : "Dispersal drafts are disabled."} ${settings.advanced.compensatoryPicks ? "Compensatory picks may be awarded." : "Compensatory picks are disabled."}`] }] : [];
   return [
-    { title: "League membership", paragraphs: [`This is a ${settings.teamCount}-team redraft league. ${settings.allowMultipleTeamsPerUser ? "A manager may control multiple franchises." : "A manager may control only one franchise."} ${settings.allowMultipleManagersPerTeam ? "Co-managers are allowed." : "Each franchise has one manager."}`] },
+    { title: "League membership", paragraphs: [`This is a ${settings.teamCount}-team ${settings.leagueType} league. ${settings.allowMultipleTeamsPerUser ? "A manager may control multiple franchises." : "A manager may control only one franchise."} ${settings.allowMultipleManagersPerTeam ? "Co-managers are allowed." : "Each franchise has one manager."}`] },
     { title: "Roster and draft", paragraphs: [`Each team uses ${rosterSummary(settings)}. That produces ${impact.draftedPlayers} drafted players league-wide, excluding IR.`, draftText] },
     { title: "Scoring", paragraphs: [`The league uses ${scoringLabel} scoring: ${settings.scoring.receptionPoints} points per reception, 1 point per ${settings.scoring.passingYardsPerPoint} passing yards, ${settings.scoring.passingTouchdown} per passing touchdown, ${settings.scoring.interception} per interception, 1 point per ${settings.scoring.rushingReceivingYardsPerPoint} rushing or receiving yards, and ${settings.scoring.rushingReceivingTouchdown} per rushing or receiving touchdown.`] },
     { title: "Schedule and playoffs", paragraphs: [`The regular season lasts ${settings.schedule.regularSeasonWeeks} weeks with ${settings.schedule.gamesPerWeek} scheduled game${settings.schedule.gamesPerWeek === 1 ? "" : "s"} per team per week${settings.schedule.medianOpponent ? " plus a league-median result" : ""}${settings.schedule.allPlay ? " and all-play tracking" : ""}. ${settings.schedule.playoffTeams} teams qualify for the playoffs${impact.playoffByes ? `, with ${impact.playoffByes} first-round bye${impact.playoffByes === 1 ? "" : "s"}` : ""}; rounds last ${settings.schedule.playoffRoundWeeks} week${settings.schedule.playoffRoundWeeks === 1 ? "" : "s"}${settings.schedule.playoffReseeding ? " and reseed" : " in a fixed bracket"}.`] },
     { title: "Waivers and trades", paragraphs: [`Player acquisition uses ${settings.transactions.waiverMode === "faab" ? `$${settings.transactions.faabBudget} FAAB` : settings.transactions.waiverMode.replace(/_/gu, " ")}. Claims process on weekdays ${settings.transactions.processingDays.join(", ")} at ${settings.transactions.processingTime} ${settings.timezone}; dropped players remain on waivers for ${settings.transactions.droppedPlayerWaiverHours} hours. ${settings.transactions.weeklyAcquisitionLimit ? `Teams may make ${settings.transactions.weeklyAcquisitionLimit} acquisitions per week.` : "Weekly acquisitions are unlimited."} ${settings.transactions.tradesEnabled ? `Trades use ${settings.transactions.tradeReview.replace(/_/gu, " ")} review, ${settings.transactions.tradeRosterEnforcement.replace(/_/gu, " ")} roster enforcement, and a Week ${settings.transactions.tradeDeadlineWeek} deadline.` : "Trades are disabled."}`] },
     { title: "Lineups and time", paragraphs: [`${lineupPolicyText(settings)} League deadlines use ${settings.timezone}. ${settings.lineup.inactiveSubstitution === "ordered_fallback" ? "Inactive starters may be replaced from each team's ordered fallback list." : "Inactive-player automatic substitution is disabled."} ${settings.lineup.automaticMode === "best_ball" ? "Best-ball optimization is active." : settings.lineup.lateSwap ? "Late swap remains available for players whose games have not locked." : "Late swap is disabled."}`] },
+    ...keeperSections,
+    ...advancedSections,
   ];
 }
 

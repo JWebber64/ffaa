@@ -246,6 +246,74 @@ service cloud.firestore {
           allow get, list: if isCanonicalManager();
           allow create, update, delete: if false;
         }
+
+        // Keeper/dynasty/cap projections are server-owned and readable by
+        // active league members. Published settings decide whether they are
+        // active; browser clients never create or edit an asset directly.
+        match /advancedLeagueState/{stateId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /futureDraftPicks/{pickId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /keeperAssignments/{assignmentId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /playerContracts/{contractId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /deadCapCharges/{chargeId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /salaryLedgers/{ledgerId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /taxiAssignments/{assignmentId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /rfaTenders/{tenderId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /franchiseTags/{tagId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /orphanTeamStates/{franchiseId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /compensatoryPicks/{pickId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /advancedDraftPlans/{planId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /seasonAwards/{awardId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
       }
 
       match /franchises/{franchiseId} {
@@ -311,6 +379,23 @@ service cloud.firestore {
       match /ruleProposals/{proposalId} {
         allow get, list: if isCanonicalMember();
         allow create, update, delete: if false;
+      }
+
+      match /seasonArchives/{seasonId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
+      // Exports can contain private commissioner context. Only current
+      // commissioners may read the immutable manifest and ordered chunks.
+      match /leagueExports/{exportId} {
+        allow get, list: if isCanonicalManager();
+        allow create, update, delete: if false;
+
+        match /chunks/{chunkId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
       }
 
       match /auditPrivate/{eventId} {

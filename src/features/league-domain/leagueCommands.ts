@@ -32,6 +32,11 @@ import {
   type CommentOnPulseEventPayload,
   type CreateRuleProposalPayload,
   type VoteRuleProposalPayload,
+  type InitializeAdvancedLeagueAssetsPayload,
+  type AwardNativeChampionPayload,
+  type ArchiveNativeSeasonPayload,
+  type RenewNativeLeaguePayload,
+  type ExportNativeLeaguePayload,
 } from "../../../shared/leagueCommandProtocol";
 import { ensurePermanentFirebaseUserId } from "../../lib/authSession";
 import { httpLeagueCommandService } from "./httpLeagueCommandService";
@@ -564,3 +569,37 @@ export function reactToPulseEventCommand(input: { leagueId: string; seasonId: st
 export function commentOnPulseEventCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: CommentOnPulseEventPayload; commandId?: string }) { return pulseCommand({ ...input, commandType: "comment_on_pulse_event", reason: "Reply to League Pulse item" }); }
 export function createRuleProposalCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: CreateRuleProposalPayload; commandId?: string }) { return pulseCommand({ ...input, commandType: "create_rule_proposal", reason: input.payload.commissionerExplanation }); }
 export function voteRuleProposalCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: VoteRuleProposalPayload; commandId?: string }) { return pulseCommand({ ...input, commandType: "vote_rule_proposal", reason: `Record ${input.payload.vote} vote on formal rule proposal` }); }
+
+export async function initializeAdvancedLeagueAssetsCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: InitializeAdvancedLeagueAssetsPayload; commandId?: string }) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({ commandId: input.commandId ?? createLeagueCommandId(), commandType: "initialize_advanced_league_assets", actorUserId, leagueId: input.leagueId, seasonId: input.seasonId, expectedRevision: input.expectedRevision, payload: input.payload, reason: "Initialize dynasty asset and salary ledgers from published rules", clientCreatedAt: nowIso() });
+}
+
+async function lifecycleCommand<T extends "award_native_champion" | "archive_native_season" | "renew_native_league" | "export_native_league">(input: {
+  commandType: T;
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: import("../../../shared/leagueCommandProtocol").LeagueCommandPayloadByType[T];
+  reason: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({ commandId: input.commandId ?? createLeagueCommandId(), commandType: input.commandType, actorUserId, leagueId: input.leagueId, seasonId: input.seasonId, expectedRevision: input.expectedRevision, payload: input.payload, reason: input.reason.trim().replace(/\s+/gu, " ").slice(0, 240), clientCreatedAt: nowIso() });
+}
+
+export function awardNativeChampionCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: AwardNativeChampionPayload; reason: string; commandId?: string }) {
+  return lifecycleCommand({ ...input, commandType: "award_native_champion" });
+}
+
+export function archiveNativeSeasonCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: ArchiveNativeSeasonPayload; reason: string; commandId?: string }) {
+  return lifecycleCommand({ ...input, commandType: "archive_native_season" });
+}
+
+export function renewNativeLeagueCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: RenewNativeLeaguePayload; reason: string; commandId?: string }) {
+  return lifecycleCommand({ ...input, commandType: "renew_native_league" });
+}
+
+export function exportNativeLeagueCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: ExportNativeLeaguePayload; commandId?: string }) {
+  return lifecycleCommand({ ...input, commandType: "export_native_league", reason: "Create private native league data export" });
+}

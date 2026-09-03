@@ -124,4 +124,19 @@ describe("native weekly lineup commands", () => {
     expect(saved.result.automaticSubstitutions).toEqual([{ slot: "WR-1", from: "wr-one", to: "wr-two" }]);
     expect(store.read(`leagues/${leagueId}/seasons/${seasonId}/lineups/${franchiseId}_week-1`)).toMatchObject({ assignments: { ...opening, "WR-1": "wr-two" }, automatic_substitutions: [{ slot: "WR-1", from: "wr-one", to: "wr-two" }] });
   });
+
+  it("rejects an illegal position and records a reasoned commissioner override for a locked player", async () => {
+    const store = new LeagueCommandMemoryStore();
+    seed(store);
+    await configure(store);
+    await expect(execute(store, saveCommand({ expectedRevision: 0, expectedSeasonRevision: 2, assignments: { ...opening, "QB-1": "rb-two" } }), managerId, "2026-09-09T12:00:00.000Z")).rejects.toMatchObject({ code: "position_ineligible" });
+    await execute(store, saveCommand({ expectedRevision: 0, expectedSeasonRevision: 2, assignments: opening }), managerId, "2026-09-09T12:01:00.000Z");
+    const override = await execute(store, typed({
+      commandId: id(), commandType: "save_weekly_lineup", actorUserId: commissionerId, leagueId, seasonId, expectedRevision: 1,
+      payload: { legacyLeagueId: "", franchiseId, week: 1, assignments: { ...opening, "QB-1": "qb-sun" }, overrideReason: "Official kickoff record was incorrect", expectedSeasonRevision: 2, expectedRosterRevision: 1, settingsVersionId: "settings-1", orderedFallbackPlayerIds: [] },
+      reason: "Official kickoff record was incorrect", clientCreatedAt: "2026-09-10T01:00:00.000Z",
+    }), commissionerId, "2026-09-10T01:00:01.000Z");
+    expect(override.status).toBe("accepted");
+    expect(store.read(`leagues/${leagueId}/auditEvents/${override.auditEventId}`)).toMatchObject({ material_differences: { locked_overrides: [expect.objectContaining({ playerId: "qb-thu" })] } });
+  });
 });

@@ -40,6 +40,8 @@ export type Season = {
   startAt: string | null;
   endAt: string | null;
   legacySourceLeagueId: string | null;
+  championFranchiseId?: string | null;
+  runnerUpFranchiseId?: string | null;
 };
 
 export type Franchise = {

@@ -39,6 +39,14 @@ describe("native trade commands", () => {
     expect(store.read(`leagues/${leagueId}/seasons/${seasonId}/rosterTransactions/tx-${offerId}`)).toMatchObject({ transaction_type: "trade", review_state: "immediate" });
   });
 
+  it("transfers a Phase 12 permanent future-pick asset through the existing atomic trade ledger", async () => {
+    const { store } = seed(); const pickId = `pick__2027__1__${teams[0]}`;
+    store.seed(`leagues/${leagueId}/seasons/${seasonId}/futureDraftPicks/${pickId}`, { id: pickId, ownerFranchiseId: teams[0], owner_franchise_id: teams[0], original_franchise_id: teams[0], season: 2027, round: 1, revision: 1 });
+    const created = await execute(store, offerCommand(0, 1, { offeredAssets: [{ type: "draft_pick", id: pickId }], requestedAssets: [{ type: "player", id: "player-2" }] }), managers[0]!, "2026-09-10T12:00:01.000Z");
+    await execute(store, { commandId: id(), commandType: "respond_trade_offer", actorUserId: managers[1]!, leagueId, seasonId, expectedRevision: 1, payload: { offerId: String(created.result.offerId), expectedOfferRevision: 1, response: "accept", week: 1, immediateCutPlayerIds: [] }, reason: "accept pick trade", clientCreatedAt: "2026-09-10T12:05:00.000Z" }, managers[1]!, "2026-09-10T12:05:01.000Z");
+    expect(store.read(`leagues/${leagueId}/seasons/${seasonId}/futureDraftPicks/${pickId}`)).toMatchObject({ ownerFranchiseId: teams[1], owner_franchise_id: teams[1], revision: 2 });
+  });
+
   it("cannot accept an expired offer", async () => {
     const { store } = seed(); const created = await execute(store, offerCommand(), managers[0]!, "2026-09-10T12:00:01.000Z");
     await expect(execute(store, { commandId: id(), commandType: "respond_trade_offer", actorUserId: managers[1]!, leagueId, seasonId, expectedRevision: 1, payload: { offerId: String(created.result.offerId), expectedOfferRevision: 1, response: "accept", week: 1, immediateCutPlayerIds: [] }, reason: "accept expired trade", clientCreatedAt: "2026-09-11T12:00:00.000Z" }, managers[1]!, "2026-09-11T12:00:01.000Z")).rejects.toMatchObject({ code: "trade_offer_expired" });

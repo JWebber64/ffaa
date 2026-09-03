@@ -453,3 +453,37 @@ leagues/{gamehqLeagueId}/ruleProposals/{proposalId}
 All four collections are member-readable and deny direct browser writes. `pulseEvents` stores the authored chat/poll/announcement/reminder/trade-block card; `pulseReactions` is one revisioned reaction per event/user; `pulseComments` stores authored replies; and `ruleProposals` stores the complete language, season, threshold, window, votes, result, explanation, and revision.
 
 Automated Pulse cards and native History are read projections, not independently editable ledgers. They rebuild from `auditEvents`, roster transactions, drafts, lineups, scoring/results, waiver/trade receipts, schedules, and permanent franchise/season-team identity. Decision recommendations and mirror parity are also read-only projections and persist no hidden mutation intent.
+
+## Implemented Phase 12 advanced-league persistence
+
+```text
+leagues/{gamehqLeagueId}/seasons/{seasonId}/advancedLeagueState/current
+leagues/{gamehqLeagueId}/seasons/{seasonId}/futureDraftPicks/{pickId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/keeperAssignments/{assignmentId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/playerContracts/{contractId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/deadCapCharges/{chargeId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/salaryLedgers/{franchiseId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/taxiAssignments/{assignmentId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/rfaTenders/{tenderId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/franchiseTags/{tagId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/orphanTeamStates/{franchiseId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/compensatoryPicks/{pickId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/advancedDraftPlans/{planId}
+```
+
+All Phase 12 collections are member-readable and server-write-only. `advancedLeagueState/current` binds initialization to the published settings version. A future-pick ID permanently encodes year, round, and original franchise while owner changes separately; Phase 8's `draftPickStates` remains the compatibility fallback for older explicit assets.
+
+Contracts preserve season salaries, option/exercised years, extension lineage, retention obligations, status, and revision. Dead-cap rows are immutable reasoned obligations; `salaryLedgers` is their rebuildable per-team projection. Taxi, RFA, tag, orphan, comp-pick, and special-draft documents retain stable IDs and revisions so later operational commands can use update-time preconditions instead of inferring state.
+
+## Implemented final season-lifecycle persistence
+
+```text
+leagues/{gamehqLeagueId}/seasons/{seasonId}/seasonAwards/champion
+leagues/{gamehqLeagueId}/seasonArchives/{seasonId}
+leagues/{gamehqLeagueId}/leagueExports/{exportId}
+leagues/{gamehqLeagueId}/leagueExports/{exportId}/chunks/{zeroPaddedIndex}
+```
+
+`seasonAwards/champion` is the member-readable authoritative champion/runner-up decision bound to exact standings, bracket, and settings revisions. `seasonArchives` is a permanent member-readable manifest; archiving changes state but does not move or delete any canonical record.
+
+Exports are commissioner-only because they include memberships, commands, and private audit context. The manifest records creator, season, byte/chunk counts, collection counts, and content type. Ordered server-written chunks stay below the Firestore document limit and deny every browser write. Renewal creates a new season aggregate and seasonal team documents while reusing permanent franchise IDs; the archived season remains byte-for-byte untouched.

@@ -21,6 +21,7 @@ import {
   publishSettingsCommand,
   restoreSettingsVersionCommand,
   saveSettingsDraftCommand,
+  initializeAdvancedLeagueAssetsCommand,
 } from "../league-domain/leagueCommands";
 import type { CanonicalLeagueWorkspace, SettingsVersion } from "../league-domain/types";
 import {
@@ -31,9 +32,11 @@ import { CommissionerAuditWorkspace } from "../league-membership/CommissionerAud
 import { CommissionerDraftWorkspace } from "../native-draft/CommissionerDraftWorkspace";
 import { defaultCommissionerPeopleService, type CommissionerPeopleService } from "../league-membership/commissionerPeopleService";
 import { CommissionerSafetyPanel } from "./CommissionerSafetyPanel";
+import { AdvancedLeagueSettingsSection } from "./AdvancedLeagueSettingsSection";
+import { CommissionerSeasonLifecycle } from "./CommissionerSeasonLifecycle";
 import "./commissioner-settings.css";
 
-type PendingAction = "idle" | "loading" | "saving" | "publishing" | "restoring";
+type PendingAction = "idle" | "loading" | "saving" | "publishing" | "restoring" | "initializing";
 
 export type CommissionerSettingsService = {
   listVersions: typeof listSettingsVersions;
@@ -124,6 +127,23 @@ function SettingsEditor({ workspace, onWorkspaceChanged, service }: { workspace:
   const unsaved = fingerprint(settings) !== savedFingerprint;
   const busy = pending !== "idle";
 
+  useEffect(() => {
+    if (!unsaved) return;
+    const beforeUnload = (event: BeforeUnloadEvent) => { event.preventDefault(); };
+    const followLink = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const target = event.target instanceof Element ? event.target.closest("a[href]") : null;
+      if (!target || target.hasAttribute("download") || target.getAttribute("target") === "_blank") return;
+      if (!window.confirm("Discard unsaved commissioner rule changes?")) event.preventDefault();
+    };
+    window.addEventListener("beforeunload", beforeUnload);
+    document.addEventListener("click", followLink, true);
+    return () => {
+      window.removeEventListener("beforeunload", beforeUnload);
+      document.removeEventListener("click", followLink, true);
+    };
+  }, [unsaved]);
+
   async function saveDraft() {
     setPending("saving");
     setMessage({ tone: "status", text: "Saving a new immutable draft…" });
@@ -199,6 +219,22 @@ function SettingsEditor({ workspace, onWorkspaceChanged, service }: { workspace:
     }
   }
 
+  async function initializeAdvancedAssets() {
+    if (!season.settingsVersionId || unsaved || issues.length || !settings.advanced.enabled) return;
+    setPending("initializing");
+    setMessage({ tone: "status", text: "Initializing permanent pick, salary, orphan, and special-draft ledgers…" });
+    try {
+      const receipt = await initializeAdvancedLeagueAssetsCommand({ leagueId: workspace.league.id, seasonId: season.id, expectedRevision: revision, payload: { settingsVersionId: season.settingsVersionId } });
+      setRevision(receipt.resultingRevision);
+      setMessage({ tone: "status", text: `${receipt.result.futurePickCount ?? 0} future picks and ${receipt.result.salaryLedgerCount ?? 0} salary ledgers initialized.` });
+      onWorkspaceChanged();
+    } catch (error) {
+      setMessage({ tone: "error", text: error instanceof Error ? error.message : "Advanced asset ledgers could not be initialized." });
+    } finally {
+      setPending("idle");
+    }
+  }
+
   function updateScoringPreset(preset: LeagueSettingsV1["scoring"]["preset"]) {
     setSettings((current) => ({
       ...current,
@@ -220,7 +256,7 @@ function SettingsEditor({ workspace, onWorkspaceChanged, service }: { workspace:
     <div className="commissioner-settings-layout">
       <form className="commissioner-rulebook" onSubmit={(event) => { event.preventDefault(); void saveDraft(); }}>
         <header className="commissioner-page-header">
-          <div><span className="hq-kicker">Commissioner rulebook</span><h1>Publish a playable redraft league</h1></div>
+          <div><span className="hq-kicker">Commissioner rulebook</span><h1>Publish a playable {settings.leagueType} league</h1></div>
           <p>Every save creates a new draft. Publishing validates the entire rule set and changes the season in one atomic command.</p>
         </header>
 
@@ -248,7 +284,7 @@ function SettingsEditor({ workspace, onWorkspaceChanged, service }: { workspace:
           <header><div><span>01</span><h2 id="league-structure-heading">League structure</h2></div><p>Redraft identity, membership policy, and deadline timezone.</p></header>
           <div className="commissioner-fields is-three-column">
             <label><span>Teams</span><NumericInput aria-invalid={issues.some((issue) => issue.field === "teamCount") || undefined} min={4} max={32} value={settings.teamCount} onChange={(event) => setSettings((current) => ({ ...current, teamCount: Number(event.target.value) }))} /></label>
-            <label><span>League type</span><input value="Redraft" readOnly /></label>
+            <label><span>League type</span><UniversalSelect aria-label="League type" value={settings.leagueType} onValueChange={(value) => setSettings((current) => { const leagueType = value as LeagueSettingsV1["leagueType"]; const keepsPlayers = leagueType !== "redraft"; return { ...current, leagueType, keeper: { ...current.keeper, enabled: keepsPlayers, maxKeepers: keepsPlayers && current.keeper.maxKeepers === 0 ? 3 : current.keeper.maxKeepers, declarationDeadline: keepsPlayers && !current.keeper.declarationDeadline ? `${season.year}-08-25T18:00` : current.keeper.declarationDeadline }, advanced: { ...current.advanced, enabled: leagueType === "dynasty" } }; })}><option value="redraft">Redraft</option><option value="keeper">Keeper</option><option value="dynasty">Dynasty / contract</option></UniversalSelect></label>
             <label><span>Timezone</span><input aria-invalid={issues.some((issue) => issue.field === "timezone") || undefined} value={settings.timezone} onChange={(event) => setSettings((current) => ({ ...current, timezone: event.target.value }))} /></label>
           </div>
           <div className="commissioner-checks">
@@ -325,6 +361,8 @@ function SettingsEditor({ workspace, onWorkspaceChanged, service }: { workspace:
             <label><span>Lineup weeks</span><NumericInput min={1} max={18} value={settings.lineup.lineupWeekCount} onChange={(event) => setSettings((current) => ({ ...current, lineup: { ...current.lineup, lineupWeekCount: Number(event.target.value) } }))} /></label>
           </div>
         </section>
+        <AdvancedLeagueSettingsSection settings={settings} onChange={setSettings} />
+        {settings.leagueType === "dynasty" && settings.advanced.enabled ? <section className="commissioner-form-section commissioner-ledger-initialize" aria-labelledby="advanced-ledger-initialize-heading"><header><div><span>07</span><h2 id="advanced-ledger-initialize-heading">Initialize authoritative ledgers</h2></div><p>This one-time pre-season command creates pick, cap, orphan, and advanced-draft assets from the active published version. It never imports or promotes provider state.</p></header><div><span>Publish this exact rule set first. Initialization is idempotent and rejects stale or already-initialized seasons.</span><Button type="button" size="sm" variant="secondary" isLoading={pending === "initializing"} disabled={busy || unsaved || Boolean(draftVersionId) || !season.settingsVersionId} onClick={() => void initializeAdvancedAssets()}>Initialize dynasty ledgers</Button></div></section> : null}
       </form>
 
       <aside className="commissioner-settings-aside">
@@ -389,7 +427,7 @@ export function CommissionerSettingsWorkspace({
             ? <CommissionerDraftWorkspace workspace={workspace} onWorkspaceChanged={onWorkspaceChanged} />
           : section === "audit"
             ? <CommissionerAuditWorkspace workspace={workspace} onWorkspaceChanged={onWorkspaceChanged} />
-            : <><CommissionerOperationsOverview workspace={workspace} service={peopleService} /><CommissionerSafetyPanel workspace={workspace} /></>}
+            : <><CommissionerOperationsOverview workspace={workspace} service={peopleService} /><CommissionerSeasonLifecycle workspace={workspace} onWorkspaceChanged={onWorkspaceChanged} /><CommissionerSafetyPanel workspace={workspace} /></>}
     </main>
   );
 }

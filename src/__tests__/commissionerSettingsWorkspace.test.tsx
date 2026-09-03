@@ -13,12 +13,17 @@ import type { CanonicalLeagueWorkspace, SettingsVersion } from "../features/leag
 
 vi.mock("../features/league-domain/firebaseLeagueRepository", () => ({ listSettingsVersions: vi.fn() }));
 vi.mock("../features/league-domain/leagueCommands", () => ({
+  archiveNativeSeasonCommand: vi.fn(),
+  awardNativeChampionCommand: vi.fn(),
   createLeagueInvitationCommand: vi.fn(),
+  exportNativeLeagueCommand: vi.fn(),
+  initializeAdvancedLeagueAssetsCommand: vi.fn(),
   publishSettingsCommand: vi.fn(),
   provisionSeasonTeamsCommand: vi.fn(),
   removeLeagueMemberCommand: vi.fn(),
   reverseRosterTransactionCommand: vi.fn(),
   revokeLeagueInvitationCommand: vi.fn(),
+  renewNativeLeagueCommand: vi.fn(),
   restoreSettingsVersionCommand: vi.fn(),
   saveSettingsDraftCommand: vi.fn(),
 }));

@@ -35,7 +35,7 @@ export function commandRequestHash(command: LeagueCommand) {
   return createHash("sha256").update(JSON.stringify(sortedValue(idempotentRequest))).digest("hex");
 }
 
-export function deriveGamehqUuid(actorUserId: string, commandId: string, domain: "league" | "season" | "franchise" | "scheduled-waiver-run") {
+export function deriveGamehqUuid(actorUserId: string, commandId: string, domain: "league" | "season" | "franchise" | "scheduled-waiver-run" | "renewed-season") {
   const bytes = createHash("sha256").update(`${domain}:${actorUserId}:${commandId}`).digest().subarray(0, 16);
   bytes[6] = ((bytes[6] ?? 0) & 0x0f) | 0x40;
   bytes[8] = ((bytes[8] ?? 0) & 0x3f) | 0x80;
@@ -162,6 +162,11 @@ export function normalizeReceipt(document: LeagueCommandStoredDocument | null): 
     "comment_on_pulse_event",
     "create_rule_proposal",
     "vote_rule_proposal",
+    "initialize_advanced_league_assets",
+    "award_native_champion",
+    "archive_native_season",
+    "renew_native_league",
+    "export_native_league",
     "save_settings_draft",
     "publish_settings",
     "restore_settings_version",

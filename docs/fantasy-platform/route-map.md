@@ -172,7 +172,7 @@ The requested inside-league nav is Home, Matchup, Team, Players, Transactions, a
 | Route | Planned page |
 |---|---|
 | `/league/:gamehqLeagueId/commissioner` | Implemented commissioner overview with active/draft revision state |
-| `/league/:gamehqLeagueId/commissioner/settings` | Implemented redraft rulebook, validation, impact preview, publication, and restore history |
+| `/league/:gamehqLeagueId/commissioner/settings` | Implemented redraft rulebook plus separately gated keeper and advanced Dynasty settings, validation, impact preview, publication, ledger initialization, and restore history |
 | `/league/:gamehqLeagueId/commissioner/teams` | Implemented native teams, memberships, invitations, owner/co-manager assignment, revocation, and audited removal |
 | `/league/:gamehqLeagueId/commissioner/draft` | Implemented native draft configuration, launch, pause/resume, settlement, and guarded correction |
 | `/league/:gamehqLeagueId/commissioner/scoring` | Scoring settings |
@@ -239,7 +239,7 @@ This navigation change follows the canonical workspace seam and is not permissio
 | `/league/:gamehqLeagueId/schedule` | Native seasons show all Week scoring matchups; connected leagues keep the generated compatibility schedule |
 | `/league/:gamehqLeagueId/pulse` | Native conversation plus rebuildable audit/result/scoring activity; connected leagues retain their compatibility reader |
 | `/league/:gamehqLeagueId/{standings,teams,history}` | Existing league readers under canonical identity |
-| `/league/:gamehqLeagueId/commissioner/*` | Existing management surface behind canonical GameHQ capability resolution |
+| `/league/:gamehqLeagueId/commissioner/*` | Canonical management surface with teams, rules, draft, audit, champion/archive/renewal controls, and private JSON export |
 
 The league workspace navigation now exposes Home, Matchup, Team, Players, Transactions, and a real disclosure menu for Standings, Schedule, Teams, History, Rules, and Commissioner. Existing legacy aliases remain valid; no route was deleted.
 

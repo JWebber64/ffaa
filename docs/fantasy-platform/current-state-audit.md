@@ -375,3 +375,12 @@ Deliberate remaining direct legacy writes are season publication, claims/members
 - Formal proposals preserve both rule-language versions, effective season, threshold, voting window, voter choices, result, and explanation. Votes use exact proposal revision checks so concurrent stale submissions cannot overwrite another vote.
 - The decision engine is read-only: it identifies the exact settings/ownership/FAAB/lineup/opponent/bye facts it used, labels unavailable evidence and uncertainty, and returns no mutation. Domain commands remain the only write authority.
 - Commissioner safe mode documents preview, required reason, impact, restore/reversal, and audit behavior. The mirror parity panel names native and imported sources, mismatches, and unavailable evidence while leaving the league's explicit authority mode untouched.
+- The final lifecycle gap is closed by revision-bound champion award, archive, renewal, and private export commands. The commissioner overview exposes the valid action for the current phase; connected leagues never receive these controls.
+
+## Phase 12 implementation delta
+
+- Existing redraft settings remain schema-compatible and normalize keeper/advanced blocks to disabled defaults. Choosing Keeper reveals only deadline/cost/escalation controls; choosing Dynasty separately reveals the permanent-asset and contract matrix.
+- The native advanced model now names every requested future asset and obligation: future picks, rookie/supplemental/dispersal drafts, taxi assignments, keeper declarations, contracts/options/extensions, retained salary, dead cap, rookie wage scales, RFA tenders, franchise tags, orphan states, and compensatory picks.
+- Deterministic fixtures validate one permanent pick per original team/year/round, one active player contract, contract/option bounds, keeper escalation, retained salary, every affected season's cap, taxi eligibility/count, tag count, feature switches, and reasoned compensatory picks.
+- A pre-season commissioner command initializes the ledgers only from the exact active published Dynasty version. The season revision, state, assets, receipt, and audit commit together; a concurrent second initializer cannot create duplicate pick or cap authority.
+- The existing trade engine reads the initialized future-pick authority and changes its canonical owner in the same guarded completion commit. Connected-provider and legacy compatibility ledgers are not copied or silently selected.

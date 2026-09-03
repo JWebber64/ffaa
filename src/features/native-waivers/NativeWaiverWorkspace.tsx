@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Clock3, Gavel, ListChecks, RotateCcw, ShieldCheck, WalletCards } from "lucide-react";
+import { List, type RowComponentProps } from "react-window";
 
 import type { WaiverClaimAlternative, WaiverPlayerPosition } from "../../../shared/leagueCommandProtocol";
 import { buildNativeDecisionRecommendations } from "../../../shared/nativeLeagueIntelligence";
@@ -8,8 +9,8 @@ import { NumericInput } from "../../ui/NumericInput";
 import { PositionBadge } from "../../ui/PositionBadge";
 import { UniversalSelect } from "../../ui/UniversalSelect";
 import { acquireFreeAgentCommand, initializeWaiverPlayerPoolCommand, processWaiverRunCommand, submitWaiverClaimGroupCommand } from "../league-domain/leagueCommands";
-import type { CanonicalLeagueWorkspace } from "../league-domain/types";
-import { useLeaguePlayerSheet } from "../player-sheet/leaguePlayerSheetContext";
+import type { CanonicalLeagueWorkspace, NativeWaiverPlayerState } from "../league-domain/types";
+import { useLeaguePlayerSheet, type LeaguePlayerSheetRequest } from "../player-sheet/leaguePlayerSheetContext";
 import { useNativeLineup } from "../native-lineup/useNativeLineup";
 import { useNativeScoring } from "../native-scoring/useNativeScoring";
 import { useNativeWaivers } from "./useNativeWaivers";
@@ -20,10 +21,34 @@ const NEW_ALTERNATIVE = (): Alternative => ({ id: crypto.randomUUID(), addPlayer
 
 function time(value: string, timezone: string) {
   const parsed = Date.parse(value);
-  return Number.isFinite(parsed) ? new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short", timeZone: timezone }).format(parsed) : "Not scheduled";
+  if (!Number.isFinite(parsed)) return "Not scheduled";
+  const leagueTime = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short", timeZone: timezone }).format(parsed);
+  const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if (!localTimezone || localTimezone === timezone) return leagueTime;
+  const localTime = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(parsed);
+  return `${leagueTime} league · ${localTime} local`;
 }
 
 function modeLabel(value: string) { return value.replace(/_/gu, " ").replace(/\b\w/gu, (letter) => letter.toUpperCase()); }
+
+type PlayerDirectoryEntry = ReturnType<typeof buildCurrentToolPlayers>[number];
+type WaiverPlayerRowProps = {
+  entries: NativeWaiverPlayerState[];
+  directory: Map<string, PlayerDirectoryEntry>;
+  leagueId: string;
+  selectedTeamName: string;
+  timezone: string;
+  week: number;
+  immediate: boolean;
+  openPlayer: (request: LeaguePlayerSheetRequest) => void;
+};
+
+function WaiverPlayerRow({ index, style, entries, directory, leagueId, selectedTeamName, timezone, week, immediate, openPlayer }: RowComponentProps<WaiverPlayerRowProps>) {
+  const entry = entries[index];
+  if (!entry) return null;
+  const player = directory.get(entry.playerId);
+  return <div className="native-waiver-player" style={style}><div><PositionBadge position={entry.position} /><span><strong>{player?.name ?? entry.playerId}</strong><small>{player?.team || "FA"} · Rank {player?.rank ?? "—"}</small></span><button type="button" className="league-player-view" onClick={() => openPlayer({ playerId: entry.playerId, currentWeek: week, leagueState: entry.state, ownership: "Unrostered", rosterFit: `${entry.position} · ${selectedTeamName || "Choose a team"}`, actionLabel: immediate ? "Add from Players" : "Claim from Players", actionTo: `/league/${leagueId}/players` })}>View</button></div><strong>{entry.state === "on_waivers" ? "Waivers" : "Free agent"}</strong><small>{entry.droppedUntil ? time(entry.droppedUntil, timezone) : "Now"}</small></div>;
+}
 
 export function NativeWaiverWorkspace({ workspace }: { workspace: CanonicalLeagueWorkspace }) {
   const season = workspace.season!;
@@ -127,7 +152,7 @@ export function NativeWaiverWorkspace({ workspace }: { workspace: CanonicalLeagu
           {notice ? <div className={`native-waiver-notice is-${notice.tone}`} role={notice.tone === "error" ? "alert" : "status"}>{notice.text}</div> : null}
 
           <div className="native-waiver-grid">
-            <section className="native-waiver-market" aria-labelledby="native-market-title"><header><div><span>Availability</span><h2 id="native-market-title">Player market</h2></div><small>{available.length} claimable</small></header><div className="native-waiver-player-head" aria-hidden="true"><span>Player</span><span>Status</span><span>Eligible</span></div>{available.slice(0, 60).map((entry) => { const player = directory.get(entry.playerId); return <div className="native-waiver-player" key={entry.playerId}><div><PositionBadge position={entry.position} /><span><strong>{player?.name ?? entry.playerId}</strong><small>{player?.team || "FA"} · Rank {player?.rank ?? "—"}</small></span><button type="button" className="league-player-view" onClick={() => openPlayer({ playerId: entry.playerId, currentWeek: week, leagueState: entry.state, ownership: "Unrostered", rosterFit: `${entry.position} · ${selectedTeam?.name ?? "Choose a team"}`, actionLabel: immediate ? "Add from Players" : "Claim from Players", actionTo: `/league/${workspace.league.id}/players` })}>View</button></div><strong>{entry.state === "on_waivers" ? "Waivers" : "Free agent"}</strong><small>{entry.droppedUntil ? time(entry.droppedUntil, workspace.league.timezone) : "Now"}</small></div>; })}</section>
+            <section className="native-waiver-market" aria-labelledby="native-market-title"><header><div><span>Availability</span><h2 id="native-market-title">Player market</h2></div><small>{available.length} claimable</small></header><div className="native-waiver-player-head" aria-hidden="true"><span>Player</span><span>Status</span><span>Eligible</span></div><List className="native-waiver-player-list" defaultHeight={Math.min(420, Math.max(64, available.length * 64))} rowComponent={WaiverPlayerRow} rowCount={available.length} rowHeight={64} rowProps={{ entries: available, directory, leagueId: workspace.league.id, selectedTeamName: selectedTeam?.name ?? "", timezone: workspace.league.timezone, week, immediate, openPlayer }} style={{ height: Math.min(420, Math.max(64, available.length * 64)) }} /></section>
             <aside className="native-waiver-queue"><header><div><span>Claims & outcomes</span><h2>Transaction receipts</h2></div>{isCommissioner && !immediate ? <button type="button" className="btn" disabled={pending === "process"} onClick={() => void process()}><RotateCcw aria-hidden="true" /> {pending === "process" ? "Processing…" : "Process due claims"}</button> : null}</header>{visibleClaims.map((claim) => <article key={claim.id}><div><strong>{claim.status.replace(/_/gu, " ")}</strong><small><Clock3 aria-hidden="true" /> {time(claim.processAt, workspace.league.timezone)}</small></div><p>{claim.alternatives.map((row) => `${row.order}. ${directory.get(row.addPlayerId)?.name ?? row.addPlayerId}${mode === "faab" ? ` $${row.bid}` : ""}`).join(" · ")}</p>{claim.failures.length ? <small>{claim.failures.join(" ")}</small> : null}</article>)}{visibleReceipts.map((receipt) => <article className={`is-${receipt.status}`} key={receipt.id}><div><strong>{receipt.status === "won" ? `Won ${directory.get(receipt.addPlayerId)?.name ?? receipt.addPlayerId}` : "Claim failed"}</strong><small>{time(receipt.processedAt, workspace.league.timezone)}</small></div><p>{receipt.winningBid === null ? "No award" : `$${receipt.winningBid} winning bid · $${receipt.remainingFaab} remaining · priority ${receipt.priorityBefore} → ${receipt.priorityAfter}`}</p>{receipt.failures.length ? <small>{receipt.failures.join(" ")}</small> : null}</article>)}{!visibleClaims.length && !visibleReceipts.length ? <div className="native-waiver-queue-empty">No claims or receipts for this team yet.</div> : null}</aside>
           </div>
         </>

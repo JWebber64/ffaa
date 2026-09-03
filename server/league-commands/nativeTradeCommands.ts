@@ -17,6 +17,13 @@ function tradeLockPath(leagueId: string, seasonId: string, teamId: string, asset
 function waiverTeamStatePath(leagueId: string, seasonId: string, teamId: string) { return `leagues/${leagueId}/seasons/${seasonId}/waiverTeamStates/${teamId}`; }
 function playerStatePath(leagueId: string, seasonId: string, playerId: string) { return `leagues/${leagueId}/seasons/${seasonId}/playerStates/${playerId}`; }
 function transferableStatePath(leagueId: string, seasonId: string, asset: NormalizedAsset) { return `leagues/${leagueId}/seasons/${seasonId}/${asset.type === "draft_pick" ? "draftPickStates" : "tradeableAssets"}/${asset.type}__${asset.id}`; }
+async function transferableState(store: LeagueCommandStore, command: TradeCommand, asset: NormalizedAsset) {
+  if (asset.type === "draft_pick") {
+    const advanced = await store.get(`leagues/${command.leagueId}/seasons/${command.seasonId}/futureDraftPicks/${asset.id}`);
+    if (advanced) return advanced;
+  }
+  return store.get(transferableStatePath(command.leagueId, command.seasonId, asset));
+}
 
 function active(document: LeagueCommandStoredDocument, at: string) { const now = Date.parse(at); const effective = Date.parse(text(document.data.effective_at)); const expires = Date.parse(text(document.data.expires_at)); return !text(document.data.revoked_at) && (!Number.isFinite(effective) || effective <= now) && (!Number.isFinite(expires) || expires > now); }
 
@@ -52,7 +59,7 @@ async function validateOwnership(store: LeagueCommandStore, command: TradeComman
   for (const asset of assets) {
     if (asset.type === "player") { const lock = await store.get(assetLockPath(command.leagueId, command.seasonId, "player", asset.id)); if (!lock || text(lock.data.franchise_id) !== franchiseId) throw new LeagueCommandFailure("trade_asset_changed", `Player ${asset.id} is no longer owned by the expected team.`, 409); continue; }
     if (asset.type === "faab") { const state = await store.get(waiverTeamStatePath(command.leagueId, command.seasonId, franchiseId)); if (!state || wholeNumber(state.data.faab_remaining) < (asset.amount ?? 0)) throw new LeagueCommandFailure("trade_asset_changed", `${franchiseId} no longer has the offered FAAB.`, 409); continue; }
-    const state = await store.get(transferableStatePath(command.leagueId, command.seasonId, asset)); if (!state || text(state.data.owner_franchise_id) !== franchiseId) throw new LeagueCommandFailure("trade_asset_changed", `${asset.type} ${asset.id} is no longer owned by the expected team.`, 409);
+    const state = await transferableState(store, command, asset); if (!state || text(state.data.owner_franchise_id) !== franchiseId) throw new LeagueCommandFailure("trade_asset_changed", `${asset.type} ${asset.id} is no longer owned by the expected team.`, 409);
   }
 }
 
@@ -126,7 +133,7 @@ async function finalizeTrade(input: { command: TradeCommand; actorUserId: string
   for (const { asset, from, to } of transferRows) {
     if (asset.type === "faab") { faabDeltas.set(from, faabDeltas.get(from)! - (asset.amount ?? 0)); faabDeltas.set(to, faabDeltas.get(to)! + (asset.amount ?? 0)); continue; }
     if (asset.type === "player") { const lock = await store.get(assetLockPath(command.leagueId, command.seasonId, "player", asset.id)); writes.push(replaceWrite(store, lock, assetLockPath(command.leagueId, command.seasonId, "player", asset.id), { ...lock?.data, franchise_id: to, roster_transaction_id: transactionId, revision: Math.max(0, wholeNumber(lock?.data.revision)) + 1, updated_at: processedAt })); const state = await store.get(playerStatePath(command.leagueId, command.seasonId, asset.id)); if (state) writes.push(replaceWrite(store, state, state.path, { ...state.data, owner_franchise_id: to, state: "owned", revision: Math.max(1, wholeNumber(state.data.revision, 1)) + 1, updated_at: processedAt })); continue; }
-    const assetState = await store.get(transferableStatePath(command.leagueId, command.seasonId, asset)); writes.push(replaceWrite(store, assetState, transferableStatePath(command.leagueId, command.seasonId, asset), { ...assetState?.data, owner_franchise_id: to, revision: Math.max(1, wholeNumber(assetState?.data.revision, 1)) + 1, updated_at: processedAt }));
+    const assetState = await transferableState(store, command, asset); const assetPath = assetState?.path ?? transferableStatePath(command.leagueId, command.seasonId, asset); writes.push(replaceWrite(store, assetState, assetPath, { ...assetState?.data, owner_franchise_id: to, ...(asset.type === "draft_pick" && assetPath.includes("/futureDraftPicks/") ? { ownerFranchiseId: to } : {}), revision: Math.max(1, wholeNumber(assetState?.data.revision, 1)) + 1, updated_at: processedAt }));
   }
   for (const [id, delta] of faabDeltas) if (delta) { const state = await store.get(waiverTeamStatePath(command.leagueId, command.seasonId, id)); if (!state || wholeNumber(state.data.faab_remaining) + delta < 0) throw new LeagueCommandFailure("trade_asset_changed", "FAAB balance changed before processing.", 409); writes.push(replaceWrite(store, state, state.path, { ...state.data, faab_remaining: wholeNumber(state.data.faab_remaining) + delta, revision: Math.max(1, wholeNumber(state.data.revision, 1)) + 1, updated_at: processedAt })); }
   for (const playerId of uniqueCuts) { const lock = await store.get(assetLockPath(command.leagueId, command.seasonId, "player", playerId)); const state = await store.get(playerStatePath(command.leagueId, command.seasonId, playerId)); if (lock) writes.push(deleteWrite(store, lock, lock.path)); if (state) writes.push(replaceWrite(store, state, state.path, { ...state.data, state: ctx.settings.transactions.droppedPlayerWaiverHours ? "on_waivers" : "free_agent", owner_franchise_id: "", dropped_until: new Date(Date.parse(processedAt) + ctx.settings.transactions.droppedPlayerWaiverHours * 3600000).toISOString(), revision: Math.max(1, wholeNumber(state.data.revision, 1)) + 1, updated_at: processedAt })); }

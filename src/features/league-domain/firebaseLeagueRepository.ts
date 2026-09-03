@@ -92,6 +92,8 @@ function normalizeSeason(value: unknown, leagueId: string, expectedId: string): 
     startAt: text(data.start_at) || null,
     endAt: text(data.end_at) || null,
     legacySourceLeagueId: text(data.legacy_source_league_id) || null,
+    championFranchiseId: text(data.champion_franchise_id) || null,
+    runnerUpFranchiseId: text(data.runner_up_franchise_id) || null,
   };
 }
 

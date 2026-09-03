@@ -29,6 +29,11 @@ export type LeagueCommandType =
   | "comment_on_pulse_event"
   | "create_rule_proposal"
   | "vote_rule_proposal"
+  | "initialize_advanced_league_assets"
+  | "award_native_champion"
+  | "archive_native_season"
+  | "renew_native_league"
+  | "export_native_league"
   | "save_settings_draft"
   | "publish_settings"
   | "restore_settings_version"
@@ -227,6 +232,11 @@ export type ReactToPulseEventPayload = { eventId: string; reaction: "like" | "ce
 export type CommentOnPulseEventPayload = { eventId: string; body: string };
 export type CreateRuleProposalPayload = { currentLanguage: string; proposedLanguage: string; effectiveSeason: number; votingThreshold: number; opensAt: string; closesAt: string; commissionerExplanation: string };
 export type VoteRuleProposalPayload = { proposalId: string; vote: "yes" | "no" | "abstain" };
+export type InitializeAdvancedLeagueAssetsPayload = { settingsVersionId: string };
+export type AwardNativeChampionPayload = { championFranchiseId: string; runnerUpFranchiseId: string; expectedStandingsRevision: number; expectedBracketRevision: number };
+export type ArchiveNativeSeasonPayload = { championFranchiseId: string };
+export type RenewNativeLeaguePayload = { year: number };
+export type ExportNativeLeaguePayload = { includePrivateAudit: boolean };
 
 export type SaveSettingsDraftPayload = {
   settings: LeagueSettingsV1;
@@ -359,6 +369,11 @@ export type LeagueCommandPayloadByType = {
   comment_on_pulse_event: CommentOnPulseEventPayload;
   create_rule_proposal: CreateRuleProposalPayload;
   vote_rule_proposal: VoteRuleProposalPayload;
+  initialize_advanced_league_assets: InitializeAdvancedLeagueAssetsPayload;
+  award_native_champion: AwardNativeChampionPayload;
+  archive_native_season: ArchiveNativeSeasonPayload;
+  renew_native_league: RenewNativeLeaguePayload;
+  export_native_league: ExportNativeLeaguePayload;
   save_settings_draft: SaveSettingsDraftPayload;
   publish_settings: PublishSettingsPayload;
   restore_settings_version: RestoreSettingsVersionPayload;

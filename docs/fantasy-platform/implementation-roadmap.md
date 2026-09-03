@@ -18,7 +18,8 @@ The roadmap follows the requested phases in order. Each phase is a bounded chang
 | 9 | Schedule, standings, playoffs | Implemented | Reproducible standings, explainable seeds, valid brackets |
 | 10 | Operational UI consolidation | Implemented | Desktop/mobile parity and dense operational surfaces |
 | 11 | League Pulse, native history, decision tools, mirror/migrate | Implemented | Native actions feed history and explainable activity |
-| 12 | Keeper, dynasty, salary cap | Blocked on reliable native redraft | Advanced assets/contracts without burdening redraft |
+| 12 | Keeper, dynasty, salary cap | Implemented as an opt-in advanced foundation | Advanced assets/contracts without burdening redraft |
+| Final completion gate | Champion, archive, renewal, export, browser/performance acceptance | Implemented | Commissioner can complete and preserve the full native season lifecycle |
 
 ## Phase 0 deliverables
 
@@ -409,6 +410,31 @@ Phase 11 compatibility/rollback: connected leagues keep their imported History w
 - Separate simple keeper configuration from advanced contract controls.
 
 Gate: native redraft remains stable and simple while advanced fixtures satisfy contract/asset invariants.
+
+Implemented Phase 12:
+
+- The additive settings schema supports `redraft`, `keeper`, and `dynasty` without invalidating existing schema-version-1 redraft documents. Redraft defaults keep both keeper and advanced controls disabled. Simple keeper limits, declaration deadline, cost method, base cost, and yearly escalation live in their own rulebook section.
+- The advanced contract section appears only for Dynasty and covers tradable future years, rookie rounds and wage scale, supplemental drafts, taxi slots/experience, salary cap, default/max contract length, option years, extensions, dead-cap percentage, salary-retention ceiling, RFA, franchise tags, orphan workflow, dispersal drafts, and compensatory picks.
+- `shared/nativeAdvancedLeague.ts` defines permanent future-pick assets, keeper declarations, multi-season contracts/options/extensions/retention, dead cap, taxi, RFA tenders, tags, orphan state, compensatory picks, startup/rookie/supplemental/dispersal plans, and salary ledgers. Its deterministic validator rejects duplicate ownership, bad term/options, illegal retention, taxi violations, disabled features, invalid comp picks, and cap overruns in every affected season.
+- `initialize_advanced_league_assets` is a commissioner-only, pre-season, revision-checked, idempotent server command. It requires the active published Dynasty settings version and atomically creates future picks, salary ledgers, orphan states, advanced draft plans, season revision, command receipt, and immutable audit. It never reads, imports, or promotes provider assets.
+- Phase 8 trades now resolve initialized permanent future-pick documents before the earlier compatibility ledger and transfer both canonical owner fields in the same trade commit.
+
+Exact Phase 12 implementation files: `shared/leagueSettings.ts`, `shared/nativeAdvancedLeague.ts`, and `shared/leagueCommandProtocol.ts`; `server/league-commands/nativeAdvancedLeagueCommands.ts`, `nativeTradeCommands.ts`, `executeLeagueCommand.ts`, and `commandSupport.ts`; `src/features/league-settings/AdvancedLeagueSettingsSection.tsx`, `CommissionerSettingsWorkspace.tsx`, and `commissioner-settings.css`; `src/features/league-domain/leagueCommands.ts`; and `firestore.rules`. Coverage is in `nativeAdvancedLeague.test.ts`, `nativeAdvancedLeagueCommands.test.ts`, `advancedLeagueSettings.test.tsx`, `nativeTradeCommands.test.ts`, `leagueSettings.test.ts`, `commissionerSettingsWorkspace.test.tsx`, and `nativeLeagueFirestoreRules.test.ts`.
+
+Phase 12 compatibility/rollback: legacy settings parse into explicit disabled defaults; redraft and keeper screens do not render the contract matrix. Disabling the Dynasty route/UI does not delete initialized assets. Provider pick/contract data remains imported evidence until a separately authorized parity migration; there is no page-load copy or dual-write.
+
+## Final completion gate — season lifecycle and cross-phase acceptance
+
+- `award_native_champion` requires commissioner authority, an exact current season revision, exact published standings and bracket revisions, two different active playoff qualifiers, and a written reason. The award, completed season state, audit, notification, and read-model invalidation commit together.
+- `archive_native_season` requires the authoritative champion award and freezes the championship/settings revision references plus canonical ledger counts without deleting operational records.
+- `renew_native_league` requires that current season archive, derives a permanent new GameHQ season ID, preserves franchise identity/team presentation, clears seasonal rosters and budgets, and carries the last published rules forward as an editable draft.
+- `export_native_league` produces an immutable commissioner-only manifest and ordered JSON chunks containing the league, current season, settings, memberships, roles, commands/audits, rosters, drafts, lineups, scoring, waivers, trades, competition, awards, archives, Pulse, and advanced ledgers. The browser reassembles and downloads the exact snapshot.
+- The native player market uses windowed rendering rather than a fixed first-page slice. Heavy league/history screens remain route-lazy. Commissioner rulebook changes install both page-unload and in-app-link confirmation guards while dirty. Deadline labels show league and user-local time when their timezones differ.
+- Desktop and 390 x 844 browser tests cover the stable manager navigation/authority contract and the inaccessible-commissioner guard. The complete requirement-to-test trace is in `docs/fantasy-platform/final-acceptance-matrix.md`.
+
+Exact completion-gate implementation files: `shared/leagueCommandProtocol.ts`; `server/league-commands/nativeSeasonLifecycleCommands.ts`, `executeLeagueCommand.ts`, `commandSupport.ts`; `src/features/league-domain/leagueCommands.ts`, `types.ts`, and `firebaseLeagueRepository.ts`; `src/features/league-settings/CommissionerSeasonLifecycle.tsx`, `nativeLeagueExport.ts`, `CommissionerSettingsWorkspace.tsx`, and `commissioner-settings.css`; `src/features/native-waivers/NativeWaiverWorkspace.tsx` and `native-waivers.css`; `firestore.rules`; and `e2e/native-league-routing.e2e.ts`. Coverage is in `nativeSeasonLifecycleCommands.test.ts`, `nativeLineupCommands.test.ts`, `nativeLeagueFirestoreRules.test.ts`, and the full desktop/mobile Playwright suite.
+
+Completion-gate compatibility/rollback: no source record is deleted. Hiding the lifecycle UI leaves awards, archives, exports, receipts, and audits intact. A renewal never mutates the archived season or reuses seasonal roster ownership. Connected-provider leagues remain read-only and cannot call these commands.
 
 ## Change-management rule for every implementation phase
 
