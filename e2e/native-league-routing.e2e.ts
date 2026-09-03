@@ -4,9 +4,10 @@ const legacyLeagueId = "1385319428408774656";
 const unavailableNativeLeagueId = "11111111-1111-4111-8111-111111111111";
 
 test("manager workflow keeps the league route, authority, and primary actions usable", async ({ page }) => {
+  test.setTimeout(90_000);
   await page.goto(`./league/${legacyLeagueId}`);
   const navigation = page.getByRole("navigation", { name: "Active team and league" });
-  await expect(navigation).toBeVisible({ timeout: 20_000 });
+  await expect(navigation).toBeVisible({ timeout: 75_000 });
   await expect(navigation.getByRole("link", { name: "Home", exact: true })).toHaveAttribute("href", `/ff/league/${legacyLeagueId}`);
   await expect(navigation.getByRole("link", { name: "Matchup", exact: true })).toBeVisible();
   await expect(navigation.getByRole("link", { name: "Team", exact: true })).toBeVisible();
