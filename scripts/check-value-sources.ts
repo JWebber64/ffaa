@@ -53,6 +53,7 @@ type SleeperPlayer = {
 const REPORT_PATH = path.resolve("reports/value-source-pulse.json");
 const FANTASY_SEASON = 2026;
 const SLEEPER_CACHE_PATH = path.resolve(`src/data/players-${FANTASY_SEASON}-sleeper.json`);
+const SLEEPER_PUBLIC_CACHE_PATH = path.resolve(`public/data/players-${FANTASY_SEASON}-sleeper.json`);
 const USER_AGENT = "FFAA value pulse (+local draft value monitor)";
 
 const HTTP_SOURCES = [
@@ -639,9 +640,13 @@ async function checkSleeperPlayers(
       const textResult = await fetchText(definition.url);
       const parsed = JSON.parse(textResult.text) as Record<string, unknown>;
       const normalized = normalizeSleeperPlayers(parsed);
-      await fs.writeFile(SLEEPER_CACHE_PATH, `${JSON.stringify(normalized, null, 2)}\n`, "utf8");
+      const serialized = `${JSON.stringify(normalized, null, 2)}\n`;
+      await Promise.all([
+        fs.writeFile(SLEEPER_CACHE_PATH, serialized, "utf8"),
+        fs.writeFile(SLEEPER_PUBLIC_CACHE_PATH, serialized, "utf8"),
+      ]);
       source.rowCount = normalized.length;
-      source.message = `${source.rowCount} Sleeper player IDs reachable and cached`;
+      source.message = `${source.rowCount} Sleeper player IDs reachable and cached for source and public runtime use`;
     } catch {
       source.message = "Reachable, but player map could not be counted";
       source.status = "warning";
