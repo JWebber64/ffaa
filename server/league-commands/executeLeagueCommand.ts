@@ -26,6 +26,7 @@ import {
   executeProcessWaiverRun,
   executeSubmitWaiverClaimGroup,
 } from "./nativeWaiverCommands";
+import { executeCounterTradeOffer, executeCreateTradeOffer, executeExpireTradeOffer, executeRespondTradeOffer, executeReviewTradeOffer } from "./nativeTradeCommands";
 import type { LeagueCommandStore } from "./store";
 
 const COMMAND_TYPES = new Set<LeagueCommandType>([
@@ -40,6 +41,11 @@ const COMMAND_TYPES = new Set<LeagueCommandType>([
   "submit_waiver_claim_group",
   "process_waiver_run",
   "acquire_free_agent",
+  "create_trade_offer",
+  "counter_trade_offer",
+  "respond_trade_offer",
+  "review_trade_offer",
+  "expire_trade_offer",
   "save_settings_draft",
   "publish_settings",
   "restore_settings_version",
@@ -150,6 +156,11 @@ export async function executeLeagueCommand(input: {
   if (command.commandType === "acquire_free_agent") {
     return executeAcquireFreeAgent(shared as Parameters<typeof executeAcquireFreeAgent>[0]);
   }
+  if (command.commandType === "create_trade_offer") return executeCreateTradeOffer(shared as Parameters<typeof executeCreateTradeOffer>[0]);
+  if (command.commandType === "counter_trade_offer") return executeCounterTradeOffer(shared as Parameters<typeof executeCounterTradeOffer>[0]);
+  if (command.commandType === "respond_trade_offer") return executeRespondTradeOffer(shared as Parameters<typeof executeRespondTradeOffer>[0]);
+  if (command.commandType === "review_trade_offer") return executeReviewTradeOffer(shared as Parameters<typeof executeReviewTradeOffer>[0]);
+  if (command.commandType === "expire_trade_offer") return executeExpireTradeOffer(shared as Parameters<typeof executeExpireTradeOffer>[0]);
   if (command.commandType === "save_settings_draft") {
     return executeSaveSettingsDraft(shared as Parameters<typeof executeSaveSettingsDraft>[0]);
   }

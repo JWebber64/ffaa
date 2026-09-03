@@ -14,6 +14,11 @@ export type LeagueCommandType =
   | "submit_waiver_claim_group"
   | "process_waiver_run"
   | "acquire_free_agent"
+  | "create_trade_offer"
+  | "counter_trade_offer"
+  | "respond_trade_offer"
+  | "review_trade_offer"
+  | "expire_trade_offer"
   | "save_settings_draft"
   | "publish_settings"
   | "restore_settings_version"
@@ -165,6 +170,42 @@ export type AcquireFreeAgentPayload = {
   dropPlayerId: string;
 };
 
+export type TradeAssetType = "player" | "draft_pick" | "faab" | "salary" | "contract" | "keeper_right" | "conditional";
+export type TradeAssetInput = { type: TradeAssetType; id: string; amount?: number; metadata?: Record<string, unknown> };
+
+export type CreateTradeOfferPayload = {
+  fromFranchiseId: string;
+  toFranchiseId: string;
+  week: number;
+  expiresAt: string;
+  settingsVersionId: string;
+  offeredAssets: TradeAssetInput[];
+  requestedAssets: TradeAssetInput[];
+  message: string;
+};
+
+export type CounterTradeOfferPayload = CreateTradeOfferPayload & {
+  originalOfferId: string;
+  expectedOriginalRevision: number;
+};
+
+export type RespondTradeOfferPayload = {
+  offerId: string;
+  expectedOfferRevision: number;
+  response: "accept" | "reject";
+  week: number;
+  immediateCutPlayerIds: string[];
+};
+
+export type ReviewTradeOfferPayload = {
+  offerId: string;
+  expectedOfferRevision: number;
+  decision: "approve" | "reject";
+  reason: string;
+};
+
+export type ExpireTradeOfferPayload = { offerId: string; expectedOfferRevision: number };
+
 export type SaveSettingsDraftPayload = {
   settings: LeagueSettingsV1;
 };
@@ -282,6 +323,11 @@ export type LeagueCommandPayloadByType = {
   submit_waiver_claim_group: SubmitWaiverClaimGroupPayload;
   process_waiver_run: ProcessWaiverRunPayload;
   acquire_free_agent: AcquireFreeAgentPayload;
+  create_trade_offer: CreateTradeOfferPayload;
+  counter_trade_offer: CounterTradeOfferPayload;
+  respond_trade_offer: RespondTradeOfferPayload;
+  review_trade_offer: ReviewTradeOfferPayload;
+  expire_trade_offer: ExpireTradeOfferPayload;
   save_settings_draft: SaveSettingsDraftPayload;
   publish_settings: PublishSettingsPayload;
   restore_settings_version: RestoreSettingsVersionPayload;

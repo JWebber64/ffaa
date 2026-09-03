@@ -404,3 +404,17 @@ leagues/{gamehqLeagueId}/seasons/{seasonId}/waiverReceipts/{receiptId}
 `playerStates` is the queryable acquisition-state projection over the unique Phase 3 player asset locks. It carries position, owner, free-agent/waiver/protected/locked/ineligible/trade-block status, dropped-until eligibility, and revision. `waiverTeamStates` carries FAAB, priority, standings rank, weekly acquisition counts, and revision. Pool initialization reconciles rather than overwrites existing ownership and protected states.
 
 Pending `waiverClaims` keep ordered conditional alternatives and bids private to the submitting user and commissioners. `waiverRuns` records the exact processing boundary and is commissioner-only. Member-readable `waiverReceipts` explain evaluated alternatives, award/failure, winning and optionally next-highest bid, priority before/after, tiebreaker, failed alternatives, add/drop, remaining FAAB, processing time, and settings version. All mutations are server commands and ownership changes co-commit `seasonTeams`, `assetLocks`, `rosterTransactions`, public/private audit, and command receipts.
+
+## Implemented Phase 8 trade persistence
+
+```text
+leagues/{gamehqLeagueId}/seasons/{seasonId}/tradeOffers/{offerId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/tradeAssetLocks/{assetKey}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/tradeReceipts/{offerId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/draftPickStates/{assetId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/tradeableAssets/{assetId}
+```
+
+`tradeOffers` is the revisioned workflow record for two teams and their complete asset arrays, timestamps, counter lineage, response, review policy/window, league votes, disclosure, and final ledger references. Offers are member-readable and server-written. Accepted offers awaiting review create unique `tradeAssetLocks`; only commissioners may inspect those internal reservation rows.
+
+`tradeReceipts` is the immutable public outcome with assets for each party, sent/accepted/processed timestamps, policy/votes/approval disclosure, roster and cap effects, settings version, processing result, transaction ID, and reversal reference. Final processing co-commits both `seasonTeams`, player and advanced ownership projections, FAAB states, permanent player locks, roster transaction, audit/command receipts, notifications, invalidations, and season revision. `draftPickStates` and `tradeableAssets` are additive advanced-asset authorities; Phase 8 does not fabricate them and rejects a transfer until the appropriate owner state exists.

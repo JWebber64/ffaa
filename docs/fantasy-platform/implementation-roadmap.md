@@ -14,8 +14,8 @@ The roadmap follows the requested phases in order. Each phase is a bounded chang
 | 5 | Weekly operation and player-level locks | Implemented for native lineups, week game states, ordered fallbacks, and emergency reopenings | Cross-device lineups and settings-derived lock behavior |
 | 6 | Provider-agnostic scoring | Implemented with normalized events, deterministic replay, corrections, freshness, and native live matchup UI | Deterministic replay/corrections and live freshness UI |
 | 7 | Free agents and waivers | Implemented with canonical player states, complete redraft waiver settings, ordered claim groups, atomic processing, and receipts | Atomic reproducible processing and receipts |
-| 8 | Two-team trades | Next phase; the roster transaction and asset-lock authorities are available | Atomic asset locks/review/receipts |
-| 9 | Schedule, standings, playoffs | Blocked on scoring/results/settings | Reproducible standings, explainable seeds, valid brackets |
+| 8 | Two-team trades | Implemented with two-team offers/counters, atomic player and extensible asset transfers, review/voting, conflict controls, and receipts | Atomic asset locks/review/receipts |
+| 9 | Schedule, standings, playoffs | Next phase; native scoring/results/settings are available | Reproducible standings, explainable seeds, valid brackets |
 | 10 | Operational UI consolidation | Iterative after each operational domain, final pass after 9 | Desktop/mobile parity and dense operational surfaces |
 | 11 | League Pulse, native history, decision tools, mirror/migrate | Blocked on event/audit/read models | Native actions feed history and explainable activity |
 | 12 | Keeper, dynasty, salary cap | Blocked on reliable native redraft | Advanced assets/contracts without burdening redraft |
@@ -329,11 +329,17 @@ Phase 7 compatibility/rollback: no connected-provider roster, waiver, or FAAB da
 
 ## Phase 8 — trades
 
-- Two-team offers, counters, expiry, acceptance, review, asset locks, atomic transactions.
-- Direct disable setting and commissioner conflict/secondary approval policy.
-- Add roster/cap effects and reversal receipts.
+- Implemented two-team offers, counters, rejection, explicit expiry, acceptance, fixed-period review, commissioner/co-commissioner review, majority league voting, asset reservations, and atomic completion.
+- Player and FAAB transfers are available in the native Trade Center. The server ledger also accepts owned current/future draft picks, salary, contracts, keeper rights, and conditional assets once those advanced states exist.
+- Published settings can directly disable trades, choose the review path, enforce post-trade roster legality by rejection, grace period, immediate cuts, or commissioner review, set a deadline, and require an uninvolved secondary approval when a commissioner-controlled team participates.
+- Accepted-review assets receive unique preconditioned locks, so the same player, pick, FAAB balance, or advanced right cannot enter two accepted trades. Finalization rechecks ownership, live-game locks, deadline, FAAB, roster size, position limits, and the exact settings version before one commit updates both rosters, ownership projections, asset locks, balances, season revision, transaction ledger, audit, notifications, invalidations, and the immutable trade receipt.
+- The native Transactions route renders the two-team builder, roster/FAAB selections, counters, accept/reject controls, review reasons/vote totals, active states, and completed receipts. Connected leagues keep the imported history route.
 
 Gate: assets cannot be double-traded and all reviews/commissioner involvement are visible.
+
+Exact Phase 8 implementation files: `shared/leagueSettings.ts` and `shared/leagueCommandProtocol.ts`; `server/league-commands/nativeTradeCommands.ts`, `executeLeagueCommand.ts`, and `commandSupport.ts`; `src/features/native-trades/**`; `src/features/league-domain/leagueCommands.ts` and `types.ts`; `src/features/league-settings/CommissionerSettingsWorkspace.tsx`; `src/screens/LeagueTransactions.tsx`; `src/App.tsx`; and `firestore.rules`. Coverage is in `nativeTradeCommands.test.ts`, `nativeTradeWorkspace.test.tsx`, `leagueSettings.test.ts`, and `nativeLeagueFirestoreRules.test.ts`.
+
+Phase 8 compatibility/rollback: connected-provider transactions remain read-only and retain the existing normalized history adapter. Removing the native Transactions branch restores that route without deleting accepted offers, trade receipts, roster transactions, asset locks, or audits. Phase 8 does not infer advanced asset ownership; those assets become transferable only when an explicit authoritative state exists.
 
 ## Phase 9 — schedule, standings, playoffs
 

@@ -19,6 +19,10 @@ import {
   type SubmitWaiverClaimGroupPayload,
   type ProcessWaiverRunPayload,
   type AcquireFreeAgentPayload,
+  type CreateTradeOfferPayload,
+  type CounterTradeOfferPayload,
+  type RespondTradeOfferPayload,
+  type ReviewTradeOfferPayload,
 } from "../../../shared/leagueCommandProtocol";
 import { ensurePermanentFirebaseUserId } from "../../lib/authSession";
 import { httpLeagueCommandService } from "./httpLeagueCommandService";
@@ -216,6 +220,17 @@ export async function acquireFreeAgentCommand(input: {
   const actorUserId = await ensurePermanentFirebaseUserId();
   return httpLeagueCommandService.execute({ commandId: input.commandId ?? createLeagueCommandId(), commandType: "acquire_free_agent", actorUserId, leagueId: input.leagueId, seasonId: input.seasonId, expectedRevision: input.expectedRevision, payload: input.payload, reason: "Acquire a free agent", clientCreatedAt: nowIso() });
 }
+
+async function tradeCommand<T extends "create_trade_offer" | "counter_trade_offer" | "respond_trade_offer" | "review_trade_offer" | "expire_trade_offer">(input: { commandType: T; leagueId: string; seasonId: string; expectedRevision: number; payload: import("../../../shared/leagueCommandProtocol").LeagueCommandPayloadByType[T]; reason: string; commandId?: string }) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({ commandId: input.commandId ?? createLeagueCommandId(), commandType: input.commandType, actorUserId, leagueId: input.leagueId, seasonId: input.seasonId, expectedRevision: input.expectedRevision, payload: input.payload, reason: input.reason.trim().replace(/\s+/gu, " ").slice(0, 240), clientCreatedAt: nowIso() });
+}
+
+export function createTradeOfferCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: CreateTradeOfferPayload; commandId?: string }) { return tradeCommand({ ...input, commandType: "create_trade_offer", reason: input.payload.message || "Send two-team trade offer" }); }
+export function counterTradeOfferCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: CounterTradeOfferPayload; commandId?: string }) { return tradeCommand({ ...input, commandType: "counter_trade_offer", reason: input.payload.message || "Counter two-team trade offer" }); }
+export function respondTradeOfferCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: RespondTradeOfferPayload; commandId?: string }) { return tradeCommand({ ...input, commandType: "respond_trade_offer", reason: `${input.payload.response} trade offer` }); }
+export function reviewTradeOfferCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: ReviewTradeOfferPayload; commandId?: string }) { return tradeCommand({ ...input, commandType: "review_trade_offer", reason: input.payload.reason }); }
+export function expireTradeOfferCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: { offerId: string; expectedOfferRevision: number }; commandId?: string }) { return tradeCommand({ ...input, commandType: "expire_trade_offer", reason: "Expire unanswered trade offer" }); }
 
 export async function saveSettingsDraftCommand(input: {
   leagueId: string;

@@ -28,6 +28,7 @@ const MyHQ = lazy(() => import("./screens/MyHQ"));
 const MyTeams = lazy(() => import("./screens/MyTeams"));
 const LeagueOverview = lazy(() => import("./screens/LeagueOverview"));
 const LeaguePlayers = lazy(() => import("./screens/LeaguePlayers"));
+const LeagueTransactions = lazy(() => import("./screens/LeagueTransactions"));
 const LeagueManage = lazy(() => import("./screens/LeagueManage"));
 const LeagueRules = lazy(() => import("./screens/LeagueRules"));
 const LeagueDraft = lazy(() => import("./screens/LeagueDraft"));
@@ -54,12 +55,6 @@ function ActiveLeagueRedirect({ destination }: { destination: string }) {
 function ActiveLeagueTeamRedirect() {
   const { teamId = "" } = useParams();
   return <ActiveLeagueRedirect destination={`teams/${encodeURIComponent(teamId)}`} />;
-}
-
-function LeagueSectionRedirect({ destination }: { destination: string }) {
-  const location = useLocation();
-  const { leagueId = "" } = useParams();
-  return <Navigate to={`/league/${encodeURIComponent(leagueId)}/${destination}${location.search}`} replace />;
 }
 
 function LegacyHistoryRedirect({ section }: { section: string }) {
@@ -130,7 +125,7 @@ function AppRoutes() {
             <Route path="teams/:teamId" element={<LeagueTeams />} />
             <Route path="matchups" element={<LeagueMatchups />} />
             <Route path="schedule" element={<LeagueMatchups />} />
-            <Route path="transactions" element={<LeagueSectionRedirect destination="history/transactions" />} />
+            <Route path="transactions" element={<LeagueTransactions />} />
             <Route path="history/*" element={<LeagueHistoryApp />} />
             <Route path="rules" element={<LeagueRules />} />
             <Route path="draft" element={<LeagueDraft />} />
@@ -145,6 +140,7 @@ function AppRoutes() {
             <Route path="leaderboards/*" element={<LegacyHistoryRedirect section="leaderboards" />} />
             <Route path="drafts/*" element={<LegacyHistoryRedirect section="drafts" />} />
             <Route path="payouts/*" element={<LegacyHistoryRedirect section="payouts" />} />
+            <Route path="trades" element={<LeagueTransactions />} />
             <Route path="trades/*" element={<LegacyHistoryRedirect section="trades" />} />
             <Route path="waivers/*" element={<LegacyHistoryRedirect section="waivers" />} />
             <Route path="rivalries/*" element={<LegacyHistoryRedirect section="rivalries" />} />

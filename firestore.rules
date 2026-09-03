@@ -180,6 +180,34 @@ service cloud.firestore {
           allow get, list: if isCanonicalMember();
           allow create, update, delete: if false;
         }
+
+        // Active offers and immutable completed receipts are visible to league
+        // members. Every mutation is performed by the authenticated command
+        // service so asset reservations and two-team transfers stay atomic.
+        match /tradeOffers/{offerId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /tradeReceipts/{receiptId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /tradeAssetLocks/{lockId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+
+        match /draftPickStates/{assetId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /tradeableAssets/{assetId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
       }
 
       match /franchises/{franchiseId} {

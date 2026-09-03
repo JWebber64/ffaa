@@ -341,3 +341,12 @@ Deliberate remaining direct legacy writes are season publication, claims/members
 - The protected scheduler endpoint is cadence-independent and has deterministic retry IDs. Vercel Hobby currently permits only the configured daily recovery invocation; the Players screen exposes immediate commissioner processing at each league's stored custom due time. Exact unattended sub-daily cadence requires upgrading the scheduler host/plan, not rewriting claim logic.
 - Pending bids are readable only by the submitting account and commissioners. Completed receipts show the outcome and allowed explanation fields to league members; all player-market browser writes remain denied.
 - Native `/players` is now an operational player market. Connected leagues keep the existing read-only recommendation and Stats Explorer behavior.
+
+## Phase 8 implementation delta
+
+- Canonical native seasons now own the full two-team offer lifecycle: create, counter, reject, expire, accept, review, vote, process, and receipt. Connected-provider transaction history remains unchanged and read-only.
+- Every new offer snapshots its teams, Week, expiry, published settings version, message, and complete assets for both sides. The server revalidates ownership on creation and again at acceptance/final processing.
+- Accepted trades awaiting review reserve every asset with create-only locks. Concurrent acceptance involving the same player, pick, FAAB balance, contract, keeper right, salary, or conditional asset fails without partial roster mutation.
+- Immediate, commissioner, co-commissioner, fixed-period, and majority league-vote paths are explicit. Commissioner-controlled-team conflicts are derived across the league's active authority and team-control grants; configured conflicts require an uninvolved reviewer and remain disclosed in the offer and receipt.
+- Atomic completion transfers players and FAAB now, supports the advanced asset ledger when those states are initialized, rechecks live player locks and the trade deadline, applies the configured roster policy, and co-commits the universal transaction, public/private audit, season revision, notifications, read-model invalidation, and immutable receipt.
+- Native `/transactions` and `/trades` render an operational Trade Center. The connected-league path still resolves to normalized imported transactions.

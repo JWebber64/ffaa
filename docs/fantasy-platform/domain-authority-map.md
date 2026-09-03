@@ -352,5 +352,9 @@ An imported league owner ID is display context. It never changes these labels or
 | Team waiver economy | `seasons/{seasonId}/waiverTeamStates/{franchiseId}` | FAAB, rolling priority, standings rank, weekly counts, and revision under the exact published settings version |
 | Conditional waiver claim | `seasons/{seasonId}/waiverClaims/{claimId}` | Ordered alternatives and secret bids; readable only by submitter and current commissioners until converted to a receipt |
 | Waiver processing and receipt | `seasons/{seasonId}/waiverRuns/{runId}` and `waiverReceipts/{receiptId}` | Idempotent atomic run trace and member-readable explanation of each claim outcome |
+| Native trade offer | `seasons/{seasonId}/tradeOffers/{offerId}` | Two-team proposal/revision authority for send, counter, response, review, league vote, expiry, and completion |
+| Accepted-trade reservation | `seasons/{seasonId}/tradeAssetLocks/{assetKey}` | Create-only temporary lock prevents one asset or team FAAB balance from entering two accepted pending-review trades |
+| Trade receipt | `seasons/{seasonId}/tradeReceipts/{offerId}` | Immutable member-readable assets, parties, timestamps, policy/votes, disclosed approval, roster/cap effects, settings version, result, and ledger linkage |
+| Transferable advanced asset | `seasons/{seasonId}/draftPickStates/{assetId}` or `tradeableAssets/{assetId}` | Explicit ownership authority for picks, salary, contracts, keeper rights, and conditional assets; never inferred by the trade UI |
 
 The first implementation does not infer authority from `managerProviderUserId`, `leagueOwnerProviderUserId`, Sleeper roster ownership, or any other imported profile field.

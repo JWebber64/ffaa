@@ -448,6 +448,57 @@ export type NativeWaiverReceipt = {
   processedAt: string;
 };
 
+export type NativeTradeAsset = { type: "player" | "draft_pick" | "faab" | "salary" | "contract" | "keeper_right" | "conditional"; id: string; amount: number | null; metadata: Record<string, unknown> };
+export type NativeTradeOffer = {
+  id: string;
+  fromFranchiseId: string;
+  toFranchiseId: string;
+  actorUserId: string;
+  week: number;
+  settingsVersionId: string;
+  offeredAssets: NativeTradeAsset[];
+  requestedAssets: NativeTradeAsset[];
+  message: string;
+  status: "sent" | "countered" | "rejected" | "expired" | "accepted_pending_review" | "review_rejected" | "completed";
+  reviewPolicy: string;
+  reviewEndsAt: string;
+  votes: Record<string, string>;
+  rosterEffects: Record<string, unknown>;
+  counterOfOfferId: string;
+  counteredByOfferId: string;
+  acceptedAt: string;
+  acceptedBy: string;
+  reviewedAt: string;
+  reviewedBy: string;
+  commissionerInvolvement: string[];
+  rosterTransactionId: string;
+  reversalTransactionId: string;
+  expiresAt: string;
+  sentAt: string;
+  revision: number;
+};
+
+export type NativeTradeReceipt = {
+  id: string;
+  offerId: string;
+  fromFranchiseId: string;
+  toFranchiseId: string;
+  offeredAssets: NativeTradeAsset[];
+  requestedAssets: NativeTradeAsset[];
+  sentAt: string;
+  acceptedAt: string;
+  processedAt: string;
+  reviewPolicy: string;
+  votes: Record<string, string>;
+  commissionerInvolvement: string[];
+  rosterEffects: Record<string, unknown>;
+  capEffects: Record<string, unknown>;
+  settingsVersionId: string;
+  processingResult: string;
+  rosterTransactionId: string;
+  reversalTransactionId: string;
+};
+
 export type LeagueAuthorityLabel =
   | "Native GameHQ League — read/write"
   | "Connected Sleeper League — read-only"
