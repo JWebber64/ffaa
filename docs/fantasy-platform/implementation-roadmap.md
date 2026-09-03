@@ -347,7 +347,19 @@ Phase 8 compatibility/rollback: connected-provider transactions remain read-only
 - Reproducible standings and explanation trace for every tiebreak/seed.
 - Versioned configurable bracket engine and audited corrections.
 
+Implemented Phase 9:
+
+- Published schedule rules now cover odd/even leagues, one or more games per team each week, scheduled/full-week and generated slot byes, balanced/division-weighted/custom construction, division/conference targets, protected rivalries, optional two-week series, median opponents, all-play, configurable regular-season length, and an ordered standings tiebreak list.
+- The deterministic generator uses an explicit seed. Validation rejects missing teams, self-matchups, repeated IDs/pairs, team slot conflicts, incomplete doubleheader slots, bye/game conflicts, and games outside the regular season; it warns on materially uneven games, byes, division games, and repeat opponents.
+- Weekly final/corrected result records are the sole standings inputs. Rebuilds derive overall/division/median/all-play records, PF, PA, potential points, lineup efficiency, streak, remaining schedule strength, playoff probability/state, and a human-readable first-separating tiebreak explanation. Doubleheaders change physical records without double-counting a team's weekly PF or median result.
+- Playoffs support arbitrary field sizes including seven, computed byes, fixed or reseeded configuration, one/two-week rounds, consolation or toilet formats, loser-advances display, third-place games, and audited manual qualifiers. Current schedules, standings, results, and brackets are member-readable; immutable schedule/bracket versions and score-correction revisions are commissioner-only.
+- Native `/schedule` is the versioned commissioner schedule/results workspace and native `/standings` is the official table and published bracket. Connected providers retain their prior read-only matchups and overview routes.
+
 Gate: odd-team, median, tiebreak, and playoff fixtures reproduce exact results.
+
+Exact Phase 9 implementation files: `shared/leagueSettings.ts`, `shared/nativeCompetition.ts`, and `shared/leagueCommandProtocol.ts`; `server/league-commands/nativeCompetitionCommands.ts`, `executeLeagueCommand.ts`, and `commandSupport.ts`; `src/features/native-competition/**`; `src/features/league-domain/leagueCommands.ts` and `types.ts`; `src/features/league-settings/CommissionerSettingsWorkspace.tsx`; `src/screens/LeagueSchedule.tsx`, `LeagueOverview.tsx`, and `App.tsx`; and `firestore.rules`. Coverage is in `nativeCompetition.test.ts`, `nativeCompetitionCommands.test.ts`, `nativeCompetitionWorkspace.test.tsx`, `leagueSettings.test.ts`, and `nativeLeagueFirestoreRules.test.ts`.
+
+Phase 9 compatibility/rollback: no connected-provider schedule, score, standing, or bracket is copied or dual-written. Removing the native branches for `/schedule` and `/standings` restores the existing connected views while canonical versions, results, corrections, brackets, commands, and audits remain immutable evidence.
 
 ## Phase 10 — operational UI consolidation
 

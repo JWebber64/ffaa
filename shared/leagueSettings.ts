@@ -34,6 +34,20 @@ export type LeagueSettingsV1 = {
   schedule: {
     regularSeasonWeeks: number;
     playoffTeams: number;
+    gamesPerWeek: number;
+    balance: "balanced" | "division_weighted" | "custom";
+    divisionGames: number;
+    conferenceGames: number;
+    medianOpponent: boolean;
+    allPlay: boolean;
+    twoWeekMatchups: boolean;
+    standingsTiebreakers: Array<"winning_percentage" | "head_to_head" | "division_percentage" | "points_for" | "all_play_percentage" | "potential_points" | "random_draw">;
+    playoffReseeding: boolean;
+    playoffRoundWeeks: 1 | 2;
+    consolationBracket: boolean;
+    toiletBowl: boolean;
+    loserAdvances: boolean;
+    thirdPlaceGame: boolean;
   };
   transactions: {
     waiverMode: "faab" | "rolling" | "reverse_standings" | "weekly_reset" | "continuous" | "first_come_first_served";
@@ -142,6 +156,20 @@ export function createRedraftLeagueSettings(timezone = "UTC"): LeagueSettingsV1 
     schedule: {
       regularSeasonWeeks: 14,
       playoffTeams: 6,
+      gamesPerWeek: 1,
+      balance: "balanced",
+      divisionGames: 0,
+      conferenceGames: 0,
+      medianOpponent: false,
+      allPlay: false,
+      twoWeekMatchups: false,
+      standingsTiebreakers: ["winning_percentage", "head_to_head", "points_for"],
+      playoffReseeding: false,
+      playoffRoundWeeks: 1,
+      consolationBracket: true,
+      toiletBowl: false,
+      loserAdvances: false,
+      thirdPlaceGame: true,
     },
     transactions: {
       waiverMode: "faab",
@@ -246,6 +274,20 @@ export function parseLeagueSettings(value: unknown, timezoneFallback = "UTC") {
     schedule: {
       regularSeasonWeeks: numberValue(schedule.regularSeasonWeeks, defaults.schedule.regularSeasonWeeks),
       playoffTeams: numberValue(schedule.playoffTeams, defaults.schedule.playoffTeams),
+      gamesPerWeek: numberValue(schedule.gamesPerWeek, defaults.schedule.gamesPerWeek),
+      balance: enumValue(schedule.balance, ["balanced", "division_weighted", "custom"] as const, defaults.schedule.balance),
+      divisionGames: numberValue(schedule.divisionGames, defaults.schedule.divisionGames),
+      conferenceGames: numberValue(schedule.conferenceGames, defaults.schedule.conferenceGames),
+      medianOpponent: booleanValue(schedule.medianOpponent, defaults.schedule.medianOpponent),
+      allPlay: booleanValue(schedule.allPlay, defaults.schedule.allPlay),
+      twoWeekMatchups: booleanValue(schedule.twoWeekMatchups, defaults.schedule.twoWeekMatchups),
+      standingsTiebreakers: Array.isArray(schedule.standingsTiebreakers) ? schedule.standingsTiebreakers.filter((entry): entry is LeagueSettingsV1["schedule"]["standingsTiebreakers"][number] => typeof entry === "string" && ["winning_percentage", "head_to_head", "division_percentage", "points_for", "all_play_percentage", "potential_points", "random_draw"].includes(entry)) : defaults.schedule.standingsTiebreakers,
+      playoffReseeding: booleanValue(schedule.playoffReseeding, defaults.schedule.playoffReseeding),
+      playoffRoundWeeks: numberValue(schedule.playoffRoundWeeks, defaults.schedule.playoffRoundWeeks) === 2 ? 2 : 1,
+      consolationBracket: booleanValue(schedule.consolationBracket, defaults.schedule.consolationBracket),
+      toiletBowl: booleanValue(schedule.toiletBowl, defaults.schedule.toiletBowl),
+      loserAdvances: booleanValue(schedule.loserAdvances, defaults.schedule.loserAdvances),
+      thirdPlaceGame: booleanValue(schedule.thirdPlaceGame, defaults.schedule.thirdPlaceGame),
     },
     transactions: {
       waiverMode: enumValue(transactions.waiverMode, ["faab", "rolling", "reverse_standings", "weekly_reset", "continuous", "first_come_first_served"] as const, defaults.transactions.waiverMode),
@@ -300,6 +342,9 @@ export function validateLeagueSettings(settings: LeagueSettingsV1): LeagueSettin
     integerIssue("teamCount", "Team count", settings.teamCount, 4, 32),
     integerIssue("schedule.regularSeasonWeeks", "Regular-season weeks", settings.schedule.regularSeasonWeeks, 1, 18),
     integerIssue("schedule.playoffTeams", "Playoff teams", settings.schedule.playoffTeams, 2, 16),
+    integerIssue("schedule.gamesPerWeek", "Games per week", settings.schedule.gamesPerWeek, 1, 4),
+    integerIssue("schedule.divisionGames", "Division games", settings.schedule.divisionGames, 0, 18),
+    integerIssue("schedule.conferenceGames", "Conference games", settings.schedule.conferenceGames, 0, 18),
     integerIssue("transactions.tradeDeadlineWeek", "Trade deadline week", settings.transactions.tradeDeadlineWeek, 1, 18),
     integerIssue("lineup.lineupWeekCount", "Lineup weeks", settings.lineup.lineupWeekCount, 1, 18),
     integerIssue("draft.pickSeconds", "Pick timer", settings.draft.pickSeconds, 15, 600),
@@ -324,7 +369,7 @@ export function validateLeagueSettings(settings: LeagueSettingsV1): LeagueSettin
   const rosterSize = settings.rosterSlots.filter((row) => row.slot !== "IR").reduce((sum, row) => sum + row.count, 0);
   if (rosterSize < 8 || rosterSize > 30) issues.push({ field: "rosterSlots", message: "Each team must draft between 8 and 30 players, excluding IR." });
   if (settings.schedule.playoffTeams > settings.teamCount) issues.push({ field: "schedule.playoffTeams", message: "Playoff teams cannot exceed the league team count." });
-  if (settings.schedule.playoffTeams % 2 !== 0) issues.push({ field: "schedule.playoffTeams", message: "Playoff team count must be even." });
+  if (!settings.schedule.standingsTiebreakers.length || settings.schedule.standingsTiebreakers[0] !== "winning_percentage" || new Set(settings.schedule.standingsTiebreakers).size !== settings.schedule.standingsTiebreakers.length) issues.push({ field: "schedule.standingsTiebreakers", message: "Standings tiebreakers must be unique and begin with winning percentage." });
   if (settings.transactions.tradeDeadlineWeek > settings.schedule.regularSeasonWeeks) issues.push({ field: "transactions.tradeDeadlineWeek", message: "Trade deadline must fall within the regular season." });
   if (settings.lineup.lineupWeekCount < settings.schedule.regularSeasonWeeks) issues.push({ field: "lineup.lineupWeekCount", message: "Lineup weeks must include the entire regular season." });
   if (!settings.transactions.processingDays.length || settings.transactions.processingDays.some((day) => !Number.isInteger(day) || day < 0 || day > 6) || new Set(settings.transactions.processingDays).size !== settings.transactions.processingDays.length) issues.push({ field: "transactions.processingDays", message: "Choose unique waiver processing weekdays from 0 through 6." });
@@ -365,7 +410,7 @@ export function simulateLeagueSettings(settings: LeagueSettingsV1): LeagueSettin
     benchPerTeam,
     reservePerTeam,
     draftedPlayers,
-    matchupsPerWeek: Math.floor(settings.teamCount / 2),
+    matchupsPerWeek: Math.floor(settings.teamCount / 2) * settings.schedule.gamesPerWeek,
     byeTeamsPerWeek: settings.teamCount % 2,
     playoffByes: bracketSize - settings.schedule.playoffTeams,
     auctionPool: settings.draft.format === "auction" ? settings.teamCount * settings.draft.auctionBudget : null,
@@ -386,7 +431,7 @@ export function buildLeagueConstitution(settings: LeagueSettingsV1): LeagueConst
     { title: "League membership", paragraphs: [`This is a ${settings.teamCount}-team redraft league. ${settings.allowMultipleTeamsPerUser ? "A manager may control multiple franchises." : "A manager may control only one franchise."} ${settings.allowMultipleManagersPerTeam ? "Co-managers are allowed." : "Each franchise has one manager."}`] },
     { title: "Roster and draft", paragraphs: [`Each team uses ${rosterSummary(settings)}. That produces ${impact.draftedPlayers} drafted players league-wide, excluding IR.`, draftText] },
     { title: "Scoring", paragraphs: [`The league uses ${scoringLabel} scoring: ${settings.scoring.receptionPoints} points per reception, 1 point per ${settings.scoring.passingYardsPerPoint} passing yards, ${settings.scoring.passingTouchdown} per passing touchdown, ${settings.scoring.interception} per interception, 1 point per ${settings.scoring.rushingReceivingYardsPerPoint} rushing or receiving yards, and ${settings.scoring.rushingReceivingTouchdown} per rushing or receiving touchdown.`] },
-    { title: "Schedule and playoffs", paragraphs: [`The regular season lasts ${settings.schedule.regularSeasonWeeks} weeks. ${settings.schedule.playoffTeams} teams qualify for the playoffs${impact.playoffByes ? `, with ${impact.playoffByes} first-round bye${impact.playoffByes === 1 ? "" : "s"}` : ""}.`] },
+    { title: "Schedule and playoffs", paragraphs: [`The regular season lasts ${settings.schedule.regularSeasonWeeks} weeks with ${settings.schedule.gamesPerWeek} scheduled game${settings.schedule.gamesPerWeek === 1 ? "" : "s"} per team per week${settings.schedule.medianOpponent ? " plus a league-median result" : ""}${settings.schedule.allPlay ? " and all-play tracking" : ""}. ${settings.schedule.playoffTeams} teams qualify for the playoffs${impact.playoffByes ? `, with ${impact.playoffByes} first-round bye${impact.playoffByes === 1 ? "" : "s"}` : ""}; rounds last ${settings.schedule.playoffRoundWeeks} week${settings.schedule.playoffRoundWeeks === 1 ? "" : "s"}${settings.schedule.playoffReseeding ? " and reseed" : " in a fixed bracket"}.`] },
     { title: "Waivers and trades", paragraphs: [`Player acquisition uses ${settings.transactions.waiverMode === "faab" ? `$${settings.transactions.faabBudget} FAAB` : settings.transactions.waiverMode.replace(/_/gu, " ")}. Claims process on weekdays ${settings.transactions.processingDays.join(", ")} at ${settings.transactions.processingTime} ${settings.timezone}; dropped players remain on waivers for ${settings.transactions.droppedPlayerWaiverHours} hours. ${settings.transactions.weeklyAcquisitionLimit ? `Teams may make ${settings.transactions.weeklyAcquisitionLimit} acquisitions per week.` : "Weekly acquisitions are unlimited."} ${settings.transactions.tradesEnabled ? `Trades use ${settings.transactions.tradeReview.replace(/_/gu, " ")} review, ${settings.transactions.tradeRosterEnforcement.replace(/_/gu, " ")} roster enforcement, and a Week ${settings.transactions.tradeDeadlineWeek} deadline.` : "Trades are disabled."}`] },
     { title: "Lineups and time", paragraphs: [`${lineupPolicyText(settings)} League deadlines use ${settings.timezone}. ${settings.lineup.inactiveSubstitution === "ordered_fallback" ? "Inactive starters may be replaced from each team's ordered fallback list." : "Inactive-player automatic substitution is disabled."} ${settings.lineup.automaticMode === "best_ball" ? "Best-ball optimization is active." : settings.lineup.lateSwap ? "Late swap remains available for players whose games have not locked." : "Late swap is disabled."}`] },
   ];

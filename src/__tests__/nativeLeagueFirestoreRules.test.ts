@@ -98,6 +98,13 @@ describeWithEmulator("native league Firestore security", () => {
         firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/tradeAssetLocks/player__player-1`).set({ league_id: leagueId, season_id: seasonId, offer_id: "trade-1" }),
         firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/draftPickStates/pick__2027-1-team-1`).set({ league_id: leagueId, season_id: seasonId, owner_franchise_id: "team-1" }),
         firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/tradeableAssets/keeper_right__player-1`).set({ league_id: leagueId, season_id: seasonId, owner_franchise_id: "team-1" }),
+        firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/schedule/current`).set({ league_id: leagueId, season_id: seasonId, revision: 1 }),
+        firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/scheduleVersions/schedule-1`).set({ league_id: leagueId, season_id: seasonId, revision: 1 }),
+        firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/standings/current`).set({ league_id: leagueId, season_id: seasonId, revision: 1 }),
+        firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/matchupResults/game-1`).set({ league_id: leagueId, season_id: seasonId, game_id: "game-1" }),
+        firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/matchupResultRevisions/game-1__r-1`).set({ league_id: leagueId, season_id: seasonId, game_id: "game-1" }),
+        firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/playoffBrackets/current`).set({ league_id: leagueId, season_id: seasonId, revision: 1 }),
+        firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/playoffBracketVersions/bracket-1`).set({ league_id: leagueId, season_id: seasonId, revision: 1 }),
         firestore.doc(`nativeDraftShares/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa`).set({ league_id: leagueId, season_id: seasonId, draft_id: "draft-public", state: { status: "live" } }),
       ]);
     });
@@ -145,6 +152,10 @@ describeWithEmulator("native league Firestore security", () => {
     await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/tradeOffers/browser-offer`).set({ status: "sent" }));
     await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/tradeReceipts/browser-receipt`).set({ processing_result: "completed" }));
     await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/tradeAssetLocks/browser-lock`).set({ offer_id: "trade-1" }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/schedule/browser-schedule`).set({ revision: 1 }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/standings/browser-standings`).set({ revision: 1 }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/matchupResults/browser-result`).set({ game_id: "browser-result" }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/playoffBrackets/browser-bracket`).set({ revision: 1 }));
   });
 
   it("lets only canonical commissioners list people and invitations", async () => {
@@ -179,6 +190,13 @@ describeWithEmulator("native league Firestore security", () => {
     await assertSucceeds(member.collection(`leagues/${leagueId}/seasons/${seasonId}/draftPickStates`).get());
     await assertSucceeds(member.collection(`leagues/${leagueId}/seasons/${seasonId}/tradeableAssets`).get());
     await assertFails(member.collection(`leagues/${leagueId}/seasons/${seasonId}/tradeAssetLocks`).get());
+    await assertSucceeds(member.collection(`leagues/${leagueId}/seasons/${seasonId}/schedule`).get());
+    await assertSucceeds(member.collection(`leagues/${leagueId}/seasons/${seasonId}/standings`).get());
+    await assertSucceeds(member.collection(`leagues/${leagueId}/seasons/${seasonId}/matchupResults`).get());
+    await assertSucceeds(member.collection(`leagues/${leagueId}/seasons/${seasonId}/playoffBrackets`).get());
+    await assertFails(member.collection(`leagues/${leagueId}/seasons/${seasonId}/scheduleVersions`).get());
+    await assertFails(member.collection(`leagues/${leagueId}/seasons/${seasonId}/matchupResultRevisions`).get());
+    await assertFails(member.collection(`leagues/${leagueId}/seasons/${seasonId}/playoffBracketVersions`).get());
     await assertFails(member.doc(`leagues/${leagueId}/auditPrivate/audit-1`).get());
 
     const commissioner = firestoreFor(commissionerId);
@@ -188,6 +206,9 @@ describeWithEmulator("native league Firestore security", () => {
     await assertSucceeds(commissioner.collection(`leagues/${leagueId}/seasons/${seasonId}/waiverClaims`).get());
     await assertSucceeds(commissioner.collection(`leagues/${leagueId}/seasons/${seasonId}/waiverRuns`).get());
     await assertSucceeds(commissioner.collection(`leagues/${leagueId}/seasons/${seasonId}/tradeAssetLocks`).get());
+    await assertSucceeds(commissioner.collection(`leagues/${leagueId}/seasons/${seasonId}/scheduleVersions`).get());
+    await assertSucceeds(commissioner.collection(`leagues/${leagueId}/seasons/${seasonId}/matchupResultRevisions`).get());
+    await assertSucceeds(commissioner.collection(`leagues/${leagueId}/seasons/${seasonId}/playoffBracketVersions`).get());
     await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/seasons/${seasonId}/rosterTransactions`).get());
     await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/seasons/${seasonId}/lineups`).get());
     await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/seasons/${seasonId}/scoringWeeks`).get());

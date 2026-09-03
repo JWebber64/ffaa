@@ -499,6 +499,14 @@ export type NativeTradeReceipt = {
   reversalTransactionId: string;
 };
 
+export type NativeScheduleGame = { id: string; week: number; slot: number; homeFranchiseId: string; awayFranchiseId: string | null; kind: "regular" | "rivalry" | "protected" | "bye"; twoWeekSeriesId: string; divisionGame: boolean; conferenceGame: boolean };
+export type NativeSchedule = { revision: number; versionId: string; settingsVersionId: string; seed: string; source: "generated" | "manual"; games: NativeScheduleGame[]; validationIssues: Array<{ code: string; severity: "error" | "warning"; message: string }>; generatedAt: string; editedAt: string; updatedAt: string };
+export type NativeMatchupResult = { gameId: string; week: number; homeFranchiseId: string; awayFranchiseId: string; homeScore: number; awayScore: number; homePotentialPoints: number; awayPotentialPoints: number; status: "final" | "corrected"; correctionReason: string; revision: number; updatedAt: string };
+export type NativeStandingRow = { franchiseId: string; seed: number; wins: number; losses: number; ties: number; winningPercentage: number; divisionWins: number; divisionLosses: number; divisionTies: number; divisionPercentage: number; medianWins: number; medianLosses: number; medianTies: number; allPlayWins: number; allPlayLosses: number; allPlayTies: number; allPlayPercentage: number; pointsFor: number; pointsAgainst: number; potentialPoints: number; lineupEfficiency: number; streak: string; remainingScheduleStrength: number; playoffProbability: number; state: "clinched" | "eliminated" | "alive"; explanation: string[] };
+export type NativeStandings = { revision: number; scheduleVersionId: string; settingsVersionId: string; completedResultCount: number; rows: NativeStandingRow[]; updatedAt: string };
+export type NativePlayoffGame = { id: string; bracket: "championship" | "consolation" | "toilet"; round: number; startWeek: number; endWeek: number; highSeed: number | null; lowSeed: number | null; homeFranchiseId: string | null; awayFranchiseId: string | null; advancesTo: string | null; loserAdvances: boolean };
+export type NativePlayoffBracket = { revision: number; standingsRevision: number; settingsVersionId: string; qualifiers: string[]; byeSeeds: number[]; reseeding: boolean; roundWeeks: number; games: NativePlayoffGame[]; correctionReason: string; updatedAt: string };
+
 export type LeagueAuthorityLabel =
   | "Native GameHQ League — read/write"
   | "Connected Sleeper League — read-only"

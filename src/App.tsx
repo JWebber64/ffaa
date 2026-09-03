@@ -23,6 +23,7 @@ const LeagueHQ = lazy(() => import("./screens/LeagueHQ"));
 const LeagueHome = lazy(() => import("./screens/LeagueHome"));
 const LeagueTeams = lazy(() => import("./screens/LeagueTeams"));
 const LeagueMatchups = lazy(() => import("./screens/LeagueMatchups"));
+const LeagueSchedule = lazy(() => import("./screens/LeagueSchedule"));
 const LeagueLineup = lazy(() => import("./screens/LeagueLineup"));
 const MyHQ = lazy(() => import("./screens/MyHQ"));
 const MyTeams = lazy(() => import("./screens/MyTeams"));
@@ -124,7 +125,7 @@ function AppRoutes() {
             <Route path="teams" element={<LeagueTeams />} />
             <Route path="teams/:teamId" element={<LeagueTeams />} />
             <Route path="matchups" element={<LeagueMatchups />} />
-            <Route path="schedule" element={<LeagueMatchups />} />
+            <Route path="schedule" element={<LeagueSchedule />} />
             <Route path="transactions" element={<LeagueTransactions />} />
             <Route path="history/*" element={<LeagueHistoryApp />} />
             <Route path="rules" element={<LeagueRules />} />

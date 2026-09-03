@@ -418,3 +418,21 @@ leagues/{gamehqLeagueId}/seasons/{seasonId}/tradeableAssets/{assetId}
 `tradeOffers` is the revisioned workflow record for two teams and their complete asset arrays, timestamps, counter lineage, response, review policy/window, league votes, disclosure, and final ledger references. Offers are member-readable and server-written. Accepted offers awaiting review create unique `tradeAssetLocks`; only commissioners may inspect those internal reservation rows.
 
 `tradeReceipts` is the immutable public outcome with assets for each party, sent/accepted/processed timestamps, policy/votes/approval disclosure, roster and cap effects, settings version, processing result, transaction ID, and reversal reference. Final processing co-commits both `seasonTeams`, player and advanced ownership projections, FAAB states, permanent player locks, roster transaction, audit/command receipts, notifications, invalidations, and season revision. `draftPickStates` and `tradeableAssets` are additive advanced-asset authorities; Phase 8 does not fabricate them and rejects a transfer until the appropriate owner state exists.
+
+## Implemented Phase 9 competition persistence
+
+```text
+leagues/{gamehqLeagueId}/seasons/{seasonId}/schedule/current
+leagues/{gamehqLeagueId}/seasons/{seasonId}/scheduleVersions/{scheduleVersionId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/matchupResults/{gameId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/matchupResultRevisions/{commandId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/standings/current
+leagues/{gamehqLeagueId}/seasons/{seasonId}/playoffBrackets/current
+leagues/{gamehqLeagueId}/seasons/{seasonId}/playoffBracketVersions/{bracketVersionId}
+```
+
+`schedule/current` is the member-readable published projection with revision, seed, settings version, normalized games, validation findings, and generation/edit timestamps. Every publish also creates a commissioner-readable immutable `scheduleVersions` document and advances `Season.schedule_version_id` in the same command commit.
+
+`matchupResults` contains one current final/corrected record per published game. Replacing a score requires a disclosed reason and creates an immutable `matchupResultRevisions` row before `standings/current` is rebuilt from the complete current result set. The standings projection contains no independently editable wins, points, seeds, or playoff flags.
+
+`playoffBrackets/current` is the member-readable field and game graph tied to a standings revision and settings version. Each publish also creates `playoffBracketVersions`; manual qualifier IDs require a reason preserved on the bracket and universal audit.

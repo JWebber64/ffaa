@@ -1,4 +1,5 @@
 import type { LeagueSettingsV1 } from "./leagueSettings";
+import type { MatchupResult, ProtectedMatchup, ScheduleGame } from "./nativeCompetition";
 
 export const LEAGUE_COMMAND_ENDPOINT = "/ff/api/league-commands/execute";
 
@@ -19,6 +20,10 @@ export type LeagueCommandType =
   | "respond_trade_offer"
   | "review_trade_offer"
   | "expire_trade_offer"
+  | "generate_native_schedule"
+  | "save_native_schedule"
+  | "record_native_matchup_results"
+  | "build_native_playoffs"
   | "save_settings_draft"
   | "publish_settings"
   | "restore_settings_version"
@@ -206,6 +211,11 @@ export type ReviewTradeOfferPayload = {
 
 export type ExpireTradeOfferPayload = { offerId: string; expectedOfferRevision: number };
 
+export type GenerateNativeSchedulePayload = { settingsVersionId: string; expectedScheduleRevision: number; seed: string; protectedMatchups: ProtectedMatchup[]; scheduledByes: Record<string, number[]> };
+export type SaveNativeSchedulePayload = { settingsVersionId: string; expectedScheduleRevision: number; games: ScheduleGame[] };
+export type RecordNativeMatchupResultsPayload = { settingsVersionId: string; expectedStandingsRevision: number; results: MatchupResult[] };
+export type BuildNativePlayoffsPayload = { settingsVersionId: string; expectedBracketRevision: number; startWeek: number; manualQualifierIds: string[] };
+
 export type SaveSettingsDraftPayload = {
   settings: LeagueSettingsV1;
 };
@@ -328,6 +338,10 @@ export type LeagueCommandPayloadByType = {
   respond_trade_offer: RespondTradeOfferPayload;
   review_trade_offer: ReviewTradeOfferPayload;
   expire_trade_offer: ExpireTradeOfferPayload;
+  generate_native_schedule: GenerateNativeSchedulePayload;
+  save_native_schedule: SaveNativeSchedulePayload;
+  record_native_matchup_results: RecordNativeMatchupResultsPayload;
+  build_native_playoffs: BuildNativePlayoffsPayload;
   save_settings_draft: SaveSettingsDraftPayload;
   publish_settings: PublishSettingsPayload;
   restore_settings_version: RestoreSettingsVersionPayload;

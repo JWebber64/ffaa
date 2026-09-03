@@ -27,6 +27,7 @@ import {
   executeSubmitWaiverClaimGroup,
 } from "./nativeWaiverCommands";
 import { executeCounterTradeOffer, executeCreateTradeOffer, executeExpireTradeOffer, executeRespondTradeOffer, executeReviewTradeOffer } from "./nativeTradeCommands";
+import { executeBuildNativePlayoffs, executeGenerateNativeSchedule, executeRecordNativeMatchupResults, executeSaveNativeSchedule } from "./nativeCompetitionCommands";
 import type { LeagueCommandStore } from "./store";
 
 const COMMAND_TYPES = new Set<LeagueCommandType>([
@@ -46,6 +47,10 @@ const COMMAND_TYPES = new Set<LeagueCommandType>([
   "respond_trade_offer",
   "review_trade_offer",
   "expire_trade_offer",
+  "generate_native_schedule",
+  "save_native_schedule",
+  "record_native_matchup_results",
+  "build_native_playoffs",
   "save_settings_draft",
   "publish_settings",
   "restore_settings_version",
@@ -161,6 +166,10 @@ export async function executeLeagueCommand(input: {
   if (command.commandType === "respond_trade_offer") return executeRespondTradeOffer(shared as Parameters<typeof executeRespondTradeOffer>[0]);
   if (command.commandType === "review_trade_offer") return executeReviewTradeOffer(shared as Parameters<typeof executeReviewTradeOffer>[0]);
   if (command.commandType === "expire_trade_offer") return executeExpireTradeOffer(shared as Parameters<typeof executeExpireTradeOffer>[0]);
+  if (command.commandType === "generate_native_schedule") return executeGenerateNativeSchedule(shared as Parameters<typeof executeGenerateNativeSchedule>[0]);
+  if (command.commandType === "save_native_schedule") return executeSaveNativeSchedule(shared as Parameters<typeof executeSaveNativeSchedule>[0]);
+  if (command.commandType === "record_native_matchup_results") return executeRecordNativeMatchupResults(shared as Parameters<typeof executeRecordNativeMatchupResults>[0]);
+  if (command.commandType === "build_native_playoffs") return executeBuildNativePlayoffs(shared as Parameters<typeof executeBuildNativePlayoffs>[0]);
   if (command.commandType === "save_settings_draft") {
     return executeSaveSettingsDraft(shared as Parameters<typeof executeSaveSettingsDraft>[0]);
   }

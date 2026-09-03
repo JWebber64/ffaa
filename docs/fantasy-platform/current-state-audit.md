@@ -350,3 +350,11 @@ Deliberate remaining direct legacy writes are season publication, claims/members
 - Immediate, commissioner, co-commissioner, fixed-period, and majority league-vote paths are explicit. Commissioner-controlled-team conflicts are derived across the league's active authority and team-control grants; configured conflicts require an uninvolved reviewer and remain disclosed in the offer and receipt.
 - Atomic completion transfers players and FAAB now, supports the advanced asset ledger when those states are initialized, rechecks live player locks and the trade deadline, applies the configured roster policy, and co-commits the universal transaction, public/private audit, season revision, notifications, read-model invalidation, and immutable receipt.
 - Native `/transactions` and `/trades` render an operational Trade Center. The connected-league path still resolves to normalized imported transactions.
+
+## Phase 9 implementation delta
+
+- Native season schedules are deterministic, seed-addressable, revisioned, and backed by immutable published versions. Odd-team byes, protected rivalries, multiple weekly slots, division/conference context, and two-week series are first-class schedule records rather than UI-only previews.
+- The command boundary validates schedule completeness and conflicts, records score corrections as new immutable revisions with a reason, and reconstructs the entire standing table from current final result records after each result command.
+- Standings expose physical, division, median, and all-play records plus PF, PA, potential points, efficiency, streak, remaining SOS, playoff probability/state, and the rule that first separated each seed.
+- The playoff builder publishes arbitrary-size fields, byes, fixed/reseeded rules, round duration, placement formats, and manual qualifier disclosure into a current bracket plus an immutable bracket version.
+- Native `/schedule` and `/standings` now own operations and display respectively. Existing connected-league readers remain the compatibility path and are not promoted by viewing either route.

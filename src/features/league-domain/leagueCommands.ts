@@ -23,6 +23,10 @@ import {
   type CounterTradeOfferPayload,
   type RespondTradeOfferPayload,
   type ReviewTradeOfferPayload,
+  type GenerateNativeSchedulePayload,
+  type SaveNativeSchedulePayload,
+  type RecordNativeMatchupResultsPayload,
+  type BuildNativePlayoffsPayload,
 } from "../../../shared/leagueCommandProtocol";
 import { ensurePermanentFirebaseUserId } from "../../lib/authSession";
 import { httpLeagueCommandService } from "./httpLeagueCommandService";
@@ -231,6 +235,12 @@ export function counterTradeOfferCommand(input: { leagueId: string; seasonId: st
 export function respondTradeOfferCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: RespondTradeOfferPayload; commandId?: string }) { return tradeCommand({ ...input, commandType: "respond_trade_offer", reason: `${input.payload.response} trade offer` }); }
 export function reviewTradeOfferCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: ReviewTradeOfferPayload; commandId?: string }) { return tradeCommand({ ...input, commandType: "review_trade_offer", reason: input.payload.reason }); }
 export function expireTradeOfferCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: { offerId: string; expectedOfferRevision: number }; commandId?: string }) { return tradeCommand({ ...input, commandType: "expire_trade_offer", reason: "Expire unanswered trade offer" }); }
+
+async function competitionCommand<T extends "generate_native_schedule" | "save_native_schedule" | "record_native_matchup_results" | "build_native_playoffs">(input: { commandType: T; leagueId: string; seasonId: string; expectedRevision: number; payload: import("../../../shared/leagueCommandProtocol").LeagueCommandPayloadByType[T]; reason: string; commandId?: string }) { const actorUserId = await ensurePermanentFirebaseUserId(); return httpLeagueCommandService.execute({ commandId: input.commandId ?? createLeagueCommandId(), commandType: input.commandType, actorUserId, leagueId: input.leagueId, seasonId: input.seasonId, expectedRevision: input.expectedRevision, payload: input.payload, reason: input.reason.trim().replace(/\s+/gu, " ").slice(0, 240), clientCreatedAt: nowIso() }); }
+export function generateNativeScheduleCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: GenerateNativeSchedulePayload; commandId?: string }) { return competitionCommand({ ...input, commandType: "generate_native_schedule", reason: "Generate deterministic native schedule" }); }
+export function saveNativeScheduleCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: SaveNativeSchedulePayload; reason: string; commandId?: string }) { return competitionCommand({ ...input, commandType: "save_native_schedule", reason: input.reason }); }
+export function recordNativeMatchupResultsCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: RecordNativeMatchupResultsPayload; reason?: string; commandId?: string }) { return competitionCommand({ ...input, commandType: "record_native_matchup_results", reason: input.reason ?? "Record completed native matchup results" }); }
+export function buildNativePlayoffsCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: BuildNativePlayoffsPayload; reason?: string; commandId?: string }) { return competitionCommand({ ...input, commandType: "build_native_playoffs", reason: input.reason ?? "Build native playoff bracket" }); }
 
 export async function saveSettingsDraftCommand(input: {
   leagueId: string;

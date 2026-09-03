@@ -208,6 +208,44 @@ service cloud.firestore {
           allow get, list: if isCanonicalMember();
           allow create, update, delete: if false;
         }
+
+        // The published competition graph is readable by every active league
+        // member. Immutable versions and correction history remain
+        // commissioner-only; all writes go through the command service.
+        match /schedule/{scheduleId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /scheduleVersions/{versionId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+
+        match /standings/{standingId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /matchupResults/{resultId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /matchupResultRevisions/{revisionId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
+
+        match /playoffBrackets/{bracketId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /playoffBracketVersions/{versionId} {
+          allow get, list: if isCanonicalManager();
+          allow create, update, delete: if false;
+        }
       }
 
       match /franchises/{franchiseId} {
