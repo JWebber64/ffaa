@@ -27,6 +27,11 @@ import {
   type SaveNativeSchedulePayload,
   type RecordNativeMatchupResultsPayload,
   type BuildNativePlayoffsPayload,
+  type PublishPulseEventPayload,
+  type ReactToPulseEventPayload,
+  type CommentOnPulseEventPayload,
+  type CreateRuleProposalPayload,
+  type VoteRuleProposalPayload,
 } from "../../../shared/leagueCommandProtocol";
 import { ensurePermanentFirebaseUserId } from "../../lib/authSession";
 import { httpLeagueCommandService } from "./httpLeagueCommandService";
@@ -540,3 +545,22 @@ export async function revertNativeDraftActionCommand(input: {
     clientCreatedAt: nowIso(),
   });
 }
+
+async function pulseCommand<T extends "publish_pulse_event" | "react_to_pulse_event" | "comment_on_pulse_event" | "create_rule_proposal" | "vote_rule_proposal">(input: {
+  commandType: T;
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: import("../../../shared/leagueCommandProtocol").LeagueCommandPayloadByType[T];
+  reason: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({ commandId: input.commandId ?? createLeagueCommandId(), commandType: input.commandType, actorUserId, leagueId: input.leagueId, seasonId: input.seasonId, expectedRevision: input.expectedRevision, payload: input.payload, reason: input.reason.trim().replace(/\s+/gu, " ").slice(0, 240), clientCreatedAt: nowIso() });
+}
+
+export function publishPulseEventCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: PublishPulseEventPayload; commandId?: string }) { return pulseCommand({ ...input, commandType: "publish_pulse_event", reason: `Publish ${input.payload.kind} to League Pulse` }); }
+export function reactToPulseEventCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: ReactToPulseEventPayload; commandId?: string }) { return pulseCommand({ ...input, commandType: "react_to_pulse_event", reason: "Update League Pulse reaction" }); }
+export function commentOnPulseEventCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: CommentOnPulseEventPayload; commandId?: string }) { return pulseCommand({ ...input, commandType: "comment_on_pulse_event", reason: "Reply to League Pulse item" }); }
+export function createRuleProposalCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: CreateRuleProposalPayload; commandId?: string }) { return pulseCommand({ ...input, commandType: "create_rule_proposal", reason: input.payload.commissionerExplanation }); }
+export function voteRuleProposalCommand(input: { leagueId: string; seasonId: string; expectedRevision: number; payload: VoteRuleProposalPayload; commandId?: string }) { return pulseCommand({ ...input, commandType: "vote_rule_proposal", reason: `Record ${input.payload.vote} vote on formal rule proposal` }); }

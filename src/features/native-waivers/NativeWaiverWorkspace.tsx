@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Clock3, Gavel, ListChecks, RotateCcw, ShieldCheck, WalletCards } from "lucide-react";
 
 import type { WaiverClaimAlternative, WaiverPlayerPosition } from "../../../shared/leagueCommandProtocol";
+import { buildNativeDecisionRecommendations } from "../../../shared/nativeLeagueIntelligence";
 import { buildCurrentToolPlayers } from "../../data/toolPlayerData";
 import { NumericInput } from "../../ui/NumericInput";
 import { PositionBadge } from "../../ui/PositionBadge";
@@ -9,6 +10,8 @@ import { UniversalSelect } from "../../ui/UniversalSelect";
 import { acquireFreeAgentCommand, initializeWaiverPlayerPoolCommand, processWaiverRunCommand, submitWaiverClaimGroupCommand } from "../league-domain/leagueCommands";
 import type { CanonicalLeagueWorkspace } from "../league-domain/types";
 import { useLeaguePlayerSheet } from "../player-sheet/leaguePlayerSheetContext";
+import { useNativeLineup } from "../native-lineup/useNativeLineup";
+import { useNativeScoring } from "../native-scoring/useNativeScoring";
 import { useNativeWaivers } from "./useNativeWaivers";
 import "./native-waivers.css";
 
@@ -29,6 +32,7 @@ export function NativeWaiverWorkspace({ workspace }: { workspace: CanonicalLeagu
   const { openPlayer } = useLeaguePlayerSheet();
   const [teamId, setTeamId] = useState("");
   const [week, setWeek] = useState(1);
+  const [riskPreference, setRiskPreference] = useState<"conservative" | "balanced" | "aggressive">("balanced");
   const [alternatives, setAlternatives] = useState<Alternative[]>([NEW_ALTERNATIVE()]);
   const [pending, setPending] = useState("");
   const [notice, setNotice] = useState<{ tone: "status" | "error"; text: string } | null>(null);
@@ -44,6 +48,12 @@ export function NativeWaiverWorkspace({ workspace }: { workspace: CanonicalLeagu
   const visibleReceipts = state.receipts.filter((receipt) => isCommissioner || receipt.franchiseId === selectedTeamId).slice(0, 8);
   const mode = state.settings?.transactions.waiverMode ?? "faab";
   const immediate = mode === "first_come_first_served";
+  const lineupState = useNativeLineup(workspace.league.id, season.id, season.settingsVersionId, week, workspace.league.timezone);
+  const scoringState = useNativeScoring(workspace.league.id, season.id, week);
+  const savedLineup = lineupState.lineups.find((row) => row.franchiseId === selectedTeamId && row.week === week);
+  const matchup = scoringState.scoringWeek?.matchups.find((row) => [row.homeFranchiseId, row.awayFranchiseId].includes(selectedTeamId));
+  const opponentProjection = matchup ? (matchup.homeFranchiseId === selectedTeamId ? matchup.awayProjectedFinal : matchup.homeProjectedFinal) : null;
+  const recommendations = state.settings && selectedTeam && selectedTeamState ? buildNativeDecisionRecommendations({ settings: state.settings, franchiseId: selectedTeamId, week, rosterPlayerIds: selectedTeam.rosterPlayerIds, starterPlayerIds: Object.values(savedLineup?.assignments ?? {}), candidates: state.players.map((row) => { const player = directory.get(row.playerId); return { playerId: row.playerId, position: row.position, projectedPoints: player?.projectedPointsPerGame ?? player?.projectedPoints ?? 0, projectionLow: player?.projectionLow ?? null, projectionHigh: player?.projectionHigh ?? null, byeWeek: player?.byeWeek ?? null, ownerFranchiseId: row.ownerFranchiseId, state: row.state }; }), faabRemaining: selectedTeamState.faabRemaining, opponentProjectedFinal: opponentProjection, riskPreference }) : [];
 
   function updateAlternative(id: string, changes: Partial<Alternative>) { setAlternatives((current) => current.map((row) => row.id === id ? { ...row, ...changes } : row)); }
   async function execute(action: string, task: () => Promise<{ result: Record<string, unknown> }>, success: string) {
@@ -86,6 +96,8 @@ export function NativeWaiverWorkspace({ workspace }: { workspace: CanonicalLeagu
         <div><span>Native player market</span><h1>Free agents & waivers</h1><p>One canonical ownership ledger, server-locked rules, ordered claims, and a receipt for every result.</p></div>
         <div className="native-waiver-summary"><span><Gavel aria-hidden="true" /> {modeLabel(mode)}</span><strong>{state.waiverState ? `${state.waiverState.playerCount} players` : "Not initialized"}</strong><small>Next run {time(state.waiverState?.nextProcessingAt ?? "", workspace.league.timezone)}</small></div>
       </header>
+
+      {state.waiverState && selectedTeam ? <section className="native-decision-engine" aria-labelledby="native-decision-title"><header><div><span>GameHQ decision engine</span><h2 id="native-decision-title">League-aware recommendations</h2><p>Read-only candidates use this league's published scoring, roster slots, ownership, waiver mode, FAAB, current lineup, opponent projection, bye exposure, and your stated risk preference.</p></div><label>Risk preference<UniversalSelect value={riskPreference} onValueChange={(value) => setRiskPreference(value as typeof riskPreference)}><option value="conservative">Conservative</option><option value="balanced">Balanced</option><option value="aggressive">Aggressive</option></UniversalSelect></label></header>{recommendations.length ? <div>{recommendations.slice(0, 6).map((row) => { const player = directory.get(row.playerId); return <article key={row.id}><PositionBadge position={player?.position ?? ""} /><div><strong>{player?.name ?? row.playerId}</strong><small>{modeLabel(row.kind)} · {row.confidence} confidence · score {row.score.toFixed(1)}</small></div><p>{row.evidence.join(" ")}</p><small>{row.uncertainty.join(" ")}</small><button type="button" className="league-player-view" onClick={() => openPlayer({ playerId: row.playerId, currentWeek: week, leagueState: state.players.find((entry) => entry.playerId === row.playerId)?.state ?? "available", ownership: "Unrostered", rosterFit: row.evidence[0] ?? "League-aware roster fit", actionLabel: immediate ? "Review free-agent add" : "Review waiver claim", actionTo: `/league/${workspace.league.id}/players` })}>Review evidence</button></article>; })}</div> : <p className="native-decision-empty">No deterministic upgrade or bye collision clears the current roster baseline. Missing projection ranges lower confidence rather than inventing certainty.</p>}<footer><ShieldCheck aria-hidden="true" />No recommendation can submit a claim, edit a lineup, or change league state.</footer></section> : null}
 
       {!state.waiverState ? (
         <section className="native-waiver-empty"><ShieldCheck aria-hidden="true" /><div><h2>Establish canonical player states</h2><p>The commissioner initializes availability from the GameHQ pool while preserving every existing roster asset lock.</p></div>{isCommissioner ? <button type="button" className="btn primary" disabled={pending === "initialize"} onClick={() => void initialize()}>{pending === "initialize" ? "Reconciling…" : "Initialize player market"}</button> : <small>Waiting for a commissioner.</small>}</section>

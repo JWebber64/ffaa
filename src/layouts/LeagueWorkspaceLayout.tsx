@@ -27,6 +27,7 @@ const leagueDestinations = [
   { section: "schedule", label: "Schedule", icon: CalendarDays },
   { section: "teams", label: "All teams", icon: Users },
   { section: "draft", label: "Draft", icon: Gavel },
+  { section: "pulse", label: "League Pulse", icon: Activity },
   { section: "history", label: "History", icon: History },
   { section: "rules", label: "Rules", icon: BookOpen },
   { section: "commissioner", label: "Commissioner", icon: Settings2 },

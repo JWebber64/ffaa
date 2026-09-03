@@ -18,6 +18,8 @@ vi.mock("../features/native-waivers/useNativeWaivers", () => ({
     receipts: [{ id: "receipt-1", runId: "run-1", claimId: "old-claim", franchiseId: "team-one", status: "won", claimsEvaluated: 2, winningBid: 16, nextHighestBid: 12, priorityBefore: 2, priorityAfter: 3, tiebreakerUsed: "priority", failures: ["Alternative 1: outbid."], addPlayerId: "2026-WR-justin-jefferson", dropPlayerId: "", remainingFaab: 84, processedAt: "2026-09-03T13:00:00.000Z" }],
   }),
 }));
+vi.mock("../features/native-lineup/useNativeLineup", () => ({ useNativeLineup: () => ({ status: "ready", message: "ready", teams: [], settings: null, week: null, lineups: [{ franchiseId: "team-one", week: 1, assignments: { "RB-1": "2026-RB-jahmyr-gibbs" } }] }) }));
+vi.mock("../features/native-scoring/useNativeScoring", () => ({ useNativeScoring: () => ({ status: "ready", message: "ready", scoringWeek: { matchups: [{ homeFranchiseId: "team-one", awayFranchiseId: "team-two", homeProjectedFinal: 112, awayProjectedFinal: 119 }] } }) }));
 
 const workspace: CanonicalLeagueWorkspace = {
   league: { id: "league-1", name: "Native League", abbreviation: "NL", logoUrl: null, colors: { primary: "", secondary: "" }, timezone: "America/New_York", status: "active", currentSeasonId: "season-1", createdBy: "commissioner", createdAt: "", updatedAt: "", revision: 1, authorityMode: "native", migrationState: "canonical_active" },

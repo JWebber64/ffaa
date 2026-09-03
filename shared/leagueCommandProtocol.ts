@@ -24,6 +24,11 @@ export type LeagueCommandType =
   | "save_native_schedule"
   | "record_native_matchup_results"
   | "build_native_playoffs"
+  | "publish_pulse_event"
+  | "react_to_pulse_event"
+  | "comment_on_pulse_event"
+  | "create_rule_proposal"
+  | "vote_rule_proposal"
   | "save_settings_draft"
   | "publish_settings"
   | "restore_settings_version"
@@ -216,6 +221,13 @@ export type SaveNativeSchedulePayload = { settingsVersionId: string; expectedSch
 export type RecordNativeMatchupResultsPayload = { settingsVersionId: string; expectedStandingsRevision: number; results: MatchupResult[] };
 export type BuildNativePlayoffsPayload = { settingsVersionId: string; expectedBracketRevision: number; startWeek: number; manualQualifierIds: string[] };
 
+export type PulseEventKind = "chat" | "announcement" | "poll" | "lineup_reminder" | "trade_block_change";
+export type PublishPulseEventPayload = { kind: PulseEventKind; title: string; body: string; week: number | null; franchiseIds: string[]; pollOptions: string[] };
+export type ReactToPulseEventPayload = { eventId: string; reaction: "like" | "celebrate" | "insightful" | "question" | "none" };
+export type CommentOnPulseEventPayload = { eventId: string; body: string };
+export type CreateRuleProposalPayload = { currentLanguage: string; proposedLanguage: string; effectiveSeason: number; votingThreshold: number; opensAt: string; closesAt: string; commissionerExplanation: string };
+export type VoteRuleProposalPayload = { proposalId: string; vote: "yes" | "no" | "abstain" };
+
 export type SaveSettingsDraftPayload = {
   settings: LeagueSettingsV1;
 };
@@ -342,6 +354,11 @@ export type LeagueCommandPayloadByType = {
   save_native_schedule: SaveNativeSchedulePayload;
   record_native_matchup_results: RecordNativeMatchupResultsPayload;
   build_native_playoffs: BuildNativePlayoffsPayload;
+  publish_pulse_event: PublishPulseEventPayload;
+  react_to_pulse_event: ReactToPulseEventPayload;
+  comment_on_pulse_event: CommentOnPulseEventPayload;
+  create_rule_proposal: CreateRuleProposalPayload;
+  vote_rule_proposal: VoteRuleProposalPayload;
   save_settings_draft: SaveSettingsDraftPayload;
   publish_settings: PublishSettingsPayload;
   restore_settings_version: RestoreSettingsVersionPayload;

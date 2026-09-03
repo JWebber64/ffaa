@@ -159,10 +159,11 @@ The canonical path parameter is always `gamehqLeagueId`, never a provider ID.
 | `/league/:gamehqLeagueId/standings` | Native standings | Existing summary only until standings phase; label limitation |
 | `/league/:gamehqLeagueId/schedule` | Season schedule | Adapter to existing generated schedule initially |
 | `/league/:gamehqLeagueId/teams` | Teams/franchises | Compatibility route retained |
-| `/league/:gamehqLeagueId/chat` | League chat | Planned; do not add a decorative empty page |
+| `/league/:gamehqLeagueId/pulse` | League conversation, automated activity, reactions, replies, polls, and rule proposals | Implemented for native leagues |
+| `/league/:gamehqLeagueId/chat` | Compatibility alias | Redirect to native Pulse; connected routes retain their existing reader |
 | `/league/:gamehqLeagueId/rules` | Published settings/constitution | Implemented from the active immutable settings version |
 | `/league/:gamehqLeagueId/draft` | Native manager/spectator draft room | Implemented canonical reconnect, picks, bids, queues, and read-only spectator token |
-| `/league/:gamehqLeagueId/history/*` | Native/imported history | Reuse current history with canonical mapping |
+| `/league/:gamehqLeagueId/history/*` | Native/imported history | Native leagues use permanent-franchise projections; connected leagues retain imported History |
 
 The requested inside-league nav is Home, Matchup, Team, Players, Transactions, and League; the League disclosure contains Standings, Schedule, Teams, Draft, Chat, Rules, and History. Mobile exposes Home, Matchup, Team, Players, and More without removing any action.
 
@@ -236,6 +237,7 @@ This navigation change follows the canonical workspace seam and is not permissio
 | `/league/:gamehqLeagueId/transactions` | Native seasons use the two-team Trade Center with offers, review/voting, and receipts; connected leagues use imported transaction history |
 | `/league/:gamehqLeagueId/trades` | Exact alias for the native Trade Center; connected leagues retain the filtered imported trade history |
 | `/league/:gamehqLeagueId/schedule` | Native seasons show all Week scoring matchups; connected leagues keep the generated compatibility schedule |
+| `/league/:gamehqLeagueId/pulse` | Native conversation plus rebuildable audit/result/scoring activity; connected leagues retain their compatibility reader |
 | `/league/:gamehqLeagueId/{standings,teams,history}` | Existing league readers under canonical identity |
 | `/league/:gamehqLeagueId/commissioner/*` | Existing management surface behind canonical GameHQ capability resolution |
 

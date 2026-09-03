@@ -30,6 +30,7 @@ import {
 import { CommissionerAuditWorkspace } from "../league-membership/CommissionerAuditWorkspace";
 import { CommissionerDraftWorkspace } from "../native-draft/CommissionerDraftWorkspace";
 import { defaultCommissionerPeopleService, type CommissionerPeopleService } from "../league-membership/commissionerPeopleService";
+import { CommissionerSafetyPanel } from "./CommissionerSafetyPanel";
 import "./commissioner-settings.css";
 
 type PendingAction = "idle" | "loading" | "saving" | "publishing" | "restoring";
@@ -388,7 +389,7 @@ export function CommissionerSettingsWorkspace({
             ? <CommissionerDraftWorkspace workspace={workspace} onWorkspaceChanged={onWorkspaceChanged} />
           : section === "audit"
             ? <CommissionerAuditWorkspace workspace={workspace} onWorkspaceChanged={onWorkspaceChanged} />
-            : <CommissionerOperationsOverview workspace={workspace} service={peopleService} />}
+            : <><CommissionerOperationsOverview workspace={workspace} service={peopleService} /><CommissionerSafetyPanel workspace={workspace} /></>}
     </main>
   );
 }

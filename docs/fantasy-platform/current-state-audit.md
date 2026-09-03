@@ -367,3 +367,11 @@ Deliberate remaining direct legacy writes are season publication, claims/members
 - A single league player side sheet is available from lineup, live matchup, draft, waiver, and trade rows. The sheet provides the same evidence structure and dismissal/focus contract in every consumer.
 - League mobile navigation is Home, Matchup, Team, Players, and More. State is never conveyed by color alone; live/status surfaces expose source/freshness language and retain the last rendered projection while hooks refresh.
 - Phase 10 adds no datastore and grants no new client write capability. It is a projection and route consolidation over Phase 1–9 authority.
+
+## Phase 11 implementation delta
+
+- Native League Pulse is the league conversation and evidence surface. Human posts, reactions, replies, polls, announcements, reminders, trade-block updates, and formal proposals persist through authenticated commands; transaction/audit, score, rivalry, lead-change, record, and award cards are rebuildable projections.
+- Native History derives its ledger from permanent franchise IDs, season teams, final results, lineups, drafts, waivers, trades, and audits. Manager accounts and seasonal names remain attributes around the permanent franchise identity rather than becoming history keys.
+- Formal proposals preserve both rule-language versions, effective season, threshold, voting window, voter choices, result, and explanation. Votes use exact proposal revision checks so concurrent stale submissions cannot overwrite another vote.
+- The decision engine is read-only: it identifies the exact settings/ownership/FAAB/lineup/opponent/bye facts it used, labels unavailable evidence and uncertainty, and returns no mutation. Domain commands remain the only write authority.
+- Commissioner safe mode documents preview, required reason, impact, restore/reversal, and audit behavior. The mirror parity panel names native and imported sources, mismatches, and unavailable evidence while leaving the league's explicit authority mode untouched.

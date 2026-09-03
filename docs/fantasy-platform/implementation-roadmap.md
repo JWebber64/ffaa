@@ -15,9 +15,9 @@ The roadmap follows the requested phases in order. Each phase is a bounded chang
 | 6 | Provider-agnostic scoring | Implemented with normalized events, deterministic replay, corrections, freshness, and native live matchup UI | Deterministic replay/corrections and live freshness UI |
 | 7 | Free agents and waivers | Implemented with canonical player states, complete redraft waiver settings, ordered claim groups, atomic processing, and receipts | Atomic reproducible processing and receipts |
 | 8 | Two-team trades | Implemented with two-team offers/counters, atomic player and extensible asset transfers, review/voting, conflict controls, and receipts | Atomic asset locks/review/receipts |
-| 9 | Schedule, standings, playoffs | Next phase; native scoring/results/settings are available | Reproducible standings, explainable seeds, valid brackets |
-| 10 | Operational UI consolidation | Iterative after each operational domain, final pass after 9 | Desktop/mobile parity and dense operational surfaces |
-| 11 | League Pulse, native history, decision tools, mirror/migrate | Blocked on event/audit/read models | Native actions feed history and explainable activity |
+| 9 | Schedule, standings, playoffs | Implemented | Reproducible standings, explainable seeds, valid brackets |
+| 10 | Operational UI consolidation | Implemented | Desktop/mobile parity and dense operational surfaces |
+| 11 | League Pulse, native history, decision tools, mirror/migrate | Implemented | Native actions feed history and explainable activity |
 | 12 | Keeper, dynasty, salary cap | Blocked on reliable native redraft | Advanced assets/contracts without burdening redraft |
 
 ## Phase 0 deliverables
@@ -390,6 +390,18 @@ Phase 10 compatibility/rollback: this phase introduces no new persistence and pe
 - Mirror/migrate compares external and native read models without obscuring authority.
 
 Gate: native actions automatically feed history/activity and no AI action silently changes state.
+
+Implemented Phase 11:
+
+- `/league/:gamehqLeagueId/pulse` combines member chat, polls, commissioner announcements/reminders, trade-block notes, waiver/trade/draft audit evidence, final scores, rivalry milestones, lead changes, awards, records, and formal rule proposals in one filterable stream. Persisted cards support revision-safe reactions and replies; derived cards rebuild from canonical audit/results/scoring inputs.
+- Native `/history` derives career records, head-to-head and rivalry summaries, championships, draft/trade and waiver/lineup efficiency, bench totals, records, milestones, season yearbooks, franchise tendencies, permanent franchise lineage, Hall of Fame candidates, and last-place finishes. A permanent franchise key is presented separately from current manager role grants and seasonal team names.
+- Rule proposals preserve current/proposed language, effective season, threshold, voting window, named votes, result, and commissioner explanation. Publishing and voting remain authenticated, idempotent server commands with immutable receipts and audits.
+- The waiver decision panel consumes exact published settings, ownership, FAAB, lineup/opponent/bye state and reports evidence plus uncertainty. Its recommendation is read-only and exposes `mutation: null`; only deterministic commands can change league state.
+- Commissioner safe mode enumerates preview, reason, impact, restore, and audit guarantees for every supported intervention. Mirror parity compares explicit native/import sources and reports unavailable evidence or mismatches without changing authority.
+
+Exact Phase 11 implementation files: `shared/nativeLeagueIntelligence.ts` and `shared/leagueCommandProtocol.ts`; `server/league-commands/nativePulseCommands.ts`, `executeLeagueCommand.ts`, and `commandSupport.ts`; `src/features/native-pulse/**`, `src/features/native-history/**`, `src/features/league-settings/CommissionerSafetyPanel.tsx`, `src/features/native-waivers/NativeWaiverWorkspace.tsx`, `src/screens/LeaguePulse.tsx`, `src/screens/LeagueHistory.tsx`, `src/layouts/LeagueWorkspaceLayout.tsx`, `src/App.tsx`, and `firestore.rules`. Coverage is in `nativeLeagueIntelligence.test.ts`, `nativePulseCommands.test.ts`, `nativePulseWorkspace.test.tsx`, `nativeWaiverWorkspace.test.tsx`, and `nativeLeagueFirestoreRules.test.ts`.
+
+Phase 11 compatibility/rollback: connected leagues keep their imported History workspace and provider read adapters. Hiding the native Pulse/History branches removes only projections; it does not delete Pulse conversation, proposals, command receipts, audits, or canonical league data. Mirror comparisons are read-only and no page view copies or promotes provider state.
 
 ## Phase 12 — keeper, dynasty, salary cap
 

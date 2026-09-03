@@ -79,6 +79,10 @@ describeWithEmulator("native league Firestore security", () => {
         firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/rosterTransactions/tx-1`).set({ league_id: leagueId, season_id: seasonId, id: "tx-1" }),
         firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/assetLocks/player__player-1`).set({ league_id: leagueId, season_id: seasonId, asset_id: "player-1", franchise_id: "team-1" }),
         firestore.doc(`leagues/${leagueId}/auditPrivate/audit-1`).set({ league_id: leagueId, season_id: seasonId, id: "audit-1", reason: "Private commissioner context" }),
+        firestore.doc(`leagues/${leagueId}/pulseEvents/event-1`).set({ league_id: leagueId, season_id: seasonId, id: "event-1", kind: "chat" }),
+        firestore.doc(`leagues/${leagueId}/pulseReactions/event-1__member-1`).set({ league_id: leagueId, event_id: "event-1", user_id: "member-1", reaction: "like" }),
+        firestore.doc(`leagues/${leagueId}/pulseComments/comment-1`).set({ league_id: leagueId, event_id: "event-1", user_id: "member-1", body: "Ready." }),
+        firestore.doc(`leagues/${leagueId}/ruleProposals/proposal-1`).set({ league_id: leagueId, season_id: seasonId, id: "proposal-1", result: "open" }),
         firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/drafts/draft-public`).set({ league_id: leagueId, season_id: seasonId, id: "draft-public", spectator_enabled: true }),
         firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/drafts/draft-private`).set({ league_id: leagueId, season_id: seasonId, id: "draft-private", spectator_enabled: false }),
         firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/lineupWeeks/week-1`).set({ league_id: leagueId, season_id: seasonId, id: "week-1", week: 1, revision: 1 }),
@@ -156,6 +160,10 @@ describeWithEmulator("native league Firestore security", () => {
     await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/standings/browser-standings`).set({ revision: 1 }));
     await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/matchupResults/browser-result`).set({ game_id: "browser-result" }));
     await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/playoffBrackets/browser-bracket`).set({ revision: 1 }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/pulseEvents/browser-event`).set({ kind: "chat" }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/pulseReactions/event-1__${commissionerId}`).set({ reaction: "like" }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/pulseComments/browser-comment`).set({ body: "Browser write" }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/ruleProposals/browser-proposal`).set({ result: "open" }));
   });
 
   it("lets only canonical commissioners list people and invitations", async () => {
@@ -198,6 +206,10 @@ describeWithEmulator("native league Firestore security", () => {
     await assertFails(member.collection(`leagues/${leagueId}/seasons/${seasonId}/matchupResultRevisions`).get());
     await assertFails(member.collection(`leagues/${leagueId}/seasons/${seasonId}/playoffBracketVersions`).get());
     await assertFails(member.doc(`leagues/${leagueId}/auditPrivate/audit-1`).get());
+    await assertSucceeds(member.collection(`leagues/${leagueId}/pulseEvents`).get());
+    await assertSucceeds(member.collection(`leagues/${leagueId}/pulseReactions`).get());
+    await assertSucceeds(member.collection(`leagues/${leagueId}/pulseComments`).get());
+    await assertSucceeds(member.collection(`leagues/${leagueId}/ruleProposals`).get());
 
     const commissioner = firestoreFor(commissionerId);
     await assertSucceeds(commissioner.doc(`leagues/${leagueId}/auditPrivate/audit-1`).get());
@@ -212,6 +224,10 @@ describeWithEmulator("native league Firestore security", () => {
     await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/seasons/${seasonId}/rosterTransactions`).get());
     await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/seasons/${seasonId}/lineups`).get());
     await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/seasons/${seasonId}/scoringWeeks`).get());
+    await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/pulseEvents`).get());
+    await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/pulseReactions`).get());
+    await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/pulseComments`).get());
+    await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/ruleProposals`).get());
   });
 
   it("allows exact-link spectators to read enabled draft state without granting writes or private draft access", async () => {

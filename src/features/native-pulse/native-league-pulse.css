@@ -1,0 +1,326 @@
+.native-pulse {
+  display: grid;
+  gap: 14px;
+  padding: 16px 18px 40px;
+  color: var(--text-primary);
+}
+.native-pulse > header,
+.native-pulse-compose,
+.native-rule-proposal,
+.native-pulse-stream > article {
+  border: 1px solid var(--line-1);
+  background: var(--surface-raised);
+}
+.native-pulse > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+}
+.native-pulse > header span,
+.native-pulse-compose header span {
+  color: var(--accent-action);
+  font-size: 0.65rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.native-pulse h1,
+.native-pulse h2,
+.native-pulse p {
+  margin: 0;
+}
+.native-pulse h1 {
+  font-size: 1.55rem;
+}
+.native-pulse > header p {
+  max-width: 760px;
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+}
+.native-pulse > header > strong {
+  font-size: 0.7rem;
+}
+.native-pulse .is-clear {
+  color: var(--state-success);
+}
+.native-pulse .is-warning {
+  color: var(--state-warning);
+}
+.native-pulse-compose {
+  padding: 14px;
+}
+.native-pulse-compose > header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 10px;
+}
+.native-pulse-compose > header svg {
+  width: 18px;
+}
+.native-pulse-compose > div,
+.native-rule-proposal > div {
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+  gap: 10px;
+}
+.native-pulse label {
+  display: grid;
+  gap: 5px;
+}
+.native-pulse label > span {
+  color: var(--text-muted);
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.native-pulse input,
+.native-pulse textarea,
+.native-pulse select {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--line-1);
+  border-radius: 0;
+  background: var(--surface-base);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.72rem;
+}
+.native-pulse textarea {
+  min-height: 64px;
+  resize: vertical;
+}
+.native-pulse .is-wide {
+  grid-column: 1/-1;
+}
+.native-pulse button {
+  min-height: 38px;
+  border: 1px solid var(--line-1);
+  background: var(--surface-base);
+  color: var(--text-primary);
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.native-pulse button:focus-visible,
+.native-pulse input:focus-visible,
+.native-pulse textarea:focus-visible,
+.native-pulse select:focus-visible,
+.native-rule-proposal > summary:focus-visible {
+  outline: 2px solid var(--accent-action);
+  outline-offset: 2px;
+}
+.native-pulse button[aria-pressed="true"],
+.native-pulse > nav button[aria-pressed="true"] {
+  border-color: var(--accent-action);
+  background: var(--accent-action);
+  color: var(--on-accent);
+}
+.native-rule-proposal > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  cursor: pointer;
+  list-style: none;
+}
+.native-rule-proposal > summary svg {
+  width: 18px;
+}
+.native-rule-proposal > summary span {
+  display: grid;
+}
+.native-rule-proposal > summary small {
+  color: var(--text-muted);
+  font-size: 0.64rem;
+}
+.native-rule-proposal > div {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0 12px 12px;
+}
+.native-rule-proposal button,
+.native-pulse-compose button {
+  align-self: end;
+  padding: 0 14px;
+  border-color: var(--accent-action);
+  background: var(--accent-action);
+  color: var(--on-accent);
+}
+.native-pulse > nav {
+  display: flex;
+  gap: 6px;
+  overflow: auto;
+  padding-bottom: 2px;
+}
+.native-pulse > nav button {
+  flex: 0 0 auto;
+  padding: 0 12px;
+}
+.native-pulse-message {
+  padding: 9px;
+  border: 1px solid var(--accent-action);
+  background: var(--surface-raised);
+  font-size: 0.7rem;
+}
+.native-pulse-stream {
+  display: grid;
+  gap: 8px;
+}
+.native-pulse-stream > article {
+  padding: 12px 14px;
+}
+.native-pulse-stream > article > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.native-pulse-stream > article > header span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--accent-action);
+  font-size: 0.62rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+.native-pulse-stream > article > header svg {
+  width: 14px;
+}
+.native-pulse-stream time {
+  color: var(--text-muted);
+  font-size: 0.62rem;
+}
+.native-pulse-stream h2 {
+  margin-top: 6px;
+  font-size: 0.94rem;
+}
+.native-pulse-stream article > p {
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 0.71rem;
+  line-height: 1.45;
+}
+.native-pulse-stream article > footer {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-0);
+}
+.native-pulse-stream article > footer > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.native-pulse-stream article > footer button {
+  min-height: 32px;
+  padding: 0 8px;
+}
+.native-pulse-stream article > footer button svg {
+  width: 13px;
+  margin-right: 4px;
+}
+.native-pulse-stream form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+}
+.native-pulse-stream form button {
+  padding-inline: 12px;
+}
+.native-pulse-stream ol {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.native-pulse-stream li {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 8px;
+  padding: 6px;
+  background: var(--surface-base);
+  font-size: 0.66rem;
+}
+.native-proposal-detail {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--surface-base);
+}
+.native-proposal-detail dl {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0;
+}
+.native-proposal-detail dl > div {
+  display: grid;
+  gap: 2px;
+}
+.native-proposal-detail dt {
+  color: var(--text-muted);
+  font-size: 0.58rem;
+  text-transform: uppercase;
+}
+.native-proposal-detail dd {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+.native-proposal-detail > div {
+  display: flex;
+  gap: 6px;
+}
+.native-proposal-detail > strong {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--state-success);
+  font-size: 0.7rem;
+}
+.native-pulse > footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.67rem;
+}
+.native-pulse > footer svg {
+  width: 16px;
+}
+@media (max-width: 720px) {
+  .native-pulse {
+    padding: 10px 10px 86px;
+  }
+  .native-pulse > header {
+    align-items: start;
+  }
+  .native-pulse-compose > div,
+  .native-rule-proposal > div {
+    grid-template-columns: 1fr;
+  }
+  .native-pulse .is-wide {
+    grid-column: auto;
+  }
+  .native-pulse-compose button {
+    width: 100%;
+  }
+  .native-proposal-detail dl {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .native-pulse-stream li {
+    grid-template-columns: 70px 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .native-pulse * {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}

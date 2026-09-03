@@ -28,6 +28,7 @@ import {
 } from "./nativeWaiverCommands";
 import { executeCounterTradeOffer, executeCreateTradeOffer, executeExpireTradeOffer, executeRespondTradeOffer, executeReviewTradeOffer } from "./nativeTradeCommands";
 import { executeBuildNativePlayoffs, executeGenerateNativeSchedule, executeRecordNativeMatchupResults, executeSaveNativeSchedule } from "./nativeCompetitionCommands";
+import { executeCommentOnPulseEvent, executeCreateRuleProposal, executePublishPulseEvent, executeReactToPulseEvent, executeVoteRuleProposal } from "./nativePulseCommands";
 import type { LeagueCommandStore } from "./store";
 
 const COMMAND_TYPES = new Set<LeagueCommandType>([
@@ -51,6 +52,11 @@ const COMMAND_TYPES = new Set<LeagueCommandType>([
   "save_native_schedule",
   "record_native_matchup_results",
   "build_native_playoffs",
+  "publish_pulse_event",
+  "react_to_pulse_event",
+  "comment_on_pulse_event",
+  "create_rule_proposal",
+  "vote_rule_proposal",
   "save_settings_draft",
   "publish_settings",
   "restore_settings_version",
@@ -170,6 +176,11 @@ export async function executeLeagueCommand(input: {
   if (command.commandType === "save_native_schedule") return executeSaveNativeSchedule(shared as Parameters<typeof executeSaveNativeSchedule>[0]);
   if (command.commandType === "record_native_matchup_results") return executeRecordNativeMatchupResults(shared as Parameters<typeof executeRecordNativeMatchupResults>[0]);
   if (command.commandType === "build_native_playoffs") return executeBuildNativePlayoffs(shared as Parameters<typeof executeBuildNativePlayoffs>[0]);
+  if (command.commandType === "publish_pulse_event") return executePublishPulseEvent(shared as Parameters<typeof executePublishPulseEvent>[0]);
+  if (command.commandType === "react_to_pulse_event") return executeReactToPulseEvent(shared as Parameters<typeof executeReactToPulseEvent>[0]);
+  if (command.commandType === "comment_on_pulse_event") return executeCommentOnPulseEvent(shared as Parameters<typeof executeCommentOnPulseEvent>[0]);
+  if (command.commandType === "create_rule_proposal") return executeCreateRuleProposal(shared as Parameters<typeof executeCreateRuleProposal>[0]);
+  if (command.commandType === "vote_rule_proposal") return executeVoteRuleProposal(shared as Parameters<typeof executeVoteRuleProposal>[0]);
   if (command.commandType === "save_settings_draft") {
     return executeSaveSettingsDraft(shared as Parameters<typeof executeSaveSettingsDraft>[0]);
   }

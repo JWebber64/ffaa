@@ -1,0 +1,218 @@
+.native-history {
+  display: grid;
+  gap: 14px;
+  padding: 16px 18px 40px;
+  color: var(--text-primary);
+}
+.native-history > header,
+.native-history-summary > article,
+.native-history-table,
+.native-history-grid > section,
+.native-history-lineage,
+.native-history-yearbook {
+  border: 1px solid var(--line-1);
+  background: var(--surface-raised);
+}
+.native-history > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+}
+.native-history > header span,
+.native-history section header span,
+.native-history-summary span,
+.native-history-yearbook span {
+  color: var(--accent-action);
+  font-size: 0.63rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.native-history h1,
+.native-history h2,
+.native-history p {
+  margin: 0;
+}
+.native-history h1 {
+  font-size: 1.5rem;
+}
+.native-history h2 {
+  font-size: 0.92rem;
+}
+.native-history > header p {
+  max-width: 740px;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+}
+.native-history > header > strong {
+  font-size: 0.68rem;
+}
+.native-history-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.native-history-summary > article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 9px;
+  padding: 12px;
+}
+.native-history-summary svg {
+  grid-row: 1/4;
+  width: 18px;
+  color: var(--accent-action);
+}
+.native-history-summary strong {
+  font-size: 0.86rem;
+}
+.native-history-summary small {
+  color: var(--text-muted);
+  font-size: 0.62rem;
+}
+.native-history-table > header,
+.native-history-lineage > header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px;
+  border-bottom: 1px solid var(--line-0);
+}
+.native-history-table > header svg,
+.native-history-lineage > header svg {
+  width: 18px;
+  color: var(--accent-action);
+}
+.native-history-table [role="table"] > [role="row"] {
+  display: grid;
+  grid-template-columns: minmax(160px, 1.5fr) repeat(6, minmax(84px, 1fr));
+  align-items: center;
+  min-height: 44px;
+  border-top: 1px solid var(--line-0);
+  padding: 0 12px;
+  font-size: 0.68rem;
+}
+.native-history-table [role="row"].is-head {
+  min-height: 34px;
+  border-top: 0;
+  color: var(--text-muted);
+  font-size: 0.58rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.native-history-table [role="row"] > strong {
+  display: grid;
+}
+.native-history-table [role="row"] small {
+  color: var(--text-muted);
+  font-size: 0.55rem;
+}
+.native-history-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.native-history-grid > section {
+  padding: 12px;
+}
+.native-history-grid ol {
+  display: grid;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.native-history-grid li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 8px;
+  min-height: 46px;
+  padding: 7px 0;
+  border-top: 1px solid var(--line-0);
+  font-size: 0.69rem;
+}
+.native-history-grid li small {
+  grid-column: 1/-1;
+  color: var(--text-muted);
+  font-size: 0.61rem;
+}
+.native-history-grid p {
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+}
+.native-history-lineage > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.native-history-lineage article {
+  display: grid;
+  gap: 3px;
+  padding: 12px;
+  border-right: 1px solid var(--line-0);
+  border-top: 1px solid var(--line-0);
+}
+.native-history-lineage code {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.58rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+}
+.native-history-lineage article span,
+.native-history-lineage article small {
+  font-size: 0.62rem;
+}
+.native-history-lineage article small {
+  color: var(--text-muted);
+}
+.native-history-yearbook {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+}
+.native-history-yearbook p {
+  max-width: 760px;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+}
+.native-history-yearbook a {
+  flex: 0 0 auto;
+  color: var(--accent-action);
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+@media (max-width: 760px) {
+  .native-history {
+    padding: 10px 10px 86px;
+  }
+  .native-history-summary,
+  .native-history-grid {
+    grid-template-columns: 1fr;
+  }
+  .native-history-table [role="row"].is-head {
+    display: none;
+  }
+  .native-history-table [role="table"] > [role="row"] {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 10px;
+  }
+  .native-history-table [role="row"] > *::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.55rem;
+    text-transform: uppercase;
+  }
+  .native-history-lineage > div {
+    grid-template-columns: 1fr;
+  }
+  .native-history-yearbook {
+    align-items: start;
+    flex-direction: column;
+  }
+}

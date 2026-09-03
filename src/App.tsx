@@ -33,10 +33,11 @@ const LeagueTransactions = lazy(() => import("./screens/LeagueTransactions"));
 const LeagueManage = lazy(() => import("./screens/LeagueManage"));
 const LeagueRules = lazy(() => import("./screens/LeagueRules"));
 const LeagueDraft = lazy(() => import("./screens/LeagueDraft"));
+const LeaguePulse = lazy(() => import("./screens/LeaguePulse"));
 const LeagueInvitationAccept = lazy(() => import("./screens/LeagueInvitationAccept"));
 const LeagueWorkspaceLayout = lazy(() => import("./layouts/LeagueWorkspaceLayout"));
 const DraftOrderShowdown = lazy(() => import("./features/draft-order/DraftOrderShowdown"));
-const LeagueHistoryApp = lazy(() => import("./features/league-history/ui/LeagueHistoryApp"));
+const LeagueHistory = lazy(() => import("./screens/LeagueHistory"));
 const OfflineDraftV2 = lazy(() => import("./screens_v2/OfflineDraftV2"));
 const LandingV2 = lazy(() => import("./screens_v2/LandingV2"));
 const AuthenticatedApp = lazy(() => import("./routes/AuthenticatedApp"));
@@ -127,9 +128,10 @@ function AppRoutes() {
             <Route path="matchups" element={<LeagueMatchups />} />
             <Route path="schedule" element={<LeagueSchedule />} />
             <Route path="transactions" element={<LeagueTransactions />} />
-            <Route path="history/*" element={<LeagueHistoryApp />} />
+            <Route path="history/*" element={<LeagueHistory />} />
             <Route path="rules" element={<LeagueRules />} />
             <Route path="draft" element={<LeagueDraft />} />
+            <Route path="pulse" element={<LeaguePulse />} />
             <Route path="join" element={<LeagueInvitationAccept />} />
             <Route path="manage" element={<LeagueManage />} />
             <Route path="commissioner/*" element={<LeagueManage />} />

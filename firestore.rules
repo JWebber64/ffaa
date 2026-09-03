@@ -293,6 +293,26 @@ service cloud.firestore {
         allow create, update, delete: if false;
       }
 
+      match /pulseEvents/{eventId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
+      match /pulseReactions/{reactionId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
+      match /pulseComments/{commentId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
+      match /ruleProposals/{proposalId} {
+        allow get, list: if isCanonicalMember();
+        allow create, update, delete: if false;
+      }
+
       match /auditPrivate/{eventId} {
         allow get, list: if isCanonicalManager();
         allow create, update, delete: if false;
