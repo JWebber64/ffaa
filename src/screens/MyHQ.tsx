@@ -19,7 +19,9 @@ function initials(name: string) {
 }
 
 function formatPlayerProjection(player: ToolPlayer | null) {
-  return player?.projectedPointsPerGame === null || !player ? "—" : player.projectedPointsPerGame.toFixed(1);
+  return player?.weeklyProjectedPoints === null || player?.weeklyProjectedPoints === undefined
+    ? "—"
+    : player.weeklyProjectedPoints.toFixed(1);
 }
 
 function TeamRosterRow({ player, slot, bench = false }: { player: ToolPlayer | null; slot: string; bench?: boolean }) {
@@ -39,8 +41,8 @@ function TeamRosterRow({ player, slot, bench = false }: { player: ToolPlayer | n
         {player?.injuryStatus || (player?.status && player.status !== "Active" ? player.status : "Active")}
       </div>
       <div className="hq-roster-points" role="cell">
-        <span className="hq-roster-mobile-label">Baseline</span>
-        <strong>{formatPlayerProjection(player)}</strong><small> PPG</small>
+        <span className="hq-roster-mobile-label">Projection</span>
+        <strong>{formatPlayerProjection(player)}</strong><small> PTS</small>
       </div>
     </div>
   );
@@ -55,7 +57,7 @@ function TeamRoster({ data }: { data: MyHQData }) {
       </header>
       <div className="hq-roster-table" role="table" aria-label={`${data.teamName} roster`}>
         <div className="hq-roster-columns" role="row">
-          <span role="columnheader">Slot</span><span role="columnheader">Player</span><span role="columnheader">Status</span><span role="columnheader">Baseline</span>
+          <span role="columnheader">Slot</span><span role="columnheader">Player</span><span role="columnheader">Status</span><span role="columnheader">Week projection</span>
         </div>
         <div role="rowgroup">
           {data.starterLineup.map((entry, index) => <TeamRosterRow key={`${entry.slot}-${entry.player?.id ?? index}`} player={entry.player} slot={entry.slot} />)}
@@ -156,7 +158,7 @@ export default function MyHQ() {
         <Link className="hq-team-matchup" to={`/league/${encodeURIComponent(data.leagueId)}/team/matchup`}>
           <span>{data.week ? `Week ${data.week}` : "Next"} vs {data.opponentName}</span>
           <strong>{formatScore(data.teamScore)} <i>–</i> {formatScore(data.opponentScore)}</strong>
-          <small>Season baseline {data.teamBaselinePoints?.toFixed(1) ?? "—"}–{data.opponentBaselinePoints?.toFixed(1) ?? "—"}</small>
+          <small>Week {data.week || 1} projection {data.teamProjectedPoints?.toFixed(1) ?? "—"}–{data.opponentProjectedPoints?.toFixed(1) ?? "—"}</small>
         </Link>
       </header>
 

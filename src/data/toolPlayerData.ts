@@ -23,6 +23,9 @@ export interface ToolPlayer {
   marketValue: number | null;
   projectedPoints: number | null;
   projectedPointsPerGame: number | null;
+  weeklyProjectedPoints?: number | null;
+  weeklyProjectionWeek?: number | null;
+  weeklyProjectionOpponent?: string;
   projectionSourceCount?: number;
   projectionLow?: number | null;
   projectionHigh?: number | null;
@@ -178,7 +181,7 @@ export function buildToolPlayers(
       ...(row.sleeper?.playerId ? { sleeperId: String(row.sleeper.playerId) } : {}),
       name: row.player.name,
       position,
-      team: normalizeToolTeam(row.player.nflTeam),
+      team: normalizeToolTeam(row.sleeper?.team ?? row.player.nflTeam),
       rank: numberValue(row.player.rank),
       positionRank: numberValue(row.player.posRank),
       byeWeek: numberValue(row.player.byeWeek),

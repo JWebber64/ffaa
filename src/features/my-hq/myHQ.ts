@@ -2,9 +2,14 @@ import {
   normalizeToolPosition,
   normalizeToolTeam,
   type ToolPlayer,
+  type ToolScoring,
 } from "../../data/toolPlayerData";
 import type { SleeperPlayerRow } from "../../data/playerStatCategories";
 import type { SleeperLeagueConnectionSummary } from "../league-hq/sleeperConnections";
+import {
+  loadSleeperWeeklyProjections,
+  type SleeperWeeklyProjection,
+} from "./sleeperWeeklyProjections";
 
 const SLEEPER_API = "https://api.sleeper.app/v1";
 
@@ -15,6 +20,7 @@ type SleeperLeague = {
   status: string;
   owner_id?: string | null;
   roster_positions?: string[];
+  scoring_settings?: Record<string, number>;
 };
 
 type SleeperState = { week?: number; display_week?: number; season?: string; season_type?: string };
@@ -94,8 +100,8 @@ export type MyHQData = {
   opponentProviderUserId: string;
   teamScore: number | null;
   opponentScore: number | null;
-  teamBaselinePoints: number | null;
-  opponentBaselinePoints: number | null;
+  teamProjectedPoints: number | null;
+  opponentProjectedPoints: number | null;
   starterLineup: MyHQLineupEntry[];
   opponentStarterLineup: MyHQLineupEntry[];
   starters: ToolPlayer[];
@@ -123,9 +129,40 @@ function scoreValue(matchup?: SleeperMatchup) {
   return Number.isFinite(Number(matchup.points)) ? Number(matchup.points) : null;
 }
 
-function lineupBaseline(players: ToolPlayer[]) {
-  const projected = players.flatMap((player) => player.projectedPointsPerGame ?? []);
+function lineupWeeklyProjection(players: ToolPlayer[]) {
+  const projected = players.flatMap((player) => player.weeklyProjectedPoints ?? []);
   return projected.length ? projected.reduce((sum, value) => sum + value, 0) : null;
+}
+
+function weeklyProjectionScoring(
+  connection: SleeperLeagueConnectionSummary,
+  league: SleeperLeague,
+): { scoring: ToolScoring; label: string } {
+  if (connection.auctionSettings) {
+    return {
+      scoring: connection.auctionSettings.scoring,
+      label: connection.auctionSettings.scoringLabel,
+    };
+  }
+  const receptionPoints = numberValue(league.scoring_settings?.rec);
+  if (receptionPoints >= 0.75) return { scoring: "ppr", label: "Full PPR" };
+  if (receptionPoints >= 0.25) return { scoring: "halfPpr", label: "Half PPR" };
+  return { scoring: "standard", label: "Standard" };
+}
+
+function withWeeklyProjection(
+  player: ToolPlayer,
+  sleeperId: string,
+  week: number,
+  projections: Map<string, SleeperWeeklyProjection>,
+): ToolPlayer {
+  const projection = sleeperId ? projections.get(sleeperId) : undefined;
+  return {
+    ...player,
+    weeklyProjectedPoints: projection?.week === week ? projection.points : null,
+    weeklyProjectionWeek: week,
+    ...(projection?.opponent ? { weeklyProjectionOpponent: projection.opponent } : {}),
+  };
 }
 
 function rosterOwnerIds(roster: SleeperRoster) {
@@ -378,20 +415,34 @@ export async function loadMyHQ(
   ]);
   const week = Math.max(0, numberValue(state.display_week ?? state.week));
   const matchupWeek = Math.max(1, week);
-  const [matchups, transactions] = await Promise.all([
+  const projectionScoring = weeklyProjectionScoring(connection, league);
+  let projectionError = "";
+  const [matchups, transactions, weeklyProjections] = await Promise.all([
     week > 0
       ? sleeperJson<SleeperMatchup[]>(`/league/${connection.leagueId}/matchups/${matchupWeek}`, signal)
       : Promise.resolve([]),
     sleeperJson<SleeperTransaction[]>(`/league/${connection.leagueId}/transactions/${matchupWeek}`, signal).catch(() => []),
+    loadSleeperWeeklyProjections(
+      league.season,
+      matchupWeek,
+      state.season_type || "regular",
+      projectionScoring.scoring,
+    ).catch((error: unknown) => {
+      projectionError = error instanceof Error ? error.message : "Unknown projection error.";
+      return new Map<string, SleeperWeeklyProjection>();
+    }),
   ]);
 
   const userRoster = rosters.find((roster) => rosterOwnerIds(roster).includes(connection.managerProviderUserId!));
   if (!userRoster) throw new Error(`${connection.managerDisplayName ?? "Your Sleeper account"} does not own a roster in this league.`);
 
-  const playerById = new Map(allPlayers.flatMap((player) => [
-    [player.id, player] as const,
-    ...(player.sleeperId ? [[player.sleeperId, player] as const] : []),
-  ]));
+  const playerById = new Map<string, ToolPlayer>();
+  for (const player of allPlayers) {
+    const sleeperId = player.sleeperId?.trim() || "";
+    const enrichedPlayer = withWeeklyProjection(player, sleeperId, matchupWeek, weeklyProjections);
+    playerById.set(player.id, enrichedPlayer);
+    if (sleeperId) playerById.set(sleeperId, enrichedPlayer);
+  }
   const sleeperById = new Map(sleeperRows.flatMap((row) => row.playerId ? [[String(row.playerId), row] as const] : []));
   const relevantPlayerIds = new Set([
     ...rosters.flatMap((roster) => roster.players ?? []),
@@ -401,7 +452,10 @@ export async function loadMyHQ(
     if (playerById.has(playerId)) continue;
     const sleeperRow = sleeperById.get(playerId);
     const fallback = sleeperRow ? sleeperFallbackPlayer(sleeperRow) : null;
-    if (fallback) playerById.set(playerId, fallback);
+    if (fallback) playerById.set(
+      playerId,
+      withWeeklyProjection(fallback, playerId, matchupWeek, weeklyProjections),
+    );
   }
   const starterIds = userRoster.starters ?? [];
   const starterSlots = (league.roster_positions ?? []).filter(isStarterSlot);
@@ -485,8 +539,8 @@ export async function loadMyHQ(
     opponentProviderUserId,
     teamScore: scoreValue(userMatchup),
     opponentScore: scoreValue(opponentMatchup),
-    teamBaselinePoints: lineupBaseline(starters),
-    opponentBaselinePoints: lineupBaseline(opponentStarters),
+    teamProjectedPoints: lineupWeeklyProjection(starters),
+    opponentProjectedPoints: lineupWeeklyProjection(opponentStarters),
     starterLineup,
     opponentStarterLineup,
     starters,
@@ -511,7 +565,9 @@ export async function loadMyHQ(
       .sort((left, right) => numberValue(right.created) - numberValue(left.created))
       .slice(0, 4)
       .map((transaction) => transactionLabel(transaction, playerById)),
-    projectionNote: "Player comparisons use GameHQ’s current full-season baseline. Sleeper does not expose a public live matchup projection here, so no weekly projection is invented.",
+    projectionNote: projectionError
+      ? `Week ${matchupWeek} projections are unavailable (${projectionError}) Season averages are not substituted.`
+      : `Player values use Sleeper’s current Week ${matchupWeek} ${projectionScoring.label} projection feed. Players absent from that feed show a dash; season averages are not substituted.`,
     loadedAt: new Date().toISOString(),
   };
 }

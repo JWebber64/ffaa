@@ -46,8 +46,10 @@ function formatLiveScore(value: number | null) {
   return value === null ? "—" : value.toFixed(2);
 }
 
-function formatPlayerBaseline(player: ToolPlayer | null) {
-  return player?.projectedPointsPerGame === null || !player ? "—" : player.projectedPointsPerGame.toFixed(1);
+function formatPlayerProjection(player: ToolPlayer | null) {
+  return player?.weeklyProjectedPoints === null || player?.weeklyProjectedPoints === undefined
+    ? "—"
+    : player.weeklyProjectedPoints.toFixed(1);
 }
 
 function MatchupPlayerSide({ player, side }: { player: ToolPlayer | null; side: "left" | "right" }) {
@@ -57,7 +59,7 @@ function MatchupPlayerSide({ player, side }: { player: ToolPlayer | null; side: 
   return (
     <div className={`league-h2h-player is-${side}`}>
       <div><strong>{player?.name ?? "Open slot"}</strong><small>{detail}</small></div>
-      <b>{formatPlayerBaseline(player)}<small>PPG</small></b>
+      <b>{formatPlayerProjection(player)}<small>PROJ</small></b>
     </div>
   );
 }
@@ -91,19 +93,19 @@ function ConnectedTeamMatchup({ data }: { data: MyHQData }) {
     <div className="league-season-page league-personal-matchup">
       <header className="league-compact-page-heading">
         <div><span>My matchup · {data.leagueName}</span><h1>{data.week ? `Week ${data.week}` : "Next matchup"}</h1></div>
-        <small>Current Sleeper rosters · season baselines</small>
+        <small>Current Sleeper rosters · Week {data.week || 1} projections</small>
       </header>
 
       <section className="league-head-to-head" aria-label={`${data.teamName} versus ${data.opponentName}`}>
         <header className="league-h2h-teams">
-          <div className="is-left"><span>Your team</span><strong>{data.teamName}</strong><small>{data.record} · {data.teamBaselinePoints?.toFixed(1) ?? "—"} baseline</small><b>{formatLiveScore(data.teamScore)}</b></div>
+          <div className="is-left"><span>Your team</span><strong>{data.teamName}</strong><small>{data.record} · {data.teamProjectedPoints?.toFixed(1) ?? "—"} projected</small><b>{formatLiveScore(data.teamScore)}</b></div>
           <span className="league-h2h-versus" aria-hidden="true">VS</span>
-          <div className="is-right"><span>Opponent</span><strong>{data.opponentName}</strong><small>{data.opponentRecord} · {data.opponentBaselinePoints?.toFixed(1) ?? "—"} baseline</small><b>{formatLiveScore(data.opponentScore)}</b></div>
+          <div className="is-right"><span>Opponent</span><strong>{data.opponentName}</strong><small>{data.opponentRecord} · {data.opponentProjectedPoints?.toFixed(1) ?? "—"} projected</small><b>{formatLiveScore(data.opponentScore)}</b></div>
         </header>
 
         {hasOpponent ? (
           <>
-            <div className="league-h2h-section-label"><span>Starters</span><small>Season baseline PPG</small></div>
+            <div className="league-h2h-section-label"><span>Starters</span><small>Week {data.week || 1} projected points</small></div>
             <MatchupLineupRows left={data.starterLineup} right={data.opponentStarterLineup} />
             {(leftBench.length || rightBench.length) ? <div className="league-h2h-section-label"><span>Bench</span><small>Roster depth</small></div> : null}
             <MatchupLineupRows left={leftBench} right={rightBench} bench />

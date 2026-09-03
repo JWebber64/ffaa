@@ -298,6 +298,25 @@ function makeIdentityMap<T extends JsonRecord>(
   return map;
 }
 
+function makeUniqueNamePositionMap<T extends JsonRecord>(
+  rows: T[],
+  fields: { name: string; pos: string }
+) {
+  const map = new Map<string, T>();
+  const ambiguousKeys = new Set<string>();
+  for (const row of rows) {
+    const key = namePositionKey(row[fields.name], row[fields.pos]);
+    if (!key || ambiguousKeys.has(key)) continue;
+    if (map.has(key)) {
+      map.delete(key);
+      ambiguousKeys.add(key);
+    } else {
+      map.set(key, row);
+    }
+  }
+  return map;
+}
+
 function makeNamePositionMap<T extends JsonRecord>(
   rows: T[],
   fields: { name: string; pos: string }
@@ -492,6 +511,10 @@ export function buildPlayerStatRows(
     pos: "pos",
     team: "team",
   });
+  const sleeperByNamePosition = makeUniqueNamePositionMap(sleeperRows, {
+    name: "name",
+    pos: "pos",
+  });
   const historicalByKey = new Map<string, HistoricalPlayerAggregate>();
   const usedHistoricalIds = new Set<string>();
   const usedClayIds = new Set<string>();
@@ -516,7 +539,8 @@ export function buildPlayerStatRows(
     if (espnClay) usedClayKeys.add(identityKey(espnClay.name, espnClay.pos, espnClay.nflTeam));
     if (espnClay) usedClayNamePositions.add(namePositionKey(espnClay.name, espnClay.pos));
 
-    const sleeper = sleeperByIdentity.get(key);
+    const sleeper = sleeperByIdentity.get(key)
+      ?? sleeperByNamePosition.get(namePositionKey(player.name, player.pos));
     const espn = espnById.get(player.id) ?? espnByIdentity.get(key);
     const winWithOdds = findWinWithOddsProjection(player);
     const subject = projectionMode && espnClay ? playerSubjectWithProjection(player, espnClay) : player;
@@ -562,7 +586,8 @@ export function buildPlayerStatRows(
 
         const player = projectionSubjectFromClay(espnClay);
         const espn = espnById.get(player.id) ?? espnByIdentity.get(key);
-        const sleeper = sleeperByIdentity.get(key);
+        const sleeper = sleeperByIdentity.get(key)
+          ?? sleeperByNamePosition.get(namePositionKey(espnClay.name, espnClay.pos));
         const winWithOdds = findWinWithOddsProjection(player);
         const statRow: PlayerStatRow = {
           player,
