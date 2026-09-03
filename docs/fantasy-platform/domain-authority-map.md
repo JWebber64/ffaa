@@ -262,6 +262,7 @@ leagues/{gamehqLeagueId}
   franchises/{franchiseId}
   memberships/{userId}
   roleGrants/{roleGrantId}
+  invitations/{invitationId}
   externalConnections/{connectionId}
   settingsVersions/{settingsVersionId}
   commands/{commandId}
@@ -327,5 +328,8 @@ An imported league owner ID is display context. It never changes these labels or
 | Weekly lineup state during cutover | Existing `leagueSeasons/{externalId}/lineups` as the single state owner | Browser writes are closed; server command is its only writer and also emits the canonical audit/receipt |
 | Idempotency | `leagues/{id}/commands/{commandId}` | Client-created timestamps are excluded from the semantic request hash so a transport retry remains the same command |
 | Audit | `leagues/{id}/auditEvents/{auditId}` | A legacy-format audit is co-written only to keep existing readers intact; both are in the same atomic commit |
+| Native team seats | Published SettingsVersion plus server reconciliation of `franchises` and seasonal `seasonTeams` | Team count changes never delete franchise identity; assigned seats cannot be retired |
+| Manager invitation | `leagues/{id}/invitations/{invitationId}` through authenticated commands | Random token hash, invited Firebase email, expiry, role, and optional franchise are verified before grants are created |
+| Manager removal | `remove_league_member` command | Revokes every active grant and the membership in one audited season-revision commit; primary commissioner cannot be removed through this path |
 
 The first implementation does not infer authority from `managerProviderUserId`, `leagueOwnerProviderUserId`, Sleeper roster ownership, or any other imported profile field.

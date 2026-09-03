@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, ClipboardList, History, Settings2 } from "lucide-react";
-import { Link, NavLink } from "react-router-dom";
+import { CheckCircle2, ClipboardList, History, Settings2, Users } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 import {
   ROSTER_SLOT_KEYS,
@@ -23,6 +23,11 @@ import {
   saveSettingsDraftCommand,
 } from "../league-domain/leagueCommands";
 import type { CanonicalLeagueWorkspace, SettingsVersion } from "../league-domain/types";
+import {
+  CommissionerOperationsOverview,
+  CommissionerTeamsWorkspace,
+} from "../league-membership/CommissionerPeopleWorkspace";
+import { defaultCommissionerPeopleService, type CommissionerPeopleService } from "../league-membership/commissionerPeopleService";
 import "./commissioner-settings.css";
 
 type PendingAction = "idle" | "loading" | "saving" | "publishing" | "restoring";
@@ -316,33 +321,33 @@ function SettingsEditor({ workspace, onWorkspaceChanged, service }: { workspace:
   );
 }
 
-function CommissionerOverview({ workspace }: { workspace: CanonicalLeagueWorkspace }) {
-  const season = workspace.season!;
-  return (
-    <section className="commissioner-overview">
-      <header className="commissioner-page-header"><div><span className="hq-kicker">Commissioner workspace</span><h1>{workspace.league.name}</h1></div><p>League authority, active rules, and setup readiness in one auditable workspace.</p></header>
-      <dl className="commissioner-overview-list">
-        <div><dt>League status</dt><dd>{workspace.league.status}</dd></div>
-        <div><dt>Season</dt><dd>{season.year} · {season.phase.replace("_", " ")}</dd></div>
-        <div><dt>Season revision</dt><dd>{season.revision}</dd></div>
-        <div><dt>Published rules</dt><dd>{season.settingsVersionId ? `Version ${season.settingsVersionId.slice(-8)}` : "Not published"}</dd></div>
-        <div><dt>Working draft</dt><dd>{season.draftSettingsVersionId ? "Ready to review" : "No unpublished draft"}</dd></div>
-      </dl>
-      <div className="commissioner-overview-actions"><Link className="hq-primary-link" to="settings">Open rulebook</Link>{season.settingsVersionId ? <Link to={`/league/${encodeURIComponent(workspace.league.id)}/rules`}>Read published constitution</Link> : null}</div>
-    </section>
-  );
-}
-
-export function CommissionerSettingsWorkspace({ workspace, section, onWorkspaceChanged, service = defaultSettingsService }: { workspace: CanonicalLeagueWorkspace; section: string; onWorkspaceChanged: () => void; service?: CommissionerSettingsService }) {
+export function CommissionerSettingsWorkspace({
+  workspace,
+  section,
+  onWorkspaceChanged,
+  service = defaultSettingsService,
+  peopleService = defaultCommissionerPeopleService,
+}: {
+  workspace: CanonicalLeagueWorkspace;
+  section: string;
+  onWorkspaceChanged: () => void;
+  service?: CommissionerSettingsService;
+  peopleService?: CommissionerPeopleService;
+}) {
   const base = `/league/${encodeURIComponent(workspace.league.id)}/commissioner`;
   return (
     <main className="commissioner-workspace">
       <nav aria-label="Commissioner workspace">
         <NavLink end to={base}><Settings2 aria-hidden="true" />Overview</NavLink>
+        <NavLink to={`${base}/teams`}><Users aria-hidden="true" />Teams &amp; roles</NavLink>
         <NavLink to={`${base}/settings`}><ClipboardList aria-hidden="true" />Rulebook</NavLink>
         {workspace.season?.settingsVersionId ? <NavLink to={`/league/${encodeURIComponent(workspace.league.id)}/rules`}><History aria-hidden="true" />Published rules</NavLink> : null}
       </nav>
-      {section === "settings" ? <SettingsEditor workspace={workspace} onWorkspaceChanged={onWorkspaceChanged} service={service} /> : <CommissionerOverview workspace={workspace} />}
+      {section === "settings"
+        ? <SettingsEditor workspace={workspace} onWorkspaceChanged={onWorkspaceChanged} service={service} />
+        : section === "teams"
+          ? <CommissionerTeamsWorkspace workspace={workspace} onWorkspaceChanged={onWorkspaceChanged} service={peopleService} />
+          : <CommissionerOperationsOverview workspace={workspace} service={peopleService} />}
     </main>
   );
 }

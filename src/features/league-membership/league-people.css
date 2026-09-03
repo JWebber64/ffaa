@@ -1,0 +1,91 @@
+.commissioner-people { min-width: 0; }
+.commissioner-people-state { display: flex; min-height: 220px; align-items: center; justify-content: center; gap: 10px; color: var(--text-secondary); }
+.commissioner-people-state svg { width: 18px; color: var(--green-400); }
+.commissioner-people-gate { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--line-1); border-radius: var(--r-lg); background: var(--color-surface-card-primary); }
+.commissioner-people-gate > svg { width: 20px; color: var(--green-400); }
+.commissioner-people-gate strong, .commissioner-people-gate p { margin: 0; }
+.commissioner-people-gate p { margin-top: 3px; color: var(--text-muted); font-size: .74rem; }
+.commissioner-invite, .commissioner-team-table, .commissioner-people-columns > section, .commissioner-removal, .commissioner-health, .commissioner-operations-grid > section { border: 1px solid var(--line-1); border-radius: var(--r-lg); background: var(--color-surface-card-primary); overflow: hidden; }
+.commissioner-invite, .commissioner-team-table { margin-bottom: var(--space-3); }
+.commissioner-invite > header, .commissioner-people-columns > section > header, .commissioner-removal > header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--line-1); background: color-mix(in oklch, var(--color-surface-card-secondary) 74%, transparent); }
+.commissioner-invite > header svg, .commissioner-people-columns > section > header svg, .commissioner-removal > header svg { width: 17px; color: var(--green-400); }
+.commissioner-invite h2, .commissioner-team-table h2, .commissioner-people-columns h2, .commissioner-removal h2, .commissioner-operations-grid h2 { margin: 0; font-size: .88rem; }
+.commissioner-invite header p, .commissioner-people-columns header p, .commissioner-removal header p { margin: 2px 0 0; color: var(--text-muted); font-size: .68rem; line-height: 1.35; }
+.commissioner-invite-fields { display: grid; grid-template-columns: 1.1fr 1.25fr .8fr 1fr auto; align-items: end; gap: 10px; padding: 13px 14px; }
+.commissioner-invite-fields label, .commissioner-share-link label, .commissioner-removal > label { display: grid; gap: 5px; color: var(--text-secondary); font-size: .68rem; font-weight: 800; }
+.commissioner-invite-fields input, .commissioner-share-link input, .commissioner-removal textarea, .commissioner-invite-fields .ffaa-custom-select-trigger { width: 100%; min-height: 38px; border: 1px solid var(--line-1); border-radius: var(--r-md); background: var(--surface-control); color: var(--text-primary); }
+.commissioner-invite-fields input, .commissioner-share-link input { padding: 0 10px; }
+.commissioner-invite-fields input[aria-invalid="true"] { border-color: var(--accent-danger); }
+.commissioner-share-link { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 10px; padding: 11px 14px; border-top: 1px solid var(--line-1); background: color-mix(in oklch, var(--green-500) 5%, transparent); }
+.commissioner-share-link > svg { width: 17px; align-self: center; color: var(--green-400); }
+.commissioner-team-table > header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--line-1); }
+.commissioner-team-table header p { margin: 2px 0 0; color: var(--text-muted); font-size: .68rem; }
+.commissioner-table-scroll { overflow-x: auto; }
+.commissioner-team-table table { width: 100%; border-collapse: collapse; font-size: .73rem; }
+.commissioner-team-table th, .commissioner-team-table td { padding: 10px 14px; border-bottom: 1px solid var(--line-1); text-align: left; vertical-align: middle; }
+.commissioner-team-table tr:last-child th, .commissioner-team-table tr:last-child td { border-bottom: 0; }
+.commissioner-team-table thead th { color: var(--text-muted); font-size: .64rem; letter-spacing: .055em; text-transform: uppercase; background: color-mix(in oklch, var(--color-surface-card-secondary) 52%, transparent); }
+.commissioner-team-table tbody th { display: flex; align-items: center; gap: 9px; }
+.commissioner-team-number { display: inline-grid; width: 25px; height: 25px; place-items: center; border: 1px solid var(--line-1); border-radius: var(--r-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.is-unassigned, .commissioner-operations-grid dd.is-warning { color: var(--accent-warning); font-weight: 800; }
+.commissioner-state { display: inline-flex; align-items: center; gap: 5px; color: var(--text-secondary); font-size: .68rem; font-weight: 800; }
+.commissioner-state svg { width: 14px; }
+.commissioner-state.is-ready { color: var(--green-300); }
+.commissioner-state.is-pending { color: var(--accent-warning); }
+.commissioner-team-access { display: flex; flex-wrap: wrap; gap: 5px; }
+.commissioner-team-access > button { min-height: 30px; padding-inline: 8px; }
+.commissioner-people-columns { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: var(--space-3); }
+.commissioner-role-list, .commissioner-audit-list { margin: 0; padding: 0; list-style: none; }
+.commissioner-role-list li { display: flex; min-height: 52px; padding: 9px 12px 9px 14px; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line-1); }
+.commissioner-role-list li:last-child { border-bottom: 0; }
+.commissioner-role-list li > div { display: grid; gap: 2px; }
+.commissioner-role-list strong { font-size: .74rem; }
+.commissioner-role-list span, .commissioner-role-list small { color: var(--text-muted); font-size: .65rem; }
+.commissioner-role-list button { flex: none; }
+.commissioner-empty { margin: 0; padding: 16px 14px; color: var(--text-muted); font-size: .72rem; }
+.commissioner-removal { margin-top: var(--space-3); border-color: color-mix(in oklch, var(--accent-danger) 45%, var(--line-1)); }
+.commissioner-removal > label { padding: 12px 14px 4px; }
+.commissioner-removal textarea { min-height: 76px; padding: 9px 10px; resize: vertical; }
+.commissioner-removal > small { display: block; padding: 0 14px; color: var(--text-muted); font-size: .65rem; }
+.commissioner-removal > div:last-child { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 14px 13px; }
+.commissioner-health { margin-bottom: var(--space-3); }
+.commissioner-health > header { display: flex; justify-content: space-between; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--line-1); }
+.commissioner-health > header div { display: grid; gap: 2px; }
+.commissioner-health > header span { color: var(--text-muted); font-size: .68rem; }
+.commissioner-health > header strong { font-size: .94rem; }
+.commissioner-health-meter { height: 5px; background: var(--color-surface-card-secondary); }
+.commissioner-health-meter span { display: block; height: 100%; background: var(--green-400); transition: width 180ms cubic-bezier(.23,1,.32,1); }
+.commissioner-health ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; }
+.commissioner-health li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; min-height: 76px; padding: 12px 14px; border-right: 1px solid var(--line-1); }
+.commissioner-health li:last-child { border-right: 0; }
+.commissioner-health li > span svg { width: 16px; color: var(--accent-warning); }
+.commissioner-health li.is-done > span svg { color: var(--green-400); }
+.commissioner-health li div { display: grid; align-content: start; gap: 3px; }
+.commissioner-health li strong { font-size: .73rem; }
+.commissioner-health li small { color: var(--text-muted); font-size: .64rem; line-height: 1.35; }
+.commissioner-health li a { grid-column: 2; color: var(--green-300); font-size: .65rem; font-weight: 850; }
+.commissioner-operations-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: var(--space-3); }
+.commissioner-operations-grid > section > header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--line-1); }
+.commissioner-operations-grid > section > header span { color: var(--text-muted); font-size: .63rem; }
+.commissioner-operations-grid dl { margin: 0; }
+.commissioner-operations-grid dl div { display: flex; min-height: 38px; padding: 8px 14px; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line-1); font-size: .7rem; }
+.commissioner-operations-grid dl div:last-child { border-bottom: 0; }
+.commissioner-operations-grid dt { color: var(--text-muted); }
+.commissioner-operations-grid dd { margin: 0; font-weight: 800; }
+.commissioner-audit-list li { display: grid; gap: 3px; padding: 10px 14px; border-bottom: 1px solid var(--line-1); }
+.commissioner-audit-list li:last-child { border-bottom: 0; }
+.commissioner-audit-list strong { font-size: .7rem; line-height: 1.35; }
+.commissioner-audit-list span { color: var(--text-muted); font-size: .63rem; }
+@media (prefers-reduced-motion: reduce) { .commissioner-health-meter span { transition: none; } }
+@media (max-width: 960px) { .commissioner-invite-fields { grid-template-columns: 1fr 1fr; } .commissioner-invite-fields > button { width: 100%; } .commissioner-health ol { grid-template-columns: 1fr 1fr; } .commissioner-health li:nth-child(2) { border-right: 0; } .commissioner-health li:nth-child(-n+2) { border-bottom: 1px solid var(--line-1); } }
+@media (max-width: 700px) { .commissioner-people-gate { grid-template-columns: auto 1fr; } .commissioner-people-gate > a, .commissioner-people-gate > button { grid-column: 1 / -1; width: 100%; } .commissioner-people-columns, .commissioner-operations-grid { grid-template-columns: 1fr; } .commissioner-team-table table, .commissioner-team-table tbody, .commissioner-team-table tr, .commissioner-team-table th, .commissioner-team-table td { display: block; } .commissioner-team-table thead { display: none; } .commissioner-team-table tr { padding: 8px 12px; border-bottom: 1px solid var(--line-1); } .commissioner-team-table tr:last-child { border-bottom: 0; } .commissioner-team-table th, .commissioner-team-table td { display: grid; grid-template-columns: minmax(105px, .42fr) 1fr; gap: 10px; padding: 6px 2px; border: 0; } .commissioner-team-table th::before, .commissioner-team-table td::before { content: attr(data-label); color: var(--text-muted); font-size: .64rem; font-weight: 700; } .commissioner-team-table tbody th { grid-template-columns: minmax(105px, .42fr) auto 1fr; } .commissioner-team-table tbody th::before { align-self: center; } }
+@media (max-width: 500px) { .commissioner-invite-fields { grid-template-columns: 1fr; } .commissioner-share-link { grid-template-columns: 1fr; } .commissioner-share-link > svg { display: none; } .commissioner-share-link button { width: 100%; } .commissioner-health ol { grid-template-columns: 1fr; } .commissioner-health li { border-right: 0; border-bottom: 1px solid var(--line-1); } .commissioner-health li:last-child { border-bottom: 0; } }
+.league-invitation-accept { width: min(620px, calc(100% - 24px)); margin: clamp(36px, 8vh, 88px) auto; padding: clamp(22px, 5vw, 38px); border: 1px solid var(--line-1); border-radius: var(--r-xl); background: var(--color-surface-card-primary); color: var(--text-primary); }
+.league-invitation-accept > svg { width: 25px; color: var(--green-400); }
+.league-invitation-accept h1 { margin: 8px 0 10px; font-size: clamp(1.75rem, 5vw, 2.55rem); line-height: 1.04; letter-spacing: -.035em; text-wrap: balance; }
+.league-invitation-accept > p:not(.commissioner-message) { color: var(--text-secondary); line-height: 1.55; }
+.league-invitation-accept > div { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
+.league-invitation-accept > div > a { color: var(--text-secondary); font-size: .78rem; font-weight: 800; }
+.league-invitation-accept > small { display: block; margin-top: 18px; color: var(--text-muted); font-size: .68rem; line-height: 1.45; }
+.league-invitation-accept.is-error > svg { color: var(--accent-danger); }
+@media (max-width: 500px) { .league-invitation-accept > div { align-items: stretch; flex-direction: column; } .league-invitation-accept > div > a { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; } }

@@ -63,6 +63,7 @@ export type SeasonTeam = {
   budget: { initial: number; remaining: number; currency: string } | null;
   cap: { limit: number; committed: number; dead: number } | null;
   rosterRevision: number;
+  status: "active" | "retired";
 };
 
 export type LeagueMembershipStatus = "invited" | "requested" | "active" | "suspended" | "removed";
@@ -74,6 +75,8 @@ export type LeagueMembership = {
   joinedAt: string | null;
   revision: number;
   roleGrantIds: string[];
+  displayName: string;
+  email: string;
 };
 
 export type LeagueRole =
@@ -97,6 +100,28 @@ export type RoleGrant = {
   effectiveAt: string;
   expiresAt: string | null;
   grantedBy: string;
+  revokedAt: string | null;
+  revision: number;
+};
+
+export type LeagueInvitationStatus = "pending" | "accepted" | "revoked" | "expired";
+export type LeagueInvitationRole = "team_owner" | "co_manager" | "co_commissioner";
+
+export type LeagueInvitation = {
+  id: string;
+  leagueId: string;
+  seasonId: string;
+  email: string;
+  displayName: string;
+  role: LeagueInvitationRole;
+  franchiseId: string | null;
+  status: LeagueInvitationStatus;
+  createdBy: string;
+  createdAt: string;
+  expiresAt: string;
+  acceptedBy: string | null;
+  acceptedAt: string | null;
+  revokedBy: string | null;
   revokedAt: string | null;
   revision: number;
 };

@@ -68,6 +68,13 @@ describeWithEmulator("native league Firestore security", () => {
           actor_user_id: commissionerId,
           action: "league_created",
         }),
+        firestore.doc(`leagues/${leagueId}/invitations/invite-1`).set({
+          league_id: leagueId,
+          season_id: seasonId,
+          id: "invite-1",
+          status: "pending",
+          email: "manager@example.com",
+        }),
       ]);
     });
   });
@@ -99,5 +106,18 @@ describeWithEmulator("native league Firestore security", () => {
     await assertFails(commissioner.doc(`leagues/${leagueId}/auditEvents/browser-audit`).set({ actor_user_id: commissionerId }));
     await assertFails(commissioner.doc(`leagues/${leagueId}/lineups/team-1_week-1`).set({ revision: 1 }));
     await assertFails(commissioner.doc(`leagues/${leagueId}/settingsVersions/browser-settings`).set({ league_id: leagueId, status: "draft" }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/invitations/browser-invite`).set({ league_id: leagueId, status: "pending" }));
+  });
+
+  it("lets only canonical commissioners list people and invitations", async () => {
+    const commissioner = firestoreFor(commissionerId);
+    await assertSucceeds(commissioner.collection(`leagues/${leagueId}/memberships`).get());
+    await assertSucceeds(commissioner.collection(`leagues/${leagueId}/roleGrants`).get());
+    await assertSucceeds(commissioner.collection(`leagues/${leagueId}/invitations`).get());
+
+    const outsider = firestoreFor("outsider-1");
+    await assertFails(outsider.collection(`leagues/${leagueId}/memberships`).get());
+    await assertFails(outsider.collection(`leagues/${leagueId}/roleGrants`).get());
+    await assertFails(outsider.collection(`leagues/${leagueId}/invitations`).get());
   });
 });

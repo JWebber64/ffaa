@@ -43,6 +43,10 @@ export default function LeagueManage() {
       </section>
     );
   }
-  const section = location.pathname.endsWith("/settings") ? "settings" : "overview";
+  const section = location.pathname.endsWith("/settings")
+    ? "settings"
+    : location.pathname.endsWith("/teams")
+      ? "teams"
+      : "overview";
   return <CommissionerSettingsWorkspace workspace={canonicalWorkspace} section={section} onWorkspaceChanged={refreshWorkspace} />;
 }

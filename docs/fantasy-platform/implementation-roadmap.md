@@ -8,8 +8,8 @@ The roadmap follows the requested phases in order. Each phase is a bounded chang
 |---|---|---|---|
 | 0 | Exact current-state, authority, route, persistence, migration, and implementation audit | Complete in this document set | Six documents present; no application/schema mutation |
 | 1A | First vertical native-league foundation | Implemented; exact Preview verified; Production unchanged | First-slice evidence and limits below |
-| 2 | Creation wizard and full Commissioner workspace/settings publication | Settings publication implemented locally; roles/invitations remain | Valid native redraft league and immutable settings publication |
-| 3 | Universal command, roster transaction, and audit expansion | Blocked on 2; lineup proof begins in 1A | All authoritative mutations use command boundary |
+| 2 | Creation wizard and full Commissioner workspace/settings publication | Native redraft exit gate implemented locally through 2A and 2B | Valid native redraft league, immutable settings, and assigned managers |
+| 3 | Universal command, roster transaction, and audit expansion | Next phase; lineup, settings, and membership commands are working proofs | All authoritative mutations use command boundary |
 | 4 | Native-league draft integration | Blocked on commands/settings | Draft completion creates roster transactions |
 | 5 | Weekly operation and player-level locks | Blocked on settings/commands | Cross-device lineups and settings-derived lock behavior |
 | 6 | Provider-agnostic scoring | Blocked on settings/schedule/lineups | Deterministic replay/corrections and live freshness UI |
@@ -230,7 +230,19 @@ Gate: a commissioner creates and publishes a valid native redraft league; invali
 - The deterministic rule-impact preview calculates roster size, draft population, matchups, byes, and auction pool. The same settings generate `/league/:gamehqLeagueId/rules` as a plain-English constitution.
 - Firestore permits active canonical members to list settings history and continues to deny every direct browser settings write.
 
-Phase 2A verification: TypeScript application/API checks, lint, focused settings/command tests, Firestore emulator rules tests, and the Vercel artifact build pass. Roles, invitations, team assignment, and the remaining commissioner domains stay in Phase 2B; no empty placeholder pages were added. Midseason publication is intentionally locked until the required material-impact reason workflow exists.
+Phase 2A verification: TypeScript application/API checks, lint, focused settings/command tests, Firestore emulator rules tests, and the Vercel artifact build pass. Midseason publication is intentionally locked until the required material-impact reason workflow exists.
+
+### Implemented Phase 2B — teams, invitations, and setup health
+
+- Publishing a native rules version now provisions permanent franchises and active season-team seats from the published team count in the same atomic commit. Restoring a larger version reactivates the canonical seats; shrinking is blocked when a removed seat still has an active manager grant or pending invitation.
+- `create_league_invitation`, `accept_league_invitation`, `revoke_league_invitation`, `remove_league_member`, and `provision_season_teams` use the authenticated command boundary, exact season revision, idempotent receipt, immutable audit, and one atomic Firestore commit.
+- Invitations are seven-day, random-token, hash-at-rest, and email-bound. The browser receives the token only in the create receipt; acceptance verifies the authenticated Firebase email before creating membership and role grants.
+- Primary commissioner and co-commissioner authority are separate from team ownership. A primary commissioner can appoint or remove a co-commissioner. A co-commissioner can invite team managers but cannot appoint league authority. Published co-manager and multi-team rules are enforced server-side.
+- `/league/:gamehqLeagueId/commissioner/teams` is a compact teams-and-roles workspace for invites, owner/co-manager state, pending invitation revocation, and audited removal/replacement. `/league/:gamehqLeagueId/join` is the signed-in acceptance route.
+- The commissioner index now uses canonical team, membership, invitation, connection, and audit data for setup gates and its action queue. Unfinished engines are labeled `Not active` or `Not configured`; no synthetic counts are displayed.
+- Firestore lets canonical managers read the membership/role/invitation administration views while continuing to deny all direct browser writes.
+
+Phase 2B rollback is code/flag based and never deletes canonical teams, memberships, grants, invitations, commands, or audits. Existing Sleeper connections, legacy claims, and legacy team membership paths are not migrated or removed by these commands.
 
 ## Phase 3 — command, transaction, and audit expansion
 
@@ -372,7 +384,7 @@ Implementation differences from the proposed file list:
 Known limits:
 
 - No waivers, trades, live scoring, native standings, playoffs, chat, or provider writes were introduced.
-- Native leagues now continue directly into the Phase 2A rulebook and can atomically publish a playable redraft rules version. Team invitations and role assignment remain Phase 2B.
+- Native leagues can publish the Phase 2A rulebook and complete the Phase 2B invitation/team-assignment gate. Draft, waiver, trade, scoring, standings, playoff, and advanced specialist-role workflows remain in their ordered phases.
 - Legacy season publication, team-claim administration, and whole-week lock mutation still use their existing direct rules and are Phase 3 command-expansion work.
 - The Firestore emulator test files passed locally with the isolated Java runtime; the host still has no system-wide Java installation or `PATH` change.
 - Preview was deployed for review on September 3, 2026. Production was not promoted or changed.

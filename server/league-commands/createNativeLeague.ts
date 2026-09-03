@@ -35,11 +35,13 @@ function abbreviation(name: string) {
 export async function executeCreateNativeLeague(input: {
   command: LeagueCommand<"create_native_league">;
   actorUserId: string;
+  actorEmail?: string;
   requestHash: string;
   processedAt: string;
   store: LeagueCommandStore;
 }): Promise<LeagueCommandReceipt> {
   const { command, actorUserId, requestHash, processedAt, store } = input;
+  const actorEmail = text(input.actorEmail).toLowerCase().slice(0, 254);
   if (!isGamehqLeagueId(command.leagueId)) throw new LeagueCommandFailure("invalid_league_id", "Native leagues require a GameHQ UUID.");
   if (!isGamehqLeagueId(command.seasonId)) throw new LeagueCommandFailure("invalid_season_id", "The native season ID is invalid.");
   const name = text(command.payload.name).replace(/\s+/gu, " ").slice(0, 100);
@@ -127,6 +129,8 @@ export async function executeCreateNativeLeague(input: {
       joined_at: processedAt,
       revision: 1,
       role_grant_ids: [grantId],
+      display_name: actorEmail ? actorEmail.split("@")[0] : "League commissioner",
+      email: actorEmail,
     }),
     createOnlyWrite(store, grantPath(command.leagueId, grantId), {
       schema_version: 1,

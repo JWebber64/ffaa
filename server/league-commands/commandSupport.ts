@@ -35,7 +35,7 @@ export function commandRequestHash(command: LeagueCommand) {
   return createHash("sha256").update(JSON.stringify(sortedValue(idempotentRequest))).digest("hex");
 }
 
-export function deriveGamehqUuid(actorUserId: string, commandId: string, domain: "league" | "season") {
+export function deriveGamehqUuid(actorUserId: string, commandId: string, domain: "league" | "season" | "franchise") {
   const bytes = createHash("sha256").update(`${domain}:${actorUserId}:${commandId}`).digest().subarray(0, 16);
   bytes[6] = ((bytes[6] ?? 0) & 0x0f) | 0x40;
   bytes[8] = ((bytes[8] ?? 0) & 0x3f) | 0x80;
@@ -76,6 +76,10 @@ export function membershipPath(leagueId: string, userId: string) {
   return `leagues/${leagueId}/memberships/${userId}`;
 }
 
+export function invitationPath(leagueId: string, invitationId: string) {
+  return `leagues/${leagueId}/invitations/${invitationId}`;
+}
+
 export function createOnlyWrite(store: LeagueCommandStore, path: string, data: Record<string, unknown>): FirestoreWrite {
   return { update: store.document(path, data), currentDocument: { exists: false } };
 }
@@ -109,7 +113,19 @@ export function normalizeReceipt(document: LeagueCommandStoredDocument | null): 
   if (!document) return null;
   const data = document.data;
   const commandType = text(data.command_type);
-  if (!["create_native_league", "connect_external_league", "save_weekly_lineup", "save_settings_draft", "publish_settings", "restore_settings_version"].includes(commandType)) return null;
+  if (![
+    "create_native_league",
+    "connect_external_league",
+    "save_weekly_lineup",
+    "save_settings_draft",
+    "publish_settings",
+    "restore_settings_version",
+    "provision_season_teams",
+    "create_league_invitation",
+    "accept_league_invitation",
+    "revoke_league_invitation",
+    "remove_league_member",
+  ].includes(commandType)) return null;
   const error = record(data.error);
   return {
     commandId: text(data.command_id),

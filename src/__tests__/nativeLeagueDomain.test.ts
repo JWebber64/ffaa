@@ -48,6 +48,8 @@ describe("GameHQ authority", () => {
         joinedAt: "2026-09-01T00:00:00.000Z",
         revision: 1,
         roleGrantIds: ["active", "revoked", "expired"],
+        displayName: "Manager One",
+        email: "manager@example.com",
       },
       roleGrants: [
         {
@@ -122,6 +124,8 @@ describe("GameHQ authority", () => {
         joinedAt: null,
         revision: 1,
         roleGrantIds: ["commissioner"],
+        displayName: "Commissioner",
+        email: "commissioner@example.com",
       },
       roleGrants: [{
         id: "commissioner",

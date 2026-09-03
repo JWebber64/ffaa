@@ -222,6 +222,7 @@ Migration is explicit and on-demand, not a page-load bulk conversion.
 1. A permanent Firebase account chooses **Create GameHQ mapping** for a saved Sleeper connection, or attempts the first legacy-backed lineup save.
 2. `connect_external_league` atomically claims the unique provider mapping and creates the canonical league aggregate.
 3. When `leagueSeasons/{externalLeagueId}` exists, the command records `mirror` / `legacy_backed_native`, creates the canonical season, frozen compatibility SettingsVersion, franchises, season teams, memberships, and role grants, and preserves the legacy source pointer.
+4. Phase 2B invitations apply only to canonical native membership. They do not infer access from Sleeper owner/co-owner fields or rewrite legacy `managerMemberships`/`franchiseClaims`.
 4. When no published legacy season exists, the command records `connected_read_only` / `mapped_read_only`; the actor receives membership but no write role.
 5. Concurrent attach commands race on the mapping precondition. The winner's GameHQ league ID becomes canonical; the loser returns an idempotent receipt pointing to that same winner.
 6. Old numeric routes resolve through the mapping; an unmapped route still loads compatibility readers.

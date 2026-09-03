@@ -142,6 +142,8 @@ function normalizeMembership(value: unknown, leagueId: string, userId: string): 
     joinedAt: text(data.joined_at) || null,
     revision: Math.max(1, Math.round(numberValue(data.revision, 1))),
     roleGrantIds: stringArray(data.role_grant_ids),
+    displayName: text(data.display_name),
+    email: text(data.email),
   };
 }
 

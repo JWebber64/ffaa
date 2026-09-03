@@ -290,3 +290,11 @@ Implementation branch: `codex/native-league-foundation`, based on `origin/master
 - No new authoritative localStorage key was added. Existing Sleeper connection preferences remain compatibility input only.
 
 Deliberate remaining direct legacy writes are season publication, claims/membership approval, and whole-week locking. They are outside the one-command lineup proof and remain scheduled for command expansion; the UI and documentation do not claim the entire legacy management surface has moved server-side.
+
+## Phase 2 implementation delta
+
+- Native settings drafts, publication, and forward-only restoration now use the authenticated command boundary and immutable `settingsVersions` documents. The active season pointer is the only rules authority.
+- Publishing reconciles native `franchises` and seasonal `seasonTeams` in the same commit, rather than asking commissioners to create local team records.
+- Canonical manager invitations, acceptance, revocation, and membership removal use email-bound expiring tokens and canonical role grants. Provider ownership is not consulted.
+- `/league/:gamehqLeagueId/commissioner/teams` and `/league/:gamehqLeagueId/join` expose the native administration/acceptance workflows. The commissioner overview calculates setup health from actual canonical reads.
+- Existing `franchiseClaims`, `managerMemberships`, and Sleeper connection storage remain compatibility data. Phase 2 does not delete, rewrite, or use them to silently grant canonical access.

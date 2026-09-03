@@ -71,6 +71,24 @@ service cloud.firestore {
           && get(canonicalMembershipPath(request.auth.uid)).data.status == 'active';
       }
 
+      function canonicalRoleGrantPath(grantId) {
+        return /databases/$(database)/documents/leagues/$(leagueId)/roleGrants/$(grantId);
+      }
+
+      function hasCurrentCanonicalRole(grantId, role) {
+        return exists(canonicalRoleGrantPath(grantId))
+          && get(canonicalRoleGrantPath(grantId)).data.user_id == request.auth.uid
+          && get(canonicalRoleGrantPath(grantId)).data.role == role
+          && (!('revoked_at' in get(canonicalRoleGrantPath(grantId)).data)
+            || get(canonicalRoleGrantPath(grantId)).data.revoked_at == '');
+      }
+
+      function isCanonicalManager() {
+        return isCanonicalMember()
+          && (hasCurrentCanonicalRole(request.auth.uid + '__commissioner', 'commissioner')
+            || hasCurrentCanonicalRole(request.auth.uid + '__co_commissioner', 'co_commissioner'));
+      }
+
       allow get: if signedIn();
       allow list, create, update, delete: if false;
 
@@ -101,14 +119,21 @@ service cloud.firestore {
       }
 
       match /memberships/{userId} {
-        allow get: if permanentUser() && request.auth.uid == userId;
-        allow list, create, update, delete: if false;
+        allow get: if permanentUser() && (request.auth.uid == userId || isCanonicalManager());
+        allow list: if isCanonicalManager();
+        allow create, update, delete: if false;
       }
 
       match /roleGrants/{grantId} {
         allow get: if permanentUser()
-          && resource.data.user_id == request.auth.uid;
-        allow list, create, update, delete: if false;
+          && (resource.data.user_id == request.auth.uid || isCanonicalManager());
+        allow list: if isCanonicalManager();
+        allow create, update, delete: if false;
+      }
+
+      match /invitations/{invitationId} {
+        allow get, list: if isCanonicalManager();
+        allow create, update, delete: if false;
       }
 
       match /commands/{commandId} {

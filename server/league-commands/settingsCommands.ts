@@ -18,6 +18,7 @@ import {
   wholeNumber,
 } from "./commandSupport";
 import type { LeagueCommandStore } from "./store";
+import { reconcileSeasonTeams } from "./teamProvisioning";
 
 type SettingsCommandType = "save_settings_draft" | "publish_settings" | "restore_settings_version";
 
@@ -239,6 +240,16 @@ async function publishVersion(input: {
     .filter((issue, index, all) => all.findIndex((candidate) => candidate.field === issue.field && candidate.message === issue.message) === index);
   if (issues.length) throw new LeagueCommandFailure("invalid_settings", `League settings cannot publish: ${issues[0]?.message ?? "fix the reported validation errors."}`, 422, revision);
 
+  const teamChanges = await reconcileSeasonTeams({
+    store,
+    leagueId: command.leagueId,
+    seasonId: command.seasonId,
+    settings: parsed.settings,
+    actorUserId,
+    commandId: command.commandId,
+    processedAt,
+  });
+
   const nextRevision = revision + 1;
   const publishedVersionId = `settings-${command.commandId}`;
   const auditEventId = `audit-${command.commandId}`;
@@ -254,10 +265,19 @@ async function publishVersion(input: {
     auditEventId,
     serverProcessedAt: processedAt,
     requestHash,
-    result: { settingsVersionId: publishedVersionId, sourceVersionId, status: "published" },
+    result: {
+      settingsVersionId: publishedVersionId,
+      sourceVersionId,
+      status: "published",
+      teamCount: teamChanges.activeCount,
+      createdTeamCount: teamChanges.createdCount,
+      restoredTeamCount: teamChanges.restoredCount,
+      retiredTeamCount: teamChanges.retiredCount,
+    },
     error: null,
   };
   const writes: FirestoreWrite[] = [
+    ...teamChanges.writes,
     createOnlyWrite(store, settingsPath(command.leagueId, publishedVersionId), settingsVersionRecord({
       id: publishedVersionId,
       leagueId: command.leagueId,
@@ -303,7 +323,13 @@ async function publishVersion(input: {
       resulting_revision: nextRevision,
       before: { settings_version_id: currentVersionId },
       after: { settings_version_id: publishedVersionId },
-      material_differences: { source_settings_version_id: sourceVersionId },
+      material_differences: {
+        source_settings_version_id: sourceVersionId,
+        team_count: teamChanges.activeCount,
+        created_team_count: teamChanges.createdCount,
+        restored_team_count: teamChanges.restoredCount,
+        retired_team_count: teamChanges.retiredCount,
+      },
       reason: command.reason,
       settings_version_id: publishedVersionId,
       command_id: command.commandId,

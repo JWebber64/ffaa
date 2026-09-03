@@ -4,6 +4,13 @@ import { executeConnectExternalLeague } from "./connectExternalLeague";
 import { executeCreateNativeLeague } from "./createNativeLeague";
 import { executeSaveWeeklyLineup } from "./saveWeeklyLineup";
 import { executePublishSettings, executeRestoreSettingsVersion, executeSaveSettingsDraft } from "./settingsCommands";
+import {
+  executeAcceptLeagueInvitation,
+  executeCreateLeagueInvitation,
+  executeProvisionSeasonTeams,
+  executeRemoveLeagueMember,
+  executeRevokeLeagueInvitation,
+} from "./membershipCommands";
 import type { LeagueCommandStore } from "./store";
 
 const COMMAND_TYPES = new Set<LeagueCommandType>([
@@ -13,6 +20,11 @@ const COMMAND_TYPES = new Set<LeagueCommandType>([
   "save_settings_draft",
   "publish_settings",
   "restore_settings_version",
+  "provision_season_teams",
+  "create_league_invitation",
+  "accept_league_invitation",
+  "revoke_league_invitation",
+  "remove_league_member",
 ]);
 
 function normalizeCommand(value: unknown): LeagueCommand {
@@ -46,6 +58,7 @@ function normalizeCommand(value: unknown): LeagueCommand {
 export async function executeLeagueCommand(input: {
   commandValue: unknown;
   actorUserId: string;
+  actorEmail?: string;
   store: LeagueCommandStore;
   processedAt?: string;
 }): Promise<LeagueCommandReceipt> {
@@ -74,7 +87,7 @@ export async function executeLeagueCommand(input: {
     return existing;
   }
 
-  const shared = { command: command as never, actorUserId: input.actorUserId, requestHash, processedAt, store: input.store };
+  const shared = { command: command as never, actorUserId: input.actorUserId, actorEmail: input.actorEmail, requestHash, processedAt, store: input.store };
   if (command.commandType === "create_native_league") {
     return executeCreateNativeLeague(shared as Parameters<typeof executeCreateNativeLeague>[0]);
   }
@@ -90,5 +103,20 @@ export async function executeLeagueCommand(input: {
   if (command.commandType === "publish_settings") {
     return executePublishSettings(shared as Parameters<typeof executePublishSettings>[0]);
   }
-  return executeRestoreSettingsVersion(shared as Parameters<typeof executeRestoreSettingsVersion>[0]);
+  if (command.commandType === "restore_settings_version") {
+    return executeRestoreSettingsVersion(shared as Parameters<typeof executeRestoreSettingsVersion>[0]);
+  }
+  if (command.commandType === "provision_season_teams") {
+    return executeProvisionSeasonTeams(shared as Parameters<typeof executeProvisionSeasonTeams>[0]);
+  }
+  if (command.commandType === "create_league_invitation") {
+    return executeCreateLeagueInvitation(shared as Parameters<typeof executeCreateLeagueInvitation>[0]);
+  }
+  if (command.commandType === "accept_league_invitation") {
+    return executeAcceptLeagueInvitation(shared as Parameters<typeof executeAcceptLeagueInvitation>[0]);
+  }
+  if (command.commandType === "revoke_league_invitation") {
+    return executeRevokeLeagueInvitation(shared as Parameters<typeof executeRevokeLeagueInvitation>[0]);
+  }
+  return executeRemoveLeagueMember(shared as Parameters<typeof executeRemoveLeagueMember>[0]);
 }

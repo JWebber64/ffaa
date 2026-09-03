@@ -290,6 +290,7 @@ leagues/{gamehqLeagueId}/franchises/{franchiseId}
 leagues/{gamehqLeagueId}/seasons/{seasonId}/seasonTeams/{seasonTeamId}
 leagues/{gamehqLeagueId}/memberships/{firebaseUid}
 leagues/{gamehqLeagueId}/roleGrants/{roleGrantId}
+leagues/{gamehqLeagueId}/invitations/{invitationId}
 leagues/{gamehqLeagueId}/externalConnections/sleeper
 leagues/{gamehqLeagueId}/settingsVersions/{settingsVersionId}
 leagues/{gamehqLeagueId}/commands/{commandId}
@@ -308,3 +309,26 @@ Native seasons now keep separate pointers:
 - `draft_settings_version_id` is the latest commissioner working draft and never governs live operations.
 
 Every draft save creates a new `settingsVersions/{settingsVersionId}` document. Publish and restore create another immutable version, update the season and league using update-time preconditions, create the command receipt and audit event, and supersede the prior published version's status in the same commit. Invalid publication performs no writes. Active canonical members may list this version history; browser clients cannot create, update, or delete it.
+
+## Implemented Phase 2B team and invitation persistence
+
+Published native settings now reconcile these paths atomically with the settings publication:
+
+```text
+leagues/{gamehqLeagueId}/franchises/{franchiseId}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/seasonTeams/{franchiseId}
+```
+
+Franchise IDs are deterministic GameHQ UUIDs for each seat and survive seasonal team-name changes. A season team records `status: active | retired`; reducing team count retires only unassigned seats, and restoring a larger rules version reactivates the same seat identities.
+
+Manager onboarding and access changes use:
+
+```text
+leagues/{gamehqLeagueId}/invitations/{invitationId}
+leagues/{gamehqLeagueId}/memberships/{firebaseUid}
+leagues/{gamehqLeagueId}/roleGrants/{firebaseUid__role[__franchiseId]}
+leagues/{gamehqLeagueId}/commands/{commandId}
+leagues/{gamehqLeagueId}/auditEvents/{auditEventId}
+```
+
+Invitation documents contain the normalized email, display label, role, optional franchise, expiry, status, and a SHA-256 token hash. The plaintext token is returned only in the accepted creation command receipt. Accept, revoke, and remove commands update invitation/membership/grants, season revision, receipt, and audit atomically. Browser writes remain denied.

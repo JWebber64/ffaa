@@ -13,7 +13,11 @@ import type { CanonicalLeagueWorkspace, SettingsVersion } from "../features/leag
 
 vi.mock("../features/league-domain/firebaseLeagueRepository", () => ({ listSettingsVersions: vi.fn() }));
 vi.mock("../features/league-domain/leagueCommands", () => ({
+  createLeagueInvitationCommand: vi.fn(),
   publishSettingsCommand: vi.fn(),
+  provisionSeasonTeamsCommand: vi.fn(),
+  removeLeagueMemberCommand: vi.fn(),
+  revokeLeagueInvitationCommand: vi.fn(),
   restoreSettingsVersionCommand: vi.fn(),
   saveSettingsDraftCommand: vi.fn(),
 }));
@@ -66,7 +70,7 @@ const workspace: CanonicalLeagueWorkspace = {
     legacySourceLeagueId: null,
   },
   connection: null,
-  membership: { leagueId, userId: "commissioner-1", status: "active", joinedAt: "2026-09-03T00:00:00.000Z", revision: 1, roleGrantIds: ["commissioner"] },
+  membership: { leagueId, userId: "commissioner-1", status: "active", joinedAt: "2026-09-03T00:00:00.000Z", revision: 1, roleGrantIds: ["commissioner"], displayName: "Commissioner", email: "commissioner@example.com" },
   roleGrants: [],
   authority: { label: "Native GameHQ League — read/write", mode: "native", canRead: true, canManage: true, canSaveLineup: true, permissions: [], roles: ["commissioner"], source: "gamehq" },
 };

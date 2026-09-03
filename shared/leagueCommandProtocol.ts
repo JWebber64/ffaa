@@ -8,7 +8,12 @@ export type LeagueCommandType =
   | "save_weekly_lineup"
   | "save_settings_draft"
   | "publish_settings"
-  | "restore_settings_version";
+  | "restore_settings_version"
+  | "provision_season_teams"
+  | "create_league_invitation"
+  | "accept_league_invitation"
+  | "revoke_league_invitation"
+  | "remove_league_member";
 
 export type CreateNativeLeaguePayload = {
   name: string;
@@ -43,6 +48,31 @@ export type RestoreSettingsVersionPayload = {
   sourceVersionId: string;
 };
 
+export type LeagueInvitationRole = "team_owner" | "co_manager" | "co_commissioner";
+
+export type ProvisionSeasonTeamsPayload = Record<string, never>;
+
+export type CreateLeagueInvitationPayload = {
+  email: string;
+  displayName: string;
+  role: LeagueInvitationRole;
+  franchiseId: string;
+  expiresInDays: number;
+};
+
+export type AcceptLeagueInvitationPayload = {
+  invitationId: string;
+  token: string;
+};
+
+export type RevokeLeagueInvitationPayload = {
+  invitationId: string;
+};
+
+export type RemoveLeagueMemberPayload = {
+  userId: string;
+};
+
 export type LeagueCommandPayloadByType = {
   create_native_league: CreateNativeLeaguePayload;
   connect_external_league: ConnectExternalLeaguePayload;
@@ -50,6 +80,11 @@ export type LeagueCommandPayloadByType = {
   save_settings_draft: SaveSettingsDraftPayload;
   publish_settings: PublishSettingsPayload;
   restore_settings_version: RestoreSettingsVersionPayload;
+  provision_season_teams: ProvisionSeasonTeamsPayload;
+  create_league_invitation: CreateLeagueInvitationPayload;
+  accept_league_invitation: AcceptLeagueInvitationPayload;
+  revoke_league_invitation: RevokeLeagueInvitationPayload;
+  remove_league_member: RemoveLeagueMemberPayload;
 };
 
 export type LeagueCommand<TType extends LeagueCommandType = LeagueCommandType> = {

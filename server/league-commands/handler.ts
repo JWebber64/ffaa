@@ -62,6 +62,7 @@ export default async function handler(request: ApiRequest, response: ApiResponse
     const receipt = await executeLeagueCommand({
       commandValue: requestBody(request.body),
       actorUserId: user.userId,
+      actorEmail: user.email,
       store: createFirestoreLeagueCommandStore(oidcToken),
     });
     response.status(200).json({ ok: true, receipt });
