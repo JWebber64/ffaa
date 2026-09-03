@@ -11,6 +11,8 @@ import {
   type CreateNativeDraftPayload,
   type RevertNativeDraftActionPayload,
   type StartNativeDraftPayload,
+  type ConfigureLineupWeekPayload,
+  type SetLineupLockOverridePayload,
 } from "../../../shared/leagueCommandProtocol";
 import { ensurePermanentFirebaseUserId } from "../../lib/authSession";
 import { httpLeagueCommandService } from "./httpLeagueCommandService";
@@ -72,6 +74,50 @@ export async function saveWeeklyLineupCommand(input: {
     expectedRevision: input.expectedRevision,
     payload: input.payload,
     reason: input.payload.overrideReason,
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function configureLineupWeekCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: ConfigureLineupWeekPayload;
+  reason?: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "configure_lineup_week",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: input.payload,
+    reason: input.reason ?? `Publish Week ${input.payload.week} player game states`,
+    clientCreatedAt: nowIso(),
+  });
+}
+
+export async function setLineupLockOverrideCommand(input: {
+  leagueId: string;
+  seasonId: string;
+  expectedRevision: number;
+  payload: SetLineupLockOverridePayload;
+  reason: string;
+  commandId?: string;
+}) {
+  const actorUserId = await ensurePermanentFirebaseUserId();
+  return httpLeagueCommandService.execute({
+    commandId: input.commandId ?? createLeagueCommandId(),
+    commandType: "set_lineup_lock_override",
+    actorUserId,
+    leagueId: input.leagueId,
+    seasonId: input.seasonId,
+    expectedRevision: input.expectedRevision,
+    payload: input.payload,
+    reason: input.reason,
     clientCreatedAt: nowIso(),
   });
 }

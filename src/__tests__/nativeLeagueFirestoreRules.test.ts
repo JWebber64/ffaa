@@ -81,6 +81,8 @@ describeWithEmulator("native league Firestore security", () => {
         firestore.doc(`leagues/${leagueId}/auditPrivate/audit-1`).set({ league_id: leagueId, season_id: seasonId, id: "audit-1", reason: "Private commissioner context" }),
         firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/drafts/draft-public`).set({ league_id: leagueId, season_id: seasonId, id: "draft-public", spectator_enabled: true }),
         firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/drafts/draft-private`).set({ league_id: leagueId, season_id: seasonId, id: "draft-private", spectator_enabled: false }),
+        firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/lineupWeeks/week-1`).set({ league_id: leagueId, season_id: seasonId, id: "week-1", week: 1, revision: 1 }),
+        firestore.doc(`leagues/${leagueId}/seasons/${seasonId}/lineups/team-1_week-1`).set({ league_id: leagueId, season_id: seasonId, id: "team-1_week-1", franchise_id: "team-1", week: 1, revision: 1 }),
         firestore.doc(`nativeDraftShares/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa`).set({ league_id: leagueId, season_id: seasonId, draft_id: "draft-public", state: { status: "live" } }),
       ]);
     });
@@ -118,6 +120,8 @@ describeWithEmulator("native league Firestore security", () => {
     await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/assetLocks/player__player-2`).set({ league_id: leagueId }));
     await assertFails(commissioner.doc(`leagues/${leagueId}/auditPrivate/browser-audit`).set({ league_id: leagueId }));
     await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/drafts/browser-draft`).set({ league_id: leagueId }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/lineupWeeks/week-2`).set({ league_id: leagueId }));
+    await assertFails(commissioner.doc(`leagues/${leagueId}/seasons/${seasonId}/lineups/team-1_week-2`).set({ league_id: leagueId }));
   });
 
   it("lets only canonical commissioners list people and invitations", async () => {
@@ -136,11 +140,14 @@ describeWithEmulator("native league Firestore security", () => {
     const member = firestoreFor("member-1");
     await assertSucceeds(member.collection(`leagues/${leagueId}/seasons/${seasonId}/rosterTransactions`).get());
     await assertSucceeds(member.collection(`leagues/${leagueId}/seasons/${seasonId}/assetLocks`).get());
+    await assertSucceeds(member.collection(`leagues/${leagueId}/seasons/${seasonId}/lineupWeeks`).get());
+    await assertSucceeds(member.collection(`leagues/${leagueId}/seasons/${seasonId}/lineups`).get());
     await assertFails(member.doc(`leagues/${leagueId}/auditPrivate/audit-1`).get());
 
     const commissioner = firestoreFor(commissionerId);
     await assertSucceeds(commissioner.doc(`leagues/${leagueId}/auditPrivate/audit-1`).get());
     await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/seasons/${seasonId}/rosterTransactions`).get());
+    await assertFails(firestoreFor("outsider-1").collection(`leagues/${leagueId}/seasons/${seasonId}/lineups`).get());
   });
 
   it("allows exact-link spectators to read enabled draft state without granting writes or private draft access", async () => {

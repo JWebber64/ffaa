@@ -364,3 +364,16 @@ nativeDraftShares/{unguessableShareToken}
 The season draft is the single native authority for format, mode, current turn, persisted deadlines, team budgets/spend, private queues, auction state, result order, roster-transaction references, status, and draft/season revisions. Browser members may read it; all mutations are server-command only. The spectator document is a rebuildable read projection containing the public draft state without queues, command actors, or private audit data. Exact-token reads are public; list and browser writes are denied.
 
 Each draft selection or auction sale co-commits the draft revision with the existing `seasonTeams`, `assetLocks`, `rosterTransactions`, season, audit, receipt, notification, and invalidation paths. Standalone `drafts`, `offlineDrafts`, and `offlineLeagueDrafts` are not rewritten, copied, or deleted.
+
+## Implemented Phase 5 native lineup persistence
+
+```text
+leagues/{gamehqLeagueId}/seasons/{seasonId}/lineupWeeks/week-{week}
+leagues/{gamehqLeagueId}/seasons/{seasonId}/lineups/{franchiseId}_week-{week}
+```
+
+`lineupWeeks` is the versioned weekly timing input. It records the active settings version, league timezone, each rostered player's position/team/game, original and current scheduled start, actual start, game status, availability, projected baseline, and player-scoped emergency reopening metadata. Configure and override commands update the exact week and season revisions together with a receipt and public/private audit.
+
+Each native lineup stores assignments, ordered fallbacks, selection mode, automatic substitution trace, lineup/week/season/roster revisions, active settings version, actor, audit reference, and timestamps. Saves use a document update-time precondition and do not advance the shared season revision, so managers on different teams do not create needless conflicts. A same-team stale save fails against the exact lineup revision.
+
+These collections do not replace legacy `leagueSeasons/{externalId}/weekSettings` or `lineups` during compatibility mode. Browser members can subscribe to canonical native records; all browser mutation remains denied.

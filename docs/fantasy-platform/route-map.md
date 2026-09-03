@@ -231,7 +231,7 @@ This navigation change follows the canonical workspace seam and is not permissio
 | `/league/:numericSleeperId/*` | Resolves `externalLeagueMappings/sleeper__{id}`; mapped routes replace the league segment and preserve suffix, query, and hash |
 | `/league/:gamehqLeagueId/matchup` | Personal matchup alias |
 | `/league/:gamehqLeagueId/team` | Existing team workspace through the external-source adapter when present |
-| `/league/:gamehqLeagueId/team/roster` | Weekly lineup editor; mutations use the server command boundary |
+| `/league/:gamehqLeagueId/team/roster` | Native seasons use player-level locks, ordered fallbacks, exact revision saves, and commissioner week controls; legacy-backed seasons retain the compatibility editor |
 | `/league/:gamehqLeagueId/players` | Existing player research surface |
 | `/league/:gamehqLeagueId/transactions` | Existing imported transaction/history compatibility route |
 | `/league/:gamehqLeagueId/schedule` | Existing all-matchups schedule alias |

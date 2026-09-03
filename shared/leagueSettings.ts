@@ -42,7 +42,12 @@ export type LeagueSettingsV1 = {
     tradeDeadlineWeek: number;
   };
   lineup: {
-    lockPolicy: "player_start" | "first_game";
+    lockPolicy: "player_start" | "scheduled_start" | "actual_start" | "first_game" | "thursday_split";
+    postponedGamePolicy: "original_start" | "rescheduled_start" | "unlock_until_actual";
+    canceledGamePolicy: "unlock" | "lock";
+    inactiveSubstitution: "disabled" | "ordered_fallback";
+    automaticMode: "manual" | "best_ball";
+    lateSwap: boolean;
     lineupWeekCount: number;
   };
   timezone: string;
@@ -131,7 +136,12 @@ export function createRedraftLeagueSettings(timezone = "UTC"): LeagueSettingsV1 
       tradeDeadlineWeek: 11,
     },
     lineup: {
-      lockPolicy: "player_start",
+      lockPolicy: "scheduled_start",
+      postponedGamePolicy: "rescheduled_start",
+      canceledGamePolicy: "unlock",
+      inactiveSubstitution: "ordered_fallback",
+      automaticMode: "manual",
+      lateSwap: true,
       lineupWeekCount: 18,
     },
     timezone,
@@ -174,7 +184,11 @@ export function parseLeagueSettings(value: unknown, timezoneFallback = "UTC") {
   if (!["snake", "auction"].includes(String(draft.format ?? ""))) schemaIssues.push({ field: "draft.format", message: "Choose snake or auction draft format." });
   if (!["faab", "rolling"].includes(String(transactions.waiverMode ?? ""))) schemaIssues.push({ field: "transactions.waiverMode", message: "Choose FAAB or rolling waivers." });
   if (!["commissioner", "league_vote", "none"].includes(String(transactions.tradeReview ?? ""))) schemaIssues.push({ field: "transactions.tradeReview", message: "Choose a supported trade review policy." });
-  if (!["player_start", "first_game"].includes(String(lineup.lockPolicy ?? ""))) schemaIssues.push({ field: "lineup.lockPolicy", message: "Choose a supported lineup lock policy." });
+  if (!["player_start", "scheduled_start", "actual_start", "first_game", "thursday_split"].includes(String(lineup.lockPolicy ?? ""))) schemaIssues.push({ field: "lineup.lockPolicy", message: "Choose a supported lineup lock policy." });
+  if (lineup.postponedGamePolicy !== undefined && !["original_start", "rescheduled_start", "unlock_until_actual"].includes(String(lineup.postponedGamePolicy))) schemaIssues.push({ field: "lineup.postponedGamePolicy", message: "Choose a supported postponed-game policy." });
+  if (lineup.canceledGamePolicy !== undefined && !["unlock", "lock"].includes(String(lineup.canceledGamePolicy))) schemaIssues.push({ field: "lineup.canceledGamePolicy", message: "Choose a supported canceled-game policy." });
+  if (lineup.inactiveSubstitution !== undefined && !["disabled", "ordered_fallback"].includes(String(lineup.inactiveSubstitution))) schemaIssues.push({ field: "lineup.inactiveSubstitution", message: "Choose a supported inactive-player substitution policy." });
+  if (lineup.automaticMode !== undefined && !["manual", "best_ball"].includes(String(lineup.automaticMode))) schemaIssues.push({ field: "lineup.automaticMode", message: "Choose manual lineups or best ball." });
 
   const settings: LeagueSettingsV1 = {
     schemaVersion: LEAGUE_SETTINGS_SCHEMA_VERSION,
@@ -209,7 +223,12 @@ export function parseLeagueSettings(value: unknown, timezoneFallback = "UTC") {
       tradeDeadlineWeek: numberValue(transactions.tradeDeadlineWeek, defaults.transactions.tradeDeadlineWeek),
     },
     lineup: {
-      lockPolicy: enumValue(lineup.lockPolicy, ["player_start", "first_game"] as const, defaults.lineup.lockPolicy),
+      lockPolicy: enumValue(lineup.lockPolicy, ["player_start", "scheduled_start", "actual_start", "first_game", "thursday_split"] as const, defaults.lineup.lockPolicy),
+      postponedGamePolicy: enumValue(lineup.postponedGamePolicy, ["original_start", "rescheduled_start", "unlock_until_actual"] as const, defaults.lineup.postponedGamePolicy),
+      canceledGamePolicy: enumValue(lineup.canceledGamePolicy, ["unlock", "lock"] as const, defaults.lineup.canceledGamePolicy),
+      inactiveSubstitution: enumValue(lineup.inactiveSubstitution, ["disabled", "ordered_fallback"] as const, defaults.lineup.inactiveSubstitution),
+      automaticMode: enumValue(lineup.automaticMode, ["manual", "best_ball"] as const, defaults.lineup.automaticMode),
+      lateSwap: booleanValue(lineup.lateSwap, defaults.lineup.lateSwap),
       lineupWeekCount: numberValue(lineup.lineupWeekCount, defaults.lineup.lineupWeekCount),
     },
     timezone: typeof source.timezone === "string" && source.timezone.trim() ? source.timezone.trim() : defaults.timezone,
@@ -307,6 +326,23 @@ export function buildLeagueConstitution(settings: LeagueSettingsV1): LeagueConst
     { title: "Scoring", paragraphs: [`The league uses ${scoringLabel} scoring: ${settings.scoring.receptionPoints} points per reception, 1 point per ${settings.scoring.passingYardsPerPoint} passing yards, ${settings.scoring.passingTouchdown} per passing touchdown, ${settings.scoring.interception} per interception, 1 point per ${settings.scoring.rushingReceivingYardsPerPoint} rushing or receiving yards, and ${settings.scoring.rushingReceivingTouchdown} per rushing or receiving touchdown.`] },
     { title: "Schedule and playoffs", paragraphs: [`The regular season lasts ${settings.schedule.regularSeasonWeeks} weeks. ${settings.schedule.playoffTeams} teams qualify for the playoffs${impact.playoffByes ? `, with ${impact.playoffByes} first-round bye${impact.playoffByes === 1 ? "" : "s"}` : ""}.`] },
     { title: "Waivers and trades", paragraphs: [`Waivers use ${settings.transactions.waiverMode === "faab" ? `$${settings.transactions.faabBudget} FAAB` : "rolling priority"}. Trades are reviewed by ${settings.transactions.tradeReview === "league_vote" ? "league vote" : settings.transactions.tradeReview === "commissioner" ? "the commissioner" : "no review period"}, and the deadline is Week ${settings.transactions.tradeDeadlineWeek}.`] },
-    { title: "Lineups and time", paragraphs: [`Lineups lock ${settings.lineup.lockPolicy === "player_start" ? "for each player at that player's scheduled game time" : "in full when the first game of the week begins"}. League deadlines use ${settings.timezone}.`] },
+    { title: "Lineups and time", paragraphs: [`${lineupPolicyText(settings)} League deadlines use ${settings.timezone}. ${settings.lineup.inactiveSubstitution === "ordered_fallback" ? "Inactive starters may be replaced from each team's ordered fallback list." : "Inactive-player automatic substitution is disabled."} ${settings.lineup.automaticMode === "best_ball" ? "Best-ball optimization is active." : settings.lineup.lateSwap ? "Late swap remains available for players whose games have not locked." : "Late swap is disabled."}`] },
   ];
+}
+
+function lineupPolicyText(settings: LeagueSettingsV1) {
+  const label = {
+    player_start: "Each player locks at scheduled kickoff.",
+    scheduled_start: "Each player locks at scheduled kickoff.",
+    actual_start: "Each player locks when the game actually starts.",
+    first_game: "Every lineup locks when the first game of the week begins.",
+    thursday_split: "Thursday players lock with their game while later players remain editable until their own kickoff.",
+  }[settings.lineup.lockPolicy];
+  const postponed = {
+    original_start: "Postponed games retain their original lock time.",
+    rescheduled_start: "Postponed games move to the rescheduled lock time.",
+    unlock_until_actual: "Postponed players stay open until the game actually begins.",
+  }[settings.lineup.postponedGamePolicy];
+  const canceled = settings.lineup.canceledGamePolicy === "lock" ? "Canceled-game players stay locked." : "Canceled-game players unlock.";
+  return `${label} ${postponed} ${canceled}`;
 }

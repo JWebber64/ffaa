@@ -140,6 +140,8 @@ export function normalizeReceipt(document: LeagueCommandStoredDocument | null): 
     "create_native_league",
     "connect_external_league",
     "save_weekly_lineup",
+    "configure_lineup_week",
+    "set_lineup_lock_override",
     "save_settings_draft",
     "publish_settings",
     "restore_settings_version",

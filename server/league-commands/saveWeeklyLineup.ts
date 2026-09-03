@@ -21,6 +21,7 @@ import {
   wholeNumber,
 } from "./commandSupport";
 import type { LeagueCommandStore, LeagueCommandStoredDocument } from "./store";
+import { executeSaveNativeWeeklyLineup } from "./nativeLineupCommands";
 
 function assignments(value: unknown) {
   const source = record(value);
@@ -66,6 +67,7 @@ export async function executeSaveWeeklyLineup(input: {
   store: LeagueCommandStore;
 }): Promise<LeagueCommandReceipt> {
   const { command, actorUserId, requestHash, processedAt, store } = input;
+  if (!text(command.payload.legacyLeagueId)) return executeSaveNativeWeeklyLineup(input);
   if (!isGamehqLeagueId(command.leagueId)) throw new LeagueCommandFailure("invalid_league_id", "Save the lineup through a canonical GameHQ league.");
   if (!isGamehqLeagueId(command.seasonId)) throw new LeagueCommandFailure("invalid_season_id", "The active GameHQ season is invalid.");
   const legacyLeagueId = text(command.payload.legacyLeagueId);

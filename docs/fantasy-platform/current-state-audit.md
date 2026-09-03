@@ -1,6 +1,6 @@
 # Fantasy platform current-state audit
 
-Status: Phase 0 baseline plus Phases 1–4 implementation deltas, 2026-09-03. The baseline audit remains below for provenance; the implemented branch facts are recorded at the end.
+Status: Phase 0 baseline plus Phases 1–5 implementation deltas, 2026-09-03. The baseline audit remains below for provenance; the implemented branch facts are recorded at the end.
 
 ## Evidence boundary
 
@@ -314,3 +314,12 @@ Deliberate remaining direct legacy writes are season publication, claims/members
 - Commissioner and co-commissioner controls pause/resume, settle expired auctions, and revert the last untouched result with a required reason and inverse roster receipt.
 - Manager and commissioner routes use the canonical draft subscription. Tokenized public spectator projections omit manager queues and actor identity; direct browser writes to drafts and projections are denied.
 - Existing live-room and offline-draft collections remain usable and unchanged. They remain non-authoritative until a commissioner explicitly chooses a future validated import workflow.
+
+## Phase 5 implementation delta
+
+- Canonical native seasons now own weekly game/player state under `lineupWeeks/week-{week}` and team assignments under `lineups/{franchiseId}_week-{week}`. Both are member-readable and server-command-only.
+- Published settings select scheduled kickoff, actual start, first-game, or Thursday-split behavior plus postponed/canceled handling, late swap, ordered inactive fallback, and manual/best-ball mode. The earlier `player_start` value remains a supported compatibility alias.
+- Native lineup saves validate authenticated franchise control, lineup/season/roster/week/settings revisions, active roster ownership, every required starter, duplicates, position eligibility, IR separation, and the derived lock of every changed player.
+- A locked Thursday player can remain fixed while an unlocked Sunday player changes. Postponed games use original, rescheduled, or actual-start timing; canceled games lock or unlock according to the active settings.
+- Commissioner emergency reopenings are player-scoped, time-bounded, reason-required, and immutable in the universal audit. Multiple managers subscribe to the same authoritative week and lineup documents.
+- The manager UI shows legality, starter count, bye/injury warnings, projected total, exact per-player lock reason/time in league timezone, next deadline, roster/settings revisions, save state, and ordered fallbacks. Commissioner controls publish kickoff groups without JSON and expose audited emergency reopening.

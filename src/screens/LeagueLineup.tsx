@@ -24,6 +24,7 @@ import { connectExternalLeague, saveWeeklyLineupCommand } from "../features/leag
 import { LeagueCommandError } from "../features/league-domain/LeagueCommandService";
 import { isGamehqLeagueId } from "../features/league-domain/types";
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
+import { NativeLineupWorkspace } from "../features/native-lineup/NativeLineupWorkspace";
 import { appUrl } from "../lib/appBasePath";
 import { PositionBadge } from "../ui/PositionBadge";
 import { UniversalSelect } from "../ui/UniversalSelect";
@@ -84,6 +85,7 @@ export default function LeagueLineup() {
     connection,
     dataLeagueId,
     leagueId,
+    refreshWorkspace,
   } = useLeagueWorkspace();
   const management = useLeagueSeasonManagement(dataLeagueId);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -143,6 +145,10 @@ export default function LeagueLineup() {
     setOverrideReason("");
     setSaveState({ status: "idle", message: "" });
   }, [optimized, saved]);
+
+  if (canonicalWorkspace?.league.authorityMode === "native" && canonicalWorkspace.season) {
+    return <NativeLineupWorkspace workspace={canonicalWorkspace} initialWeek={week} onWeekChange={changeWeek} onWorkspaceChanged={refreshWorkspace} />;
+  }
 
   function changeWeek(nextWeek: number) {
     saveAttemptRef.current = null;

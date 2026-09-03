@@ -274,6 +274,50 @@ export type NativeDraft = {
   updatedAt: string;
 };
 
+export type NativeLineupWeekPlayer = {
+  playerId: string;
+  position: "QB" | "RB" | "WR" | "TE" | "K" | "DST";
+  nflTeam: string;
+  gameId: string;
+  originalScheduledStartAt: string;
+  scheduledStartAt: string;
+  actualStartedAt: string;
+  gameStatus: "scheduled" | "in_progress" | "postponed" | "canceled" | "final";
+  availability: "active" | "questionable" | "doubtful" | "inactive" | "out" | "ir";
+  projectedPoints: number;
+};
+
+export type NativeLineupWeek = {
+  id: string;
+  leagueId: string;
+  seasonId: string;
+  week: number;
+  settingsVersionId: string;
+  timezone: string;
+  revision: number;
+  players: NativeLineupWeekPlayer[];
+  lockOverrides: Record<string, { reopenedUntil: string; reason: string; actorUserId: string }>;
+  updatedAt: string;
+};
+
+export type NativeWeeklyLineup = {
+  id: string;
+  leagueId: string;
+  seasonId: string;
+  franchiseId: string;
+  week: number;
+  settingsVersionId: string;
+  seasonRevision: number;
+  rosterRevision: number;
+  lineupWeekRevision: number;
+  assignments: Record<string, string>;
+  orderedFallbackPlayerIds: string[];
+  selectionMode: "manual" | "best_ball";
+  automaticSubstitutions: Array<{ slot: string; from: string; to: string }>;
+  revision: number;
+  updatedAt: string;
+};
+
 export type LeagueAuthorityLabel =
   | "Native GameHQ League — read/write"
   | "Connected Sleeper League — read-only"

@@ -256,6 +256,7 @@ Logical paths are explicit so adapters and rules can be designed before any data
 leagues/{gamehqLeagueId}
   seasons/{seasonId}
     seasonTeams/{seasonTeamId}
+    lineupWeeks/week-{week}
     lineups/{lineupId}
     scheduleVersions/{scheduleVersionId}
     drafts/{draftId}
@@ -343,5 +344,7 @@ An imported league owner ID is display context. It never changes these labels or
 | Downstream effects | `notificationOutbox` and `readModelInvalidations` | Durable server-written pending hooks; they are rebuildable/consumable and never a second mutation authority |
 | Native draft | `seasons/{seasonId}/drafts/{draftId}` through draft commands | Settings/franchise IDs and exact draft revision govern turns; each result co-commits its universal roster transaction |
 | Draft spectator state | `nativeDraftShares/{shareToken}` | Redacted rebuildable projection only; it omits queues/actors and never accepts browser writes |
+| Native weekly player/game state | `leagues/{leagueId}/seasons/{seasonId}/lineupWeeks/week-{week}` | Authoritative lock input version; commissioner/scheduler command only |
+| Native weekly lineup | `leagues/{leagueId}/seasons/{seasonId}/lineups/{franchiseId}_week-{week}` | Authoritative assignments and ordered fallback trace; exact revisions and server command only |
 
 The first implementation does not infer authority from `managerProviderUserId`, `leagueOwnerProviderUserId`, Sleeper roster ownership, or any other imported profile field.

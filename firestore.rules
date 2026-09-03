@@ -122,6 +122,16 @@ service cloud.firestore {
           allow get, list: if isCanonicalMember();
           allow create, update, delete: if false;
         }
+
+        match /lineupWeeks/{weekId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
+
+        match /lineups/{lineupId} {
+          allow get, list: if isCanonicalMember();
+          allow create, update, delete: if false;
+        }
       }
 
       match /franchises/{franchiseId} {

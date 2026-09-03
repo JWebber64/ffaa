@@ -11,8 +11,8 @@ The roadmap follows the requested phases in order. Each phase is a bounded chang
 | 2 | Creation wizard and full Commissioner workspace/settings publication | Native redraft exit gate implemented locally through 2A and 2B | Valid native redraft league, immutable settings, and assigned managers |
 | 3 | Universal command, roster transaction, and audit expansion | Implemented for canonical player ownership, commissioner correction/reversal, and pipeline hooks | Concurrent ownership is atomic and every roster mutation has a receipt |
 | 4 | Native-league draft integration | Implemented for authoritative auction, snake, linear, and third-round-reversal rooms | Draft completion creates roster transactions |
-| 5 | Weekly operation and player-level locks | Next phase; settings, rosters, and command gates are available | Cross-device lineups and settings-derived lock behavior |
-| 6 | Provider-agnostic scoring | Blocked on settings/schedule/lineups | Deterministic replay/corrections and live freshness UI |
+| 5 | Weekly operation and player-level locks | Implemented for native lineups, week game states, ordered fallbacks, and emergency reopenings | Cross-device lineups and settings-derived lock behavior |
+| 6 | Provider-agnostic scoring | Next phase; normalized week/player state and scoring settings are available | Deterministic replay/corrections and live freshness UI |
 | 7 | Free agents and waivers | Blocked on roster/scoring state | Atomic reproducible processing and receipts |
 | 8 | Two-team trades | Blocked on roster transaction ledger | Atomic asset locks/review/receipts |
 | 9 | Schedule, standings, playoffs | Blocked on scoring/results/settings | Reproducible standings, explainable seeds, valid brackets |
@@ -295,6 +295,10 @@ Phase 4 compatibility/rollback: route/UI entry can be disabled without deleting 
 - Add exact UI reasons, deadline/timezone, unsaved state, and commissioner audited override.
 
 Gate: Thursday and Sunday locks behave according to the published policy across multiple managers/devices.
+
+Exact Phase 5 implementation files: `shared/leagueSettings.ts` and `shared/leagueCommandProtocol.ts`; `server/league-commands/nativeLineupCommands.ts`, `saveWeeklyLineup.ts`, `executeLeagueCommand.ts`, and `commandSupport.ts`; `src/features/native-lineup/NativeLineupWorkspace.tsx`, `nativeLineup.ts`, `useNativeLineup.ts`, and `native-lineup.css`; `src/features/league-domain/leagueCommands.ts` and `types.ts`; `src/features/league-settings/CommissionerSettingsWorkspace.tsx`; `src/screens/LeagueLineup.tsx`; and `firestore.rules`. Coverage is in `nativeLineupCommands.test.ts`, `nativeLineupModel.test.ts`, `nativeLineupWorkspace.test.tsx`, `nativeLeagueFirestoreRules.test.ts`, and the existing legacy lineup/settings suites.
+
+Phase 5 compatibility/rollback: canonical native seasons use season-scoped `lineupWeeks` and `lineups`; `legacy_backed_native` seasons continue through their existing numeric `leagueSeasons` adapter and whole-week compatibility rules. Disabling the native UI does not rewrite or delete either owner. Published settings accept the earlier `player_start` value as a scheduled-kickoff alias.
 
 ## Phase 6 — live scoring
 

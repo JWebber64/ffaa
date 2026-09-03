@@ -6,6 +6,8 @@ export type LeagueCommandType =
   | "create_native_league"
   | "connect_external_league"
   | "save_weekly_lineup"
+  | "configure_lineup_week"
+  | "set_lineup_lock_override"
   | "save_settings_draft"
   | "publish_settings"
   | "restore_settings_version"
@@ -40,6 +42,39 @@ export type SaveWeeklyLineupPayload = {
   week: number;
   assignments: Record<string, string>;
   overrideReason: string;
+  expectedSeasonRevision?: number;
+  expectedRosterRevision?: number;
+  settingsVersionId?: string;
+  orderedFallbackPlayerIds?: string[];
+};
+
+export type LineupGameStatus = "scheduled" | "in_progress" | "postponed" | "canceled" | "final";
+export type LineupPlayerAvailability = "active" | "questionable" | "doubtful" | "inactive" | "out" | "ir";
+
+export type LineupWeekPlayerInput = {
+  playerId: string;
+  position: "QB" | "RB" | "WR" | "TE" | "K" | "DST";
+  nflTeam: string;
+  gameId: string;
+  originalScheduledStartAt: string;
+  scheduledStartAt: string;
+  actualStartedAt: string;
+  gameStatus: LineupGameStatus;
+  availability: LineupPlayerAvailability;
+  projectedPoints: number;
+};
+
+export type ConfigureLineupWeekPayload = {
+  week: number;
+  expectedWeekRevision: number;
+  players: LineupWeekPlayerInput[];
+};
+
+export type SetLineupLockOverridePayload = {
+  week: number;
+  expectedWeekRevision: number;
+  playerIds: string[];
+  reopenedUntil: string | null;
 };
 
 export type SaveSettingsDraftPayload = {
@@ -151,6 +186,8 @@ export type LeagueCommandPayloadByType = {
   create_native_league: CreateNativeLeaguePayload;
   connect_external_league: ConnectExternalLeaguePayload;
   save_weekly_lineup: SaveWeeklyLineupPayload;
+  configure_lineup_week: ConfigureLineupWeekPayload;
+  set_lineup_lock_override: SetLineupLockOverridePayload;
   save_settings_draft: SaveSettingsDraftPayload;
   publish_settings: PublishSettingsPayload;
   restore_settings_version: RestoreSettingsVersionPayload;
