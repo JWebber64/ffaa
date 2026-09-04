@@ -433,6 +433,7 @@
 .league-account-panel > button { min-height: 40px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--accent-action); border-radius: var(--r-md); color: #06110a; background: var(--accent-action); font-size: .74rem; font-weight: 850; white-space: nowrap; }
 .league-account-panel > button svg { width: 15px; }
 .league-account-panel > button:disabled { opacity: .5; cursor: not-allowed; }
+.league-account-panel > .league-account-sign-out { border-color: var(--line-1); color: var(--text-0); background: transparent; }
 .league-account-panel > p { flex-basis: 100%; margin: 0; color: var(--text-danger); font-size: .68rem; }
 
 .league-publish-panel {
