@@ -177,7 +177,7 @@ function CareerPanel({ player, result, loading, error, onRetry }: {
   const columns = careerColumns(player.position);
   const scoringLabel = player.career.scoring === "halfPpr" ? "Half PPR" : player.career.scoring.toUpperCase();
   return <>
-    <dl className="stats-career-summary"><div><dt>Seasons played</dt><dd>{seasons.length}</dd></div><div><dt>Games</dt><dd>{games.toLocaleString()}</dd></div><div><dt>Career FPTS</dt><dd>{formatNumber(fantasyPoints, 1)}</dd></div><div><dt>Career FPG</dt><dd>{games ? formatNumber(fantasyPoints / games, 1) : "—"}</dd></div></dl>
+    <dl className="stats-career-summary"><div><dt>Seasons played</dt><dd>{seasons.length}</dd></div><div><dt>Games</dt><dd>{games.toLocaleString()}</dd></div><div><dt>Career FPTS</dt><dd>{formatNumber(fantasyPoints, 1)}</dd></div><div><dt>Career PPG</dt><dd>{games ? formatNumber(fantasyPoints / games, 1) : "—"}</dd></div></dl>
     {result?.unavailableSeasons.length ? <div className="stats-career-notice" role="status"><AlertCircle size={16} aria-hidden="true" /><span>{result.unavailableSeasons.length} source season{result.unavailableSeasons.length === 1 ? "" : "s"} could not be checked. The rows below include every available season.</span></div> : null}
     <p className="stats-career-context">Regular-season totals · {scoringLabel} fantasy scoring · Team is the most recent club listed for that season.</p>
     <div className="stats-drawer-table-shell stats-career-table-shell"><table className="stats-drawer-table stats-career-table"><caption className="sr-only">{player.name} NFL regular-season statistics by year</caption><thead><tr>{columns.map((column) => <th key={column.id} scope="col" className={column.align === "left" ? "is-left" : undefined}>{column.label}</th>)}</tr></thead><tbody>{seasons.map((season) => <tr key={`${season.playerId}-${season.season}`}>{columns.map((column) => <td key={column.id} className={column.align === "left" ? "is-left" : undefined}>{column.value(season)}</td>)}</tr>)}</tbody></table></div>
@@ -194,16 +194,29 @@ function NewsPanel({ playerName, items, loading, error, onRetry }: {
   return <div className="stats-news-list">{items.map((item) => <article key={item.id}><div><span>{item.source}</span>{item.publishedAt ? <time dateTime={item.publishedAt}>{new Date(item.publishedAt).toLocaleDateString()}</time> : null}</div><a href={item.url} target="_blank" rel="noreferrer"><strong>{item.title}</strong><ExternalLink size={15} aria-hidden="true" /></a>{item.description ? <p>{item.description}</p> : null}</article>)}</div>;
 }
 
-function careerOverviewMetric(result: PlayerCareerStatsResult | null, loading: boolean, error: string | null): StatsPlayerMetric {
-  if (loading && !result) return { label: "Career PPG", value: "…", helper: "Loading NFL career" };
+function careerOverviewMetric(position: string, result: PlayerCareerStatsResult | null, loading: boolean, error: string | null): StatsPlayerMetric {
+  if (position === "DEF") return { label: "Career PPG", value: "—", helper: "Not available for team D/ST" };
+  if (loading && !result) return { label: "Career PPG", value: "—", helper: "Loading career data" };
   if (error && !result) return { label: "Career PPG", value: "—", helper: "Career data unavailable" };
   const seasons = result?.seasons ?? [];
   const games = seasons.reduce((sum, season) => sum + season.games, 0);
   const fantasyPoints = seasons.reduce((sum, season) => sum + season.fantasyPoints, 0);
-  return { label: "Career PPG", value: games ? formatNumber(fantasyPoints / games, 1) : "—", helper: games ? `${games} games · ${seasons.length} season${seasons.length === 1 ? "" : "s"}` : "No career rows" };
+  const firstSeason = seasons[seasons.length - 1]?.season;
+  const lastSeason = seasons[0]?.season;
+  return {
+    label: "Career PPG",
+    value: games ? formatNumber(fantasyPoints / games, 1) : "—",
+    helper: games
+      ? firstSeason && lastSeason
+        ? `${firstSeason}–${lastSeason} · ${games.toLocaleString()} games`
+        : `${games.toLocaleString()} regular-season games`
+      : "No regular-season games",
+  };
 }
 
 function withCareerOverviewMetric(metrics: StatsPlayerMetric[], metric: StatsPlayerMetric) {
+  const existingIndex = metrics.findIndex((item) => item.label === metric.label);
+  if (existingIndex >= 0) return metrics.map((item, index) => index === existingIndex ? metric : item);
   const index = metrics.findIndex((item) => item.label === "Season PPG" || item.label === "Fantasy PPG");
   const next = [...metrics];
   next.splice(index >= 0 ? index + 1 : Math.min(4, next.length), 0, metric);
@@ -300,8 +313,13 @@ export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
   if (!player) return null;
   const careerResult = careerState?.key === careerRequestKey ? careerState.result : null;
   const careerError = careerErrorState?.key === careerRequestKey ? careerErrorState.message : null;
-  const careerLoading = careerLoadingKey === careerRequestKey;
-  const overviewMetrics = withCareerOverviewMetric(player.overviewMetrics, careerOverviewMetric(careerResult, careerLoading, careerError));
+  const careerLoading = careerLoadingKey === careerRequestKey || (
+    Boolean(careerRequestKey)
+    && player.position !== "DEF"
+    && !careerResult
+    && !careerError
+  );
+  const overviewMetrics = withCareerOverviewMetric(player.overviewMetrics, careerOverviewMetric(player.position, careerResult, careerLoading, careerError));
   const columns = gameLogColumns(player.position);
 
   return <div className="stats-drawer-root">

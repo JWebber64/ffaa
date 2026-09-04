@@ -41,6 +41,26 @@ export type PlayerCareerStatsResult = {
   coverageEnd: number;
 };
 
+export type PlayerCareerSummary = {
+  playerId: string;
+  playerName: string;
+  positions: string[];
+  seasons: number;
+  games: number;
+  fantasyPoints: number;
+  fantasyPointsPerGame: number | null;
+  firstSeason: number;
+  lastSeason: number;
+};
+
+export type PlayerCareerSummaryIndex = {
+  byPlayerId: ReadonlyMap<string, PlayerCareerSummary>;
+  byIdentity: ReadonlyMap<string, PlayerCareerSummary>;
+  unavailableSeasons: number[];
+  coverageStart: number;
+  coverageEnd: number;
+};
+
 type CareerSourceRow = Omit<PlayerCareerSeason, "fantasyPoints" | "fantasyPointsPerGame"> & {
   standardFantasyPoints: number;
   pprFantasyPoints: number;
@@ -54,10 +74,16 @@ type LoadPlayerCareerStatsOptions = {
   signal?: AbortSignal;
 };
 
+type LoadPlayerCareerSummaryIndexOptions = {
+  scoring: PlayerCareerScoringMode;
+  signal?: AbortSignal;
+};
+
 const NFLVERSE_PLAYER_STATS_URL =
   "https://github.com/nflverse/nflverse-data/releases/download/stats_player";
 const LOCAL_CAREER_STATS_URL = appUrl("data/nflverse-player-careers.json");
 const resolvedSeasonCache = new Map<number, CareerSourceRow[]>();
+const resolvedCareerSummaryIndexCache = new Map<PlayerCareerScoringMode, PlayerCareerSummaryIndex>();
 let resolvedCareerBundle: {
   rows: CareerSourceRow[];
   coverageStart: number;
@@ -363,6 +389,94 @@ function selectedFantasyPoints(row: CareerSourceRow, scoring: PlayerCareerScorin
   return row.pprFantasyPoints;
 }
 
+function careerIdentityKey(playerName: string, position: string) {
+  return `${normalizeName(playerName)}|${normalizePosition(position)}`;
+}
+
+function preferCareerSummary(
+  current: PlayerCareerSummary | undefined,
+  candidate: PlayerCareerSummary,
+) {
+  if (!current) return candidate;
+  if (candidate.lastSeason !== current.lastSeason) {
+    return candidate.lastSeason > current.lastSeason ? candidate : current;
+  }
+  return candidate.games > current.games ? candidate : current;
+}
+
+export function buildPlayerCareerSummaryIndex(
+  rows: CareerSourceRow[],
+  scoring: PlayerCareerScoringMode,
+  coverage: Pick<PlayerCareerStatsResult, "unavailableSeasons" | "coverageStart" | "coverageEnd">,
+): PlayerCareerSummaryIndex {
+  const groupedRows = new Map<string, CareerSourceRow[]>();
+  for (const row of rows) {
+    const group = groupedRows.get(row.playerId) ?? [];
+    group.push(row);
+    groupedRows.set(row.playerId, group);
+  }
+
+  const byPlayerId = new Map<string, PlayerCareerSummary>();
+  const byIdentity = new Map<string, PlayerCareerSummary>();
+  for (const [playerId, playerRows] of groupedRows) {
+    let games = 0;
+    let fantasyPoints = 0;
+    let firstSeason = Number.POSITIVE_INFINITY;
+    let lastSeason = Number.NEGATIVE_INFINITY;
+    let playerName = playerRows[0]?.playerName ?? playerId;
+    const positions = new Set<string>();
+
+    for (const row of playerRows) {
+      games += row.games;
+      fantasyPoints += selectedFantasyPoints(row, scoring);
+      firstSeason = Math.min(firstSeason, row.season);
+      if (row.season >= lastSeason) {
+        lastSeason = row.season;
+        playerName = row.playerName;
+      }
+      positions.add(normalizePosition(row.position));
+    }
+
+    const summary: PlayerCareerSummary = {
+      playerId,
+      playerName,
+      positions: [...positions],
+      seasons: new Set(playerRows.map((row) => row.season)).size,
+      games,
+      fantasyPoints,
+      fantasyPointsPerGame: games > 0 ? fantasyPoints / games : null,
+      firstSeason: Number.isFinite(firstSeason) ? firstSeason : 0,
+      lastSeason: Number.isFinite(lastSeason) ? lastSeason : 0,
+    };
+    byPlayerId.set(playerId, summary);
+
+    for (const row of playerRows) {
+      const key = careerIdentityKey(row.playerName, row.position);
+      byIdentity.set(key, preferCareerSummary(byIdentity.get(key), summary));
+    }
+  }
+
+  return {
+    byPlayerId,
+    byIdentity,
+    unavailableSeasons: [...coverage.unavailableSeasons],
+    coverageStart: coverage.coverageStart,
+    coverageEnd: coverage.coverageEnd,
+  };
+}
+
+export function findPlayerCareerSummary(
+  index: PlayerCareerSummaryIndex,
+  identity: Pick<LoadPlayerCareerStatsOptions, "playerId" | "playerName" | "position">,
+) {
+  const exactId = identity.playerId?.trim();
+  if (exactId) {
+    const exact = index.byPlayerId.get(exactId);
+    if (exact) return exact;
+  }
+  return index.byIdentity.get(careerIdentityKey(identity.playerName, identity.position)) ?? null;
+}
+
 async function loadAllSeasons(signal?: AbortSignal) {
   const seasons = Array.from(
     { length: NFLVERSE_CAREER_LATEST_SEASON - NFLVERSE_CAREER_MIN_SEASON + 1 },
@@ -393,6 +507,38 @@ async function loadAllSeasons(signal?: AbortSignal) {
   return { rows, unavailableSeasons };
 }
 
+async function loadCareerRows(signal?: AbortSignal) {
+  try {
+    const bundle = await loadBundledCareerRows(signal);
+    return {
+      ...bundle,
+      unavailableSeasons: [] as number[],
+    };
+  } catch (error) {
+    if (signal?.aborted || (error instanceof Error && error.name === "AbortError")) throw error;
+    const remote = await loadAllSeasons(signal);
+    return {
+      ...remote,
+      coverageStart: NFLVERSE_CAREER_MIN_SEASON,
+      coverageEnd: NFLVERSE_CAREER_LATEST_SEASON,
+    };
+  }
+}
+
+export async function loadPlayerCareerSummaryIndex({
+  scoring,
+  signal,
+}: LoadPlayerCareerSummaryIndexOptions): Promise<PlayerCareerSummaryIndex> {
+  throwIfAborted(signal);
+  const cached = resolvedCareerSummaryIndexCache.get(scoring);
+  if (cached) return cached;
+  const result = await loadCareerRows(signal);
+  throwIfAborted(signal);
+  const index = buildPlayerCareerSummaryIndex(result.rows, scoring, result);
+  resolvedCareerSummaryIndexCache.set(scoring, index);
+  return index;
+}
+
 export async function loadPlayerCareerStats({
   playerId,
   playerName,
@@ -400,22 +546,12 @@ export async function loadPlayerCareerStats({
   scoring,
   signal,
 }: LoadPlayerCareerStatsOptions): Promise<PlayerCareerStatsResult> {
-  let rows: CareerSourceRow[];
-  let unavailableSeasons: number[];
-  let coverageStart = NFLVERSE_CAREER_MIN_SEASON;
-  let coverageEnd = NFLVERSE_CAREER_LATEST_SEASON;
-  try {
-    const bundle = await loadBundledCareerRows(signal);
-    rows = bundle.rows;
-    unavailableSeasons = [];
-    coverageStart = bundle.coverageStart;
-    coverageEnd = bundle.coverageEnd;
-  } catch (error) {
-    if (signal?.aborted || (error instanceof Error && error.name === "AbortError")) throw error;
-    const remote = await loadAllSeasons(signal);
-    rows = remote.rows;
-    unavailableSeasons = remote.unavailableSeasons;
-  }
+  const {
+    rows,
+    unavailableSeasons,
+    coverageStart,
+    coverageEnd,
+  } = await loadCareerRows(signal);
   throwIfAborted(signal);
   const selectedRows = selectPlayerCareerRows(rows, {
     ...(playerId ? { playerId } : {}),
