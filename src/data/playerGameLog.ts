@@ -23,5 +23,16 @@ export function buildPlayerGameLog(rows: readonly WeeklyPlayerStatRow[]): StatsP
         (week.stats.passing_tds ?? 0) +
         (week.stats.rushing_tds ?? 0) +
         (week.stats.receiving_tds ?? 0),
+      completions: week.stats.completions ?? 0,
+      passingAttempts: week.stats.attempts ?? 0,
+      passingYards: week.stats.passing_yards ?? 0,
+      passingTouchdowns: week.stats.passing_tds ?? 0,
+      interceptions: week.stats.passing_interceptions ?? 0,
+      rushingYards: week.stats.rushing_yards ?? 0,
+      rushingTouchdowns: week.stats.rushing_tds ?? 0,
+      receivingYards: week.stats.receiving_yards ?? 0,
+      receivingTouchdowns: week.stats.receiving_tds ?? 0,
+      fieldGoalsMade: week.stats.fg_made ?? 0,
+      extraPointsMade: week.stats.pat_made ?? 0,
     }));
 }

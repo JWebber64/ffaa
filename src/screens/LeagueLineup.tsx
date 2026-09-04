@@ -25,6 +25,7 @@ import { LeagueCommandError } from "../features/league-domain/LeagueCommandServi
 import { isGamehqLeagueId } from "../features/league-domain/types";
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
 import { NativeLineupWorkspace } from "../features/native-lineup/NativeLineupWorkspace";
+import { PlayerProfileButton } from "../features/player-profile/PlayerProfileProvider";
 import { appUrl } from "../lib/appBasePath";
 import { PositionBadge } from "../ui/PositionBadge";
 import { UniversalSelect } from "../ui/UniversalSelect";
@@ -357,7 +358,7 @@ export default function LeagueLineup() {
 
       <section className="league-lineup-bench" aria-labelledby="lineup-bench-title">
         <header><div><span>Available depth</span><h2 id="lineup-bench-title">Bench</h2></div><b>{displayed?.bench.length ?? 0}</b></header>
-        <div>{displayed?.bench.map((player) => <article key={player.id}><PositionBadge className="league-position" position={player.position}>{positionLabel(player.position)}</PositionBadge><div><strong>{player.name}</strong><small>{player.nflTeam || "FA"}{player.isOnBye ? " · Bye" : ""}</small></div><span>{player.baselinePoints?.toFixed(1) ?? "—"}</span></article>)}</div>
+        <div>{displayed?.bench.map((player) => <article key={player.id}><PositionBadge className="league-position" position={player.position}>{positionLabel(player.position)}</PositionBadge><div><PlayerProfileButton player={player.projection ?? player} scoring={toolScoring(season.scoring)}><strong>{player.name}</strong><small>{player.nflTeam || "FA"}{player.isOnBye ? " · Bye" : ""}</small></PlayerProfileButton></div><span>{player.baselinePoints?.toFixed(1) ?? "—"}</span></article>)}</div>
       </section>
     </div>
   );

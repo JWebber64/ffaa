@@ -10,6 +10,7 @@ import { AppStateScreen } from "./components/AppStateScreen";
 import { ToastProvider } from "./ui/ToastProvider";
 import { useSleeperLeagueConnections } from "./features/league-hq/sleeperConnections";
 import { SleeperConnectionsCloudSync } from "./features/league-hq/SleeperConnectionsCloudSync";
+import { PlayerProfileProvider } from "./features/player-profile/PlayerProfileProvider";
 
 import AppShellV2 from "./layouts/AppShellV2";
 
@@ -178,17 +179,19 @@ function App() {
       <ConfigProvider>
         <RoleProvider>
           <BrowserRouter basename={APP_ROUTER_BASENAME}>
-            <SleeperConnectionsCloudSync />
-            <Suspense
-              fallback={
-                <AppStateScreen
-                  title="Loading Fantasy Football"
-                  message="Opening the requested fantasy football workspace."
-                />
-              }
-            >
-              <AppRoutes />
-            </Suspense>
+            <PlayerProfileProvider>
+              <SleeperConnectionsCloudSync />
+              <Suspense
+                fallback={
+                  <AppStateScreen
+                    title="Loading Fantasy Football"
+                    message="Opening the requested fantasy football workspace."
+                  />
+                }
+              >
+                <AppRoutes />
+              </Suspense>
+            </PlayerProfileProvider>
           </BrowserRouter>
         </RoleProvider>
       </ConfigProvider>

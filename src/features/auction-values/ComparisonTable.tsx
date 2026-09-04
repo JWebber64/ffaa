@@ -1,5 +1,6 @@
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 
+import { PlayerProfileButton } from "@/features/player-profile/PlayerProfileProvider";
 import { PositionBadge } from "../../ui/PositionBadge";
 import type { AuctionComparisonRow, AuctionSortKey, AuctionValueMode, AuctionValueSource } from "./auctionValueTypes";
 
@@ -125,7 +126,7 @@ export function ComparisonTable(props: Props) {
               return (
                 <tr key={row.playerId}>
                   <td className="auction-rank-column">{index + 1}</td>
-                  <th className="auction-player-column" scope="row"><strong>{row.playerName}</strong><small>{row.position} · {row.nflTeam ?? "FA"}</small></th>
+                  <th className="auction-player-column" scope="row"><PlayerProfileButton player={{ playerId: row.playerId, playerName: row.playerName, position: row.position, nflTeam: row.nflTeam, byeWeek: row.byeWeek, auctionValue: row.gamehqFairValue, marketValue: row.marketAav }}><strong>{row.playerName}</strong><small>{row.position} · {row.nflTeam ?? "FA"}</small></PlayerProfileButton></th>
                   <td><PositionBadge className="auction-position-chip" position={row.position} /></td>
                   <td>{row.nflTeam ?? "—"}</td>
                   <td>{row.byeWeek ?? "—"}</td>
@@ -167,7 +168,7 @@ export function ComparisonTable(props: Props) {
       <div className={`auction-mobile-stack ${props.mobileView === "stacked" ? "is-active" : ""}`}>
         {props.rows.map((row, index) => (
           <article className="auction-mobile-player" key={row.playerId}>
-            <header><span>{index + 1}</span><div><strong>{row.playerName}</strong><small>{row.position} · {row.nflTeam ?? "FA"} · Bye {row.byeWeek ?? "—"}</small></div><b>{money(row.gamehqFairValue)}</b></header>
+            <header><span>{index + 1}</span><div><PlayerProfileButton player={{ playerId: row.playerId, playerName: row.playerName, position: row.position, nflTeam: row.nflTeam, byeWeek: row.byeWeek, auctionValue: row.gamehqFairValue, marketValue: row.marketAav }}><strong>{row.playerName}</strong><small>{row.position} · {row.nflTeam ?? "FA"} · Bye {row.byeWeek ?? "—"}</small></PlayerProfileButton></div><b>{money(row.gamehqFairValue)}</b></header>
             <dl>
               <div><dt>GameHQ Fair</dt><dd>{money(row.gamehqFairValue)}</dd></div>
               <div><dt>Inputs</dt><dd>{row.fairValuePublisherCount} pub · {row.projectionSourceCount} proj · {row.publishedValueSourceCount} boards</dd></div>

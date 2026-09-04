@@ -33,6 +33,7 @@ import {
   type OfflineDraftCloudState,
 } from "../features/offline-draft/offlineDraftIdentity";
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
+import { PlayerProfileButton } from "../features/player-profile/PlayerProfileProvider";
 import { findSleeperLeagues } from "../features/league-hq/sleeperLeague";
 import {
   DEFAULT_ROSTER_SLOTS,
@@ -2276,14 +2277,14 @@ export default function OfflineDraftV2() {
                     }}
                     onDragEnd={() => setPlayerTransferSelection(null)}
                   >
-                    <div className="offline-roster-copy">
+                    <PlayerProfileButton player={{ playerId: player.playerId, playerName: player.name, position: player.pos, nflTeam: player.team, byeWeek: player.byeWeek, auctionValue: player.auctionValue }} className="offline-roster-copy">
                       <strong>{player.name}</strong>
                       <span>
                         {[player.pos, player.team, player.byeWeek ? `Bye ${player.byeWeek}` : null]
                           .filter(Boolean)
                           .join(" | ")}
                       </span>
-                    </div>
+                    </PlayerProfileButton>
                     <div className="offline-roster-actions">
                       {canMove && currentSlot ? (
                         <div className="offline-roster-slot-control">

@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, Info, Radio } from "lucide-react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { buildCurrentToolPlayers, type ToolPlayer } from "../data/toolPlayerData";
+import { buildCurrentToolPlayers, type ToolPlayer, type ToolScoring } from "../data/toolPlayerData";
+import { PlayerProfileButton } from "../features/player-profile/PlayerProfileProvider";
 import { getLeagueProjectionFreshness, projectionFreshnessSummary } from "../features/league-season/leagueProjectionFreshness";
 import {
   DEFAULT_REGULAR_SEASON_WEEKS,
@@ -52,19 +53,19 @@ function formatPlayerProjection(player: ToolPlayer | null) {
     : player.weeklyProjectedPoints.toFixed(1);
 }
 
-function MatchupPlayerSide({ player, side }: { player: ToolPlayer | null; side: "left" | "right" }) {
+function MatchupPlayerSide({ player, side, scoring }: { player: ToolPlayer | null; side: "left" | "right"; scoring: ToolScoring }) {
   const detail = player
     ? [player.position, player.team || "FA", player.byeWeek ? `Bye ${player.byeWeek}` : "", player.injuryStatus || ""].filter(Boolean).join(" · ")
     : "No player assigned";
   return (
     <div className={`league-h2h-player is-${side}`}>
-      <div><strong>{player?.name ?? "Open slot"}</strong><small>{detail}</small></div>
+      <PlayerProfileButton player={player} scoring={scoring} className="league-h2h-profile"><strong>{player?.name ?? "Open slot"}</strong><small>{detail}</small></PlayerProfileButton>
       <b>{formatPlayerProjection(player)}<small>PROJ</small></b>
     </div>
   );
 }
 
-function MatchupLineupRows({ left, right, bench = false }: { left: MyHQLineupEntry[]; right: MyHQLineupEntry[]; bench?: boolean }) {
+function MatchupLineupRows({ left, right, scoring, bench = false }: { left: MyHQLineupEntry[]; right: MyHQLineupEntry[]; scoring: ToolScoring; bench?: boolean }) {
   const rowCount = Math.max(left.length, right.length);
   if (!rowCount) return null;
   return (
@@ -75,9 +76,9 @@ function MatchupLineupRows({ left, right, bench = false }: { left: MyHQLineupEnt
         const slot = leftEntry?.slot ?? rightEntry?.slot ?? (bench ? `BN${index + 1}` : "FLEX");
         return (
           <div className={`league-h2h-row ${bench ? "is-bench" : ""}`} role="row" key={`${slot}-${index}`}>
-            <MatchupPlayerSide player={leftEntry?.player ?? null} side="left" />
+            <MatchupPlayerSide player={leftEntry?.player ?? null} side="left" scoring={scoring} />
             <PositionBadge className="league-position" position={slot}>{bench ? "BN" : slot.replace(/_/g, " ")}</PositionBadge>
-            <MatchupPlayerSide player={rightEntry?.player ?? null} side="right" />
+            <MatchupPlayerSide player={rightEntry?.player ?? null} side="right" scoring={scoring} />
           </div>
         );
       })}
@@ -85,7 +86,7 @@ function MatchupLineupRows({ left, right, bench = false }: { left: MyHQLineupEnt
   );
 }
 
-function ConnectedTeamMatchup({ data }: { data: MyHQData }) {
+function ConnectedTeamMatchup({ data, scoring }: { data: MyHQData; scoring: ToolScoring }) {
   const leftBench = data.bench.map((player, index): MyHQLineupEntry => ({ slot: `BN${index + 1}`, player }));
   const rightBench = data.opponentBench.map((player, index): MyHQLineupEntry => ({ slot: `BN${index + 1}`, player }));
   const hasOpponent = data.opponentProviderUserId || data.opponentStarterLineup.length || data.opponentName !== "Opponent not set";
@@ -106,9 +107,9 @@ function ConnectedTeamMatchup({ data }: { data: MyHQData }) {
         {hasOpponent ? (
           <>
             <div className="league-h2h-section-label"><span>Starters</span><small>Week {data.week || 1} projected points</small></div>
-            <MatchupLineupRows left={data.starterLineup} right={data.opponentStarterLineup} />
+            <MatchupLineupRows left={data.starterLineup} right={data.opponentStarterLineup} scoring={scoring} />
             {(leftBench.length || rightBench.length) ? <div className="league-h2h-section-label"><span>Bench</span><small>Roster depth</small></div> : null}
-            <MatchupLineupRows left={leftBench} right={rightBench} bench />
+            <MatchupLineupRows left={leftBench} right={rightBench} scoring={scoring} bench />
           </>
         ) : <div className="league-h2h-empty">Sleeper has not assigned an opponent for this week yet.</div>}
       </section>
@@ -246,8 +247,8 @@ function LeagueScheduleMatchups({ personalOnly = false }: { personalOnly?: boole
                 </Link>
               </div>
               <footer>
-                <span>{awayTop ? `${awayTop.name} · ${awayTop.baselinePoints?.toFixed(1)} baseline` : `${away.displayName} has no matched projections`}</span>
-                <span>{homeTop ? `${homeTop.name} · ${homeTop.baselinePoints?.toFixed(1)} baseline` : `${home.displayName} has no matched projections`}</span>
+                <span>{awayTop ? <PlayerProfileButton player={awayTop} scoring={toolScoring(season.scoring)}>{awayTop.name} · {awayTop.baselinePoints?.toFixed(1)} baseline</PlayerProfileButton> : `${away.displayName} has no matched projections`}</span>
+                <span>{homeTop ? <PlayerProfileButton player={homeTop} scoring={toolScoring(season.scoring)}>{homeTop.name} · {homeTop.baselinePoints?.toFixed(1)} baseline</PlayerProfileButton> : `${home.displayName} has no matched projections`}</span>
               </footer>
             </article>
           );
@@ -263,7 +264,7 @@ export default function LeagueMatchups({ personalOnly = false }: { personalOnly?
     return <NativeLiveMatchupWorkspace workspace={workspace.canonicalWorkspace} personalOnly={personalOnly} />;
   }
   if (personalOnly && workspace) {
-    if (workspace.teamState.status === "ready") return <ConnectedTeamMatchup data={workspace.teamState.data} />;
+    if (workspace.teamState.status === "ready") return <ConnectedTeamMatchup data={workspace.teamState.data} scoring={workspace.connection?.auctionSettings?.scoring ?? "halfPpr"} />;
     return (
       <div className="league-season-page">
         <div className={`league-compact-state ${workspace.teamState.status === "error" ? "is-error" : ""}`} aria-busy={workspace.teamState.status !== "error"}>

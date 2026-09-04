@@ -1,0 +1,57 @@
+.player-profile-trigger {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+.player-profile-trigger:hover {
+  color: var(--color-text-link-hover);
+}
+
+.player-profile-trigger:focus-visible {
+  border-radius: var(--r-sm);
+  outline: 2px solid var(--color-field-focus);
+  outline-offset: 3px;
+}
+
+.player-profile-trigger strong,
+.player-profile-trigger small,
+.player-profile-trigger span {
+  color: inherit;
+}
+
+.player-pool-profile {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: .5rem;
+}
+
+.draft-board-player-profile {
+  display: block;
+  min-width: 0;
+  flex: 1;
+}
+
+.player-search-profile {
+  display: inline-flex;
+  min-width: 0;
+}
+
+.draft-queue-copy,
+.offline-roster-copy {
+  display: grid;
+  min-width: 0;
+  text-align: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-profile-trigger {
+    scroll-behavior: auto;
+  }
+}

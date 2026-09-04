@@ -31,6 +31,7 @@ import { useDisclosure } from '@/ui/custom';
 import { useAuctionSound } from '../hooks/useAuctionSound';
 import { toastError } from '../utils/toastError';
 import { TeamMark } from '../components/player/TeamMark';
+import { PlayerProfileButton } from '../features/player-profile/PlayerProfileProvider';
 
 const Auctioneer: React.FC = () => {
   const toast = useToast();
@@ -585,9 +586,11 @@ const Auctioneer: React.FC = () => {
               <HStack justify="space-between" align="center">
                 <HStack minW={0} spacing={2}>
                   <TeamMark team={currentPlayer.nflTeam} size="sm" />
-                  <Text fontSize="xl" fontWeight="bold" color="white">
-                    {currentPlayer.name}
-                  </Text>
+                  <PlayerProfileButton player={currentPlayer}>
+                    <Text fontSize="xl" fontWeight="bold" color="white">
+                      {currentPlayer.name}
+                    </Text>
+                  </PlayerProfileButton>
                   {currentPlayer.pos && (
                     <Badge ml={2} colorScheme="green">
                       {formatPositionForDisplay(currentPlayer.pos)}

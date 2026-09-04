@@ -7,6 +7,7 @@ import type { HistoricalDraftPick, HistoricalMatchup } from "../../domain/types"
 import { useLeagueHistorySnapshot } from "../historyContext";
 import { coverageForSeason, coverageStatusLabel } from "../../coverage/historyCoverage";
 import { formatNumber, formatRecord, ordinal } from "../format";
+import { PlayerProfileButton } from "../../../player-profile/PlayerProfileProvider";
 
 const ARCHIVE_SECTIONS = ["overview", "standings", "games", "auction", "activity"] as const;
 type ArchiveSection = typeof ARCHIVE_SECTIONS[number];
@@ -258,7 +259,7 @@ export function SeasonArchivePage() {
           <div className="history-table-wrap history-draft-table-wrap history-season-draft-table-wrap">
             <table className="history-table history-draft-table"><thead><tr><th>Player</th><th>Pos / NFL</th><th>Manager</th><th>Franchise</th><th>Price</th>{orderKnown ? <th>Order</th> : null}</tr></thead><tbody>{filteredDraftPicks.map((pick) => {
               const franchise = pick.franchiseId ? franchiseById.get(pick.franchiseId) : null;
-              return <tr key={pick.id}><td><strong>{pick.playerName || pick.providerPlayerId}</strong>{pick.isKeeper ? <small>Keeper</small> : null}</td><td>{pick.position || "—"}<small>{pick.nflTeam || "NFL team unavailable"}</small></td><td>{managerNameForFranchise(pick.franchiseId)}</td><td>{franchise?.teamName ?? "Unknown"}</td><td className="history-price-cell">{pick.auctionPrice == null ? "—" : `$${formatNumber(pick.auctionPrice, 0)}`}</td>{orderKnown ? <td title={pick.pickNumber == null ? "Nomination order unavailable" : undefined}>{pick.pickNumber == null ? "—" : `#${pick.pickNumber}`}</td> : null}</tr>;
+              return <tr key={pick.id}><td><PlayerProfileButton player={{ playerId: pick.providerPlayerId, playerName: pick.playerName, position: pick.position, nflTeam: pick.nflTeam }}><strong>{pick.playerName || pick.providerPlayerId}</strong>{pick.isKeeper ? <small>Keeper</small> : null}</PlayerProfileButton></td><td>{pick.position || "—"}<small>{pick.nflTeam || "NFL team unavailable"}</small></td><td>{managerNameForFranchise(pick.franchiseId)}</td><td>{franchise?.teamName ?? "Unknown"}</td><td className="history-price-cell">{pick.auctionPrice == null ? "—" : `$${formatNumber(pick.auctionPrice, 0)}`}</td>{orderKnown ? <td title={pick.pickNumber == null ? "Nomination order unavailable" : undefined}>{pick.pickNumber == null ? "—" : `#${pick.pickNumber}`}</td> : null}</tr>;
             })}</tbody></table>
             {!filteredDraftPicks.length ? <div className="history-draft-empty">No auction players match these filters.</div> : null}
           </div>

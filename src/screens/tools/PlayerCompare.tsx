@@ -10,6 +10,7 @@ import { ToolLayout } from "@/components/tools/ToolLayout";
 import { ToolPlayerPicker } from "@/components/tools/ToolPlayerPicker";
 import type { ToolPlayer, ToolScoring } from "@/data/toolPlayerData";
 import { formatToolScoring } from "@/data/toolPlayerData";
+import { PlayerProfileButton } from "@/features/player-profile/PlayerProfileProvider";
 import { useToolData } from "@/screens/tools/useToolData";
 import { UniversalSelect } from "@/ui/UniversalSelect";
 
@@ -148,7 +149,7 @@ export function PlayerCompare() {
               <TeamMark team={player.team} size="sm" />
               <span>{player.position} · {formatTeamBye(player.team || "FA", player.byeWeek)}</span>
             </span>
-            <h2>{player.name}</h2>
+            <h2><PlayerProfileButton player={player} scoring={scoring}>{player.name}</PlayerProfileButton></h2>
             <p>{player.injuryStatus || player.status || "No active injury designation"}</p>
             <div className="compare-player-primary">
               <strong>{formatNumber(player.projectedPoints)}</strong>
@@ -165,7 +166,7 @@ export function PlayerCompare() {
           <thead>
             <tr>
               <th scope="col">Metric</th>
-              {comparedPlayers.map((player) => <th scope="col" key={player.id}>{player.name}</th>)}
+              {comparedPlayers.map((player) => <th scope="col" key={player.id}><PlayerProfileButton player={player} scoring={scoring}>{player.name}</PlayerProfileButton></th>)}
             </tr>
           </thead>
           <tbody>
@@ -195,7 +196,7 @@ export function PlayerCompare() {
             const directSources = player.valueSources.filter((source) => source.kind === "auction");
             return (
               <article key={player.id}>
-                <h3>{player.name}</h3>
+                <h3><PlayerProfileButton player={player} scoring={scoring}>{player.name}</PlayerProfileButton></h3>
                 {directSources.length ? (
                   <dl>
                     {directSources.map((source) => (

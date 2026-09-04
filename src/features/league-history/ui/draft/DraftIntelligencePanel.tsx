@@ -6,6 +6,7 @@ import { coverageForSeason, coverageStatusLabel } from "../../coverage/historyCo
 import type { LeagueHistorySnapshot } from "../../domain/types";
 import { useLeagueHistoryWeeks } from "../../useLeagueHistoryWeeks";
 import { formatNumber, ordinal } from "../format";
+import { PlayerProfileButton } from "../../../player-profile/PlayerProfileProvider";
 
 type ReceiptSort = "player" | "manager" | "price" | "startedPoints" | "efficiency" | "percentile";
 
@@ -154,7 +155,7 @@ export function DraftIntelligencePanel({
               <th>Evidence</th>
             </tr></thead>
             <tbody>{sortedReceipts.map((receipt) => <tr key={receipt.id}>
-              <td data-label="Player"><strong>{receipt.playerName}</strong><small>{receipt.position} · {receipt.nflTeam || "NFL team unavailable"}</small></td>
+              <td data-label="Player"><PlayerProfileButton player={{ playerId: receipt.providerPlayerId, playerName: receipt.playerName, position: receipt.position, nflTeam: receipt.nflTeam }}><strong>{receipt.playerName}</strong><small>{receipt.position} · {receipt.nflTeam || "NFL team unavailable"}</small></PlayerProfileButton></td>
               <td data-label="Manager">{receipt.managerName}<small>{receipt.franchiseName}</small></td>
               <td data-label="Paid">{receipt.price == null ? "—" : `$${formatNumber(receipt.price, 0)}`}<small>{receipt.priceBand.label}</small></td>
               <td data-label="Observed weeks">{receipt.observedRosterWeeks}<small>{receipt.starterWeeks} starts</small></td>

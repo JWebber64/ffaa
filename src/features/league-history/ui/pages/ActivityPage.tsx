@@ -10,6 +10,7 @@ import { useLeagueHistorySnapshot } from "../historyContext";
 import { formatNumber } from "../format";
 import { groupTransactionAssetsByRecipient } from "../transactionPresentation";
 import { DraftIntelligencePanel } from "../draft/DraftIntelligencePanel";
+import { PlayerProfileButton } from "../../../player-profile/PlayerProfileProvider";
 
 const TRANSACTION_PAGE_SIZE = 100;
 
@@ -179,7 +180,7 @@ export function DraftHistoryPage() {
             <table className="history-table history-draft-table"><thead><tr><th>Player</th><th>Pos / NFL</th><th>Manager</th><th>Franchise</th><th>Price</th><th>Order</th></tr></thead><tbody>{filteredPicks.map((pick) => {
               const franchise = pick.franchiseId ? franchiseById.get(pick.franchiseId) : null;
               const manager = franchise?.managerId ? managerById.get(franchise.managerId) : null;
-              return <tr key={pick.id}><td><strong>{pick.playerName || pick.providerPlayerId}</strong>{pick.isKeeper ? <small>Keeper</small> : null}</td><td>{pick.position || "—"}<small>{pick.nflTeam || "NFL team unavailable"}</small></td><td>{manager?.displayName ?? franchise?.historicalUsername ?? "Unknown"}</td><td>{franchise?.teamName ?? "Unknown"}</td><td className="history-price-cell">{pick.auctionPrice == null ? "—" : `$${formatNumber(pick.auctionPrice, 0)}`}</td><td title={pick.pickNumber == null ? "Nomination order unavailable" : undefined}>{pick.pickNumber == null ? "—" : `#${pick.pickNumber}`}</td></tr>;
+              return <tr key={pick.id}><td><PlayerProfileButton player={{ playerId: pick.providerPlayerId, playerName: pick.playerName, position: pick.position, nflTeam: pick.nflTeam }}><strong>{pick.playerName || pick.providerPlayerId}</strong>{pick.isKeeper ? <small>Keeper</small> : null}</PlayerProfileButton></td><td>{pick.position || "—"}<small>{pick.nflTeam || "NFL team unavailable"}</small></td><td>{manager?.displayName ?? franchise?.historicalUsername ?? "Unknown"}</td><td>{franchise?.teamName ?? "Unknown"}</td><td className="history-price-cell">{pick.auctionPrice == null ? "—" : `$${formatNumber(pick.auctionPrice, 0)}`}</td><td title={pick.pickNumber == null ? "Nomination order unavailable" : undefined}>{pick.pickNumber == null ? "—" : `#${pick.pickNumber}`}</td></tr>;
             })}</tbody></table>
             {!filteredPicks.length ? <div className="history-draft-empty">No draft picks match these filters.</div> : null}
           </div>

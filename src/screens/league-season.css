@@ -359,6 +359,8 @@
 .league-h2h-row > .league-position { justify-self: center; }
 .league-h2h-player { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; }
 .league-h2h-player > div { min-width: 0; display: grid; gap: 2px; }
+.league-h2h-profile { min-width: 0; display: grid; gap: 2px; text-align: left; }
+.league-h2h-player.is-right .league-h2h-profile { text-align: right; }
 .league-h2h-player strong { overflow: hidden; color: var(--text-0); font-size: .75rem; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .league-h2h-player small { overflow: hidden; color: var(--text-2); font-size: .61rem; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .league-h2h-player > b { display: grid; color: var(--text-1); font-size: .78rem; line-height: 1.05; text-align: right; }
@@ -658,6 +660,7 @@
   .league-h2h-player.is-right { grid-template-columns: minmax(0, 1fr); }
   .league-h2h-player.is-right > div,
   .league-h2h-player.is-right > b { grid-row: auto; grid-column: 1; justify-self: end; text-align: right; }
+  .league-h2h-player.is-right .league-h2h-profile { justify-self: end; }
   .league-h2h-player small { font-size: .56rem; }
   .league-season-gate-content { min-height: 360px; margin-top: 20px; padding: 28px 22px; }
   .league-season-gate-content.is-editorial { min-height: 0; padding: 0; }

@@ -1,6 +1,7 @@
 import { Activity, AlertTriangle, CheckCircle2, Clock3, History, ShieldAlert, Sparkles, Swords, Trophy, Users } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { ToolPlayer } from "../data/toolPlayerData";
+import type { ToolPlayer, ToolScoring } from "../data/toolPlayerData";
+import { PlayerProfileButton } from "../features/player-profile/PlayerProfileProvider";
 import { calculateHeadToHead, calculateManagerCareer } from "../features/league-history/analytics";
 import { useLeagueHistory } from "../features/league-history/useLeagueHistory";
 import type { SleeperLeagueConnectionSummary } from "../features/league-hq/sleeperConnections";
@@ -24,7 +25,7 @@ function formatPlayerProjection(player: ToolPlayer | null) {
     : player.weeklyProjectedPoints.toFixed(1);
 }
 
-function TeamRosterRow({ player, slot, bench = false }: { player: ToolPlayer | null; slot: string; bench?: boolean }) {
+function TeamRosterRow({ player, slot, scoring, bench = false }: { player: ToolPlayer | null; slot: string; scoring: ToolScoring; bench?: boolean }) {
   const detail = player
     ? [player.team || "FA", player.byeWeek ? `Bye ${player.byeWeek}` : "", player.injuryStatus || ""].filter(Boolean).join(" · ")
     : "No player assigned";
@@ -33,8 +34,10 @@ function TeamRosterRow({ player, slot, bench = false }: { player: ToolPlayer | n
       <div role="cell"><span className="hq-roster-mobile-label">Slot</span><PositionBadge className="hq-position" position={slot}>{slot.replace(/_/g, " ")}</PositionBadge></div>
       <div className="hq-roster-player" role="cell">
         <span className="hq-roster-mobile-label">Player</span>
-        <strong>{player?.name ?? "Open slot"}</strong>
-        <small>{detail}</small>
+        <PlayerProfileButton player={player} scoring={scoring} className="hq-roster-profile">
+          <strong>{player?.name ?? "Open slot"}</strong>
+          <small>{detail}</small>
+        </PlayerProfileButton>
       </div>
       <div className="hq-roster-status" role="cell">
         <span className="hq-roster-mobile-label">Status</span>
@@ -48,7 +51,7 @@ function TeamRosterRow({ player, slot, bench = false }: { player: ToolPlayer | n
   );
 }
 
-function TeamRoster({ data }: { data: MyHQData }) {
+function TeamRoster({ data, scoring }: { data: MyHQData; scoring: ToolScoring }) {
   return (
     <section className="hq-roster" aria-labelledby="hq-roster-title">
       <header className="hq-roster-heading">
@@ -60,11 +63,11 @@ function TeamRoster({ data }: { data: MyHQData }) {
           <span role="columnheader">Slot</span><span role="columnheader">Player</span><span role="columnheader">Status</span><span role="columnheader">Week projection</span>
         </div>
         <div role="rowgroup">
-          {data.starterLineup.map((entry, index) => <TeamRosterRow key={`${entry.slot}-${entry.player?.id ?? index}`} player={entry.player} slot={entry.slot} />)}
+          {data.starterLineup.map((entry, index) => <TeamRosterRow key={`${entry.slot}-${entry.player?.id ?? index}`} player={entry.player} slot={entry.slot} scoring={scoring} />)}
         </div>
         <div className="hq-roster-divider"><span>Bench</span><small>{data.bench.length} players</small></div>
         <div role="rowgroup">
-          {data.bench.map((player, index) => <TeamRosterRow key={player.id} player={player} slot={`BN${index + 1}`} bench />)}
+          {data.bench.map((player, index) => <TeamRosterRow key={player.id} player={player} slot={`BN${index + 1}`} scoring={scoring} bench />)}
         </div>
       </div>
       <footer>{data.projectionNote}</footer>
@@ -162,7 +165,7 @@ export default function MyHQ() {
         </Link>
       </header>
 
-      <TeamRoster data={data} />
+      <TeamRoster data={data} scoring={connection.auctionSettings?.scoring ?? "halfPpr"} />
 
       <section className="hq-section hq-decisions">
         <div className="hq-section-heading"><div><span>Decision queue</span><h2>What needs your attention</h2></div><Clock3 aria-hidden="true" /></div>

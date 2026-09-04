@@ -58,6 +58,7 @@ import { DraftLogEntry } from "../components/DraftLogEntry";
 import { CountdownRing } from "../components/CountdownRing";
 import { MobileManagerDraftView } from "../components/manager/MobileManagerDraftView";
 import { TeamMark } from "../components/player/TeamMark";
+import { PlayerProfileButton } from "../features/player-profile/PlayerProfileProvider";
 import { formatByeWeek, formatTeamBye } from "../components/player/teamMarkUtils";
 import { DraftConfigV2, DEFAULT_ROSTER_SLOTS } from "../types/draftConfig";
 import TeamBoard, { type TeamBoardDensity } from "../components/draft/TeamBoard";
@@ -1521,11 +1522,9 @@ export default function DraftRoomV2() {
                               !isMyTurnToAct ? "is-locked" : ""
                             )}
                           >
-                            <button
-                              type="button"
+                            <PlayerProfileButton
+                              player={{ playerId: player.playerId, playerName: player.name, position: player.pos, nflTeam: player.team, byeWeek: player.byeWeek, auctionValue: player.auctionValue, marketValue: player.marketValue, projectedPoints: player.projectedPoints }}
                               className="draft-player-select-button"
-                              onClick={() => selectPlayerForNomination(player)}
-                              disabled={!isMyTurnToAct}
                             >
                               <div className="draft-player-copy">
                                 <div className="draft-player-title">
@@ -1536,7 +1535,7 @@ export default function DraftRoomV2() {
                                   {draftPlayerMeta(player)}
                                 </div>
                               </div>
-                            </button>
+                            </PlayerProfileButton>
 
                             <div className="draft-player-actions">
                               <button
@@ -1637,14 +1636,14 @@ export default function DraftRoomV2() {
                           className={cn("draft-queue-row", `is-${status.tone}`, isSelected ? "is-selected" : "")}
                         >
                           <div className="draft-queue-rank">{index + 1}</div>
-                          <div className="draft-queue-copy">
+                          <PlayerProfileButton player={{ playerId: player.playerId, playerName: player.name, position: player.pos, nflTeam: player.team, byeWeek: player.byeWeek, auctionValue: player.auctionValue, marketValue: player.marketValue, projectedPoints: player.projectedPoints }} className="draft-queue-copy">
                             <div className="draft-queue-player-title">
                               <TeamMark team={player.team} size="xs" />
                               <span>{player.name}</span>
                             </div>
                             <div className="draft-queue-player-meta">{draftPlayerMeta(player)}</div>
                             <div className="draft-queue-status">{status.label}</div>
-                          </div>
+                          </PlayerProfileButton>
                           <div className="draft-queue-actions">
                             <button
                               type="button"

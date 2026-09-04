@@ -65,6 +65,11 @@ export default defineConfig(({ mode }) => ({
     port: 5173,
     allowedHosts: ['.trycloudflare.com'],
     proxy: {
+      '/espn-nfl-news': {
+        target: 'https://www.espn.com',
+        changeOrigin: true,
+        rewrite: () => '/espn/rss/nfl/news',
+      },
       '/ffc-api': {
         target: 'https://fantasyfootballcalculator.com',
         changeOrigin: true,

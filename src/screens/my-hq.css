@@ -35,6 +35,7 @@
 .hq-roster-row:hover { background: var(--surface-hover); }
 .hq-roster-row > div { min-width: 0; }
 .hq-roster-player { display: grid; gap: 2px; }
+.hq-roster-profile { display: grid; gap: 2px; }
 .hq-roster-player strong { overflow: hidden; color: var(--text-primary); line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .hq-roster-player small,
 .hq-roster-points small { color: var(--text-muted); font-size: .65rem; }

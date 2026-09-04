@@ -24,6 +24,7 @@ import { formatTeamBye } from "../components/player/teamMarkUtils";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { useRouteMetadata } from "../lib/routeMetadata";
+import { PlayerProfileButton } from "../features/player-profile/PlayerProfileProvider";
 
 function formatDate(value: unknown) {
   if (!value || typeof value !== "string") return "--";
@@ -352,6 +353,7 @@ export default function ResultsV2() {
                             {team.players.map((player) => (
                               <tr key={player.playerId}>
                                 <td>
+                                  <PlayerProfileButton player={{ playerId: player.playerId, playerName: player.name, position: player.position, nflTeam: player.nflTeam, byeWeek: player.byeWeek, projectedPoints: player.projectedPoints, auctionValue: player.projectedValue }}>
                                   <span className="results-player-identity">
                                     <TeamMark team={player.nflTeam} size="xs" />
                                     <span className="results-player-copy">
@@ -359,6 +361,7 @@ export default function ResultsV2() {
                                       <span>{formatTeamBye(player.nflTeam, player.byeWeek)}</span>
                                     </span>
                                   </span>
+                                  </PlayerProfileButton>
                                 </td>
                                 <td>{player.position}</td>
                                 <td>{player.lineupSlot}</td>

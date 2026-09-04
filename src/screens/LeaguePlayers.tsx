@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
 import { NativeWaiverWorkspace } from "../features/native-waivers/NativeWaiverWorkspace";
+import { PlayerProfileButton } from "../features/player-profile/PlayerProfileProvider";
 import { PositionBadge } from "../ui/PositionBadge";
 import StatsExplorer from "./StatsExplorer";
 import "./league-players.css";
@@ -13,6 +14,7 @@ export default function LeaguePlayers() {
     return <NativeWaiverWorkspace workspace={canonicalWorkspace} />;
   }
   const data = teamState.status === "ready" ? teamState.data : null;
+  const scoring = connection?.auctionSettings?.scoring ?? "halfPpr";
   return (
     <div className="league-players-page">
       <div className="stats-hub-note">
@@ -33,8 +35,8 @@ export default function LeaguePlayers() {
               <div className="league-player-recommendation-head" aria-hidden="true"><span>Available player</span><span>Roster fit</span><span>Baseline</span><span>Evidence</span></div>
               {data.availableRecommendations.slice(0, 6).map((recommendation) => (
                 <article key={recommendation.id}>
-                  <div><PositionBadge position={recommendation.player.position} /><strong>{recommendation.player.name}</strong><small>{recommendation.player.team || "FA"}</small></div>
-                  <div><strong>{recommendation.eligibleSlots.map((slot) => slot.replace(/_/g, " ")).join(" / ")}</strong><small>{recommendation.dropPlayer ? `Compare with ${recommendation.dropPlayer.name}` : "No bench comparison available"}</small></div>
+                  <div><PositionBadge position={recommendation.player.position} /><PlayerProfileButton player={recommendation.player} scoring={scoring}><strong>{recommendation.player.name}</strong><small>{recommendation.player.team || "FA"}</small></PlayerProfileButton></div>
+                  <div><strong>{recommendation.eligibleSlots.map((slot) => slot.replace(/_/g, " ")).join(" / ")}</strong><small>{recommendation.dropPlayer ? <>Compare with <PlayerProfileButton player={recommendation.dropPlayer} scoring={scoring}>{recommendation.dropPlayer.name}</PlayerProfileButton></> : "No bench comparison available"}</small></div>
                   <div><strong>{recommendation.player.projectedPointsPerGame?.toFixed(1) ?? "—"} PPG</strong><small>{recommendation.baselineGain === null ? "No comparable drop" : `${recommendation.baselineGain >= 0 ? "+" : ""}${recommendation.baselineGain.toFixed(1)} vs suggested drop`}</small></div>
                   <div><strong>{recommendation.confidence} confidence</strong><small>{recommendation.evidence}</small></div>
                 </article>
