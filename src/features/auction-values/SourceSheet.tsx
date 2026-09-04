@@ -1,6 +1,8 @@
 import { ExternalLink, Plus, Printer } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
+import { PlayerProfileButton } from "@/features/player-profile/PlayerProfileProvider";
+
 import { PositionBadge } from "../../ui/PositionBadge";
 import type { AuctionPlayerValue, AuctionValueMode, AuctionValueSource, ScoringFormat } from "./auctionValueTypes";
 
@@ -88,7 +90,7 @@ export function SourceSheet(props: Props) {
             </tr></thead>
             <tbody>{visibleRows.map((row, index) => <tr key={`${row.sourceId}-${row.playerId}`}>
               <td>{row.rank ?? index + 1}</td>
-              <th className="auction-player-column" scope="row"><strong>{row.playerName}</strong><small>{row.position} · {row.nflTeam ?? "FA"}</small></th>
+              <th className="auction-player-column" scope="row"><PlayerProfileButton player={{ playerId: row.playerId, playerName: row.playerName, position: row.position, nflTeam: row.nflTeam, byeWeek: row.byeWeek }} scoring={props.scoringFormat === "half_ppr" ? "halfPpr" : props.scoringFormat}><strong>{row.playerName}</strong><small>{row.position} · {row.nflTeam ?? "FA"}</small></PlayerProfileButton></th>
               <td><PositionBadge className="auction-position-chip" position={row.position} /></td>
               <td>{row.nflTeam ?? "—"}</td><td>{row.byeWeek ?? "—"}</td>
               <td>{currency.format(row.rawValue)}</td><td className={props.valueMode === "normalized" ? "auction-consensus-cell" : ""}>{currency.format(row.normalizedValue)}</td>

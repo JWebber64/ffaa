@@ -3,6 +3,17 @@
   min-width: 0;
 }
 
+.stats-drawer-headshot {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  background: var(--color-surface-card-secondary);
+  object-fit: cover;
+  object-position: center top;
+}
+
 .stats-drawer-tabs button:focus-visible {
   border-radius: 6px 6px 0 0;
   outline: 2px solid var(--color-field-focus);
@@ -143,6 +154,87 @@
   text-align: left;
 }
 
+.stats-game-log-head {
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
+.stats-game-log-head > div > span {
+  display: block;
+  margin-top: 3px;
+}
+
+.stats-game-log-head label {
+  width: 112px;
+}
+
+.stats-news-list {
+  display: grid;
+  gap: 9px;
+}
+
+.stats-news-list article,
+.stats-news-empty {
+  padding: 14px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 10px;
+  background: var(--color-surface-card-secondary);
+}
+
+.stats-news-list article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--color-text-muted);
+  font-size: .65rem;
+}
+
+.stats-news-list article > a,
+.stats-news-empty > a {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-top: 7px;
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.stats-news-list article > a svg,
+.stats-news-empty > a svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.stats-news-list article p,
+.stats-news-empty p {
+  margin: 7px 0 0;
+  color: var(--color-text-muted);
+  font-size: .72rem;
+  line-height: 1.5;
+}
+
+.stats-news-empty {
+  text-align: center;
+}
+
+.stats-news-empty > svg {
+  color: var(--color-text-muted);
+}
+
+.stats-news-empty > strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--color-text-primary);
+  font-size: .8rem;
+}
+
+.stats-news-empty > a {
+  justify-content: center;
+  color: var(--color-text-link);
+  font-size: .72rem;
+  font-weight: 700;
+}
+
 .stats-career-table th:first-child,
 .stats-career-table td:first-child {
   position: sticky;
@@ -160,7 +252,10 @@
   .stats-drawer-tabs {
     overflow-x: auto;
     padding-inline: 12px;
+    scrollbar-width: none;
   }
+
+  .stats-drawer-tabs::-webkit-scrollbar { display: none; }
 
   .stats-drawer-tabs button {
     flex: none;

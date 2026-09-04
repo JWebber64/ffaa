@@ -36,6 +36,14 @@
   ],
   "rewrites": [
     {
+      "source": "/ff/espn-nfl-news",
+      "destination": "https://www.espn.com/espn/rss/nfl/news"
+    },
+    {
+      "source": "/espn-nfl-news",
+      "destination": "https://www.espn.com/espn/rss/nfl/news"
+    },
+    {
       "source": "/ff/sw.js",
       "destination": "/sw.js"
     },

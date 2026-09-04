@@ -38,6 +38,7 @@ import {
 import { useLeagueSeasonDraft } from "../features/league-season/useLeagueSeasonDraft";
 import { useLeagueSeasonManagement } from "../features/league-season/useLeagueSeasonManagement";
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
+import { PlayerProfileButton } from "../features/player-profile/PlayerProfileProvider";
 import "./league-season.css";
 
 type ActionState = { status: "idle" | "working" | "success" | "error"; key: string; message: string };
@@ -74,13 +75,13 @@ function LeagueSeasonGate({ status, message }: { status: string; message: string
   );
 }
 
-function PlayerRow({ player, slot, group }: { player: ProjectedRosterPlayer | null; slot: string; group: "starter" | "bench" }) {
+function PlayerRow({ player, slot, group, scoring }: { player: ProjectedRosterPlayer | null; slot: string; group: "starter" | "bench"; scoring: ReturnType<typeof toolScoring> }) {
   return (
     <div className={`league-roster-row ${group === "bench" ? "is-bench" : ""}`} role="row">
       <div role="cell"><span className="league-mobile-label">Slot</span><PositionBadge className="league-position" position={slot}>{positionLabel(slot)}</PositionBadge></div>
       <div className="league-roster-player" role="cell">
         <span className="league-mobile-label">Player</span>
-        {player ? <><strong>{player.name}</strong><small>{player.nflTeam || "FA"}{player.isOnBye ? " · Bye" : player.projection?.injuryStatus ? ` · ${player.projection.injuryStatus}` : ""}</small></> : <><strong>Open slot</strong><small>No eligible player</small></>}
+        {player ? <PlayerProfileButton player={player.projection ?? player} scoring={scoring} className="league-roster-profile"><strong>{player.name}</strong><small>{player.nflTeam || "FA"}{player.isOnBye ? " · Bye" : player.projection?.injuryStatus ? ` · ${player.projection.injuryStatus}` : ""}</small></PlayerProfileButton> : <><strong>Open slot</strong><small>No eligible player</small></>}
       </div>
       <div role="cell"><span className="league-mobile-label">Bye</span>{player?.projection?.byeWeek ?? player?.byeWeek ?? "—"}</div>
       <div role="cell"><span className="league-mobile-label">Drafted</span>{player ? `$${player.price}` : "—"}</div>
@@ -89,19 +90,19 @@ function PlayerRow({ player, slot, group }: { player: ProjectedRosterPlayer | nu
   );
 }
 
-function RosterTable({ lineup }: { lineup: ProjectedLineup }) {
+function RosterTable({ lineup, scoring }: { lineup: ProjectedLineup; scoring: ReturnType<typeof toolScoring> }) {
   return (
     <div className="league-roster-table" role="table" aria-label="Projected lineup and roster">
       <div className="league-roster-header" role="row">
         <span role="columnheader">Slot</span><span role="columnheader">Player</span><span role="columnheader">Bye</span><span role="columnheader">Drafted</span><span role="columnheader">Baseline</span>
       </div>
       <div role="rowgroup">
-        {lineup.slots.map((slot) => <PlayerRow key={slot.key} player={slot.player} slot={slot.label} group="starter" />)}
+        {lineup.slots.map((slot) => <PlayerRow key={slot.key} player={slot.player} slot={slot.label} group="starter" scoring={scoring} />)}
       </div>
       {lineup.bench.length ? (
         <div className="league-roster-bench" role="rowgroup" aria-label="Bench">
           <div className="league-roster-divider"><span>Bench and depth</span><small>{lineup.bench.length} players</small></div>
-          {lineup.bench.map((player, index) => <PlayerRow key={player.id} player={player} slot={`BN${index + 1}`} group="bench" />)}
+          {lineup.bench.map((player, index) => <PlayerRow key={player.id} player={player} slot={`BN${index + 1}`} group="bench" scoring={scoring} />)}
         </div>
       ) : null}
     </div>
@@ -313,7 +314,7 @@ export default function LeagueTeams() {
           <div><span>Projected lineup</span><h3>Starters and depth</h3></div>
           <Link to={`/league/${encodeURIComponent(leagueId)}/matchups?team=${encodeURIComponent(selected.id)}`}>View matchups</Link>
         </div>
-        <RosterTable lineup={lineup} />
+        <RosterTable lineup={lineup} scoring={toolScoring(season.scoring)} />
       </section>
     </div>
   );

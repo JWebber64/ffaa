@@ -19,6 +19,7 @@ import {
   type TeamRaterSlotPosition,
 } from "@/data/teamRater";
 import { useSleeperLeagueConnections } from "@/features/league-hq/sleeperConnections";
+import { PlayerProfileButton } from "@/features/player-profile/PlayerProfileProvider";
 import {
   loadCurrentTeamForRater,
   teamRaterSettingsFromConnection,
@@ -523,7 +524,9 @@ export function TeamRater() {
                     <TeamMark team={player.team} size="xs" />
                     <PositionBadge className="tool-position-tag" position={player.position} />
                   </span>
-                  <div><strong>{player.name}</strong><small>{formatTeamBye(player.team || "FA", player.byeWeek)} · Proj {formatNumber(player.projectedPoints)}</small></div>
+                  <PlayerProfileButton player={player} scoring={scoring} className="team-rater-profile">
+                    <strong>{player.name}</strong><small>{formatTeamBye(player.team || "FA", player.byeWeek)} · Proj {formatNumber(player.projectedPoints)}</small>
+                  </PlayerProfileButton>
                   {rosterSource === "custom" ? (
                     <button type="button" aria-label={`Remove ${player.name}`} onClick={() => setRosterIds((current) => current.filter((id) => id !== player.id))}>
                       <Trash2 size={15} aria-hidden="true" />
@@ -569,7 +572,9 @@ export function TeamRater() {
               {rating.lineup.map((entry) => (
                 <div key={`${entry.slot}-${entry.player.id}`}>
                   <span>{SLOT_LABELS[entry.slot]}</span>
-                  <strong>{entry.player.name}</strong>
+                  <PlayerProfileButton player={entry.player} scoring={scoring} className="rated-lineup-profile">
+                    <strong>{entry.player.name}</strong>
+                  </PlayerProfileButton>
                   <small>{formatTeamBye(entry.player.team || "FA", entry.player.byeWeek)} · {formatNumber(entry.player.projectedPoints)} pts · {Math.round(entry.projectionPercentile)}th percentile</small>
                 </div>
               ))}

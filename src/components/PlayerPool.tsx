@@ -23,6 +23,7 @@ import type { Player } from '../types/draft';
 import { formatPositionForDisplay } from '../utils/positionUtils';
 import { TeamMark } from './player/TeamMark';
 import { formatByeWeek } from './player/teamMarkUtils';
+import { PlayerProfileButton } from '../features/player-profile/PlayerProfileProvider';
 
 type Pos = Exclude<PositionType, 'FLEX' | 'BENCH' | 'IR'>;
 type TabValue = DefaultPositionToggleValue;
@@ -67,10 +68,10 @@ const PlayerRow: React.FC<PlayerRowProps> = ({ player, onNominate, nominate, sho
       justify="space-between"
     >
       <HStack spacing={3} flex={1}>
-        <HStack spacing={2} minW={0}>
+        <PlayerProfileButton player={player} className="player-pool-profile">
           <TeamMark team={player.nflTeam} size="xs" />
           <Text fontWeight="semibold" isTruncated>{player.name}</Text>
-        </HStack>
+        </PlayerProfileButton>
         {player.pos ? <PositionBadge className="cui-badge" position={player.pos} /> : null}
         {player.nflTeam && <Badge colorScheme="gray" minW="2.5em" textAlign="center">{player.nflTeam}</Badge>}
         {player.byeWeek && <Badge colorScheme="gray" minW="3.5em" textAlign="center">Bye {player.byeWeek}</Badge>}

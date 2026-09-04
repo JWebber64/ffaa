@@ -36,6 +36,7 @@ import { PositionBadge } from '../../ui/PositionBadge';
 import { positionColorVar } from '../../ui/positionColors';
 import { TeamMark } from '../player/TeamMark';
 import { formatByeWeek } from '../player/teamMarkUtils';
+import { PlayerProfileButton } from '../../features/player-profile/PlayerProfileProvider';
 
 type PlayerSearchProps = {
   /** Array of players to search through. If not provided, will use players from store */
@@ -362,10 +363,10 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                 >
                   <HStack justify="space-between">
                     <Box>
-                      <HStack spacing={2}>
+                      <PlayerProfileButton player={player} className="player-search-profile"><HStack spacing={2}>
                         <TeamMark team={player.nflTeam} size="xs" />
                         <Text fontWeight="medium" color="white">{player.name}</Text>
-                      </HStack>
+                      </HStack></PlayerProfileButton>
                       <HStack spacing={2} mt={1}>
                         <PositionBadge className="cui-badge" position={player.pos}>
                           {player.pos}

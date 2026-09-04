@@ -23,6 +23,7 @@ import {
   useSleeperLeagueConnections,
   type SleeperLeagueAuctionSettings,
 } from "@/features/league-hq/sleeperConnections";
+import { PlayerProfileButton } from "@/features/player-profile/PlayerProfileProvider";
 
 type SortKey = "value" | "rank" | "name" | "position" | "projection";
 type DraftPick = { playerId: string; bid: number };
@@ -234,7 +235,7 @@ export function AuctionTeamBuilder() {
           <div className="auction-card-header"><div><span>Draft ticket</span><h2 id="auction-team-title">Your team</h2></div><div className="auction-card-total"><strong>{money(spent)}</strong><small>of {money(budget)}</small></div></div>
           <div className="auction-progress"><span style={{ width: `${Math.min(100, (spent / Math.max(1, budget)) * 100)}%` }} /></div>
           <TeamPointsSummary players={draftedPlayers} scoring={scoring} />
-          <div className="auction-card-slots">{SLOT_ORDER.map((slot) => { const slotPicks = cardGroups[slot]; return <div className="auction-card-group" key={slot}><div className="auction-group-label"><span>{SLOT_LABELS[slot]}</span><small>{slot === "FLEX" ? "RB / WR / TE" : `${slotPicks.length}/${slots[slot]}`}</small></div>{slotPicks.map(({ player, bid: playerBid }) => <div className="auction-drafted-player" key={player.id}><span className="tool-player-badges"><TeamMark team={player.team} size="xs" /><PositionBadge className="tool-position-tag" position={player.position} /></span><div><strong>{player.name}</strong><small>{formatTeamBye(player.team || "FA", player.byeWeek)} · {player.projectedPoints?.toFixed(1) ?? "—"} pts</small></div><b>{money(playerBid)}</b><button type="button" aria-label={`Remove ${player.name}`} onClick={() => setPicks((current) => current.filter((pick) => pick.playerId !== player.id))}><Trash2 size={14} /></button></div>)}{!slotPicks.length && slot !== "BENCH" ? <div className="auction-open-slot">Open slot</div> : null}</div>; })}</div>
+          <div className="auction-card-slots">{SLOT_ORDER.map((slot) => { const slotPicks = cardGroups[slot]; return <div className="auction-card-group" key={slot}><div className="auction-group-label"><span>{SLOT_LABELS[slot]}</span><small>{slot === "FLEX" ? "RB / WR / TE" : `${slotPicks.length}/${slots[slot]}`}</small></div>{slotPicks.map(({ player, bid: playerBid }) => <div className="auction-drafted-player" key={player.id}><span className="tool-player-badges"><TeamMark team={player.team} size="xs" /><PositionBadge className="tool-position-tag" position={player.position} /></span><PlayerProfileButton player={player} scoring={scoring} className="auction-drafted-profile"><strong>{player.name}</strong><small>{formatTeamBye(player.team || "FA", player.byeWeek)} · {player.projectedPoints?.toFixed(1) ?? "—"} pts</small></PlayerProfileButton><b>{money(playerBid)}</b><button type="button" aria-label={`Remove ${player.name}`} onClick={() => setPicks((current) => current.filter((pick) => pick.playerId !== player.id))}><Trash2 size={14} /></button></div>)}{!slotPicks.length && slot !== "BENCH" ? <div className="auction-open-slot">Open slot</div> : null}</div>; })}</div>
         </section>
 
         <section className="auction-board" aria-labelledby="auction-board-title">
@@ -252,7 +253,7 @@ export function AuctionTeamBuilder() {
               onChange={setPosition}
             />
           </div>
-          <div className="auction-selected-ticket">{selected ? <><div><span>Selected player</span><strong>{selected.name}</strong><small>{selected.position} · {formatTeamBye(selected.team || "FA", selected.byeWeek)} · fair {money(selected.auctionValue ?? 0)} · market {selected.marketValue === null ? "—" : money(selected.marketValue)} · recommended {money(recommendedBid)}</small></div><label>Bid <span><b>$</b><NumericInput aria-label="Player bid" min="1" max={Math.max(1, maxBid)} value={bid} onChange={(event) => setBid(Number(event.target.value))} /></span></label><button type="button" className="tool-button is-primary" onClick={draftSelected} disabled={!maxBid}><Gavel size={15} /> Draft</button></> : <span>Select a player to add them to your card.</span>}</div>
+          <div className="auction-selected-ticket">{selected ? <><div><span>Selected player</span><PlayerProfileButton player={selected} scoring={scoring} className="auction-selected-profile"><strong>{selected.name}</strong><small>{selected.position} · {formatTeamBye(selected.team || "FA", selected.byeWeek)} · fair {money(selected.auctionValue ?? 0)} · market {selected.marketValue === null ? "—" : money(selected.marketValue)} · recommended {money(recommendedBid)}</small></PlayerProfileButton></div><label>Bid <span><b>$</b><NumericInput aria-label="Player bid" min="1" max={Math.max(1, maxBid)} value={bid} onChange={(event) => setBid(Number(event.target.value))} /></span></label><button type="button" className="tool-button is-primary" onClick={draftSelected} disabled={!maxBid}><Gavel size={15} /> Draft</button></> : <span>Select a player to add them to your card.</span>}</div>
           <div className="auction-table-wrap">
             <table className="auction-table">
               <thead>
@@ -280,7 +281,7 @@ export function AuctionTeamBuilder() {
                   return (
                     <tr className={selectedId === player.id ? "is-selected" : ""} key={player.id} onClick={() => selectPlayer(player)}>
                       <td><PositionBadge className="tool-position-tag" position={player.position} /></td>
-                      <th><span className="auction-player-identity"><TeamMark team={player.team} size="xs" /><span>{player.name}<small>{formatTeamBye(player.team || "FA", player.byeWeek)}</small></span></span></th>
+                      <th><PlayerProfileButton player={player} scoring={scoring}><span className="auction-player-identity"><TeamMark team={player.team} size="xs" /><span>{player.name}<small>{formatTeamBye(player.team || "FA", player.byeWeek)}</small></span></span></PlayerProfileButton></th>
                       <td>{player.rank ?? "—"}</td>
                       <td className="auction-projection-cell" title={hasRange ? `${sourceCount} independent sources: ${player.projectionLow!.toFixed(1)}–${player.projectionHigh!.toFixed(1)} points` : undefined}>
                         <span>{player.projectedPoints?.toFixed(1) ?? "—"}</span>

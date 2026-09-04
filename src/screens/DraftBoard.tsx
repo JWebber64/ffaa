@@ -10,6 +10,7 @@ import PositionPickerModal from '../components/modals/PositionPickerModal';
 import { getValidSlotsForPlayer } from '../store/draftStore';
 import { toastError } from '../utils/toastError';
 import DraftStateIO from '../components/DraftStateIO';
+import { PlayerProfileButton } from '../features/player-profile/PlayerProfileProvider';
 import { PositionBadge } from '../ui/PositionBadge';
 import { positionColorVar } from '../ui/positionColors';
 
@@ -110,16 +111,18 @@ const SlotBox = ({ label, player }: SlotBoxProps) => {
       >
         {/* Top row: Name left, Price right */}
         <HStack justify="space-between" align="flex-start" spacing={1}>
-          <Text
-            fontWeight={600}
-            color="white"
-            fontSize="0.65rem"
-            lineHeight="1.1"
-            flex={1}
-            noOfLines={2}
-          >
-            {player.name}
-          </Text>
+          <PlayerProfileButton player={player} className="draft-board-player-profile">
+            <Text
+              fontWeight={600}
+              color="white"
+              fontSize="0.65rem"
+              lineHeight="1.1"
+              flex={1}
+              noOfLines={2}
+            >
+              {player.name}
+            </Text>
+          </PlayerProfileButton>
           <Text fontWeight={700} color="white" fontSize="0.65rem" flexShrink={0}>
             ${player.price ?? 0}
           </Text>

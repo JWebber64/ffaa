@@ -1204,6 +1204,12 @@
   font-size: .68rem;
 }
 
+.auction-player-column .player-profile-trigger {
+  display: grid;
+  min-width: 0;
+  text-align: left;
+}
+
 .auction-source-value-column {
   min-width: 84px !important;
 }

@@ -4,6 +4,7 @@ import { formatPositionForDisplay } from '../../utils/positionUtils';
 import type { Position } from '../../types/draft';
 import { PositionBadge } from '../../ui/PositionBadge';
 import { TeamMark } from '../player/TeamMark';
+import { PlayerProfileButton } from '../../features/player-profile/PlayerProfileProvider';
 
 interface Nomination {
   playerId: string;
@@ -64,7 +65,7 @@ export const NominationQueue = ({
                 <Box flex={1}>
                   <HStack gap={2}>
                     <TeamMark team={player.nflTeam} size="xs" />
-                    <Text fontWeight="medium">{player.name}</Text>
+                    <PlayerProfileButton player={player}><Text fontWeight="medium">{player.name}</Text></PlayerProfileButton>
                     <PositionBadge className="cui-badge" position={player.pos}>
                       {formatPositionForDisplay(player.pos as Position)}
                     </PositionBadge>
