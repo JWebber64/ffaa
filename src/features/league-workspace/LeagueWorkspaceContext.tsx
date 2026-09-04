@@ -33,7 +33,8 @@ function snapshotChanged(connection: SleeperLeagueConnectionSummary, data: MyHQD
     || connection.managerStanding !== data.standing
     || connection.currentWeek !== data.week
     || connection.opponentName !== data.opponentName
-    || connection.leagueOwnerProviderUserId !== data.leagueOwnerProviderUserId;
+    || connection.leagueOwnerProviderUserId !== data.leagueOwnerProviderUserId
+    || Boolean(data.managerAvatarUrl && connection.managerAvatarUrl !== data.managerAvatarUrl);
 }
 
 export function LeagueWorkspaceProvider({ children }: { children: ReactNode }) {
@@ -207,6 +208,7 @@ export function LeagueWorkspaceProvider({ children }: { children: ReactNode }) {
             managerStanding: data.standing,
             currentWeek: data.week,
             opponentName: data.opponentName,
+            ...(data.managerAvatarUrl ? { managerAvatarUrl: data.managerAvatarUrl } : {}),
             ...(data.leagueOwnerProviderUserId
               ? { leagueOwnerProviderUserId: data.leagueOwnerProviderUserId }
               : {}),

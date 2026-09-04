@@ -1,7 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import { exportDraftState, importDraftState } from '../store/draftStore';
 import type { DraftState } from '../types/draft';
 import { generateRoomCode, isValidRoomCode } from '../lib/multiplayer';
+
+afterEach(() => vi.restoreAllMocks());
 
 describe('Multiplayer Export/Import', () => {
   it('should export and import draft state correctly', () => {
@@ -119,7 +121,9 @@ describe('Multiplayer Export/Import', () => {
   });
 
   it('should handle invalid import data gracefully', () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     expect(() => importDraftState('invalid json')).toThrow();
+    expect(consoleError).toHaveBeenCalledWith('Failed to import draft state:', expect.any(SyntaxError));
     const importedInvalidType = importDraftState('{"__type": "invalid"}');
     expect(importedInvalidType.players).toEqual([]);
     expect(importedInvalidType.teams).toEqual([]);

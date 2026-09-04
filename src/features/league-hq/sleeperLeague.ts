@@ -145,6 +145,7 @@ export interface SleeperLeagueLookupResult {
   lookupType: "league" | "user";
   displayName: string;
   providerUserId?: string;
+  managerAvatarUrl?: string;
   leagues: SleeperLeagueChoice[];
 }
 
@@ -266,6 +267,7 @@ export async function findSleeperLeagues(
     lookupType: "user",
     displayName: user.display_name || user.username || normalized.value,
     providerUserId: user.user_id,
+    ...(avatarUrl(user) ? { managerAvatarUrl: avatarUrl(user) } : {}),
     leagues: leagues
       .map(leagueChoice)
       .sort((left, right) => left.name.localeCompare(right.name)),

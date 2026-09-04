@@ -76,7 +76,7 @@ describe("Sleeper League HQ import", () => {
     const fetcher = (async (input: string | URL | Request) => {
       const path = new URL(typeof input === "string" ? input : input instanceof URL ? input : input.url).pathname.replace("/v1", "");
       const payloads = new Map<string, unknown>([
-        ["/user/test-manager", { user_id: "user-123", display_name: "Test Manager" }],
+        ["/user/test-manager", { user_id: "user-123", display_name: "Test Manager", avatar: "manager-avatar" }],
         ["/user/user-123/leagues/nfl/2026", [
           { league_id: "222222222222", name: "Zeta League", season: "2026", status: "pre_draft", total_rosters: 12 },
           {
@@ -104,6 +104,7 @@ describe("Sleeper League HQ import", () => {
     expect(result.lookupType).toBe("user");
     expect(result.displayName).toBe("Test Manager");
     expect(result.providerUserId).toBe("user-123");
+    expect(result.managerAvatarUrl).toBe("https://sleepercdn.com/avatars/thumbs/manager-avatar");
     expect(result.leagues.map((league) => league.name)).toEqual(["Alpha League", "Zeta League"]);
     expect(result.leagues[0]).toMatchObject({
       leagueId: "111111111111",

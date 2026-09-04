@@ -40,7 +40,7 @@ export function ManagerIdentityForm({
         managerDisplayName: identity.displayName,
         managerTeamName: identity.teamName,
         lastUsedAt: new Date().toISOString(),
-        ...(identity.avatarUrl ? { avatarUrl: identity.avatarUrl } : {}),
+        ...(identity.avatarUrl ? { managerAvatarUrl: identity.avatarUrl } : {}),
         ...(identity.leagueOwnerProviderUserId
           ? { leagueOwnerProviderUserId: identity.leagueOwnerProviderUserId }
           : {}),

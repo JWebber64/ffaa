@@ -12,7 +12,7 @@ import {
   Gavel,
   Users,
 } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 
 import { LeagueWorkspaceProvider } from "../features/league-workspace/LeagueWorkspaceContext";
@@ -32,6 +32,20 @@ const leagueDestinations = [
   { section: "rules", label: "Rules", icon: BookOpen },
   { section: "commissioner", label: "Commissioner", icon: Settings2 },
 ] as const;
+
+export function LeagueWorkspaceMark({ avatarUrl, teamName }: { avatarUrl?: string; teamName: string }) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  useEffect(() => setImageFailed(false), [avatarUrl]);
+
+  return (
+    <span className="league-workspace-mark" aria-hidden="true">
+      {avatarUrl && !imageFailed
+        ? <img src={avatarUrl} alt="" decoding="async" onError={() => setImageFailed(true)} />
+        : teamName.slice(0, 2).toUpperCase()}
+    </span>
+  );
+}
 
 function LeagueWorkspaceChrome() {
   const location = useLocation();
@@ -73,12 +87,15 @@ function LeagueWorkspaceChrome() {
     ? leagueDestinations
     : leagueDestinations.filter(({ section }) => section !== "commissioner");
   const authorityLabel = authority?.label ?? "Connected Sleeper League — read-only";
+  const managerAvatarUrl = teamState.status === "ready"
+    ? teamState.data.managerAvatarUrl || connection?.managerAvatarUrl
+    : connection?.managerAvatarUrl;
 
   return (
     <LeaguePlayerSheetProvider><div className="league-workspace-shell">
       <header className="league-workspace-context">
         <div className="league-workspace-identity">
-          <span className="league-workspace-mark" aria-hidden="true">{teamName.slice(0, 2).toUpperCase()}</span>
+          <LeagueWorkspaceMark {...(managerAvatarUrl ? { avatarUrl: managerAvatarUrl } : {})} teamName={teamName} />
           <div>
             <span>{canonicalWorkspace?.league.name ?? connection?.leagueName ?? (leagueId ? "Connected league" : "League workspace")}</span>
             <strong>{teamName}</strong>

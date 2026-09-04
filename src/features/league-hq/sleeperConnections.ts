@@ -29,9 +29,11 @@ export interface SleeperLeagueConnectionSummary {
   totalRosters: number;
   sourceUrl: string;
   lastUsedAt: string;
+  /** League artwork returned by Sleeper. This is not the signed-in manager avatar. */
   avatarUrl?: string;
   managerProviderUserId?: string;
   managerDisplayName?: string;
+  managerAvatarUrl?: string;
   managerTeamName?: string;
   leagueOwnerProviderUserId?: string;
   managerRecord?: string;
@@ -109,6 +111,9 @@ export function parseSleeperLeagueConnections(raw: string | null) {
           : {}),
         ...(String(entry.managerDisplayName ?? "").trim()
           ? { managerDisplayName: String(entry.managerDisplayName).trim() }
+          : {}),
+        ...(String(entry.managerAvatarUrl ?? "").trim()
+          ? { managerAvatarUrl: String(entry.managerAvatarUrl).trim() }
           : {}),
         ...(String(entry.managerTeamName ?? "").trim()
           ? { managerTeamName: String(entry.managerTeamName).trim() }
