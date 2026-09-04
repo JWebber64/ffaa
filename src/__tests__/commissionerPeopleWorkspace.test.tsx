@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useState } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -138,6 +139,31 @@ describe("commissioner people workspace", () => {
     })));
     const shareLink = await screen.findByRole("textbox", { name: "Secure invitation link" });
     expect((shareLink as HTMLInputElement).value).toContain("/ff/league/11111111-1111-4111-8111-111111111111/join?invitation=invite-created");
+  });
+
+  it("keeps the one-time invitation link visible across the workspace refresh boundary", async () => {
+    const peopleService = service();
+
+    function RemountingWorkspace() {
+      const [workspaceKey, setWorkspaceKey] = useState(0);
+      return (
+        <CommissionerTeamsWorkspace
+          key={workspaceKey}
+          workspace={workspace}
+          service={peopleService}
+          onWorkspaceChanged={() => setWorkspaceKey((current) => current + 1)}
+        />
+      );
+    }
+
+    render(<MemoryRouter><RemountingWorkspace /></MemoryRouter>);
+    await screen.findByRole("heading", { name: "Fill every seat safely" });
+    fireEvent.change(screen.getByRole("textbox", { name: "Manager name" }), { target: { value: "New Manager" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Sign-in email" }), { target: { value: "new@example.com" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create invitation" }));
+
+    const shareLink = await screen.findByRole("textbox", { name: "Secure invitation link" });
+    expect((shareLink as HTMLInputElement).value).toContain("invitation=invite-created");
   });
 
   it("requires an audit reason before removing a team manager", async () => {
