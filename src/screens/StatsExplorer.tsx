@@ -37,7 +37,12 @@ import {
   normalizeAuctionValueScoring,
 } from "@/data/auctionValueSettings";
 import { FANTASY_SEASON } from "@/config/fantasySeason";
-import { NFLVERSE_CAREER_LATEST_SEASON } from "@/data/playerCareerStats";
+import {
+  findPlayerCareerSummary,
+  NFLVERSE_CAREER_LATEST_SEASON,
+  loadPlayerCareerSummaryIndex,
+} from "@/data/playerCareerStats";
+import type { PlayerCareerSummaryIndex } from "@/data/playerCareerStats";
 import { buildPlayerGameLog } from "@/data/playerGameLog";
 import { buildPlayerStatRows } from "@/data/playerStatCategories";
 import type { PlayerStatRow } from "@/data/playerStatCategories";
@@ -126,6 +131,7 @@ interface HubPlayerRow {
   games: number;
   fantasyPoints: number;
   fantasyPointsPerGame: number;
+  careerFantasyPointsPerGame: number | null;
   last3FantasyPointsPerGame: number;
   last5FantasyPointsPerGame: number;
   medianFantasyPoints: number;
@@ -226,7 +232,7 @@ const FFC_ADP_BASE_URL = import.meta.env.PROD && AUCTION_GATEWAY_URL
 const VIEW_COPY: Record<StatsView, { title: string; description: string }> = {
   leaders: {
     title: "Fantasy leaders",
-    description: "Scoring leaders with recent form, consistency, and a week-by-week game log.",
+    description: "Scoring leaders with career PPG, recent form, consistency, and a week-by-week game log.",
   },
   draft: {
     title: "Draft market",
@@ -471,7 +477,11 @@ function deltaClass(value: number) {
   return "is-neutral";
 }
 
-function playerColumns(view: StatsView, leaderProjectionMode = false): StatsTableColumn<HubPlayerRow>[] {
+function playerColumns(
+  view: StatsView,
+  leaderProjectionMode = false,
+  careerPpgLoading = false,
+): StatsTableColumn<HubPlayerRow>[] {
   const playerColumn: StatsTableColumn<HubPlayerRow> = {
     id: "player",
     label: "Player",
@@ -837,6 +847,15 @@ function playerColumns(view: StatsView, leaderProjectionMode = false): StatsTabl
       label: "FPG",
       sortValue: (row) => row.fantasyPointsPerGame,
       render: (row) => formatNumber(row.fantasyPointsPerGame),
+    },
+    {
+      id: "careerFantasyPointsPerGame",
+      label: "Career PPG",
+      description: `Fantasy points per game across every available NFL regular-season game through ${NFLVERSE_CAREER_LATEST_SEASON}, weighted by games played and recalculated for the selected scoring format.`,
+      sortValue: (row) => row.careerFantasyPointsPerGame,
+      render: (row) => row.careerFantasyPointsPerGame === null
+        ? careerPpgLoading ? "…" : "—"
+        : formatNumber(row.careerFantasyPointsPerGame),
     },
     {
       id: "last3FantasyPointsPerGame",
@@ -1399,6 +1418,12 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
   const [weeklyData, setWeeklyData] = useState<WeeklyPlayerStatsResult | null>(null);
   const [weeklyLoading, setWeeklyLoading] = useState(true);
   const [weeklyError, setWeeklyError] = useState<string | null>(null);
+  const [careerSummaryState, setCareerSummaryState] = useState<{
+    scoring: HubScoring;
+    index: PlayerCareerSummaryIndex;
+  } | null>(null);
+  const [careerPpgLoading, setCareerPpgLoading] = useState(false);
+  const [careerPpgError, setCareerPpgError] = useState<string | null>(null);
   const [adpResult, setAdpResult] = useState<FfcAdpResult | null>(null);
   const [adpLoading, setAdpLoading] = useState(true);
   const [adpError, setAdpError] = useState<string | null>(null);
@@ -1519,6 +1544,26 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
   }, [scoring, seasonType, weekEnd, weekStart, weeklySeason]);
 
   useEffect(() => {
+    if (view !== "leaders" || leaderProjectionMode) {
+      setCareerPpgLoading(false);
+      return;
+    }
+    const controller = new AbortController();
+    setCareerPpgLoading(true);
+    setCareerPpgError(null);
+    loadPlayerCareerSummaryIndex({ scoring, signal: controller.signal })
+      .then((index) => setCareerSummaryState({ scoring, index }))
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+        setCareerPpgError(error instanceof Error ? error.message : String(error));
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setCareerPpgLoading(false);
+      });
+    return () => controller.abort();
+  }, [leaderProjectionMode, scoring, view]);
+
+  useEffect(() => {
     const controller = new AbortController();
     setAdpLoading(true);
     setAdpError(null);
@@ -1628,6 +1673,7 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
         games,
         fantasyPoints: summary.selectedFantasyPoints,
         fantasyPointsPerGame: summary.selectedFantasyPointsPerGame,
+        careerFantasyPointsPerGame: null,
         last3FantasyPointsPerGame: summary.last3FantasyPointsPerGame,
         last5FantasyPointsPerGame: summary.last5FantasyPointsPerGame,
         medianFantasyPoints: summary.medianFantasyPoints,
@@ -1696,6 +1742,7 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
         games,
         fantasyPoints: summary?.selectedFantasyPoints ?? 0,
         fantasyPointsPerGame: summary?.selectedFantasyPointsPerGame ?? 0,
+        careerFantasyPointsPerGame: null,
         last3FantasyPointsPerGame: summary?.last3FantasyPointsPerGame ?? 0,
         last5FantasyPointsPerGame: summary?.last5FantasyPointsPerGame ?? 0,
         medianFantasyPoints: summary?.medianFantasyPoints ?? 0,
@@ -1760,6 +1807,7 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
         games: 0,
         fantasyPoints: 0,
         fantasyPointsPerGame: 0,
+        careerFantasyPointsPerGame: null,
         last3FantasyPointsPerGame: 0,
         last5FantasyPointsPerGame: 0,
         medianFantasyPoints: 0,
@@ -1821,13 +1869,36 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
     return withPositionRanks(rows, (row) => row.auctionValue);
   }, [draftPlayerRows, sleeperAuctionImportedAt, sleeperAuctionPriceMap]);
 
-  const playerRows = view === "draft" || leaderProjectionMode
+  const basePlayerRows = view === "draft" || leaderProjectionMode
     ? draftPlayerRows
     : view === "auction"
       ? auctionPlayerRows
       : view === "trends"
         ? draftPlayerRows
         : actualPlayerRows;
+  const activeCareerSummaryIndex = view === "leaders"
+    && !leaderProjectionMode
+    && careerSummaryState?.scoring === scoring
+    ? careerSummaryState.index
+    : null;
+  const playerRows = useMemo(() => {
+    if (!activeCareerSummaryIndex) return basePlayerRows;
+    return basePlayerRows.map((row) => {
+      const summary = findPlayerCareerSummary(activeCareerSummaryIndex, {
+        ...(row.summary?.playerId
+          ? { playerId: row.summary.playerId }
+          : /^00-/.test(row.id)
+            ? { playerId: row.id }
+            : {}),
+        playerName: row.name,
+        position: row.position,
+      });
+      return {
+        ...row,
+        careerFantasyPointsPerGame: summary?.fantasyPointsPerGame ?? null,
+      };
+    });
+  }, [activeCareerSummaryIndex, basePlayerRows]);
   const teams = useMemo(
     () => ["ALL", ...new Set(playerRows.map((row) => row.team).filter(Boolean))].sort(),
     [playerRows],
@@ -1863,8 +1934,8 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
   }, [search, teamRows]);
 
   const currentPlayerColumns = useMemo(
-    () => playerColumns(view, leaderProjectionMode),
-    [leaderProjectionMode, view],
+    () => playerColumns(view, leaderProjectionMode, careerPpgLoading),
+    [careerPpgLoading, leaderProjectionMode, view],
   );
   const currentDefenseColumns = useMemo(() => defenseColumns(), []);
   const currentTeamColumns = useMemo(() => teamColumns(), []);
@@ -2182,10 +2253,11 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
       );
       return;
     }
+    const includeCareerPpg = view === "leaders" && !leaderProjectionMode;
     downloadCsv(
       `gamehq-${view}-${view === "draft" ? DRAFT_SEASON : season}.csv`,
-      ["Player", "Position", "Team", "Games", "Fantasy Points", "FPG", "Last 3", "Last 5", "Floor", "Ceiling", "Opportunities/G", "Target Share", "ADP", "ADP High", "ADP Low", "Times Drafted", "Projected Points", "GameHQ Fair Value", "Market Median", "Bye"],
-      filteredPlayerRows.map((row) => [row.name, row.position, row.team, row.games, row.fantasyPoints, row.fantasyPointsPerGame, row.last3FantasyPointsPerGame, row.last5FantasyPointsPerGame, row.floorFantasyPoints, row.ceilingFantasyPoints, row.opportunitiesPerGame, row.targetShare ?? "", row.adp ?? "", row.adpHigh ?? "", row.adpLow ?? "", row.timesDrafted ?? "", row.projectedFantasyPoints ?? "", row.auctionValue ?? "", row.marketValue ?? "", row.bye ?? ""]),
+      ["Player", "Position", "Team", "Games", "Fantasy Points", "FPG", ...(includeCareerPpg ? ["Career PPG"] : []), "Last 3", "Last 5", "Floor", "Ceiling", "Opportunities/G", "Target Share", "ADP", "ADP High", "ADP Low", "Times Drafted", "Projected Points", "GameHQ Fair Value", "Market Median", "Bye"],
+      filteredPlayerRows.map((row) => [row.name, row.position, row.team, row.games, row.fantasyPoints, row.fantasyPointsPerGame, ...(includeCareerPpg ? [row.careerFantasyPointsPerGame ?? ""] : []), row.last3FantasyPointsPerGame, row.last5FantasyPointsPerGame, row.floorFantasyPoints, row.ceilingFantasyPoints, row.opportunitiesPerGame, row.targetShare ?? "", row.adp ?? "", row.adpHigh ?? "", row.adpLow ?? "", row.timesDrafted ?? "", row.projectedFantasyPoints ?? "", row.auctionValue ?? "", row.marketValue ?? "", row.bye ?? ""]),
     );
   }
 
@@ -2536,6 +2608,12 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
         <div className="stats-hub-note">
           <Info size={17} aria-hidden="true" />
           <span>{TREND_BASELINE_SEASON} form context is unavailable; the 2026 player pool and live activity remain usable.</span>
+        </div>
+      ) : null}
+      {view === "leaders" && !leaderProjectionMode && careerPpgError ? (
+        <div className="stats-hub-note is-error" role="alert">
+          <Info size={17} aria-hidden="true" />
+          <span>Career PPG is temporarily unavailable. Current-range leaders remain usable. {careerPpgError}</span>
         </div>
       ) : null}
       {view === "draft" && adpError ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>Live ADP is temporarily unavailable. Projection and auction data remain usable. {adpError}</span></div> : null}

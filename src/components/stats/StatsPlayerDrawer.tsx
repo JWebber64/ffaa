@@ -236,7 +236,7 @@ function CareerPanel({
         <div><dt>Seasons played</dt><dd>{seasons.length}</dd></div>
         <div><dt>Games</dt><dd>{games.toLocaleString()}</dd></div>
         <div><dt>Career FPTS</dt><dd>{formatCareerNumber(fantasyPoints, 1)}</dd></div>
-        <div><dt>Career FPG</dt><dd>{games ? formatCareerNumber(fantasyPoints / games, 1) : "—"}</dd></div>
+        <div><dt>Career PPG</dt><dd>{games ? formatCareerNumber(fantasyPoints / games, 1) : "—"}</dd></div>
       </dl>
 
       {result?.unavailableSeasons.length ? (
@@ -285,11 +285,65 @@ function CareerPanel({
   );
 }
 
+function careerOverviewMetric(
+  position: string,
+  result: PlayerCareerStatsResult | null,
+  loading: boolean,
+  error: string | null,
+): StatsPlayerMetric {
+  if (position === "DEF") {
+    return { label: "Career PPG", value: "—", helper: "Not available for team D/ST" };
+  }
+  if (loading && !result) {
+    return { label: "Career PPG", value: "—", helper: "Loading career data" };
+  }
+  if (error && !result) {
+    return { label: "Career PPG", value: "—", helper: "Career data unavailable" };
+  }
+
+  const seasons = result?.seasons ?? [];
+  const games = seasons.reduce((sum, season) => sum + season.games, 0);
+  const fantasyPoints = seasons.reduce((sum, season) => sum + season.fantasyPoints, 0);
+  if (!games) {
+    return { label: "Career PPG", value: "—", helper: "No regular-season games" };
+  }
+  const firstSeason = seasons[seasons.length - 1]?.season;
+  const lastSeason = seasons[0]?.season;
+  return {
+    label: "Career PPG",
+    value: formatCareerNumber(fantasyPoints / games, 1),
+    helper: firstSeason && lastSeason
+      ? `${firstSeason}–${lastSeason} · ${games.toLocaleString()} games`
+      : `${games.toLocaleString()} regular-season games`,
+  };
+}
+
+function withCareerOverviewMetric(
+  metrics: StatsPlayerMetric[],
+  careerMetric: StatsPlayerMetric,
+) {
+  const existingIndex = metrics.findIndex((metric) => metric.label === careerMetric.label);
+  if (existingIndex >= 0) {
+    return metrics.map((metric, index) => index === existingIndex ? careerMetric : metric);
+  }
+  const seasonPpgIndex = metrics.findIndex(
+    (metric) => metric.label === "Fantasy PPG" || metric.label === "Season PPG",
+  );
+  const insertionIndex = seasonPpgIndex >= 0 ? seasonPpgIndex + 1 : 0;
+  return [
+    ...metrics.slice(0, insertionIndex),
+    careerMetric,
+    ...metrics.slice(insertionIndex),
+  ];
+}
+
 export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
   const [tab, setTab] = useState<DrawerTab>("overview");
   const [careerResult, setCareerResult] = useState<PlayerCareerStatsResult | null>(null);
+  const [careerResultKey, setCareerResultKey] = useState<string | null>(null);
   const [careerLoading, setCareerLoading] = useState(false);
   const [careerError, setCareerError] = useState<string | null>(null);
+  const [careerErrorKey, setCareerErrorKey] = useState<string | null>(null);
   const [careerAttempt, setCareerAttempt] = useState(0);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
@@ -346,30 +400,37 @@ export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
 
   useEffect(() => {
     setCareerResult(null);
+    setCareerResultKey(null);
     setCareerError(null);
+    setCareerErrorKey(null);
     setCareerLoading(false);
     setCareerAttempt(0);
   }, [careerRequestKey]);
 
   useEffect(() => {
-    if (tab !== "career" || !player || player.position === "DEF") return;
+    if (!player || !careerRequestKey || player.position === "DEF") return;
     const controller = new AbortController();
     setCareerLoading(true);
     setCareerError(null);
+    setCareerErrorKey(null);
     loadPlayerCareerStats({
       ...player.career,
       signal: controller.signal,
     })
-      .then(setCareerResult)
+      .then((result) => {
+        setCareerResult(result);
+        setCareerResultKey(careerRequestKey);
+      })
       .catch((error: unknown) => {
         if (controller.signal.aborted) return;
         setCareerError(error instanceof Error ? error.message : String(error));
+        setCareerErrorKey(careerRequestKey);
       })
       .finally(() => {
         if (!controller.signal.aborted) setCareerLoading(false);
       });
     return () => controller.abort();
-  }, [careerAttempt, player, tab]);
+  }, [careerAttempt, careerRequestKey, player]);
 
   function moveTab(event: ReactKeyboardEvent<HTMLButtonElement>, currentIndex: number) {
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
@@ -388,6 +449,18 @@ export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
   }
 
   if (!player) return null;
+  const activeCareerResult = careerResultKey === careerRequestKey ? careerResult : null;
+  const activeCareerError = careerErrorKey === careerRequestKey ? careerError : null;
+  const activeCareerLoading = careerLoading || (
+    careerRequestKey !== null
+    && player.position !== "DEF"
+    && !activeCareerResult
+    && !activeCareerError
+  );
+  const overviewMetrics = withCareerOverviewMetric(
+    player.overviewMetrics,
+    careerOverviewMetric(player.position, activeCareerResult, activeCareerLoading, activeCareerError),
+  );
 
   return (
     <div className="stats-drawer-root">
@@ -457,7 +530,7 @@ export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
             <>
               <section aria-labelledby="stats-overview-heading">
                 <h3 id="stats-overview-heading">Fantasy outlook</h3>
-                <MetricGrid metrics={player.overviewMetrics} />
+                <MetricGrid metrics={overviewMetrics} />
               </section>
               <section aria-labelledby="stats-usage-heading">
                 <h3 id="stats-usage-heading">Opportunity and efficiency</h3>
@@ -470,13 +543,13 @@ export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
             <section aria-labelledby="stats-career-heading">
               <div className="stats-drawer-section-head">
                 <h3 id="stats-career-heading">NFL career by season</h3>
-                <span>{careerResult?.seasons.length ? `${careerResult.seasons.length} seasons` : "Regular season"}</span>
+                <span>{activeCareerResult?.seasons.length ? `${activeCareerResult.seasons.length} seasons` : "Regular season"}</span>
               </div>
               <CareerPanel
                 player={player}
-                result={careerResult}
-                loading={careerLoading}
-                error={careerError}
+                result={activeCareerResult}
+                loading={activeCareerLoading}
+                error={activeCareerError}
                 onRetry={() => setCareerAttempt((attempt) => attempt + 1)}
               />
             </section>

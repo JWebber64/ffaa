@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildPlayerCareerSummaryIndex,
+  findPlayerCareerSummary,
   parsePlayerCareerCsv,
   selectPlayerCareerRows,
 } from "@/data/playerCareerStats";
@@ -99,6 +101,40 @@ describe("player career stats", () => {
 
     expect(selected).toHaveLength(1);
     expect(selected[0]?.playerId).toBe("veteran");
+  });
+
+  it("calculates career PPG from total points and games for the selected scoring", () => {
+    const seasons = parsePlayerCareerCsv([
+      HEADER,
+      row([
+        "weighted-player", "Weighted Player", "W.Player", "RB", "SEA", 2024, 4,
+        40, 44, 0, 0, 0, 0, 0, 0, 0, 0, 4,
+      ]),
+      row([
+        "weighted-player", "Weighted Player", "W.Player", "RB", "SEA", 2025, 16,
+        240, 272, 0, 0, 0, 0, 0, 0, 0, 0, 32,
+      ]),
+    ].join("\n"), 2025);
+    const index = buildPlayerCareerSummaryIndex(seasons, "halfPpr", {
+      unavailableSeasons: [],
+      coverageStart: 1999,
+      coverageEnd: 2025,
+    });
+
+    const summary = findPlayerCareerSummary(index, {
+      playerId: "weighted-player",
+      playerName: "Weighted Player",
+      position: "RB",
+    });
+
+    expect(summary).toMatchObject({
+      seasons: 2,
+      games: 20,
+      fantasyPoints: 298,
+      firstSeason: 2024,
+      lastSeason: 2025,
+    });
+    expect(summary?.fantasyPointsPerGame).toBeCloseTo(14.9);
   });
 });
 
