@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { FANTASY_SEASON } from "../../config/fantasySeason";
 import type { SleeperLeagueConnectionSummary } from "../league-hq/sleeperConnections";
+import { LeagueAccountPanel } from "../league-season/LeagueAccountPanel";
 import { Button } from "../../ui/Button";
 import { NumericInput } from "../../ui/NumericInput";
 import { connectExternalLeague, createNativeLeague } from "./leagueCommands";
@@ -80,6 +81,7 @@ export function NativeLeagueFoundationPanel({
         <h2 id="native-league-foundation-title">GameHQ owns league identity and permissions</h2>
         <p>Create a new native league, or map the selected Sleeper league without treating Sleeper ownership as GameHQ authority.</p>
       </header>
+      <LeagueAccountPanel />
       <div className="native-league-foundation__workflows">
         <form onSubmit={createLeague}>
           <div className="native-league-foundation__workflow-title"><Plus aria-hidden="true" /><div><strong>New native league</strong><span>Starts with permanent GameHQ IDs</span></div></div>

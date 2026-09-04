@@ -6,6 +6,7 @@ import {
   upgradeFirebaseSessionWithGoogle,
 } from "../../lib/authSession";
 import { useFirebaseSession } from "../../lib/useFirebaseSession";
+import "../../screens/league-season.css";
 
 export function LeagueAccountPanel() {
   const session = useFirebaseSession();
