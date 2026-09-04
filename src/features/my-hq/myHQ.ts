@@ -27,8 +27,9 @@ type SleeperState = { week?: number; display_week?: number; season?: string; sea
 type SleeperUser = {
   user_id: string;
   display_name: string;
+  avatar?: string | null;
   is_owner?: boolean;
-  metadata?: { team_name?: string } | null;
+  metadata?: { avatar?: string; team_name?: string } | null;
 };
 type SleeperRoster = {
   roster_id: number;
@@ -96,6 +97,7 @@ export type MyHQData = {
   opponentName: string;
   opponentRecord: string;
   managerProviderUserId: string;
+  managerAvatarUrl?: string;
   leagueOwnerProviderUserId: string;
   opponentProviderUserId: string;
   teamScore: number | null;
@@ -173,6 +175,13 @@ function teamNameForRoster(roster: SleeperRoster | undefined, users: SleeperUser
   if (!roster) return "Opponent not set";
   const user = users.find((candidate) => rosterOwnerIds(roster).includes(candidate.user_id));
   return user?.metadata?.team_name?.trim() || user?.display_name?.trim() || `Roster ${roster.roster_id}`;
+}
+
+function avatarUrlForUser(user: SleeperUser | undefined) {
+  const custom = user?.metadata?.avatar?.trim();
+  if (custom) return custom;
+  const avatar = user?.avatar?.trim();
+  return avatar ? `https://sleepercdn.com/avatars/thumbs/${avatar}` : "";
 }
 
 async function sleeperJson<T>(path: string, signal: AbortSignal): Promise<T> {
@@ -435,6 +444,7 @@ export async function loadMyHQ(
 
   const userRoster = rosters.find((roster) => rosterOwnerIds(roster).includes(connection.managerProviderUserId!));
   if (!userRoster) throw new Error(`${connection.managerDisplayName ?? "Your Sleeper account"} does not own a roster in this league.`);
+  const managerUser = users.find((user) => user.user_id === connection.managerProviderUserId);
 
   const playerById = new Map<string, ToolPlayer>();
   for (const player of allPlayers) {
@@ -533,6 +543,7 @@ export async function loadMyHQ(
       ? `${numberValue(opponentRoster.settings?.wins)}-${numberValue(opponentRoster.settings?.losses)}${numberValue(opponentRoster.settings?.ties) ? `-${numberValue(opponentRoster.settings?.ties)}` : ""}`
       : "—",
     managerProviderUserId: connection.managerProviderUserId,
+    managerAvatarUrl: avatarUrlForUser(managerUser),
     leagueOwnerProviderUserId: league.owner_id?.trim()
       || users.find((user) => user.is_owner)?.user_id
       || "",

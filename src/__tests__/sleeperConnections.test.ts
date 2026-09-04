@@ -74,6 +74,7 @@ describe("Sleeper league connections", () => {
       ...connection("111111111111", "Alpha", "2026-08-10T00:00:00.000Z"),
       managerProviderUserId: "user-123",
       managerDisplayName: "Test Manager",
+      managerAvatarUrl: "https://sleepercdn.com/avatars/thumbs/manager-avatar",
       leagueOwnerProviderUserId: "commissioner-456",
     };
     const parsed = parseSleeperLeagueConnections(JSON.stringify([saved]));
@@ -82,6 +83,7 @@ describe("Sleeper league connections", () => {
       leagueId: "111111111111",
       managerProviderUserId: "user-123",
       managerDisplayName: "Test Manager",
+      managerAvatarUrl: "https://sleepercdn.com/avatars/thumbs/manager-avatar",
       leagueOwnerProviderUserId: "commissioner-456",
     });
   });

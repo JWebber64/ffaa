@@ -893,6 +893,11 @@ export function NumberInput({ value, defaultValue, onChange, min, max, step, siz
 
 export function NumberInputField(props: InputCompatProps) {
   const ctx = useContext(NumberInputContext);
+  const valueProps = ctx.value !== undefined
+    ? { value: ctx.value }
+    : ctx.defaultValue !== undefined
+      ? { defaultValue: ctx.defaultValue }
+      : {};
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     ctx.onChange?.(event.target.value, event.target.valueAsNumber);
     props.onChange?.(event);
@@ -905,8 +910,7 @@ export function NumberInputField(props: InputCompatProps) {
       min={ctx.min}
       max={ctx.max}
       step={ctx.step}
-      value={ctx.value as any}
-      defaultValue={ctx.defaultValue as any}
+      {...valueProps}
       onChange={handleChange}
     />
   );

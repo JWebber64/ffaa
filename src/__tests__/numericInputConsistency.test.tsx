@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { useState } from "react";
 
 import { NumericInput } from "../ui/NumericInput";
@@ -31,7 +31,10 @@ function ControlledBudget() {
   );
 }
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe("numeric input consistency", () => {
   it("documents the one shared numeric-stepper rule", () => {
@@ -66,6 +69,14 @@ describe("numeric input consistency", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Decrease Auction budget" }));
     expect(input.value).toBe("200");
+  });
+
+  it("prefers the controlled value when compatibility callers also provide a default", () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    render(<NumericInput aria-label="Legacy amount" value={7} defaultValue={1} readOnly />);
+
+    expect((screen.getByRole("spinbutton", { name: "Legacy amount" }) as HTMLInputElement).value).toBe("7");
+    expect(consoleError).not.toHaveBeenCalled();
   });
 
   it("reserves enough room to show the auction bid beside its stepper", () => {

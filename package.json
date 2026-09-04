@@ -17,6 +17,7 @@
     "test:e2e": "playwright test",
     "test:e2e:update": "playwright test --update-snapshots",
     "test:firestore-rules": "npx firebase-tools@15.28.2 emulators:exec --only firestore \"vitest run src/__tests__/leagueSeasonFirestoreRules.test.ts src/__tests__/nativeLeagueFirestoreRules.test.ts\"",
+    "pilot:native:preflight": "vitest run src/__tests__/leagueMembershipCommands.test.ts src/__tests__/leagueCommandService.test.ts src/__tests__/nativeLineupCommands.test.ts src/__tests__/nativeWaiverCommands.test.ts src/__tests__/nativeTradeCommands.test.ts src/__tests__/nativeCompetitionCommands.test.ts src/__tests__/nativeSeasonLifecycleCommands.test.ts --pool=threads --maxWorkers=2 && npm run test:firestore-rules",
     "release:check": "node scripts/check-production-release.mjs",
     "release:preflight": "npm run release:check && npm run release:verify && npm run test:e2e",
     "release:verify": "npm run lint && vitest run --pool=threads --maxWorkers=2 && npm run build:vercel:artifact",

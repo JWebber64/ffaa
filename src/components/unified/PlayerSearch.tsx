@@ -429,7 +429,6 @@ export const PlayerSearch: React.FC<PlayerSearchProps> = ({
                   min={1}
                   max={1000}
                   width="100%"
-                  defaultValue={1}
                 >
                   <NumberInputField />
                   <NumberInputStepper>

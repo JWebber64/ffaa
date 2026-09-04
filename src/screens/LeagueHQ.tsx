@@ -88,6 +88,7 @@ type SleeperLookupState = {
   choices: SleeperLeagueChoice[];
   providerUserId?: string;
   displayName?: string;
+  managerAvatarUrl?: string;
 };
 
 const SLEEPER_SEASONS = Array.from({ length: 6 }, (_, index) => FANTASY_SEASON - index);
@@ -318,6 +319,7 @@ export default function LeagueHQ() {
       ...(choice.avatarUrl ? { avatarUrl: choice.avatarUrl } : {}),
       ...(lookupState.providerUserId ? { managerProviderUserId: lookupState.providerUserId } : {}),
       ...(lookupState.displayName ? { managerDisplayName: lookupState.displayName } : {}),
+      ...(lookupState.managerAvatarUrl ? { managerAvatarUrl: lookupState.managerAvatarUrl } : {}),
       ...(choice.ownerProviderUserId ? { leagueOwnerProviderUserId: choice.ownerProviderUserId } : {}),
       auctionSettings: choice.auctionSettings,
     }));
@@ -357,6 +359,7 @@ export default function LeagueHQ() {
         status: "success",
         ...(result.providerUserId ? { providerUserId: result.providerUserId } : {}),
         displayName: result.displayName,
+        ...(result.managerAvatarUrl ? { managerAvatarUrl: result.managerAvatarUrl } : {}),
         message: unsavedLeagueIds.length
           ? `${unsavedLeagueIds.length} new ${unsavedLeagueIds.length === 1 ? "league is" : "leagues are"} selected. Review the list, then add ${unsavedLeagueIds.length === 1 ? "it" : "them"}.`
           : availableConnectionSlots

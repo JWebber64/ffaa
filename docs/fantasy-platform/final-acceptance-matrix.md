@@ -21,6 +21,7 @@ This matrix traces the required final scenarios to authoritative implementation 
 | Migrate old route and preserve Sleeper history | Unique provider mapping; compatibility resolver; imported history remains distinct/read-only | `nativeLeagueDomain.test.ts`, `leagueCommandService.test.ts`, `automaticLeagueHistoryImport.test.ts` |
 | Mobile manager and commissioner workflows | Stable primary navigation, explicit authority, protected management, no horizontal overflow at 390 x 844 | `e2e/native-league-routing.e2e.ts` |
 | Award champion, archive, renew, export | Revision-bound lifecycle commands, permanent franchises, immutable archive, private chunked JSON | `nativeSeasonLifecycleCommands.test.ts`, `nativeLeagueFirestoreRules.test.ts` |
+| Two distinct accounts complete the operator journey | Preview-only commissioner/manager pilot covering identity, reconnect, authority, stale writes, weekly operations, mobile, and revoke | `docs/fantasy-platform/two-account-pilot.md`; `npm run pilot:native:preflight` is prerequisite evidence, not a substitute for the real run |
 
 ## Required concurrency attempts
 

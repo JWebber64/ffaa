@@ -31,6 +31,7 @@ export const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps
   {
     "aria-label": ariaLabel,
     className,
+    defaultValue,
     disabled,
     max,
     min,
@@ -49,6 +50,11 @@ export const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps
   const numericMax = max === undefined ? undefined : Number(max);
   const currentValue = value === undefined || value === "" ? Number.NaN : Number(value);
   const label = ariaLabel || props.name || "value";
+  const inputValueProps = value !== undefined
+    ? { value }
+    : defaultValue !== undefined
+      ? { defaultValue }
+      : {};
   const shellStyle = useMemo<React.CSSProperties>(() => {
     const dimensions: React.CSSProperties = {};
     if (style?.width !== undefined) dimensions.width = style.width;
@@ -92,7 +98,7 @@ export const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps
         step={step}
         style={{ ...style, width: "100%", paddingRight: "46px" }}
         type="number"
-        value={value}
+        {...inputValueProps}
       />
       <span className="ffaa-number-stepper">
         <span className="ffaa-number-stepper-visual" aria-hidden="true">
