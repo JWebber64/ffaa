@@ -6,7 +6,8 @@ import {
 } from "firebase/firestore";
 
 import { firebaseAuth, firestore } from "../../lib/firebase";
-import { resolveLeagueAuthority } from "./authority";
+import { normalizeSeasonTeam } from "../league-membership/leaguePeople";
+import { leagueRoleGrantIsActive, resolveLeagueAuthority } from "./authority";
 import type { LeagueRepository, LeagueRouteResolution } from "./LeagueRepository";
 import {
   externalLeagueMappingId,
@@ -262,12 +263,34 @@ export const firebaseLeagueRepository: LeagueRepository = {
           return snapshot.exists() ? normalizeRoleGrant(snapshot.data(), league.id, grantId) : null;
         }))).filter((grant): grant is RoleGrant => Boolean(grant))
       : [];
+    const managedTeamGrant = membership?.status === "active"
+      ? grants.find((grant) => (
+          ["team_owner", "co_manager"].includes(grant.role)
+          && Boolean(grant.franchiseId)
+          && leagueRoleGrantIsActive(grant)
+        )) ?? null
+      : null;
+    const managedTeamSnapshot = season && managedTeamGrant?.franchiseId
+      ? await getDoc(doc(
+          firestore,
+          "leagues",
+          league.id,
+          "seasons",
+          season.id,
+          "seasonTeams",
+          managedTeamGrant.franchiseId,
+        ))
+      : null;
+    const managedTeam = managedTeamSnapshot?.exists()
+      ? normalizeSeasonTeam(managedTeamSnapshot.data(), league.id, season?.id ?? "")
+      : null;
     return {
       league,
       season,
       connection,
       membership,
       roleGrants: grants,
+      managedTeam,
       authority: resolveLeagueAuthority({ league, membership, roleGrants: grants, connection }),
     };
   },

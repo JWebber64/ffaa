@@ -532,6 +532,7 @@ export type CanonicalLeagueWorkspace = {
   connection: ExternalConnection | null;
   membership: LeagueMembership | null;
   roleGrants: RoleGrant[];
+  managedTeam?: SeasonTeam | null;
   authority: LeagueAuthority;
 };
 

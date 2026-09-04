@@ -47,7 +47,7 @@ export function LeagueWorkspaceMark({ avatarUrl, teamName }: { avatarUrl?: strin
   );
 }
 
-function LeagueWorkspaceChrome() {
+export function LeagueWorkspaceChrome() {
   const location = useLocation();
   const moreMenuRef = useRef<HTMLDetailsElement>(null);
   useDismissibleDisclosureMenus(moreMenuRef);
@@ -62,7 +62,10 @@ function LeagueWorkspaceChrome() {
     capabilities,
   } = useLeagueWorkspace();
   const base = `/league/${encodeURIComponent(leagueId)}`;
-  const teamName = teamState.status === "ready"
+  const managedNativeTeam = authority?.mode === "native" ? canonicalWorkspace?.managedTeam : null;
+  const teamName = managedNativeTeam?.name
+    ? managedNativeTeam.name
+    : teamState.status === "ready"
     ? teamState.data.teamName
     : connection?.managerProviderUserId
       ? connection.managerTeamName || connection.managerDisplayName || "Your team"
@@ -87,9 +90,9 @@ function LeagueWorkspaceChrome() {
     ? leagueDestinations
     : leagueDestinations.filter(({ section }) => section !== "commissioner");
   const authorityLabel = authority?.label ?? "Connected Sleeper League — read-only";
-  const managerAvatarUrl = teamState.status === "ready"
+  const managerAvatarUrl = managedNativeTeam?.logoUrl || (teamState.status === "ready"
     ? teamState.data.managerAvatarUrl || connection?.managerAvatarUrl
-    : connection?.managerAvatarUrl;
+    : connection?.managerAvatarUrl);
 
   return (
     <LeaguePlayerSheetProvider><div className="league-workspace-shell">
