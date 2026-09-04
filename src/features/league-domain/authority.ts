@@ -30,7 +30,7 @@ const ROLE_PERMISSIONS: Record<LeagueRole, string[]> = {
   read_only_guest: [],
 };
 
-function grantIsActive(grant: RoleGrant, now: Date) {
+export function leagueRoleGrantIsActive(grant: RoleGrant, now = new Date()) {
   if (grant.revokedAt) return false;
   const effectiveAt = Date.parse(grant.effectiveAt);
   if (Number.isFinite(effectiveAt) && effectiveAt > now.getTime()) return false;
@@ -56,7 +56,7 @@ export function resolveLeagueAuthority(input: {
   const now = input.now ?? new Date();
   const membershipActive = input.membership?.status === "active";
   const activeGrants = membershipActive
-    ? input.roleGrants.filter((grant) => grant.leagueId === input.league.id && grantIsActive(grant, now))
+    ? input.roleGrants.filter((grant) => grant.leagueId === input.league.id && leagueRoleGrantIsActive(grant, now))
     : [];
   const permissions = Array.from(new Set(activeGrants.flatMap((grant) => [
     ...(ROLE_PERMISSIONS[grant.role] ?? []),
