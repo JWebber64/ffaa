@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -92,6 +92,13 @@ export function CommissionerTeamsWorkspace({
   const [shareUrl, setShareUrl] = useState("");
   const [removalTarget, setRemovalTarget] = useState<LeagueMembership | null>(null);
   const [removalReason, setRemovalReason] = useState("");
+  const deferredWorkspaceRefresh = useRef(false);
+
+  useEffect(() => () => {
+    if (!deferredWorkspaceRefresh.current) return;
+    deferredWorkspaceRefresh.current = false;
+    onWorkspaceChanged();
+  }, [onWorkspaceChanged]);
 
   async function reload() {
     const loaded = await service.load(workspace.league.id, season.id);
@@ -124,14 +131,24 @@ export function CommissionerTeamsWorkspace({
     && /^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(email.trim())
     && (role === "co_commissioner" || Boolean(franchiseId));
 
-  async function runAction(key: string, action: () => Promise<{ resultingRevision: number }>, success: string) {
+  async function runAction(
+    key: string,
+    action: () => Promise<{ resultingRevision: number }>,
+    success: string,
+    options: { deferWorkspaceRefresh?: boolean } = {},
+  ) {
     setBusy(key);
     setMessage(null);
     try {
       const receipt = await action();
       setRevision(receipt.resultingRevision);
       await reload();
-      onWorkspaceChanged();
+      if (options.deferWorkspaceRefresh) {
+        deferredWorkspaceRefresh.current = true;
+      } else {
+        deferredWorkspaceRefresh.current = false;
+        onWorkspaceChanged();
+      }
       setMessage({ tone: "status", text: success });
       return receipt;
     } catch (error) {
@@ -149,6 +166,7 @@ export function CommissionerTeamsWorkspace({
   }
 
   async function createInvitation() {
+    setShareUrl("");
     const receipt = await runAction("invite", () => service.createInvitation({
       leagueId: workspace.league.id,
       seasonId: season.id,
@@ -160,7 +178,7 @@ export function CommissionerTeamsWorkspace({
         franchiseId: role === "co_commissioner" ? "" : franchiseId,
         expiresInDays: 7,
       },
-    }), `Invitation created for ${displayName.trim()}.`);
+    }), `Invitation created for ${displayName.trim()}.`, { deferWorkspaceRefresh: true });
     if (!receipt) return;
     const invitationId = String((receipt as { result?: Record<string, unknown> }).result?.invitationId ?? "");
     const token = String((receipt as { result?: Record<string, unknown> }).result?.token ?? "");
@@ -173,6 +191,10 @@ export function CommissionerTeamsWorkspace({
     try {
       await navigator.clipboard.writeText(shareUrl);
       setMessage({ tone: "status", text: "Invitation link copied." });
+      if (deferredWorkspaceRefresh.current) {
+        deferredWorkspaceRefresh.current = false;
+        onWorkspaceChanged();
+      }
     } catch {
       setMessage({ tone: "error", text: "Copy was blocked. Select the invitation link and copy it manually." });
     }
