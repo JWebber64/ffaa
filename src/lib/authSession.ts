@@ -5,6 +5,7 @@ import {
   onAuthStateChanged,
   signInAnonymously,
   signInWithCredential,
+  signOut,
 } from "firebase/auth";
 import { firebaseAuth } from "./firebase";
 
@@ -162,4 +163,10 @@ export async function upgradeFirebaseSessionWithGoogle() {
     emitSession(restored);
     return restored;
   }
+}
+
+export async function signOutFirebaseSession() {
+  await signOut(firebaseAuth);
+  emitSession(null);
+  return ensureFirebaseSession();
 }
