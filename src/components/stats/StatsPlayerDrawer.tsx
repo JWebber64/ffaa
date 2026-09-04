@@ -75,6 +75,7 @@ export interface StatsPlayerDetail {
 interface StatsPlayerDrawerProps {
   player: StatsPlayerDetail | null;
   onClose: () => void;
+  returnFocusElement?: HTMLElement | null;
 }
 
 const DRAWER_TABS = [
@@ -210,7 +211,7 @@ function withCareerOverviewMetric(metrics: StatsPlayerMetric[], metric: StatsPla
   return next;
 }
 
-export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
+export function StatsPlayerDrawer({ player, onClose, returnFocusElement }: StatsPlayerDrawerProps) {
   const [tab, setTab] = useState<DrawerTab>("overview");
   const [careerState, setCareerState] = useState<{ key: string; result: PlayerCareerStatsResult } | null>(null);
   const [careerLoadingKey, setCareerLoadingKey] = useState<string | null>(null);
@@ -237,7 +238,7 @@ export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
 
   useEffect(() => {
     if (!playerId) return;
-    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    previousFocusRef.current = returnFocusElement ?? document.activeElement as HTMLElement | null;
     const previousOverflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
     closeButtonRef.current?.focus();
@@ -251,8 +252,13 @@ export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     }
     document.addEventListener("keydown", handleKeyDown);
-    return () => { document.documentElement.style.overflow = previousOverflow; document.removeEventListener("keydown", handleKeyDown); previousFocusRef.current?.focus(); };
-  }, [onClose, playerId]);
+    return () => {
+      document.documentElement.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+      const returnFocusTarget = previousFocusRef.current;
+      requestAnimationFrame(() => returnFocusTarget?.focus());
+    };
+  }, [onClose, playerId, returnFocusElement]);
 
   useEffect(() => {
     setTab("overview"); setGameLogSeason(NFLVERSE_CAREER_LATEST_SEASON); setGameLogRows([]); setGameLogError(null); setGameLogAttempt(0); setNewsItems([]); setNewsError(null); setNewsAttempt(0);

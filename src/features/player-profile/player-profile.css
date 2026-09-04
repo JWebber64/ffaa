@@ -1,3 +1,7 @@
+.player-profile-app-content {
+  display: contents;
+}
+
 .player-profile-trigger {
   min-width: 0;
   margin: 0;

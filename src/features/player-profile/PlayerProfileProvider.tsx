@@ -18,7 +18,9 @@ import "@/features/player-profile/player-profile.css";
 
 export function PlayerProfileProvider({ children }: { children: ReactNode }) {
   const [selection, setSelection] = useState<{ player: PlayerProfileCandidate; scoring: ToolScoring } | null>(null);
-  const openPlayerProfile = useCallback((player: PlayerProfileCandidate, scoring: ToolScoring = "halfPpr") => {
+  const [returnFocusElement, setReturnFocusElement] = useState<HTMLElement | null>(null);
+  const openPlayerProfile = useCallback((player: PlayerProfileCandidate, scoring: ToolScoring = "halfPpr", trigger?: HTMLElement | null) => {
+    setReturnFocusElement(trigger ?? document.activeElement as HTMLElement | null);
     setSelection({ player, scoring });
   }, []);
   const closePlayerProfile = useCallback(() => setSelection(null), []);
@@ -30,8 +32,18 @@ export function PlayerProfileProvider({ children }: { children: ReactNode }) {
 
   return (
     <PlayerProfileContext.Provider value={value}>
-      {children}
-      <StatsPlayerDrawer player={detail} onClose={closePlayerProfile} />
+      <div
+        className="player-profile-app-content"
+        inert={selection ? true : undefined}
+        aria-hidden={selection ? true : undefined}
+      >
+        {children}
+      </div>
+      <StatsPlayerDrawer
+        player={detail}
+        onClose={closePlayerProfile}
+        returnFocusElement={returnFocusElement}
+      />
     </PlayerProfileContext.Provider>
   );
 }
@@ -58,7 +70,7 @@ export function PlayerProfileButton({
 
   function open(event: MouseEvent<HTMLButtonElement>) {
     if (stopPropagation) event.stopPropagation();
-    openPlayerProfile(player!, scoring);
+    openPlayerProfile(player!, scoring, event.currentTarget);
   }
 
   return (

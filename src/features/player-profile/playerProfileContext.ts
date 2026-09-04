@@ -4,7 +4,7 @@ import type { ToolScoring } from "@/data/toolPlayerData";
 import type { PlayerProfileCandidate } from "@/features/player-profile/playerProfileData";
 
 export type PlayerProfileContextValue = {
-  openPlayerProfile: (player: PlayerProfileCandidate, scoring?: ToolScoring) => void;
+  openPlayerProfile: (player: PlayerProfileCandidate, scoring?: ToolScoring, trigger?: HTMLElement | null) => void;
   closePlayerProfile: () => void;
 };
 

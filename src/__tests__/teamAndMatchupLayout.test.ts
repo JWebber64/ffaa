@@ -12,7 +12,7 @@ function source(path: string) {
 describe("team and matchup information hierarchy", () => {
   it("opens the active team on its roster instead of a promotional hero", () => {
     const team = source("src/screens/MyHQ.tsx");
-    const rosterIndex = team.indexOf("<TeamRoster data={data} />");
+    const rosterIndex = team.indexOf("<TeamRoster data={data}");
     const decisionsIndex = team.indexOf("hq-decisions");
 
     expect(team).not.toContain("hq-hero");
