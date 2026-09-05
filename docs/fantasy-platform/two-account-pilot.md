@@ -40,3 +40,7 @@ Save one short report per run under an ignored local evidence directory or the r
 Stop immediately on cross-account data exposure, a direct client write to authoritative state, duplicate ownership, silent stale overwrite, missing audit/receipt, or a role that survives revocation. Do not broaden the cohort until the fix passes the entire pilot from a new league.
 
 The pilot creates real external state and therefore requires the two account credentials and chosen Firebase/Preview environment from the operator. The automated preflight in this repository is safe to run locally, but it is not evidence that the real two-account pilot has passed.
+
+## Production activation
+
+`VITE_NATIVE_LEAGUE_FOUNDATION=true` is the build-time switch for the native-league entry surface. Scope it to Preview while the pilot is running. After explicit Production approval, add it to the Vercel Production environment and trigger a new deployment through a real `master` Git change; a prior deployment does not inherit environment-variable changes, and an empty Git commit may be skipped because its source tree is unchanged. Verify the exact Git SHA and the canonical `/ff/leagues` route before calling activation complete.
