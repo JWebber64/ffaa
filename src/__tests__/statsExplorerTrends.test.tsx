@@ -151,9 +151,6 @@ describe("StatsExplorer 2026 Trends", () => {
     const veteranName = within(table).getByText("Veteran Current");
 
     expect(screen.getByText("2026 live trends")).toBeInTheDocument();
-    const trendYear = screen.getByRole("button", { name: "Trend year: 2026" });
-    expect(trendYear).toBeDisabled();
-    expect(trendYear).toHaveTextContent("2026");
     expect(screen.getByRole("button", { name: /Net 24h/ }).closest("th")).toHaveAttribute("aria-sort", "descending");
     expect(screen.getByRole("button", { name: /2026 Proj\/G/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /2025 FPG/ })).toBeInTheDocument();

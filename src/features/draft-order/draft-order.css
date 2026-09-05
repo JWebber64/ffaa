@@ -12,7 +12,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
   gap: var(--space-6);
-  min-height: 230px;
+  min-height: 0;
   padding: clamp(22px, 4vw, 42px);
   overflow: hidden;
   border: 1px solid var(--color-border-default);
@@ -781,11 +781,11 @@ html.showdown-reveal-active { overflow: hidden; }
 .draft-order-hero {
   min-height: 0;
   align-items: center;
-  padding: clamp(18px, 3vw, 30px);
+  padding: var(--space-4);
 }
 
 .draft-order-hero h1 {
-  font-size: var(--type-display-page);
+  font-size: var(--type-title-section);
   line-height: .96;
 }
 
@@ -1129,7 +1129,7 @@ html.showdown-reveal-active { overflow: hidden; }
 }
 
 @media (max-width: 720px) {
-  .draft-order-hero h1 { font-size: var(--type-display-page); }
+  .draft-order-hero h1 { font-size: var(--type-title-section); }
   .draft-order-utility { width: auto; justify-self: start; }
   .participant-import-grid { grid-template-columns: 1fr; }
   .participant-import-grid article.is-primary { grid-column: auto; grid-template-columns: 1fr; align-items: stretch; }

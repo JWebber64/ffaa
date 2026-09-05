@@ -43,11 +43,6 @@ const OfflineDraftV2 = lazy(() => import("./screens_v2/OfflineDraftV2"));
 const LandingV2 = lazy(() => import("./screens_v2/LandingV2"));
 const AuthenticatedApp = lazy(() => import("./routes/AuthenticatedApp"));
 
-function ConnectedHome() {
-  const { connections } = useSleeperLeagueConnections();
-  return connections.length ? <Navigate to="/teams" replace /> : <LandingV2 />;
-}
-
 function ActiveLeagueRedirect({ destination }: { destination: string }) {
   const location = useLocation();
   const { activeLeagueId } = useSleeperLeagueConnections();
@@ -100,7 +95,7 @@ function AppRoutes() {
     return (
       <Routes>
         <Route element={<AppShellV2 />}>
-          <Route index element={<ConnectedHome />} />
+          <Route index element={<LandingV2 />} />
           <Route path="/teams" element={<MyTeams />} />
           <Route path="/leagues" element={<LeagueHQ />} />
           <Route path="/stats" element={<StatsExplorer />} />

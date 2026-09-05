@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Radio } from "lucide-react";
 import { appUrl } from "../lib/appBasePath";
+import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import "./landing-v2.css";
 
 const platformFeatures = [
@@ -70,6 +71,7 @@ const platformChapters = [
 ] as const;
 
 export default function LandingV2() {
+  const { connections } = useSleeperLeagueConnections();
   return (
     <div className="platform-home">
       <section className="platform-hero" aria-labelledby="platform-home-title">
@@ -82,8 +84,8 @@ export default function LandingV2() {
           </h1>
           <p>Turn player stats, projections, rankings, and auction values into better rosters. Then run drafts, manage weekly matchups, and preserve league history without stitching together five different sites.</p>
           <div className="platform-hero-actions">
-            <Link className="platform-primary-link" to="/stats">Explore Player Research</Link>
-            <Link className="platform-secondary-link" to="/tools">Browse All Tools</Link>
+            <Link className="platform-primary-link" to={connections.length ? "/teams" : "/stats"}>{connections.length ? "My Teams" : "Explore Player Research"}</Link>
+            <Link className="platform-secondary-link" to={connections.length ? "/stats" : "/tools"}>{connections.length ? "Explore Player Research" : "Browse All Tools"}</Link>
           </div>
         </div>
 

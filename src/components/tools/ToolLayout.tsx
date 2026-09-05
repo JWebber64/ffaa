@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ToolLayoutProps {
@@ -21,17 +21,12 @@ export function ToolLayout({
     <section className="tools-page">
       <header className="tools-page-hero">
         <div>
-          <Link className="tools-back-link" to="/tools">
+          <div className="tools-page-context"><Link className="tools-back-link" to="/tools">
             <ArrowLeft size={15} aria-hidden="true" />
             All tools
-          </Link>
-          <div className="tools-eyebrow">{eyebrow}</div>
+          </Link><span>{eyebrow} · Free, no login required</span></div>
           <h1 className="ff-display">{title}</h1>
           <p>{description}</p>
-        </div>
-        <div className="tools-free-mark">
-          <ShieldCheck size={22} aria-hidden="true" />
-          <span><strong>Free</strong>No login required</span>
         </div>
       </header>
 

@@ -13,4 +13,5 @@ export function appUrl(path: string, baseUrl = import.meta.env.BASE_URL) {
 }
 
 export const APP_BASE_URL = normalizeAppBaseUrl(import.meta.env.BASE_URL);
-export const APP_ROUTER_BASENAME = APP_BASE_URL === "/" ? "/" : APP_BASE_URL.slice(0, -1);
+// Keep root links canonical so Home can be refreshed under a hosted base path.
+export const APP_ROUTER_BASENAME = APP_BASE_URL;

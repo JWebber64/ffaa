@@ -4244,7 +4244,7 @@ body,
   background: transparent;
 }
 
-/* Compact layout contract: natural-height content, capped type, and shared rhythm. */
+/* Compact layout contract: working pages use title and control spacing roles; landing artwork retains its hero scale. */
 .app-main {
   width: min(100%, var(--content-wide));
   max-width: var(--content-wide);
@@ -4261,8 +4261,8 @@ body,
 .tools-page-hero,
 .league-hero {
   min-height: 0;
-  padding: var(--space-page-hero);
-  gap: var(--space-section-gap);
+  padding: var(--space-4);
+  gap: var(--space-4);
   border-radius: var(--r-xl);
 }
 
@@ -4275,9 +4275,9 @@ body,
 .tools-hero h1,
 .tools-page-hero h1,
 .league-hero h1 {
-  max-width: 16ch;
-  margin-top: var(--space-2);
-  font-size: var(--type-display-page);
+  max-width: 28ch;
+  margin-top: var(--space-1);
+  font-size: var(--type-title-section);
   line-height: var(--line-display);
   text-shadow: none;
   text-wrap: balance;
@@ -4292,16 +4292,20 @@ body,
 .tools-hero-copy > p,
 .tools-page-hero > div:first-child > p,
 .league-hero-copy > p {
-  max-width: 68ch;
-  margin-top: var(--space-3);
-  font-size: 1rem;
-  line-height: 1.55;
+  max-width: 80ch;
+  margin-top: var(--space-2);
+  font-size: .9rem;
+  line-height: 1.45;
   text-wrap: pretty;
 }
 
+.stats-hub.is-embedded .stats-hero { padding: 0; border: 0; background: transparent; box-shadow: none; }
+.stats-hub.is-embedded .stats-hero::after { display: none; }
+.stats-hub .stats-hero { grid-template-columns: minmax(0, 1fr); }
+
 .stats-hub,
 .analytics-lab {
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
 .stats-hub-summary-card,
@@ -4357,6 +4361,6 @@ body,
   .tools-hero h1,
   .tools-page-hero h1,
   .league-hero h1 {
-    font-size: clamp(2.45rem, 12vw, 3.25rem);
+    font-size: var(--type-title-section);
   }
 }

@@ -30,7 +30,7 @@ export function LeagueDashboardPage() {
           <span><Crown size={16} /> Defending champion</span>
           <strong>{champion?.displayName ?? "Not available"}</strong>
           <p>{championFranchise?.teamName || "Sleeper has not exposed a completed championship result."}</p>
-          {champion ? <Link to={`managers/${champion.id}`}>View career</Link> : null}
+          {champion ? <Link className="history-text-link" to={`managers/${champion.id}`}>View career</Link> : null}
         </article>
         <article><span>Seasons</span><strong>{snapshot.seasons.length}</strong><small>Normalized archives</small></article>
         <article><span>Managers</span><strong>{snapshot.managers.length}</strong><small>Permanent identities</small></article>

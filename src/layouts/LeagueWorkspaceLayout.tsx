@@ -13,7 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 
 import { LeagueWorkspaceProvider } from "../features/league-workspace/LeagueWorkspaceContext";
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
@@ -62,6 +62,8 @@ export function LeagueWorkspaceChrome() {
     capabilities,
   } = useLeagueWorkspace();
   const base = `/league/${encodeURIComponent(leagueId)}`;
+  const isMatchup = location.pathname === `${base}/matchup` || location.pathname === `${base}/team/matchup`;
+  const isTeam = location.pathname === `${base}/team` || location.pathname.startsWith(`${base}/team/roster`);
   const managedNativeTeam = authority?.mode === "native" ? canonicalWorkspace?.managedTeam : null;
   const teamName = managedNativeTeam?.name
     ? managedNativeTeam.name
@@ -108,7 +110,7 @@ export function LeagueWorkspaceChrome() {
 
         <div className={`league-workspace-authority is-${authority?.mode ?? "connected_read_only"}`}>
           <ShieldCheck aria-hidden="true" />
-          <div><span>Authority</span><strong>{authorityLabel}</strong></div>
+          <strong>{authorityLabel}</strong>
         </div>
 
         {connections.length ? (
@@ -135,14 +137,14 @@ export function LeagueWorkspaceChrome() {
 
       <nav className="league-workspace-nav" aria-label="Active team and league">
         <NavLink end to={base} className={({ isActive }) => isActive ? "is-active" : ""}>
-          <House aria-hidden="true" /><span>Home</span>
+          <House aria-hidden="true" /><span>League home</span>
         </NavLink>
-        <NavLink to={`${base}/matchup`} className={({ isActive }) => isActive ? "is-active" : ""}>
+        <Link to={`${base}/matchup`} aria-current={isMatchup ? "page" : undefined} className={isMatchup ? "is-active" : ""}>
           <CalendarDays aria-hidden="true" /><span>Matchup</span>
-        </NavLink>
-        <NavLink to={`${base}/team`} className={({ isActive }) => isActive ? "is-active" : ""}>
+        </Link>
+        <Link to={`${base}/team`} aria-current={isTeam ? "page" : undefined} className={isTeam ? "is-active" : ""}>
           <Users aria-hidden="true" /><span>Team</span>
-        </NavLink>
+        </Link>
         <NavLink to={`${base}/players`} className={({ isActive }) => isActive ? "is-active" : ""}>
           <ListChecks aria-hidden="true" /><span>Players</span>
         </NavLink>
@@ -151,7 +153,7 @@ export function LeagueWorkspaceChrome() {
         </NavLink>
         <details className="league-workspace-more" ref={moreMenuRef}>
           <summary className={leagueSectionActive ? "is-active" : ""}><Trophy aria-hidden="true" /><span>League</span><ChevronDown className="league-workspace-chevron" aria-hidden="true" /></summary>
-          <div>
+          <div data-viewport-menu>
             {visibleLeagueDestinations.map(({ section, label, icon: Icon }) => (
               <NavLink key={section} to={`${base}/${section}`} onClick={(event) => closeParentDisclosure(event.currentTarget)}>
                 <Icon aria-hidden="true" /><span>{label}</span>

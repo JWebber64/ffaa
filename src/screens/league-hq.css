@@ -551,13 +551,13 @@
 .league-workspace-message { margin-top: 9px; color: #fbbf24; font-size: 0.76rem; }
 .league-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding-top: 15px; }
 
-.commissioner-studio { display: flex; width: min(1180px, 100%); height: min(820px, calc(100vh - 40px)); flex-direction: column; overflow: hidden; border: 1px solid color-mix(in srgb, var(--green-200) 24%, transparent); border-radius: 22px; background: var(--gray-950); box-shadow: 0 40px 120px rgba(0, 0, 0, 0.68); }
+.commissioner-studio { display: flex; width: min(1180px, 100%); height: min(820px, calc(100dvh - 40px)); max-height: 100%; flex-direction: column; overflow: hidden; border: 1px solid color-mix(in srgb, var(--green-200) 24%, transparent); border-radius: 22px; background: var(--gray-950); box-shadow: 0 40px 120px rgba(0, 0, 0, 0.68); }
 .studio-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 21px 24px 18px; border-bottom: 1px solid var(--league-line); background: color-mix(in oklch, var(--gray-950) 68%, transparent); }
 .studio-header > div > span, .studio-section-heading > span { color: var(--league-emerald); font-size: 0.63rem; font-weight: 850; letter-spacing: 0.12em; text-transform: uppercase; }
 .studio-header h2 { margin: 5px 0 3px; font: 800 1.65rem/1.1 var(--font-display, system-ui); letter-spacing: -0.03em; }
 .studio-header p { margin: 0; color: var(--text-2, #a3a3a3); font-size: 0.78rem; }
 .studio-layout { display: grid; min-height: 0; flex: 1; grid-template-columns: 190px minmax(0, 1fr); }
-.studio-nav { display: flex; flex-direction: column; gap: 4px; padding: 14px 10px; border-right: 1px solid var(--league-line); background: color-mix(in oklch, var(--gray-950) 34%, transparent); }
+.studio-nav { display: flex; min-height: 0; overflow-y: auto; overscroll-behavior: contain; flex-direction: column; gap: 4px; padding: 14px 10px; border-right: 1px solid var(--league-line); background: color-mix(in oklch, var(--gray-950) 34%, transparent); }
 .studio-nav button { display: flex; min-height: 42px; align-items: center; gap: 9px; padding: 0 11px; border: 1px solid transparent; border-radius: 9px; background: transparent; color: var(--text-2, #a3a3a3); font-size: 0.75rem; font-weight: 750; text-align: left; cursor: pointer; }
 .studio-nav button:hover { background: rgba(255, 255, 255, 0.04); color: var(--text-0, white); }
 .studio-nav button.is-active { border-color: color-mix(in srgb, var(--green-200) 20%, transparent); background: color-mix(in srgb, var(--green-300) 11%, transparent); color: var(--green-100); }
@@ -644,7 +644,7 @@
   .league-ballot > div, .league-ballot > small { grid-column: auto; }
   .league-season-body article { grid-template-columns: 1fr; gap: 4px; }
   .league-season-honors { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .commissioner-studio { height: calc(100vh - 20px); }
+  .commissioner-studio { height: calc(100dvh - 40px); }
   .studio-header { padding: 16px; }
   .studio-header p { display: none; }
   .studio-layout { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }

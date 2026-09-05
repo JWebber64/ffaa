@@ -134,12 +134,6 @@ export default function MyTeams() {
   const { connections, activeLeagueId } = useSleeperLeagueConnections();
   const teams = useMyTeamsPortfolio();
   const exposures = useMemo(() => buildPortfolioExposures(teams), [teams]);
-  const actionableTeams = teams.filter((team) => (
-    team.state.status === "identity"
-    || team.state.status === "error"
-    || team.decision?.urgency === "now"
-    || team.decision?.urgency === "watch"
-  ));
   const readyCount = teams.filter((team) => team.state.status === "ready").length;
 
   if (!connections.length) {
@@ -157,35 +151,18 @@ export default function MyTeams() {
   return (
     <div className="my-teams-page">
       <header className="my-teams-heading">
-        <div><span>Weekly command center</span><h1 className="ff-display">My teams</h1><p>Every connected team, sorted by what needs attention first.</p></div>
+        <div><h1 className="ff-display">My teams</h1><p>Sorted by what needs attention first.</p></div>
         <Link to="/leagues"><Plus aria-hidden="true" /> Manage leagues</Link>
       </header>
 
-      <section className="portfolio-command" aria-labelledby="portfolio-command-title">
+      <section className="portfolio-command" aria-label="Team status">
         <div className="portfolio-command-summary">
-          <div><span>Portfolio</span><h2 id="portfolio-command-title">{actionableTeams.length ? `${actionableTeams.length} teams need a look` : "No urgent team flags"}</h2><p>{readyCount} of {teams.length} teams refreshed from current Sleeper roster data.</p></div>
+          <p>{readyCount} of {teams.length} {teams.length === 1 ? "team" : "teams"} refreshed from Sleeper</p>
           <div className="portfolio-command-counts">
             <span><strong>{teams.filter((team) => team.decision?.urgency === "now" || team.state.status === "identity" || team.state.status === "error").length}</strong>Act now</span>
             <span><strong>{teams.filter((team) => team.decision?.urgency === "watch").length}</strong>Watch</span>
             <span><strong>{teams.filter((team) => team.decision?.urgency === "clear").length}</strong>Clear</span>
           </div>
-        </div>
-
-        <div className="portfolio-notifications">
-          <div className="portfolio-notification-heading"><BellRing aria-hidden="true" /><span><strong>Decision queue</strong><small>Highest-impact item from each team</small></span></div>
-          {actionableTeams.length ? (
-            <ul>
-              {actionableTeams.slice(0, 6).map((team) => (
-                <li key={team.connection.leagueId}>
-                  <span>{team.connection.leagueName}</span>
-                  <strong>{team.state.status === "identity" ? "Identify your manager roster"
-                    : team.state.status === "error" ? team.state.error
-                    : team.decision?.title}</strong>
-                  <Link to={`/league/${encodeURIComponent(team.connection.leagueId)}/team`}>Review</Link>
-                </li>
-              ))}
-            </ul>
-          ) : <p className="portfolio-all-clear"><CheckCircle2 aria-hidden="true" /> Current roster snapshots show no urgent lineup flags.</p>}
         </div>
 
         {exposures.length ? (
@@ -195,12 +172,12 @@ export default function MyTeams() {
           </div>
         ) : null}
 
-        <AccountSyncControl />
       </section>
 
       <section className="my-teams-list" aria-label="Connected fantasy teams">
         {teams.map((team) => <PortfolioTeamRow key={team.connection.leagueId} team={team} activeLeagueId={activeLeagueId} />)}
       </section>
+      <AccountSyncControl />
     </div>
   );
 }

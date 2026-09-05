@@ -1,12 +1,12 @@
 .league-workspace-shell {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-3);
 }
 
 .league-workspace-context {
   display: flex;
   min-width: 0;
-  padding: var(--space-4) var(--space-5);
+  padding: var(--space-3) var(--space-4);
   align-items: center;
   justify-content: space-between;
   gap: var(--space-5);
@@ -75,7 +75,7 @@
 }
 
 .league-workspace-switcher {
-  display: grid;
+  display: none;
   width: min(360px, 42vw);
   gap: var(--space-1);
 }
@@ -102,13 +102,10 @@
 
 .league-workspace-authority {
   display: inline-flex;
-  min-width: 230px;
-  padding: var(--space-2) var(--space-3);
+  min-width: 0;
   align-items: center;
   gap: var(--space-2);
-  border: 1px solid var(--line-1);
-  border-radius: var(--r-md);
-  background: var(--surface-sunken, rgba(8, 13, 11, .72));
+  color: var(--text-secondary);
 }
 
 .league-workspace-authority > svg {
@@ -116,10 +113,7 @@
   color: var(--green-200);
 }
 
-.league-workspace-authority > div {
-  display: grid;
-  gap: 1px;
-}
+
 
 .league-workspace-authority span {
   color: var(--text-muted);
@@ -130,9 +124,9 @@
 }
 
 .league-workspace-authority strong {
-  color: var(--text-primary);
+  color: var(--text-secondary);
   font-size: .75rem;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .league-workspace-public svg {
@@ -205,7 +199,10 @@
   inset-block-start: calc(100% + 8px);
   inset-inline-end: 0;
   display: grid;
-  width: 230px;
+  width: min(230px, calc(100vw - 48px));
+  max-height: calc(100dvh - 260px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--space-2);
   gap: var(--space-1);
   border: 1px solid var(--line-1);
@@ -236,6 +233,10 @@
   color: var(--accent-action);
 }
 
+@media (min-width: 761px) and (max-width: 1100px) {
+  .league-workspace-switcher { display: grid; }
+}
+
 @media (max-width: 760px) {
   .league-workspace-shell {
     gap: var(--space-4);
@@ -243,7 +244,7 @@
 
   .league-workspace-context {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
     padding: var(--space-3);
     align-items: center;
     gap: var(--space-3);
@@ -256,7 +257,7 @@
   }
 
   .league-workspace-identity strong {
-    max-width: 32vw;
+    max-width: 76vw;
     font-size: .92rem;
   }
 
@@ -276,10 +277,8 @@
     grid-column: 1 / -1;
   }
 
-  .league-workspace-nav {
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
+  .league-workspace-nav { flex-wrap: wrap; }
+  .league-workspace-nav > a:nth-child(-n + 4) { display: none; }
 
   .league-workspace-nav::-webkit-scrollbar {
     display: none;

@@ -15,12 +15,13 @@ describe("app shell navigation menus", () => {
   it("renders the approved football artwork in the shared product header", () => {
     const { container } = render(
       <MemoryRouter>
-        <AppBrand homeTo="/" />
+        <AppBrand />
       </MemoryRouter>,
     );
 
     const brandLink = screen.getByRole("link", { name: "Fantasy Football presented by GameHQ home" });
     const brandImage = brandLink.querySelector("img");
+    expect(brandLink).toHaveAttribute("href", "/");
 
     expect(brandImage).not.toBeNull();
     expect(brandImage).toHaveAttribute("src", expect.stringContaining("images/football-header-mark.jpg"));

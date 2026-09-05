@@ -35,8 +35,7 @@ export function AuctionValueControls(props: Props) {
     <section className="auction-control-panel" aria-labelledby="auction-controls-title">
       <div className="auction-control-heading">
         <div>
-          <span className="auction-kicker">Draft setup</span>
-          <h2 id="auction-controls-title">Set the board</h2>
+          <h2 id="auction-controls-title">Board settings</h2>
         </div>
         <div className="auction-scoring-tabs" role="tablist" aria-label="Scoring format">
           {SCORING_FORMATS.map((format) => (
@@ -55,10 +54,6 @@ export function AuctionValueControls(props: Props) {
       </div>
 
       <div className="auction-control-grid">
-        <div className="auction-field auction-static-setting" aria-label="Season 2026">
-          <span>Season</span>
-          <strong>2026</strong>
-        </div>
         <label className="auction-field">
           <span>League size</span>
           <NumericInput aria-label="League size" className="ffaa-control" min={4} max={32} step={1} value={props.leagueSize} onChange={(event) => props.onLeagueSizeChange(Number(event.target.value) || 12)} />
@@ -78,7 +73,9 @@ export function AuctionValueControls(props: Props) {
         <PositionToggle options={AUCTION_POSITION_OPTIONS} value={props.position} onChange={props.onPositionChange} ariaLabel="Filter auction values by position" />
       </div>
 
-      <div className="auction-toggle-row">
+      <details className="auction-comparison-options">
+        <summary>Comparison options <span>{props.valueMode === "raw" ? "Raw values" : "Normalized values"}{props.comparableOnly ? " · Comparable only" : " · All sources"}{props.includeMarketInConsensus ? " · Market included" : ""}</span></summary>
+        <div className="auction-toggle-row">
         <label className="auction-check-control">
           <input type="checkbox" checked={props.comparableOnly} onChange={(event) => props.onComparableOnlyChange(event.target.checked)} />
           <span><strong>Comparable sources only</strong><small>Same season, scoring, QB format, and league size.</small></span>
@@ -94,6 +91,7 @@ export function AuctionValueControls(props: Props) {
         </label>
       </div>
       <p className="auction-control-note"><Info size={14} aria-hidden="true" /> Values stay within their published scoring format; Standard, Half PPR, and Full PPR are never estimated from one another.</p>
+      </details>
     </section>
   );
 }

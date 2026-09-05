@@ -117,6 +117,11 @@ export default function AuctionValuesPage() {
       return publisher ? [publisher.id] : [];
     }),
   ]);
+  const sourceStats = <dl className="auction-hero-stats">
+    <div><dt>Selected</dt><dd>{selectedSources.length} sources</dd></div>
+    <div><dt>Comparable</dt><dd>{compatibleForFormat.length} boards</dd></div>
+    <div><dt>Player pool</dt><dd>{comparisonRows.length.toLocaleString()} matched</dd></div>
+  </dl>;
 
   return (
     <div className={`auction-values-page ${isPrintRoute ? "is-print-route" : ""} ${state.inkFriendly ? "is-ink-friendly" : ""}`}>
@@ -124,21 +129,22 @@ export default function AuctionValuesPage() {
       <header className="auction-page-header">
         <div className="auction-page-header-copy">
           <span className="auction-kicker">2026 draft research</span>
-          <h1>Fantasy Football Auction Values</h1>
-          <p>Build a defensible auction board from public expert values and market prices—without blending scoring formats or hiding source assumptions.</p>
-          <dl className="auction-hero-stats">
-            <div><dt>Selected</dt><dd>{selectedSources.length} sources</dd></div>
-            <div><dt>Comparable</dt><dd>{compatibleForFormat.length} boards</dd></div>
-            <div><dt>Player pool</dt><dd>{comparisonRows.length.toLocaleString()} matched</dd></div>
-          </dl>
-        </div>
-        <div className="auction-page-actions">
-          {sheetId && !isPrintRoute ? <Link to={`/auction-values?${state.searchParams.toString()}`}>Back to comparison</Link> : null}
-          <button type="button" onClick={() => setPrintSettingsOpen((open) => !open)}><Printer size={16} aria-hidden="true" /> Print</button>
+          <div className="auction-title-row">
+            <h1>Auction Values</h1>
+            <div className="auction-page-actions">
+              {sheetId && !isPrintRoute ? <Link to={`/auction-values?${state.searchParams.toString()}`}>Back to comparison</Link> : null}
+              <button type="button" onClick={() => setPrintSettingsOpen((open) => !open)}><Printer size={16} aria-hidden="true" /> Print</button>
+            </div>
+          </div>
+          <p>Compare public expert values and market prices by scoring format.</p>
+          {isPrintRoute ? sourceStats : null}
         </div>
       </header>
 
       {!isPrintRoute ? (
+        <details className="auction-source-details">
+          <summary>Fair Value sources <span>{fairValuePublisherIds.size} publishers · {fairRosterSize} roster slots</span></summary>
+          {sourceStats}
         <section className="auction-source-model" aria-label="Fair Value source model">
           <div>
             <span>Projection inputs</span>
@@ -161,6 +167,7 @@ export default function AuctionValuesPage() {
             <small>{activeAuctionSettings ? `Using ${activeConnection?.leagueName ?? "the active Sleeper league"}` : "Using the default roster profile"}</small>
           </div>
         </section>
+        </details>
       ) : null}
 
       {!isPrintRoute ? (

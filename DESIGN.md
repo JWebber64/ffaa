@@ -195,7 +195,7 @@ Selection, activity, status, position, and emphasis must never be shown with a h
 
 This is an information-dense product, not a poster. Layouts must maximize useful information without crowding controls or reducing ordinary body copy below 16px.
 
-Use the shared density roles in `src/styles/tokens.css`. The landing display is capped by `--type-display-hero` at 4.75rem. Normal page titles are capped by `--type-display-page` at 3.75rem. Section and card titles use their smaller named roles. Do not add a page-local viewport clamp that exceeds those caps.
+Use the shared density roles in `src/styles/tokens.css`. The landing display is capped by `--type-display-hero` at 4.75rem. Working pages use `--type-title-section` and compact control spacing (`--space-3` / `--space-4`); reserve `--type-display-page` for introductions that need display scale, capped at 3.75rem. Section and card titles use their smaller named roles. Do not add a page-local viewport clamp that exceeds those caps.
 
 Page heroes and cards use natural height. Do not add `min-height` merely to make a surface feel substantial, and do not vertically center short content inside a tall empty container. A minimum height is allowed only when it protects an interaction, visualization, media aspect ratio, loading skeleton, or explicitly designed empty state.
 
@@ -206,6 +206,14 @@ Desktop pages should use the available shared content width. At a 900px-tall des
 Group by proximity before adding another card. Use the compact spacing roles for card padding and related groups, the section role between separate tasks, and the page role only between page chapters. Repeated cards in one row may match height, but one card must not force unrelated rows or sections to reserve empty space.
 
 On wide landing pages, independent feature chapters may use two equal columns with secondary-card surfaces. Collapse them to one column before image, title, or body-copy measures become cramped, and keep the DOM reading order unchanged.
+
+Home always means the product landing page at `/ff/`, including when a manager has connected teams. The brand and global Home link share that destination. Name the league overview **League home**. Choose mobile navigation from the current route, not the remembered team; keep global Home and My Teams accessible from More inside a league. Team and Matchup must never both expose the current-page state.
+
+Each team row owns its decision and evidence. A compact status band may summarize urgency counts, but must not repeat those same decisions in a second queue. Keep account sync in a supporting footer and cross-league alerts only when they add information across teams. Nested history and research screens reuse the outer league gutters and compact identity row. Independent columns align to their own content; the four history overview metrics occupy one complete desktop row.
+
+Keep primary search, scoring, budget, and position controls visible. Source methodology, duplicate research summary metrics, and advanced comparison options may use labeled disclosures, with the current mode or source warning in the summary. Do not hide errors that invalidate the current results. Small-screen player profile metrics remain two columns; long tables retain their own horizontal scrolling region.
+
+Menus and dialogs must fit the dynamic viewport and respect safe areas. Long More menus, selects, and dropdowns scroll within a bounded panel. Dialog headers and actions remain visible while the body scrolls. Ordinary pages keep `html` as the document scroller; bounded overlay bodies are intentional exceptions. Verify at 1440×900, 390×844, and short/landscape sizes before release. See `docs/LAYOUT_NAVIGATION.md` for the audit and verification commands.
 
 Repeated editable data belongs in one compact list or table shell. On desktop, use shared column headers, single-line controls, and row dividers; do not turn every record into a padded card or repeat the same visible field labels in every row. At wide desktop widths, pack independent records into two or more columns before letting the editor consume most of the viewport. A common 10-12-record single-line editor should occupy roughly 250-350px vertically, not merely fit inside a 900px-tall viewport. Preserve explicit labels and full-size controls when the layout stacks on mobile.
 

@@ -17,17 +17,11 @@ export default function LeaguePlayers() {
   const scoring = connection?.auctionSettings?.scoring ?? "halfPpr";
   return (
     <div className="league-players-page">
-      <div className="stats-hub-note">
-        <Info aria-hidden="true" />
-        <span>
-          Research is scoped to <strong>{connection?.leagueName ?? "this league"}</strong> where league settings are available.
-          Roster ownership is read-only, and player availability is not claimed unless it is verified from the current Sleeper roster snapshot.
-        </span>
-      </div>
       {data ? (
-        <section className="league-player-advisor" aria-labelledby="league-player-advisor-title">
+        <details className="league-player-advisor" aria-labelledby="league-player-advisor-title">
+          <summary id="league-player-advisor-title">Available upgrades for {data.teamName}<span>{data.availableRecommendations.length ? `${Math.min(6, data.availableRecommendations.length)} options` : "No verified upgrades"}</span></summary>
           <header>
-            <div><span><CheckCircle2 aria-hidden="true" /> Verified against current rosters</span><h2 id="league-player-advisor-title">Available upgrades for {data.teamName}</h2><p>GameHQ compares scoring-adjusted season baselines and legal starter slots. Confirm weekly news before acting.</p></div>
+            <div><span><CheckCircle2 aria-hidden="true" /> Verified against current rosters</span><p>GameHQ compares scoring-adjusted season baselines and legal starter slots. Confirm weekly news before acting.</p></div>
             <small>Roster snapshot {new Date(data.loadedAt).toLocaleString()}</small>
           </header>
           {data.availableRecommendations.length ? (
@@ -44,7 +38,7 @@ export default function LeaguePlayers() {
             </div>
           ) : <div className="league-player-advisor-empty"><ListChecks aria-hidden="true" /><p>No verified season-baseline upgrade clears the current roster comparison. Use the research table below for weekly context.</p></div>}
           <footer><span>Recommendations are read-only and never submit an add/drop.</span><a href={connection?.sourceUrl ?? "https://sleeper.com/"} target="_blank" rel="noreferrer">Open this league in Sleeper</a></footer>
-        </section>
+        </details>
       ) : teamState.status === "error" && !connection?.managerProviderUserId ? (
         <section className="league-player-advisor-empty"><Info aria-hidden="true" /><p>Identify your Sleeper roster before GameHQ labels players as available.</p><Link to="/teams">Identify my team</Link></section>
       ) : null}

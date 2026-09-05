@@ -10,7 +10,6 @@ import {
   Layers3,
   Radio,
   Search,
-  ShieldCheck,
   TrendingUp,
 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -2273,15 +2272,14 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
     : VIEW_COPY[view];
 
   return (
-    <section className="stats-explorer stats-hub">
+    <section className={`stats-explorer stats-hub${embeddedLeagueId ? " is-embedded" : ""}`}>
       <div className="stats-hero">
         <div className="stats-hub-hero-copy">
-          <div className="stats-kicker">{embeddedLeagueId ? `${embeddedLeagueName ?? "Active league"} players` : "Free fantasy football research"}</div>
           <h1 className="stats-title ff-display">{embeddedLeagueId ? "League Players" : "Stats Hub"}</h1>
           <p className="stats-hub-subtitle">
             {embeddedLeagueId
-              ? "Use the active league's scoring profile when available, then research rankings, opportunity, trends, matchups, and player context."
-              : "Draft prep, weekly leaders, opportunity, trends, matchups, and team context in one public place—no subscription required."}
+              ? `${embeddedLeagueName ?? "Active league"} scoring where available · Read-only roster context`
+              : "Rankings, projections, weekly stats, and player research. Free to use."}
           </p>
           <div className="stats-meta-line">
             <span>{leaderProjectionMode
@@ -2295,16 +2293,34 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
             <span>{viewResultCount} results</span>
           </div>
         </div>
-        <div className="stats-hub-free-badge">
-          <ShieldCheck size={28} aria-hidden="true" />
-          <strong>{embeddedLeagueId ? "League context connected" : "Free for everyone"}</strong>
-          <span>{embeddedLeagueId ? "Read-only roster context" : "Public data · clear attribution"}</span>
-        </div>
       </div>
 
       <StatsViewTabs value={view} onChange={changeView} />
 
-      <div className="stats-hub-source-strip" aria-label="Active data sources">
+      <details className="stats-source-details">
+        <summary>Data sources <span>{weeklyError || adpError || sleeperError ? "Some sources need attention" : weeklyLoading || adpLoading || sleeperLoading ? "Refreshing live sources" : "Sources ready"}</span></summary>
+        <p>{viewCopy.description}</p>
+        {leaderProjectionMode ? <p>{DRAFT_SEASON} values are season-long projections, not actual results. Projected FPTS uses the scoring-compatible median of one vote per independent publisher: ESPN Mike Clay, Sleeper Season, WinWithOdds, FFToday, and CBS. Range and Sources expose the consensus behind each player.</p> : null}
+      {valueView ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>{activeValueConnection && activeValueSettings ? `Using ${activeValueConnection.leagueName}: ${auctionSettingsSummary(activeValueSettings)}. ` : `Using custom settings: ${teamCount} teams · ${scoring === "ppr" ? "Full PPR" : scoring === "halfPpr" ? "Half PPR" : "Standard"} · ${budget} budget · ${rosterSize} drafted players per team. `}Fair Value recalculates from these settings and conserves the full ${
+        (teamCount * budget).toLocaleString()
+      } league budget. Market Median remains the compatible published-market reference. {!connectedValueProfiles.length ? <a href={appUrl("/league")}>Connect a Sleeper league</a> : null}</span></div> : null}
+      {view === "auction" ? (
+        <>
+          <div className="stats-hub-note stats-auction-attribution">
+            <Database size={17} aria-hidden="true" />
+            <span>
+              LeagueLogs is a market-index signal converted into GameHQ dollars, not a published auction price. <a href="https://developer.leaguelogs.com/" target="_blank" rel="noreferrer">Powered by LeagueLogs API <ExternalLink size={12} aria-hidden="true" /></a>
+            </span>
+          </div>
+          <div className="stats-hub-note">
+            <Info size={17} aria-hidden="true" />
+            <span>
+              Restricted publisher columns remain blank until GameHQ has a display license or you provide an authorized import. The source average, range, spread, and count use only visible numeric source columns; an imported Sleeper winning bid is included there but does not become a universal market recommendation.
+            </span>
+          </div>
+        </>
+      ) : null}
+        <div className="stats-hub-source-strip" aria-label="Active data sources">
         <div className="stats-hub-source">
           <Database size={18} aria-hidden="true" />
           <div>
@@ -2347,7 +2363,17 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
           </div>
           <span className="stats-hub-source-status">Ready</span>
         </div>
+        </div>
+      <div className="stats-hub-summary-grid">
+        {cards.map((card) => (
+          <div className="stats-hub-summary-card" key={card.label}>
+            <span>{card.label}</span>
+            <strong>{card.value}</strong>
+            <small>{card.helper}</small>
+          </div>
+        ))}
       </div>
+      </details>
 
       <div className="stats-hub-controls">
         <div className="stats-control-primary">
@@ -2374,6 +2400,7 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
           ) : null}
         </div>
 
+        <div className="stats-control-filters">
         {seasonSelectableView ? (
           <div className="stats-select-shell">
             <SelectWrapper
@@ -2393,13 +2420,7 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
               ))}
             </SelectWrapper>
           </div>
-        ) : (
-          <div className="stats-select-shell">
-            <SelectWrapper label={view === "trends" ? "Trend year" : "Draft year"} value={String(DRAFT_SEASON)} onValueChange={() => undefined} className="stats-select-trigger" disabled>
-              <SelectItem value={String(DRAFT_SEASON)}>{DRAFT_SEASON}</SelectItem>
-            </SelectWrapper>
-          </div>
-        )}
+        ) : null}
 
         {valueView ? (
           <div className="stats-select-shell">
@@ -2484,12 +2505,12 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
             {ROW_LIMIT_OPTIONS.map((option) => <SelectItem key={option} value={String(option)}>{option === 1000 ? "All" : option}</SelectItem>)}
           </SelectWrapper>
         </div>
+        </div>
       </div>
 
       <div className="stats-hub-view-intro">
         <div>
           <h2>{viewCopy.title}</h2>
-          <p>{viewCopy.description}</p>
         </div>
         <div className="stats-hub-view-intro-actions">
           <span className="stats-hub-result-count">{viewResultCount.toLocaleString()} results</span>
@@ -2520,17 +2541,11 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
         </div>
       </div>
 
-      <div className="stats-hub-summary-grid">
-        {cards.map((card) => (
-          <div className="stats-hub-summary-card" key={card.label}>
-            <span>{card.label}</span>
-            <strong>{card.value}</strong>
-            <small>{card.helper}</small>
-          </div>
-        ))}
-      </div>
+
 
       {view === "auction" ? (
+        <details className="stats-auction-import-details">
+        <summary>Import actual Sleeper auction prices <span>{sleeperAuctionError ? "Import needs attention" : sleeperAuction ? `${sleeperAuction.prices.length.toLocaleString()} winning bids imported` : "Completed draft"}</span></summary>
         <div className="stats-auction-import">
           <div className="stats-auction-import-copy">
             <strong>Add actual Sleeper auction prices</strong>
@@ -2573,17 +2588,10 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
             </div>
           ) : null}
         </div>
+        </details>
       ) : null}
 
       {actualDataView && weeklyError ? <div className="stats-hub-note is-error"><Info size={17} aria-hidden="true" /><span>{weeklyError}</span></div> : null}
-      {leaderProjectionMode ? (
-        <div className="stats-hub-note">
-          <Info size={17} aria-hidden="true" />
-          <span>
-            {DRAFT_SEASON} values are season-long projections, not actual results. Projected FPTS uses the scoring-compatible median of one vote per independent publisher: ESPN Mike Clay, Sleeper Season, WinWithOdds, FFToday, and CBS. Range and Sources expose the consensus behind each player.
-          </span>
-        </div>
-      ) : null}
       {leaderProjectionMode && weeklyError ? (
         <div className="stats-hub-note">
           <Info size={17} aria-hidden="true" />
@@ -2617,25 +2625,7 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
         </div>
       ) : null}
       {view === "draft" && adpError ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>Live ADP is temporarily unavailable. Projection and auction data remain usable. {adpError}</span></div> : null}
-      {valueView ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>{activeValueConnection && activeValueSettings ? `Using ${activeValueConnection.leagueName}: ${auctionSettingsSummary(activeValueSettings)}. ` : `Using custom settings: ${teamCount} teams · ${scoring === "ppr" ? "Full PPR" : scoring === "halfPpr" ? "Half PPR" : "Standard"} · $${budget} budget · ${rosterSize} drafted players per team. `}Fair Value recalculates from these settings and conserves the full ${
-        (teamCount * budget).toLocaleString()
-      } league budget. Market Median remains the compatible published-market reference. {!connectedValueProfiles.length ? <a href={appUrl("/league")}>Connect a Sleeper league</a> : null}</span></div> : null}
-      {view === "auction" ? (
-        <>
-          <div className="stats-hub-note stats-auction-attribution">
-            <Database size={17} aria-hidden="true" />
-            <span>
-              LeagueLogs is a market-index signal converted into GameHQ dollars, not a published auction price. <a href="https://developer.leaguelogs.com/" target="_blank" rel="noreferrer">Powered by LeagueLogs API <ExternalLink size={12} aria-hidden="true" /></a>
-            </span>
-          </div>
-          <div className="stats-hub-note">
-            <Info size={17} aria-hidden="true" />
-            <span>
-              Restricted publisher columns remain blank until GameHQ has a display license or you provide an authorized import. The source average, range, spread, and count use only visible numeric source columns; an imported Sleeper winning bid is included there but does not become a universal market recommendation.
-            </span>
-          </div>
-        </>
-      ) : null}
+      {valueView ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>Value profile: {activeValueConnection?.leagueName ?? "Custom settings"} · {teamCount} teams · {scoring === "ppr" ? "Full PPR" : scoring === "halfPpr" ? "Half PPR" : "Standard"} · ${budget} budget · {rosterSize} roster slots</span></div> : null}
       {view === "matchups" ? <div className="stats-hub-note"><Info size={17} aria-hidden="true" /><span>Lower fantasy points allowed means a tougher defense. Values aggregate all opposing players at that position per team game.</span></div> : null}
       {view === "teams" ? <div className="stats-hub-note"><CheckCircle2 size={17} aria-hidden="true" /><span>Offensive totals include QB, RB, WR, TE, and K. “Opp FPG” is the same defense-vs-position model used in Matchups.</span></div> : null}
 

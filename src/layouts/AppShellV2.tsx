@@ -86,7 +86,7 @@ export function ProductMenu({ label, links, active }: { label: string; links: Me
         <span>{label}</span>
         <ChevronDown size={14} aria-hidden="true" />
       </summary>
-      <div className="product-menu-panel">
+      <div className="product-menu-panel" data-viewport-menu>
         {links.map(({ to, label: itemLabel, detail, icon: Icon }) => (
           <Link key={`${to}-${itemLabel}`} to={to} className="product-menu-link" onClick={dismissDisclosureMenu}>
             <Icon size={17} aria-hidden="true" />
@@ -109,9 +109,9 @@ export function DesktopProductNavigation({ children }: { children: ReactNode }) 
   );
 }
 
-export function AppBrand({ homeTo }: { homeTo: string }) {
+export function AppBrand() {
   return (
-    <Link to={homeTo} className="app-brand" aria-label="Fantasy Football presented by GameHQ home">
+    <Link to="/" className="app-brand" aria-label="Fantasy Football presented by GameHQ home">
       <span className="app-brand-image" aria-hidden="true">
         <img
           src={appUrl("images/football-header-mark.jpg")}
@@ -140,18 +140,17 @@ export default function AppShellV2() {
     if (!match?.[1]) return "";
     try { return decodeURIComponent(match[1]); } catch { return match[1]; }
   })();
-  const workspaceLeagueId = connections.some((connection) => connection.leagueId === routeLeagueId)
-    ? routeLeagueId
-    : activeLeagueId;
+  const workspaceLeagueId = routeLeagueId || activeLeagueId;
   const activeConnection = connections.find((connection) => connection.leagueId === workspaceLeagueId);
   const workspaceBase = workspaceLeagueId ? `/league/${encodeURIComponent(workspaceLeagueId)}` : "";
   const isDraft = isPathActive(location.pathname, ["/draft", "/offline-draft", "/draft-order"]);
+  const isDraftNavigation = isDraft || isPathActive(location.pathname, ["/host", "/join", "/results"]);
   const isResearch = isPathActive(location.pathname, ["/stats", "/auction-values", "/analytics", "/tools"]);
   const isTeams = isPathActive(location.pathname, ["/teams"]);
   const isWorkspace = Boolean(routeLeagueId);
   const isTeamHome = location.pathname === `${workspaceBase}/team`;
   const isRoster = location.pathname.startsWith(`${workspaceBase}/team/roster`);
-  const isMatchup = location.pathname.startsWith(`${workspaceBase}/team/matchup`);
+  const isMatchup = location.pathname === `${workspaceBase}/matchup` || location.pathname.startsWith(`${workspaceBase}/team/matchup`);
   const leagueLinks: MenuLink[] = workspaceBase ? [
     { to: `${workspaceBase}/teams`, label: "All teams", detail: "Rosters and manager ownership", icon: Users },
     { to: `${workspaceBase}/matchups`, label: "All matchups", detail: "League-wide weekly board", icon: CalendarDays },
@@ -160,7 +159,7 @@ export default function AppShellV2() {
   ] : [
     { to: "/leagues", label: "Connect a league", detail: "Add Sleeper league access", icon: Trophy },
   ];
-  const primaryAction = !activeConnection
+  const primaryAction = !activeConnection && !isWorkspace
     ? { to: "/leagues", label: "Connect League" }
     : isRoster || isTeamHome
       ? { to: `${workspaceBase}/team/matchup`, label: "View Matchup" }
@@ -185,12 +184,13 @@ export default function AppShellV2() {
     <div className="product-shell ffaa-bg min-h-screen" style={visualAssets}>
       <header className={`app-header ${isDraft ? "app-header-draft" : ""}`}>
         <div className="app-header-inner">
-          <AppBrand homeTo={connections.length ? "/teams" : "/"} />
+          <AppBrand />
 
           <DesktopProductNavigation>
-            <NavLink to="/teams" className={() => `product-nav-link ${isTeams || isWorkspace ? "is-active" : ""}`}>My Teams</NavLink>
+            <NavLink end to="/" className={({ isActive }) => `product-nav-link ${isActive ? "is-active" : ""}`}>Home</NavLink>
+            <Link to="/teams" aria-current={isTeams || isWorkspace ? "page" : undefined} className={`product-nav-link ${isTeams || isWorkspace ? "is-active" : ""}`}>My Teams</Link>
             <ProductMenu label="Research" links={researchLinks} active={isResearch} />
-            <ProductMenu label="Draft" links={draftLinks} active={isDraft || isPathActive(location.pathname, ["/host", "/join", "/results"])} />
+            <ProductMenu label="Draft" links={draftLinks} active={isDraftNavigation} />
           </DesktopProductNavigation>
 
           <div className="app-header-right">
@@ -201,12 +201,13 @@ export default function AppShellV2() {
                   aria-label="Active fantasy team and league"
                   className="league-context-select"
                   onValueChange={switchLeague}
-                  value={workspaceLeagueId}
+                  value={activeConnection?.leagueId ?? ""}
                 >
+                  {!activeConnection ? <option value="">Choose a connected team</option> : null}
                   {connections.map((connection) => <option key={connection.leagueId} value={connection.leagueId}>{connectionTeamLabel(connection)}</option>)}
                 </UniversalSelect>
               </div>
-            ) : <Link className="connect-league-link" to="/leagues">Connect league</Link>}
+            ) : null}
             <Link className="shell-primary-action" to={primaryAction.to}>{primaryAction.label}</Link>
             {import.meta.env.DEV ? (
               <button className="shell-debug-action" type="button" onClick={debugDrawer.toggle} aria-label="Open debug drawer"><Bug size={16} aria-hidden="true" /></button>
@@ -218,27 +219,40 @@ export default function AppShellV2() {
       <main className={`app-main ${isDraft ? "app-main-draft" : ""}`}><Outlet /></main>
 
       <nav className="product-mobile-nav" aria-label="Mobile navigation">
-        {workspaceBase ? (
+        {isWorkspace ? (
           <>
-            <NavLink end to={workspaceBase}><Home aria-hidden="true" /><span>Home</span></NavLink>
-            <NavLink to={`${workspaceBase}/team/matchup`}><CalendarDays aria-hidden="true" /><span>Matchup</span></NavLink>
-            <NavLink to={`${workspaceBase}/team`}><Users aria-hidden="true" /><span>Team</span></NavLink>
+            <NavLink end to={workspaceBase}><Home aria-hidden="true" /><span>League home</span></NavLink>
+            <Link to={`${workspaceBase}/matchup`} aria-current={isMatchup ? "page" : undefined} className={isMatchup ? "active" : ""}><CalendarDays aria-hidden="true" /><span>Matchup</span></Link>
+            <Link to={`${workspaceBase}/team`} aria-current={isTeamHome || isRoster ? "page" : undefined} className={isTeamHome || isRoster ? "active" : ""}><Users aria-hidden="true" /><span>Team</span></Link>
             <NavLink to={`${workspaceBase}/players`}><Search aria-hidden="true" /><span>Players</span></NavLink>
           </>
         ) : (
           <>
+            <NavLink end to="/"><Home aria-hidden="true" /><span>Home</span></NavLink>
             <NavLink to="/teams"><Users aria-hidden="true" /><span>My Teams</span></NavLink>
-            <NavLink to="/leagues"><Trophy aria-hidden="true" /><span>Connect</span></NavLink>
-            <NavLink to="/stats"><Search aria-hidden="true" /><span>Research</span></NavLink>
-            <NavLink to="/host/setup"><Gavel aria-hidden="true" /><span>Draft</span></NavLink>
+            <Link to="/stats" aria-current={isResearch ? "page" : undefined} className={isResearch ? "active" : ""}><Search aria-hidden="true" /><span>Research</span></Link>
+            <Link to="/host/setup" aria-current={isDraftNavigation ? "page" : undefined} className={isDraftNavigation ? "active" : ""}><Gavel aria-hidden="true" /><span>Draft</span></Link>
           </>
         )}
         <details className="mobile-more-menu" ref={mobileMoreMenuRef}>
           <summary onKeyDown={toggleDisclosureFromKeyboard}><Menu aria-hidden="true" /><span>More</span></summary>
           <div className="mobile-more-panel">
-            <strong>Explore Fantasy Football</strong>
-            {[...leagueLinks, ...researchLinks, ...draftLinks.slice(2), { to: "/host/setup", label: "Draft settings", detail: "Configure a room", icon: Gavel }].map(({ to, label, icon: Icon }) => (
-              <Link key={`${to}-${label}`} to={to} onClick={dismissDisclosureMenu}><Icon aria-hidden="true" /><span>{label}</span></Link>
+            {isWorkspace ? <>
+              <Link to="/" onClick={dismissDisclosureMenu}><Home aria-hidden="true" /><span>Home</span></Link>
+              <Link to="/teams" onClick={dismissDisclosureMenu}><Users aria-hidden="true" /><span>My Teams</span></Link>
+            </> : null}
+            <Link to="/leagues" onClick={dismissDisclosureMenu}><Trophy aria-hidden="true" /><span>Manage leagues</span></Link>
+            {[
+              { label: "League", links: workspaceBase ? leagueLinks : [] },
+              { label: "Research", links: researchLinks },
+              { label: "Draft", links: draftLinks },
+            ].filter((group) => group.links.length).map((group) => (
+              <div className="mobile-more-group" key={group.label}>
+                <strong>{group.label}</strong>
+                {group.links.map(({ to, label, icon: Icon }) => (
+                  <Link key={`${to}-${label}`} to={to} onClick={dismissDisclosureMenu}><Icon aria-hidden="true" /><span>{label}</span></Link>
+                ))}
+              </div>
             ))}
             {connections.length ? (
               <div className="mobile-more-league">

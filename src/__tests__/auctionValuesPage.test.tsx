@@ -91,7 +91,7 @@ describe("Auction Values page", () => {
   it("renders without console errors", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
     renderRoute("/auction-values?format=standard&sources=fftoday,usa-today&freshness=archive");
-    expect(screen.getByRole("heading", { name: "Fantasy Football Auction Values" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Auction Values", level: 1 })).toBeInTheDocument();
     expect(error).not.toHaveBeenCalled();
     error.mockRestore();
   }, 15_000);

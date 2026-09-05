@@ -126,16 +126,13 @@ function LeagueHistoryLayout() {
     <div className="history-shell">
       <header className="history-masthead">
         <div>
-          <Link className="history-back" to={`/league/${encodeURIComponent(leagueId)}/manage`}>
-            <ArrowLeft size={14} aria-hidden="true" /> Manage league
-          </Link>
-          <span className="history-kicker">League History</span>
-          <h1>{snapshot.league.name}</h1>
+          <h1>League History</h1>
           <p>{firstSeason && latestSeason ? `${firstSeason}–${latestSeason}` : "Imported history"} · {snapshot.league.format} · {snapshot.managers.length} managers</p>
         </div>
         <div className="history-masthead-actions">
+          <Link className="history-back" to={`/league/${encodeURIComponent(leagueId)}/manage`}>Manage league</Link>
           <ShareButton title={pageMetadata.title} text={pageMetadata.description} />
-          <div className="history-provider-mark"><span>S</span><small>Sleeper source</small></div>
+          <small className="history-source-label">Sleeper source</small>
         </div>
       </header>
       <nav className="history-nav" aria-label="League history navigation" ref={navigationRef}>
@@ -146,7 +143,7 @@ function LeagueHistoryLayout() {
           return (
             <details className={`history-nav-group ${active ? "is-active" : ""}`} key={group.label}>
               <summary><span>{group.label}</span><ChevronDown size={14} aria-hidden="true" /></summary>
-              <div>
+              <div data-viewport-menu>
                 {group.links.map((link) => {
                   const { label, detail, icon: Icon } = link;
                   const target = "leagueView" in link

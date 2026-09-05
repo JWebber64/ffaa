@@ -41,13 +41,14 @@ export default function TopNav({ onMenu }: Props) {
             <Menu size={16} />
           </Button>
 
-          <Box>
+          <Box as={NavLink} to="/" aria-label="Fantasy Football presented by GameHQ home">
             <Text fontWeight="bold">Fantasy Football</Text>
             <Text fontSize="xs" color="var(--text-1)">Presented by GameHQ</Text>
           </Box>
 
           <HStack spacing={2} display={{ base: "none", md: "flex" }}>
-            <NavLink to="/legacy" style={linkStyle}>Home</NavLink>
+            <NavLink end to="/" style={linkStyle}>Home</NavLink>
+            <NavLink end to="/legacy" style={linkStyle}>Draft home</NavLink>
             <NavLink to="/legacy/setup" style={linkStyle}>Setup</NavLink>
             <NavLink to="/legacy/player-pool" style={linkStyle}>Player Pool</NavLink>
             <NavLink to="/legacy/stats" style={linkStyle}>Stats</NavLink>

@@ -47,10 +47,10 @@ describe("shared layout density contract", () => {
   it("keeps representative page families on the shared compact roles", () => {
     const consumers: Record<string, string[]> = {
       "src/screens_v2/landing-v2.css": ["var(--type-display-hero)", "var(--space-section-gap)", "aspect-ratio: 16 / 8"],
-      "src/screens/tools/tools.css": ["var(--type-display-page)", "var(--space-page-hero)", "min-height: 0"],
+      "src/screens/tools/tools.css": ["var(--type-title-section)", "var(--space-4)", "min-height: 0"],
       "src/screens/league-hq.css": ["var(--type-display-page)", ".league-content { min-height: 0; }", "var(--space-panel-padding)"],
       "src/screens/my-hq.css": ["var(--type-display-page)", "min-height: 0", "var(--space-panel-padding)"],
-      "src/styles/refinement.css": ["Compact layout contract", "var(--type-display-page)", "var(--space-page-hero)"],
+      "src/styles/refinement.css": ["Compact layout contract", "var(--type-title-section)", ".stats-hub.is-embedded .stats-hero"],
     };
 
     for (const [path, required] of Object.entries(consumers)) {

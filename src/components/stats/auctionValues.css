@@ -2,6 +2,23 @@
   grid-template-columns: repeat(7, minmax(130px, 1fr));
 }
 
+.stats-auction-import-details > summary {
+  min-height: 44px;
+  padding-block: 12px;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  font-size: .82rem;
+}
+
+.stats-auction-import-details > summary span {
+  margin-left: 12px;
+  color: var(--color-text-secondary);
+  font-size: .75rem;
+}
+
+.stats-source-details .stats-hub-note { margin-block: 8px; }
+.stats-hub-note a { color: inherit; text-underline-offset: 2px; }
+
 .stats-auction-import {
   display: grid;
   grid-template-columns: minmax(260px, 1fr) minmax(330px, 0.85fr);

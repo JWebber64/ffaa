@@ -40,9 +40,9 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-6);
-  min-height: 236px;
+  min-height: 0;
   overflow: hidden;
-  padding: clamp(24px, 3.4vw, 44px);
+  padding: var(--space-4);
   border: 1px solid var(--color-border-default);
   border-radius: var(--r-xl);
   background:
@@ -67,8 +67,10 @@
 }
 
 .auction-page-header-copy {
-  max-width: 760px;
+  width: 100%;
+  min-width: 0;
 }
+.auction-title-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); }
 
 .auction-kicker {
   display: block;
@@ -83,7 +85,7 @@
 .auction-page-header h1 {
   font-family: var(--font-display);
   max-width: 720px;
-  font-size: clamp(2.7rem, 4.5vw, 4.6rem);
+  font-size: var(--type-title-section);
   line-height: 1.08;
   letter-spacing: -.045em;
   text-wrap: balance;
@@ -101,7 +103,7 @@
 .auction-hero-stats {
   display: flex;
   gap: var(--space-5);
-  margin: var(--space-5) 0 0;
+  margin: var(--space-3) 0 0;
 }
 
 .auction-hero-stats div {
@@ -189,6 +191,11 @@
   font-size: .78rem;
   line-height: 1.45;
 }
+
+.auction-source-details { margin-top: var(--space-3); color: var(--color-text-secondary); font-size: .8rem; }
+.auction-source-details > summary { min-height: 44px; align-content: center; cursor: pointer; }
+.auction-source-details > summary > span { margin-inline-start: var(--space-3); color: var(--color-text-muted); font-size: .75rem; }
+.auction-source-details .auction-source-model { margin-top: var(--space-2); }
 
 .auction-source-model {
   display: grid;
@@ -307,7 +314,7 @@
 
 .auction-control-grid {
   display: grid;
-  grid-template-columns: .55fr .72fr .82fr minmax(280px, 1.9fr);
+  grid-template-columns: .72fr .82fr minmax(280px, 1.9fr);
   gap: var(--space-3);
   margin-top: var(--space-4);
 }
@@ -407,6 +414,10 @@
 .auction-position-row .ffaa-position-button {
   font-size: .72rem;
 }
+
+.auction-comparison-options { margin-top: var(--space-3); border-top: 1px solid var(--color-border-subtle); }
+.auction-comparison-options > summary { min-height: 44px; align-content: center; cursor: pointer; color: var(--color-text-secondary); font-size: .8rem; }
+.auction-comparison-options > summary > span { margin-inline-start: var(--space-2); color: var(--color-text-muted); font-size: .75rem; }
 
 .auction-toggle-row {
   display: grid;
@@ -923,7 +934,7 @@
 }
 
 .auction-table-tools label {
-  width: 72px;
+  width: 100px;
 }
 
 .auction-table-tools .ffaa-control {
@@ -1579,6 +1590,7 @@
   .auction-control-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .auction-search-field { grid-column: 1 / -1; }
 
   .auction-scoring-tabs {
     margin-left: 0;
@@ -1635,7 +1647,7 @@
 
 @media (max-width: 560px) {
   .auction-page-header h1 {
-    font-size: 2.45rem;
+    font-size: var(--type-title-section);
   }
 
   .auction-page-header {
@@ -1646,16 +1658,12 @@
     gap: var(--space-3) var(--space-5);
   }
 
-  .auction-page-actions,
-  .auction-page-actions button,
-  .auction-page-actions a,
   .auction-directory-search {
     width: 100%;
   }
 
   .auction-definition-strip,
   .auction-source-model,
-  .auction-control-grid,
   .auction-directory-filters,
   .auction-source-row,
   .auction-print-grid {
@@ -1858,6 +1866,7 @@
   .auction-page-actions,
   .auction-definition-strip,
   .auction-source-model,
+  .auction-source-details,
   .auction-control-panel,
   .auction-directory,
   .auction-print-settings,
