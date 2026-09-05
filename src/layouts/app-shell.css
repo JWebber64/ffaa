@@ -37,7 +37,7 @@
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--accent-history) 50%, var(--line-1));
   border-radius: var(--r-md);
-  background: #030805;
+  background: var(--gray-950);
 }
 
 .product-shell .app-brand-image img {
@@ -114,7 +114,7 @@
 .league-context-select .ffaa-custom-select-icon,
 .mobile-more-league-select .ffaa-custom-select-icon { width: 24px; height: 24px; }
 .connect-league-link { color: var(--text-secondary); font-size: .75rem; font-weight: 700; }
-.shell-primary-action { display: inline-flex; height: var(--app-header-control-height); min-height: var(--app-header-control-height); padding: 0 var(--space-4); align-items: center; border: 1px solid var(--color-border-brand); border-radius: var(--r-md); background: var(--color-button-primary); color: var(--color-button-primary-text); font-size: .77rem; font-weight: 850; }
+.shell-primary-action { display: inline-flex; height: var(--app-header-control-height); min-height: var(--app-header-control-height); padding: 0 var(--space-4); align-items: center; border: 1px solid var(--color-button-primary-border); border-radius: var(--r-md); background: var(--color-button-primary); color: var(--color-button-primary-text); font-size: .77rem; font-weight: 850; }
 .shell-primary-action:hover { background: var(--color-button-primary-hover); color: var(--color-button-primary-text); }
 .shell-debug-action { display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid var(--line-0); border-radius: var(--r-md); background: transparent; color: var(--text-secondary); }
 .product-shell .app-main { width: min(100%, var(--content-wide)); max-width: var(--content-wide); padding: var(--space-6) clamp(16px, 2vw, 28px) 64px; }

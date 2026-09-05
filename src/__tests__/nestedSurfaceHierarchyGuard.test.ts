@@ -15,8 +15,8 @@ const historyCss = readFileSync(resolve(projectRoot, "src/features/league-histor
 
 describe("app-wide nested surface hierarchy guard", () => {
   it("keeps primary, secondary, and field surfaces as separate named roles", () => {
-    expect(tokensCss).toMatch(/--color-surface-card-primary:\s*var\(--gray-900\)/);
-    expect(tokensCss).toMatch(/--color-surface-card-secondary:\s*var\(--gray-800\)/);
+    expect(tokensCss).toMatch(/--color-surface-card-primary:\s*var\(--green-900\)/);
+    expect(tokensCss).toMatch(/--color-surface-card-secondary:\s*var\(--green-800\)/);
     expect(tokensCss).toMatch(/--color-surface-field:\s*color-mix\([^;]*var\(--gray-/);
     expect(tokensCss).toMatch(/--ffaa-control-surface:\s*var\(--color-surface-field\)/);
     expect(tokensCss).toMatch(/--ffaa-panel-background:[^;]*var\(--color-surface-card-secondary\)[^;]*var\(--color-surface-card-primary\)/);

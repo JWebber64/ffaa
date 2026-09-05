@@ -27,7 +27,7 @@ const variants: Record<Variant, string> = {
   primary:
     "text-[var(--color-button-primary-text)] " +
     "bg-[var(--color-button-primary)] hover:bg-[var(--color-button-primary-hover)] " +
-    "border border-[var(--color-border-brand)] shadow-[var(--shadow-control)]",
+    "border border-[var(--color-button-primary-border)] shadow-[var(--shadow-control)]",
 
   secondary:
     "text-[var(--color-button-secondary-text)] " +

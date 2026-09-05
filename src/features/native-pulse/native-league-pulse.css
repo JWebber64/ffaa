@@ -109,14 +109,14 @@
 .native-pulse textarea:focus-visible,
 .native-pulse select:focus-visible,
 .native-rule-proposal > summary:focus-visible {
-  outline: 2px solid var(--accent-action);
+  outline: 2px solid var(--color-field-focus);
   outline-offset: 2px;
 }
 .native-pulse button[aria-pressed="true"],
 .native-pulse > nav button[aria-pressed="true"] {
-  border-color: var(--accent-action);
-  background: var(--accent-action);
-  color: var(--on-accent);
+  border-color: var(--color-border-brand);
+  background: var(--color-surface-selected);
+  color: var(--color-text-primary);
 }
 .native-rule-proposal > summary {
   display: flex;
@@ -144,9 +144,9 @@
 .native-pulse-compose button {
   align-self: end;
   padding: 0 14px;
-  border-color: var(--accent-action);
-  background: var(--accent-action);
-  color: var(--on-accent);
+  border-color: var(--color-button-primary-border);
+  background: var(--color-button-primary);
+  color: var(--color-button-primary-text);
 }
 .native-pulse > nav {
   display: flex;

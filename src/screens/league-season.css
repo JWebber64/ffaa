@@ -408,7 +408,7 @@
 .league-season-gate-content p { margin: 0 0 10px; color: var(--text-1); line-height: 1.6; }
 .league-season-gate-artwork { position: relative; min-height: 300px; overflow: hidden; border-left: 1px solid var(--line-1); background: var(--surface-raised); }
 .league-season-gate-artwork img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; object-position: 13% center; filter: saturate(.82) contrast(1.05); }
-.league-season-primary { min-height: 42px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: var(--r-md); color: #06110a; background: var(--accent-action); font-size: .78rem; font-weight: 850; text-decoration: none; }
+.league-season-primary { min-height: 42px; padding: 0 16px; display: inline-flex; align-items: center; border: 1px solid var(--color-button-primary-border); border-radius: var(--r-md); color: var(--color-button-primary-text); background: var(--color-button-primary); font-size: .78rem; font-weight: 850; text-decoration: none; }
 
 .league-account-panel {
   min-height: 72px;
@@ -430,7 +430,7 @@
 .league-account-panel span { color: var(--text-2); font-size: .64rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .league-account-panel strong { overflow: hidden; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; font-size: .82rem; }
 .league-account-panel small { color: var(--text-2); font-size: .66rem; line-height: 1.45; }
-.league-account-panel > button { min-height: 40px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--accent-action); border-radius: var(--r-md); color: #06110a; background: var(--accent-action); font-size: .74rem; font-weight: 850; white-space: nowrap; }
+.league-account-panel > button { min-height: 40px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--color-button-primary-border); border-radius: var(--r-md); color: var(--color-button-primary-text); background: var(--color-button-primary); font-size: .74rem; font-weight: 850; white-space: nowrap; }
 .league-account-panel > button svg { width: 15px; }
 .league-account-panel > button:disabled { opacity: .5; cursor: not-allowed; }
 .league-account-panel > .league-account-sign-out { border-color: var(--line-1); color: var(--text-0); background: transparent; }
@@ -464,10 +464,10 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  border: 1px solid color-mix(in srgb, var(--accent-action) 55%, var(--line-1));
+  border: 1px solid var(--color-button-primary-border);
   border-radius: var(--r-md);
-  color: #06110a;
-  background: var(--accent-action);
+  color: var(--color-button-primary-text);
+  background: var(--color-button-primary);
   font-size: .74rem;
   font-weight: 850;
   white-space: nowrap;
@@ -503,14 +503,14 @@
 
 .league-team-actions .league-ownership-note { min-height: 40px; display: inline-flex; align-items: center; gap: 8px; color: var(--text-1); font-size: .75rem; font-weight: 800; }
 .league-team-actions .league-ownership-note svg { width: 16px; color: var(--accent-history); }
-.league-team-actions .league-lineup-link { min-height: 38px; padding: 0 13px; display: inline-flex; align-items: center; border-radius: var(--r-md); color: #06110a; background: var(--accent-action); font-size: .74rem; font-weight: 850; text-decoration: none; }
+.league-team-actions .league-lineup-link { min-height: 38px; padding: 0 13px; display: inline-flex; align-items: center; border: 1px solid var(--color-button-primary-border); border-radius: var(--r-md); color: var(--color-button-primary-text); background: var(--color-button-primary); font-size: .74rem; font-weight: 850; text-decoration: none; }
 .league-team-actions button.is-quiet { min-height: 28px; padding: 0; border: 0; color: var(--text-2); background: transparent; font-size: .66rem; text-decoration: underline; text-underline-offset: 3px; }
 .league-team-actions button.is-quiet:hover { color: var(--text-0); background: transparent; }
 .league-claim-form { width: min(320px, 100%); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px 8px; }
 .league-claim-form label { grid-column: 1 / -1; color: var(--text-2); font-size: .62rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 .league-claim-form input { min-width: 0; min-height: 40px; padding: 0 11px; border: 1px solid var(--line-1); border-radius: var(--r-md); color: var(--text-0); background: var(--surface-control); font-size: .74rem; }
-.league-claim-form input:focus { outline: 2px solid color-mix(in srgb, var(--accent-action) 35%, transparent); outline-offset: 1px; border-color: var(--accent-action); }
-.league-claim-form button { min-height: 40px; padding: 0 12px; color: #06110a; border-color: var(--accent-action); background: var(--accent-action); }
+.league-claim-form input:focus { outline: 2px solid var(--color-focus-ring); outline-offset: 1px; border-color: var(--color-field-focus); }
+.league-claim-form button { min-height: 40px; padding: 0 12px; color: var(--color-button-primary-text); border-color: var(--color-button-primary-border); background: var(--color-button-primary); }
 
 .league-lineup-toolbar { min-height: 72px; margin-bottom: 14px; padding: 10px; display: flex; align-items: stretch; gap: 12px; border: 1px solid var(--line-1); border-radius: var(--r-lg); background: var(--surface-base); }
 .league-week-stepper { display: flex; gap: 6px; }

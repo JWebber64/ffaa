@@ -102,7 +102,7 @@ html, body, #root {
   width: 32px;
   height: 32px;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(16,185,129,0.9), color-mix(in oklch, var(--green-400) 90%, transparent));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--green-300) 90%, transparent), color-mix(in oklch, var(--green-400) 90%, transparent));
   box-shadow: 0 10px 24px rgba(0,0,0,0.45);
   display: inline-block;
 }
@@ -163,7 +163,7 @@ html, body, #root {
 
 .app-dot-ok {
   background: var(--a1);
-  box-shadow: 0 0 8px rgba(16,185,129,0.6);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--green-300) 60%, transparent);
 }
 
 .app-dot-warn {
@@ -244,7 +244,7 @@ html, body, #root {
   /**
    * You asked for:
    * - base: #070D09
-   * - emerald glow: rgba(16,185,129,0.08)
+   * - emerald glow: color-mix(in srgb, var(--green-300) 8%, transparent)
    * - visible green gradient (not "flat")
    *
    * So: use real green-black midtones + slightly stronger glows.
@@ -479,7 +479,7 @@ html, body, #root {
 }
 
 .select-item[data-state="checked"] {
-  background: rgba(16,185,129,0.18);
+  background: color-mix(in srgb, var(--green-300) 18%, transparent);
   color: white;
 }
 
@@ -851,7 +851,7 @@ html, body, #root {
   inset: -140px -8% auto;
   height: 760px;
   background:
-    radial-gradient(720px 520px at 9% 14%, rgba(16,185,129,0.2), transparent 60%),
+    radial-gradient(720px 520px at 9% 14%, color-mix(in srgb, var(--green-300) 20%, transparent), transparent 60%),
     radial-gradient(520px 320px at 84% 10%, color-mix(in oklch, var(--green-400) 16%, transparent), transparent 68%),
     radial-gradient(760px 620px at 56% 72%, color-mix(in oklch, var(--green-400) 14%, transparent), transparent 70%),
     linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0)),
@@ -894,7 +894,7 @@ html, body, #root {
   line-height: 0.88;
   letter-spacing: 0.02em;
   max-width: 9ch;
-  background: linear-gradient(135deg, #f8fffb 0%, #cbfff0 46%, var(--green-200) 100%);
+  background: linear-gradient(135deg, var(--brand-paper) 0%, var(--green-50) 46%, var(--green-200) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -1022,8 +1022,8 @@ html, body, #root {
   min-height: 36px;
   padding: 0 14px;
   border-radius: 999px;
-  border: 1px solid rgba(16,185,129,0.28);
-  background: rgba(16,185,129,0.12);
+  border: 1px solid color-mix(in srgb, var(--green-300) 28%, transparent);
+  background: color-mix(in srgb, var(--green-300) 12%, transparent);
   color: rgba(244,255,250,0.92);
   font-size: 0.74rem;
   letter-spacing: 0.16em;
@@ -1053,8 +1053,8 @@ html, body, #root {
 }
 
 .stage-tone-logic {
-  border-color: rgba(34,197,94,0.24);
-  color: #bbf7d0;
+  border-color: color-mix(in srgb, var(--color-status-success) 24%, transparent);
+  color: var(--green-100);
 }
 
 .stage-live {
@@ -1070,7 +1070,7 @@ html, body, #root {
   height: 9px;
   border-radius: 999px;
   background: var(--a1);
-  box-shadow: 0 0 14px rgba(16,185,129,0.72);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--green-300) 72%, transparent);
 }
 
 .stage-player {
@@ -1166,8 +1166,8 @@ html, body, #root {
 
 .stage-feed-row.is-active {
   transform: translateY(-1px);
-  background: linear-gradient(135deg, rgba(16,185,129,0.12), color-mix(in oklch, var(--green-400) 5%, transparent));
-  border-color: rgba(16,185,129,0.24);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--green-300) 12%, transparent), color-mix(in oklch, var(--green-400) 5%, transparent));
+  border-color: color-mix(in srgb, var(--green-300) 24%, transparent);
 }
 
 .stage-feed-rank {
@@ -1208,7 +1208,7 @@ html, body, #root {
 
 .stage-side-card-accent {
   background:
-    linear-gradient(145deg, rgba(16,185,129,0.14), color-mix(in oklch, var(--green-400) 8%, transparent)),
+    linear-gradient(145deg, color-mix(in srgb, var(--green-300) 14%, transparent), color-mix(in oklch, var(--green-400) 8%, transparent)),
     rgba(7,13,9,0.62);
 }
 
@@ -1308,7 +1308,7 @@ html, body, #root {
   left: 10%;
   right: 10%;
   height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(16,185,129,0.26), rgba(255,255,255,0.04));
+  background: linear-gradient(90deg, rgba(255,255,255,0.04), color-mix(in srgb, var(--green-300) 26%, transparent), rgba(255,255,255,0.04));
   pointer-events: none;
 }
 
@@ -1330,7 +1330,7 @@ html, body, #root {
   border-radius: 18px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, rgba(16,185,129,0.34), color-mix(in oklch, var(--green-400) 16%, transparent));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--green-300) 34%, transparent), color-mix(in oklch, var(--green-400) 16%, transparent));
   border: 1px solid rgba(255,255,255,0.12);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
   font-family: var(--font-display);
@@ -1471,7 +1471,7 @@ p {
   position: absolute;
   inset: -120px -10% 0;
   background:
-    radial-gradient(640px 420px at 12% 16%, rgba(16,185,129,0.22), transparent 62%),
+    radial-gradient(640px 420px at 12% 16%, color-mix(in srgb, var(--green-300) 22%, transparent), transparent 62%),
     radial-gradient(520px 360px at 80% 12%, color-mix(in oklch, var(--green-400) 16%, transparent), transparent 65%),
     radial-gradient(700px 520px at 70% 78%, color-mix(in oklch, var(--green-400) 18%, transparent), transparent 70%),
     repeating-linear-gradient(135deg, rgba(255,255,255,0.015), rgba(255,255,255,0.015) 1px, transparent 1px, transparent 14px);
@@ -1516,7 +1516,7 @@ p {
   margin: 12px 0 10px;
   line-height: 0.9;
   letter-spacing: 0.02em;
-  background: linear-gradient(135deg, #f8fffb 0%, #b6f3e0 45%, var(--green-200) 100%);
+  background: linear-gradient(135deg, var(--brand-paper) 0%, var(--green-50) 45%, var(--green-200) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -1597,9 +1597,9 @@ p {
   letter-spacing: 0.16em;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(16,185,129,0.18);
+  background: color-mix(in srgb, var(--green-300) 18%, transparent);
   color: var(--text-0);
-  border: 1px solid rgba(16,185,129,0.3);
+  border: 1px solid color-mix(in srgb, var(--green-300) 30%, transparent);
 }
 
 .mini-status {
@@ -1615,7 +1615,7 @@ p {
   height: 8px;
   border-radius: 999px;
   background: var(--a1);
-  box-shadow: 0 0 10px rgba(16,185,129,0.6);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--green-300) 60%, transparent);
 }
 
 .mini-row {
@@ -1669,9 +1669,9 @@ p {
   letter-spacing: 0.14em;
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(16,185,129,0.18);
+  background: color-mix(in srgb, var(--green-300) 18%, transparent);
   color: var(--text-0);
-  border: 1px solid rgba(16,185,129,0.3);
+  border: 1px solid color-mix(in srgb, var(--green-300) 30%, transparent);
 }
 
 .preview-status {
@@ -1687,7 +1687,7 @@ p {
   height: 8px;
   border-radius: 999px;
   background: var(--a1);
-  box-shadow: 0 0 10px rgba(16,185,129,0.6);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--green-300) 60%, transparent);
 }
 
 .preview-row {
@@ -1789,7 +1789,7 @@ p {
   display: grid;
   place-items: center;
   font-weight: 700;
-  background: linear-gradient(135deg, rgba(16,185,129,0.35), color-mix(in oklch, var(--green-400) 25%, transparent));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--green-300) 35%, transparent), color-mix(in oklch, var(--green-400) 25%, transparent));
   border: 1px solid rgba(255,255,255,0.18);
 }
 
@@ -1884,7 +1884,7 @@ p {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(540px 320px at 15% 20%, rgba(16,185,129,0.12), transparent 60%),
+    radial-gradient(540px 320px at 15% 20%, color-mix(in srgb, var(--green-300) 12%, transparent), transparent 60%),
     radial-gradient(520px 320px at 85% 0%, color-mix(in oklch, var(--green-400) 10%, transparent), transparent 60%),
     repeating-linear-gradient(135deg, rgba(255,255,255,0.015), rgba(255,255,255,0.015) 1px, transparent 1px, transparent 18px);
   opacity: 0.7;
@@ -2508,7 +2508,7 @@ p {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(520px 320px at 12% 18%, rgba(16,185,129,0.12), transparent 60%),
+    radial-gradient(520px 320px at 12% 18%, color-mix(in srgb, var(--green-300) 12%, transparent), transparent 60%),
     radial-gradient(480px 280px at 88% 0%, color-mix(in oklch, var(--green-400) 10%, transparent), transparent 60%);
   opacity: 0.7;
 }
@@ -2600,7 +2600,7 @@ p {
 
 .dot-ready {
   background: var(--a1);
-  box-shadow: 0 0 10px rgba(16,185,129,0.6);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--green-300) 60%, transparent);
 }
 
 .dot-wait {
@@ -2741,8 +2741,8 @@ p {
 }
 
 .host-manager-card.ready {
-  border-color: rgba(16,185,129,0.4);
-  box-shadow: 0 0 18px rgba(16,185,129,0.2);
+  border-color: color-mix(in srgb, var(--green-300) 40%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--green-300) 20%, transparent);
 }
 
 .host-manager-card.computer {
@@ -2768,7 +2768,7 @@ p {
 .host-manager-role {
   padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(16,185,129,0.2);
+  background: color-mix(in srgb, var(--green-300) 20%, transparent);
   color: var(--text-0);
   font-size: 0.65rem;
   letter-spacing: 0.14em;
@@ -3379,7 +3379,7 @@ p {
 }
 
 .draft-sync-pill.is-live {
-  border-color: rgba(16,185,129,0.26);
+  border-color: color-mix(in srgb, var(--green-300) 26%, transparent);
 }
 
 .draft-sync-pill.is-stale {
@@ -3390,7 +3390,7 @@ p {
   width: 7px;
   height: 7px;
   border-radius: 999px;
-  background: rgba(16,185,129,0.92);
+  background: color-mix(in srgb, var(--green-300) 92%, transparent);
 }
 
 .draft-sync-pill.is-stale .draft-sync-dot {
@@ -3984,14 +3984,14 @@ p {
 }
 
 .draft-player-action-button {
-  background: rgba(16,185,129,0.15);
-  border-color: rgba(16,185,129,0.34);
+  background: color-mix(in srgb, var(--green-300) 15%, transparent);
+  border-color: color-mix(in srgb, var(--green-300) 34%, transparent);
   color: rgba(209,250,229,0.98);
 }
 
 .draft-player-action-button:hover:not(:disabled) {
-  background: rgba(16,185,129,0.22);
-  border-color: rgba(16,185,129,0.46);
+  background: color-mix(in srgb, var(--green-300) 22%, transparent);
+  border-color: color-mix(in srgb, var(--green-300) 46%, transparent);
   color: white;
 }
 
@@ -4182,7 +4182,7 @@ p {
 
 .draft-queue-row.is-active {
   background:
-    linear-gradient(90deg, rgba(16,185,129,0.14), rgba(255,255,255,0.025)),
+    linear-gradient(90deg, color-mix(in srgb, var(--green-300) 14%, transparent), rgba(255,255,255,0.025)),
     rgba(255,255,255,0.01);
 }
 
@@ -4226,8 +4226,8 @@ p {
 
 .draft-queue-row.is-active .draft-queue-status {
   color: rgba(209,250,229,0.98);
-  border-color: rgba(16,185,129,0.28);
-  background: rgba(16,185,129,0.14);
+  border-color: color-mix(in srgb, var(--green-300) 28%, transparent);
+  background: color-mix(in srgb, var(--green-300) 14%, transparent);
 }
 
 .draft-queue-row.is-drafted .draft-queue-status {
@@ -4247,8 +4247,8 @@ p {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  border: 1px solid rgba(16,185,129,0.34);
-  background: rgba(16,185,129,0.15);
+  border: 1px solid color-mix(in srgb, var(--green-300) 34%, transparent);
+  background: color-mix(in srgb, var(--green-300) 15%, transparent);
   color: rgba(209,250,229,0.98);
   font: inherit;
   font-size: 0.62rem;
@@ -4259,8 +4259,8 @@ p {
 }
 
 .draft-queue-action-button:hover:not(:disabled) {
-  border-color: rgba(16,185,129,0.48);
-  background: rgba(16,185,129,0.22);
+  border-color: color-mix(in srgb, var(--green-300) 48%, transparent);
+  background: color-mix(in srgb, var(--green-300) 22%, transparent);
   color: white;
 }
 
@@ -4473,7 +4473,7 @@ p {
 
 .team-panel-nominator {
   --team-status-inset: 6px;
-  border-color: rgba(16,185,129,0.42);
+  border-color: color-mix(in srgb, var(--green-300) 42%, transparent);
 }
 
 .team-panel-high-bidder {
@@ -4624,7 +4624,7 @@ p {
 }
 
 .team-flag-otc {
-  border-color: rgba(16,185,129,0.32);
+  border-color: color-mix(in srgb, var(--green-300) 32%, transparent);
   color: rgba(167,243,208,0.96);
 }
 
@@ -4656,7 +4656,7 @@ p {
   height: 20px;
   padding: 0 8px;
   border-radius: 999px;
-  border: 1px solid rgba(16,185,129,0.38);
+  border: 1px solid color-mix(in srgb, var(--green-300) 38%, transparent);
   background: rgba(6,20,13,0.92);
   color: rgba(209,250,229,0.98);
   font-size: 0.48rem;
@@ -4974,8 +4974,8 @@ p {
   height: 15px;
   padding: 0 3px;
   border-radius: 999px;
-  border: 1px solid rgba(16,185,129,0.24);
-  background: rgba(16,185,129,0.12);
+  border: 1px solid color-mix(in srgb, var(--green-300) 24%, transparent);
+  background: color-mix(in srgb, var(--green-300) 12%, transparent);
   color: rgba(209,250,229,0.98);
   font-size: 0.52rem;
   font-weight: 800;
@@ -5308,8 +5308,8 @@ p {
 }
 
 .team-detail-status.is-nominator {
-  border-color: rgba(16,185,129,0.32);
-  background: rgba(16,185,129,0.12);
+  border-color: color-mix(in srgb, var(--green-300) 32%, transparent);
+  background: color-mix(in srgb, var(--green-300) 12%, transparent);
   color: rgba(209,250,229,0.98);
 }
 
@@ -5971,8 +5971,8 @@ p {
   min-height: 32px;
   padding: 0 10px;
   border-radius: 999px;
-  border: 1px solid rgba(16,185,129,0.32);
-  background: rgba(16,185,129,0.14);
+  border: 1px solid color-mix(in srgb, var(--green-300) 32%, transparent);
+  background: color-mix(in srgb, var(--green-300) 14%, transparent);
   color: rgba(209,250,229,0.96);
   font-size: 0.7rem;
   font-weight: 900;
@@ -7146,9 +7146,9 @@ p {
   justify-content: center;
   padding: 0 10px;
   border-radius: 12px;
-  border: 1px solid rgba(16,185,129,0.2);
+  border: 1px solid color-mix(in srgb, var(--green-300) 20%, transparent);
   background:
-    linear-gradient(180deg, rgba(16,185,129,0.12), rgba(16,185,129,0.035)),
+    linear-gradient(180deg, color-mix(in srgb, var(--green-300) 12%, transparent), color-mix(in srgb, var(--green-300) 3.5%, transparent)),
     rgba(5,13,9,0.58);
   color: rgba(209,250,229,0.9);
   font-size: 0.68rem;
@@ -7537,7 +7537,7 @@ p {
   border: 1px solid color-mix(in oklch, var(--green-300) 18%, transparent);
   background:
     radial-gradient(120% 160% at 50% 0%, color-mix(in oklch, var(--green-300) 28%, transparent), transparent 66%),
-    rgba(16,185,129,0.13);
+    color-mix(in srgb, var(--green-300) 13%, transparent);
   color: rgba(209,250,229,0.98);
   font-size: 0.8rem;
   font-weight: 800;
@@ -7687,8 +7687,8 @@ p {
 }
 
 .offline-roster-price-field:focus-within .offline-roster-price-input {
-  border-color: rgba(47,201,148,0.64);
-  box-shadow: 0 0 0 2px rgba(47,201,148,0.15);
+  border-color: color-mix(in srgb, var(--green-300) 64%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--green-300) 15%, transparent);
 }
 
 .offline-roster-slot-control,
@@ -7710,8 +7710,8 @@ p {
 }
 
 .offline-roster-slot-control:focus-within {
-  border-color: rgba(47,201,148,0.64);
-  box-shadow: 0 0 0 2px rgba(47,201,148,0.15);
+  border-color: color-mix(in srgb, var(--green-300) 64%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--green-300) 15%, transparent);
 }
 
 .offline-roster-slot-control .ffaa-custom-select {
@@ -8476,15 +8476,15 @@ p {
   z-index: 4;
   height: 48px;
   background:
-    linear-gradient(180deg, color-mix(in oklch, var(--green-400) 16%, transparent), rgba(7,13,9,0.96)),
-    #07100a;
+    linear-gradient(180deg, color-mix(in oklch, var(--green-300) 16%, transparent), color-mix(in srgb, var(--green-950) 96%, transparent)),
+    var(--color-surface-table-header);
   box-shadow: inset 0 -1px 0 rgba(255,255,255,0.08);
 }
 
 .stats-table th.is-schema {
   background:
-    linear-gradient(180deg, color-mix(in oklch, var(--green-400) 10%, transparent), rgba(7,13,9,0.96)),
-    #07100a;
+    linear-gradient(180deg, color-mix(in oklch, var(--green-300) 10%, transparent), color-mix(in srgb, var(--green-950) 96%, transparent)),
+    var(--color-surface-table-header);
 }
 
 .stats-table th button {
@@ -8789,7 +8789,7 @@ p {
   max-width: 12ch;
   margin: 20px 0 16px;
   color: transparent;
-  background: linear-gradient(135deg, #ffffff 0%, #d6fff4 42%, var(--green-300) 74%, #fde68a 100%);
+  background: linear-gradient(135deg, var(--brand-paper) 0%, var(--green-50) 42%, var(--green-300) 74%, #fde68a 100%);
   -webkit-background-clip: text;
   background-clip: text;
   font-size: 5.7rem;
@@ -8950,9 +8950,9 @@ p {
   gap: 8px;
   min-height: 34px;
   padding: 0 12px;
-  border: 1px solid rgba(16,185,129,0.2);
+  border: 1px solid color-mix(in srgb, var(--green-300) 20%, transparent);
   border-radius: 999px;
-  background: rgba(16,185,129,0.09);
+  background: color-mix(in srgb, var(--green-300) 9%, transparent);
   color: rgba(229,255,248,0.82);
   font-size: 0.78rem;
   font-weight: 800;
@@ -8963,8 +8963,8 @@ p {
   width: 9px;
   height: 9px;
   border-radius: 999px;
-  background: #22c55e;
-  box-shadow: 0 0 16px rgba(34,197,94,0.72);
+  background: var(--color-status-success);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--color-status-success) 72%, transparent);
 }
 
 .mode-switch {
@@ -8994,7 +8994,7 @@ p {
 
 .mode-switch button.is-active {
   color: white;
-  background: linear-gradient(135deg, rgba(16,185,129,0.26), color-mix(in oklch, var(--green-400) 13%, transparent));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--green-300) 26%, transparent), color-mix(in oklch, var(--green-400) 13%, transparent));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
@@ -9285,7 +9285,7 @@ p {
 .manager-avatar-green { background: linear-gradient(135deg, var(--green-600), var(--green-400)); }
 .manager-avatar-sky { background: linear-gradient(135deg, var(--green-700), var(--green-300)); }
 .manager-avatar-amber { background: linear-gradient(135deg, #b45309, #f59e0b); }
-.manager-avatar-emerald { background: linear-gradient(135deg, #047857, #22c55e); }
+.manager-avatar-emerald { background: linear-gradient(135deg, var(--green-700), var(--color-status-success)); }
 
 .manager-copy {
   min-width: 0;
@@ -9425,7 +9425,7 @@ p {
   height: 58px;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(16,185,129,0.28), color-mix(in oklch, var(--green-400) 12%, transparent));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--green-300) 28%, transparent), color-mix(in oklch, var(--green-400) 12%, transparent));
   color: white;
   font-family: var(--font-display);
   line-height: 1.1;
@@ -9545,7 +9545,7 @@ p {
   gap: 24px;
   padding: 28px;
   background:
-    linear-gradient(135deg, rgba(16,185,129,0.16), color-mix(in oklch, var(--green-400) 9%, transparent), rgba(245,158,11,0.08)),
+    linear-gradient(135deg, color-mix(in srgb, var(--green-300) 16%, transparent), color-mix(in oklch, var(--green-400) 9%, transparent), rgba(245,158,11,0.08)),
     rgba(4,12,8,0.74);
 }
 
@@ -9802,7 +9802,7 @@ p {
   }
 
   .landing-mobile-cta a:first-child {
-    background: linear-gradient(135deg, #10b981, var(--green-400));
+    background: linear-gradient(135deg, var(--green-400), var(--green-400));
   }
 
   .landing-mobile-cta a:nth-child(2),
@@ -10087,9 +10087,9 @@ p {
   margin-top: 18px;
   padding: 18px;
   border-radius: 18px;
-  border: 1px solid rgba(16,185,129,0.2);
+  border: 1px solid color-mix(in srgb, var(--green-300) 20%, transparent);
   background:
-    linear-gradient(135deg, rgba(16,185,129,0.12), color-mix(in oklch, var(--green-400) 6%, transparent)),
+    linear-gradient(135deg, color-mix(in srgb, var(--green-300) 12%, transparent), color-mix(in oklch, var(--green-400) 6%, transparent)),
     rgba(255,255,255,0.035);
   color: var(--text-0);
   font-size: clamp(2.2rem, 7vw, 4rem);
@@ -10150,7 +10150,7 @@ p {
 .join-ready-ring.is-ready {
   background:
     radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12), transparent 54%),
-    conic-gradient(from 180deg, rgba(16,185,129,0.24), color-mix(in oklch, var(--green-400) 78%, transparent), rgba(16,185,129,0.24));
+    conic-gradient(from 180deg, color-mix(in srgb, var(--green-300) 24%, transparent), color-mix(in oklch, var(--green-400) 78%, transparent), color-mix(in srgb, var(--green-300) 24%, transparent));
 }
 
 .join-ready-ring span {
@@ -10222,9 +10222,9 @@ p {
 }
 
 .manager-card.ready {
-  border-color: rgba(16,185,129,0.34);
+  border-color: color-mix(in srgb, var(--green-300) 34%, transparent);
   background:
-    linear-gradient(180deg, rgba(16,185,129,0.1), rgba(255,255,255,0.02)),
+    linear-gradient(180deg, color-mix(in srgb, var(--green-300) 10%, transparent), rgba(255,255,255,0.02)),
     rgba(255,255,255,0.035);
 }
 
@@ -10258,7 +10258,7 @@ p {
 
 .manager-dot.ready {
   background: var(--a1);
-  box-shadow: 0 0 12px rgba(16,185,129,0.62);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--green-300) 62%, transparent);
 }
 
 .manager-tags {
@@ -10359,10 +10359,10 @@ p {
   width: 78px;
   height: 78px;
   border-radius: 999px;
-  color: #bbf7d0;
-  border: 1px solid rgba(16,185,129,0.26);
+  color: var(--green-100);
+  border: 1px solid color-mix(in srgb, var(--green-300) 26%, transparent);
   background:
-    radial-gradient(circle at 50% 50%, rgba(16,185,129,0.22), transparent 62%),
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--green-300) 22%, transparent), transparent 62%),
     rgba(255,255,255,0.035);
 }
 
@@ -10404,9 +10404,9 @@ p {
   gap: 16px;
   align-items: center;
   padding: 16px;
-  border: 1px solid rgba(16,185,129,0.16);
+  border: 1px solid color-mix(in srgb, var(--green-300) 16%, transparent);
   border-radius: 18px;
-  background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(255,255,255,0.025));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--green-300) 8%, transparent), rgba(255,255,255,0.025));
 }
 
 .results-draft-notice.waiting,
@@ -10456,9 +10456,9 @@ p {
 }
 
 .results-team-card:first-of-type {
-  border-color: rgba(16,185,129,0.22);
+  border-color: color-mix(in srgb, var(--green-300) 22%, transparent);
   background:
-    radial-gradient(100% 180% at 0% 0%, rgba(16,185,129,0.12), transparent 52%),
+    radial-gradient(100% 180% at 0% 0%, color-mix(in srgb, var(--green-300) 12%, transparent), transparent 52%),
     rgba(255,255,255,0.03);
 }
 
@@ -10487,9 +10487,9 @@ p {
   color: var(--a1);
   font-size: 0.88rem;
   font-weight: 800;
-  border: 1px solid rgba(16,185,129,0.22);
+  border: 1px solid color-mix(in srgb, var(--green-300) 22%, transparent);
   border-radius: 13px;
-  background: rgba(16,185,129,0.08);
+  background: color-mix(in srgb, var(--green-300) 8%, transparent);
 }
 
 .results-team-identity h3 {
@@ -10514,7 +10514,7 @@ p {
   flex: 0 0 auto;
   align-items: baseline;
   gap: 7px;
-  color: #bbf7d0;
+  color: var(--green-100);
 }
 
 .results-team-grade span {
@@ -10562,7 +10562,7 @@ p {
 }
 
 .results-team-metrics .positive {
-  color: #86efac;
+  color: var(--color-status-success);
 }
 
 .results-team-metrics .negative {
@@ -10725,7 +10725,7 @@ p {
 
 .results-winner-card {
   padding: 14px;
-  border: 1px solid rgba(16,185,129,0.18);
+  border: 1px solid color-mix(in srgb, var(--green-300) 18%, transparent);
 }
 
 .results-winner-card strong {
@@ -10984,8 +10984,8 @@ body,
 
 .ui-badge-accent,
 .ui-badge-success {
-  background: rgba(16,185,129,0.16);
-  border-color: rgba(16,185,129,0.36);
+  background: color-mix(in srgb, var(--green-300) 16%, transparent);
+  border-color: color-mix(in srgb, var(--green-300) 36%, transparent);
 }
 
 .ui-badge-host {
@@ -11237,8 +11237,8 @@ body,
 }
 
 .cui-alert-success {
-  border-color: rgba(16,185,129,0.28);
-  background: rgba(16,185,129,0.12);
+  border-color: color-mix(in srgb, var(--green-300) 28%, transparent);
+  background: color-mix(in srgb, var(--green-300) 12%, transparent);
 }
 
 .cui-modal-root {
@@ -11312,7 +11312,7 @@ body,
 
 /* --------------------------- Free Stats Hub --------------------------- */
 .stats-hub {
-  --stats-hub-green: #34d399;
+  --stats-hub-green: var(--green-200);
   --stats-hub-green-soft: var(--green-300);
   --stats-hub-green: var(--green-400);
   --stats-hub-amber: #fbbf24;
@@ -11443,9 +11443,9 @@ body,
 
 .stats-hub-source-status {
   padding: 4px 7px;
-  border: 1px solid rgba(52,211,153,0.2);
+  border: 1px solid color-mix(in srgb, var(--green-200) 20%, transparent);
   border-radius: 999px;
-  background: rgba(52,211,153,0.08);
+  background: color-mix(in srgb, var(--green-200) 8%, transparent);
   color: rgba(167,243,208,0.85);
   font-size: 0.66rem;
   font-weight: 800;
@@ -11776,8 +11776,8 @@ body,
 }
 
 .stats-hub-rating-pill.is-good {
-  border-color: rgba(52,211,153,0.22);
-  background: rgba(52,211,153,0.08);
+  border-color: color-mix(in srgb, var(--green-200) 22%, transparent);
+  background: color-mix(in srgb, var(--green-200) 8%, transparent);
   color: rgba(167,243,208,0.9);
 }
 
@@ -11793,17 +11793,20 @@ body,
   height: 28px;
   margin-left: auto;
   overflow: visible;
+  border-radius: var(--r-sm);
+  background: var(--color-chart-plot);
+  box-shadow: inset 0 0 0 1px var(--color-chart-grid);
 }
 
 .stats-sparkline polyline {
-  stroke: color-mix(in oklch, var(--green-300) 80%, transparent);
+  stroke: var(--color-chart-series-neutral);
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .stats-sparkline circle {
-  fill: var(--green-200);
+  fill: var(--color-chart-series-neutral-point);
 }
 
 .stats-sparkline-empty {
@@ -12269,7 +12272,7 @@ body,
 }
 
 .analytics-public-badge {
-  border-color: rgba(52,211,153,0.25);
+  border-color: color-mix(in srgb, var(--green-200) 25%, transparent);
 }
 
 .analytics-section-nav {
@@ -12510,7 +12513,11 @@ body,
 
 .analytics-scatter-frame {
   min-width: 0;
-  padding: 4px 8px 0;
+  margin: 8px 10px 0;
+  padding: 8px 10px 2px;
+  border: 1px solid var(--color-chart-grid);
+  border-radius: var(--r-md);
+  background: var(--color-chart-plot);
 }
 
 .analytics-scatter-plot {
@@ -12521,24 +12528,24 @@ body,
 }
 
 .analytics-grid-line {
-  stroke: rgba(163,163,163,0.1);
+  stroke: var(--color-chart-grid);
   stroke-width: 1;
 }
 
 .analytics-zero-line {
-  stroke: rgba(226,232,240,0.36);
+  stroke: var(--color-chart-reference);
   stroke-dasharray: 5 5;
   stroke-width: 1.2;
 }
 
 .analytics-axis-tick {
-  fill: rgba(163,163,163,0.72);
+  fill: var(--color-chart-axis-muted);
   font-family: var(--font-body, sans-serif);
   font-size: 12px;
 }
 
 .analytics-axis-label {
-  fill: rgba(203,213,225,0.86);
+  fill: var(--color-chart-axis);
   font-family: var(--font-body, sans-serif);
   font-size: 13px;
   font-weight: 760;
@@ -12559,18 +12566,18 @@ body,
 .analytics-scatter-point:hover circle,
 .analytics-scatter-point:focus circle,
 .analytics-scatter-point.is-selected circle {
-  stroke: rgba(255,255,255,0.98);
+  stroke: var(--color-chart-axis);
   stroke-width: 3;
   opacity: 1;
 }
 
 .analytics-point-label {
-  fill: rgba(248,250,252,0.96);
+  fill: var(--color-chart-axis);
   font-family: var(--font-body, sans-serif);
   font-size: 12px;
   font-weight: 800;
   paint-order: stroke;
-  stroke: color-mix(in oklch, var(--gray-950) 90%, transparent);
+  stroke: var(--color-chart-plot);
   stroke-width: 4px;
   stroke-linejoin: round;
 }
@@ -12631,8 +12638,11 @@ body,
 .analytics-ranked-bars {
   display: grid;
   gap: 4px;
-  margin: 12px 14px 14px;
-  padding: 0;
+  margin: 8px 10px 14px;
+  padding: 10px;
+  border: 1px solid var(--color-chart-grid);
+  border-radius: var(--r-md);
+  background: var(--color-chart-plot);
   list-style: none;
 }
 
@@ -12653,14 +12663,14 @@ body,
 .analytics-ranked-bars button:hover,
 .analytics-ranked-bars button:focus-visible,
 .analytics-ranked-bars button.is-selected {
-  border-color: color-mix(in oklch, var(--green-200) 20%, transparent);
-  background: color-mix(in oklch, var(--green-300) 7%, transparent);
+  border-color: color-mix(in oklch, var(--green-700) 32%, transparent);
+  background: color-mix(in oklch, var(--green-700) 9%, transparent);
   outline: none;
 }
 
 .analytics-ranked-number,
 .analytics-ranked-copy small {
-  color: rgba(163,163,163,0.68);
+  color: var(--color-chart-axis-muted);
   font-size: 0.67rem;
   font-weight: 760;
 }
@@ -12673,7 +12683,7 @@ body,
 
 .analytics-ranked-copy strong {
   overflow: hidden;
-  color: rgba(226,232,240,0.94);
+  color: var(--color-chart-axis);
   font-size: 0.78rem;
   line-height: 1.22;
   text-overflow: ellipsis;
@@ -12685,7 +12695,7 @@ body,
   height: 7px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(163,163,163,0.12);
+  background: var(--color-chart-track);
 }
 
 .analytics-ranked-track i {
@@ -12693,10 +12703,10 @@ body,
   height: 100%;
   border-radius: inherit;
 }
-.analytics-ranked-track .is-neutral { background: #a3a3a3; }
+.analytics-ranked-track .is-neutral { background: var(--color-chart-series-neutral); }
 
 .analytics-ranked-bars b {
-  color: rgba(240,253,250,0.94);
+  color: var(--color-chart-axis);
   font-size: 0.73rem;
   text-align: right;
 }

@@ -3,87 +3,127 @@
   --font-display: "Teko", "Oswald", "Impact", sans-serif;
 
   /*
-   * Primitive color ramps.
-   * Green is the product color; neutral gray carries the interface hierarchy.
+   * Approved brand primitives.
+   * Verde Bosco owns the canvas and selection, Ruggine owns primary actions,
+   * Sabbia supplies the warm neutral, and Grigio Fumo owns the header.
    * Position, warning, and danger colors remain semantic exceptions.
    */
-  --green-50: oklch(0.97 0.025 150);
-  --green-100: oklch(0.93 0.045 150);
-  --green-200: oklch(0.86 0.08 150);
-  --green-300: oklch(0.78 0.125 150);
-  --green-400: oklch(0.7 0.155 150);
-  --green-500: oklch(0.63 0.16 150);
-  --green-600: oklch(0.55 0.145 150);
-  --green-700: oklch(0.46 0.11 150);
-  --green-800: oklch(0.38 0.075 150);
-  --green-900: oklch(0.3 0.045 150);
-  --green-950: oklch(0.22 0.025 150);
+  --brand-verde-bosco: #365a43;
+  --brand-ruggine: #9c4f31;
+  --brand-sabbia: #d8c6a8;
+  --brand-fumo: #353a38;
+  --brand-paper: #f5eee3;
 
-  --gray-50: oklch(0.97 0.006 160);
-  --gray-100: oklch(0.92 0.008 160);
-  --gray-200: oklch(0.84 0.009 160);
-  --gray-300: oklch(0.74 0.011 160);
-  --gray-400: oklch(0.64 0.012 160);
-  --gray-500: oklch(0.54 0.012 160);
-  --gray-600: oklch(0.44 0.012 160);
-  --gray-700: oklch(0.35 0.012 160);
-  --gray-800: oklch(0.27 0.011 160);
-  --gray-900: oklch(0.21 0.009 160);
-  --gray-950: oklch(0.16 0.008 160);
+  --green-50: #f0f4ee;
+  --green-100: #dce7dc;
+  --green-200: #bfd1c0;
+  --green-300: #9db89f;
+  --green-400: #78997f;
+  --green-500: #56775f;
+  --green-600: var(--brand-verde-bosco);
+  --green-700: #2e4c39;
+  --green-800: #263f30;
+  --green-900: #1e3226;
+  --green-950: #17261d;
+
+  --rust-50: #faf0ea;
+  --rust-100: #f0bda6;
+  --rust-200: #e2a083;
+  --rust-300: #c77d5d;
+  --rust-400: #b66343;
+  --rust-500: var(--brand-ruggine);
+  --rust-600: #814128;
+  --rust-700: #6a3522;
+  --rust-800: #51291c;
+  --rust-900: #3b2119;
+
+  --gray-50: var(--brand-paper);
+  --gray-100: #e9ddca;
+  --gray-200: var(--brand-sabbia);
+  --gray-300: #b9b09f;
+  --gray-400: #96968e;
+  --gray-500: #646963;
+  --gray-600: #545954;
+  --gray-700: #454a46;
+  --gray-800: var(--brand-fumo);
+  --gray-900: #292e2b;
+  --gray-950: #171a18;
 
   /* Named surfaces: every page maps cards and controls to these roles. */
-  --color-surface-page: var(--gray-950);
+  --color-surface-page: var(--brand-verde-bosco);
   --color-surface-header: var(--gray-800);
-  --color-surface-card-primary: var(--gray-900);
-  --color-surface-card-secondary: var(--gray-800);
-  --color-surface-card-tertiary: color-mix(in oklch, var(--gray-800) 78%, var(--gray-700));
-  --color-surface-overlay: color-mix(in oklch, var(--gray-800) 82%, var(--green-950));
-  --color-surface-field: color-mix(in oklch, var(--green-950) 62%, var(--gray-800));
-  --color-surface-field-hover: color-mix(in oklch, var(--green-900) 46%, var(--gray-800));
-  --color-surface-field-disabled: color-mix(in oklch, var(--gray-900) 82%, var(--gray-800));
-  --color-surface-hover: color-mix(in oklch, var(--gray-800) 84%, var(--green-900));
-  --color-surface-selected: color-mix(in oklch, var(--green-800) 42%, var(--gray-800));
-  --color-surface-table-header: color-mix(in oklch, var(--gray-800) 86%, var(--green-950));
+  --color-surface-card-primary: var(--green-900);
+  --color-surface-card-secondary: var(--green-800);
+  --color-surface-card-tertiary: color-mix(in oklch, var(--green-800) 72%, var(--green-700));
+  --color-surface-warm: var(--brand-sabbia);
+  --color-surface-warm-subtle: color-mix(in oklch, var(--brand-sabbia) 18%, var(--green-900));
+  --color-surface-overlay: color-mix(in oklch, var(--gray-900) 72%, var(--green-950));
+  --color-surface-field: color-mix(in oklch, var(--gray-900) 78%, var(--green-950));
+  --color-surface-field-hover: color-mix(in oklch, var(--gray-800) 68%, var(--green-800));
+  --color-surface-field-disabled: color-mix(in oklch, var(--gray-900) 84%, var(--gray-800));
+  --color-surface-hover: color-mix(in oklch, var(--green-700) 76%, var(--green-800));
+  --color-surface-selected: color-mix(in oklch, var(--green-700) 78%, var(--green-600));
+  --color-surface-table-header: color-mix(in oklch, var(--green-950) 80%, var(--gray-900));
   --color-surface-navigation: var(--color-surface-header);
   --color-surface-toolbar: color-mix(in oklch, var(--color-surface-card-primary) 94%, transparent);
   --color-surface-menu: var(--color-surface-overlay);
   --color-surface-modal: var(--color-surface-overlay);
-  --color-surface-tooltip: var(--gray-700);
+  --color-surface-tooltip: var(--gray-800);
   --color-surface-table-row: var(--color-surface-card-primary);
   --color-surface-table-row-alt: color-mix(in oklch, var(--color-surface-card-primary) 72%, var(--color-surface-card-secondary));
   --color-surface-table-row-hover: var(--color-surface-hover);
+  --color-surface-table-warm-row: var(--brand-sabbia);
+  --color-surface-table-warm-row-alt: color-mix(in oklch, var(--brand-sabbia) 90%, var(--brand-paper));
+  --color-surface-table-warm-row-hover: color-mix(in oklch, var(--brand-sabbia) 84%, var(--green-300));
   --color-surface-badge-neutral: var(--gray-700);
-  --color-surface-badge-brand: color-mix(in oklch, var(--green-700) 48%, var(--gray-800));
+  --color-surface-badge-brand: color-mix(in oklch, var(--green-700) 82%, var(--green-600));
+
+  /* Chart canvases use exact Sabbia; marks switch to contrast-safe dark roles. */
+  --color-chart-plot: var(--brand-sabbia);
+  --color-chart-grid: color-mix(in oklch, var(--gray-950) 16%, transparent);
+  --color-chart-axis: var(--gray-950);
+  --color-chart-axis-muted: var(--gray-700);
+  --color-chart-reference: color-mix(in oklch, var(--rust-700) 62%, transparent);
+  --color-chart-series-neutral: var(--green-700);
+  --color-chart-series-neutral-point: var(--green-900);
+  --color-chart-series-positive: var(--green-700);
+  --color-chart-series-negative: color-mix(in oklch, var(--color-status-danger) 86%, var(--gray-950));
+  --color-chart-track: color-mix(in oklch, var(--gray-950) 14%, transparent);
 
   /* Named borders and text. */
   --color-border-subtle: color-mix(in oklch, var(--gray-200) 14%, transparent);
   --color-border-default: color-mix(in oklch, var(--gray-200) 24%, transparent);
   --color-border-strong: color-mix(in oklch, var(--gray-100) 38%, transparent);
-  --color-border-brand: color-mix(in oklch, var(--green-400) 58%, transparent);
+  --color-border-brand: color-mix(in oklch, var(--green-300) 58%, transparent);
+  --color-border-on-warm: color-mix(in oklch, var(--gray-950) 24%, transparent);
+  --color-button-primary-border: var(--rust-300);
   --color-text-primary: var(--gray-50);
-  --color-text-secondary: var(--gray-200);
-  --color-text-muted: var(--gray-300);
-  --color-text-disabled: var(--gray-500);
-  --color-text-on-brand: var(--gray-950);
-  --color-text-link: var(--green-200);
-  --color-text-link-hover: var(--green-100);
+  --color-text-secondary: var(--gray-100);
+  --color-text-muted: var(--gray-200);
+  --color-text-disabled: var(--gray-300);
+  --color-text-on-brand: var(--gray-50);
+  --color-text-on-warm: var(--gray-950);
+  --color-text-on-warm-secondary: var(--gray-700);
+  --color-text-on-warm-accent: var(--rust-700);
+  --color-text-link: var(--rust-100);
+  --color-text-link-hover: var(--rust-50);
   --color-text-placeholder: var(--gray-400);
 
   /* Named control roles. */
-  --color-button-primary: var(--green-400);
-  --color-button-primary-hover: var(--green-300);
+  --color-button-primary: var(--brand-ruggine);
+  --color-button-primary-hover: var(--rust-600);
   --color-button-primary-text: var(--color-text-on-brand);
   --color-button-secondary: var(--gray-800);
   --color-button-secondary-hover: var(--gray-700);
   --color-button-secondary-text: var(--color-text-primary);
-  --color-button-quiet-hover: color-mix(in oklch, var(--green-500) 11%, transparent);
+  --color-button-quiet-hover: color-mix(in oklch, var(--brand-sabbia) 11%, transparent);
   --color-button-danger: color-mix(in oklch, var(--color-status-danger) 14%, var(--gray-800));
   --color-button-danger-hover: color-mix(in oklch, var(--color-status-danger) 21%, var(--gray-800));
-  --color-field-focus: var(--green-400);
-  --color-focus-ring: color-mix(in oklch, var(--green-300) 52%, transparent);
+  --color-field-focus: var(--rust-300);
+  --color-focus-ring: color-mix(in oklch, var(--brand-sabbia) 52%, transparent);
 
   /* Status colors are reserved for meaning, not general decoration. */
-  --color-status-success: var(--green-400);
+  --color-status-success: var(--green-200);
   --color-status-warning: oklch(0.78 0.14 75);
   --color-status-danger: oklch(0.68 0.19 25);
 
@@ -112,36 +152,40 @@
   --text-positive: var(--color-status-success);
   --text-warning: var(--color-status-warning);
   --text-negative: var(--color-status-danger);
+  --on-accent: var(--color-button-primary-text);
+  --state-success: var(--color-status-success);
+  --state-warning: var(--color-status-warning);
+  --state-danger: var(--color-status-danger);
 
-  /* Shared accents: green is the only general product accent. */
+  /* Shared accents: green carries product state; rust carries action emphasis. */
   --a1: var(--color-status-success);
-  --a2: var(--green-400);
+  --a2: var(--green-200);
   --a3: oklch(0.78 0.13 85);
   --accent-live: var(--color-status-success);
-  --accent-action: var(--green-400);
-  --accent-history: var(--green-300);
+  --accent-action: var(--rust-100);
+  --accent-history: var(--brand-sabbia);
   --accent-danger: var(--color-status-danger);
   --brand-emerald: var(--green-400);
-  --brand-leather: var(--green-600);
+  --brand-leather: var(--brand-ruggine);
   --brand-gold: var(--a3);
   --brand-broadcast: var(--gray-300);
-  --brand-info: var(--green-300);
+  --brand-info: var(--green-200);
 
   --football-chalk: #f3f0e7;
   --football-chalk-muted: #c8d0ca;
-  --football-leather: #c4672d;
-  --football-leather-light: #e49a5e;
-  --football-broadcast: var(--green-300);
-  --football-floodlight: #d9ebe2;
+  --football-leather: var(--brand-ruggine);
+  --football-leather-light: var(--rust-200);
+  --football-broadcast: var(--green-200);
+  --football-floodlight: var(--green-100);
   --football-field: var(--green-950);
   --football-ink: var(--gray-950);
-  --team-primary: #33433a;
-  --team-secondary: #111a15;
-  --team-accent: #9fb3a7;
-  --team-foreground: #f7fbf8;
+  --team-primary: var(--brand-verde-bosco);
+  --team-secondary: var(--green-950);
+  --team-accent: var(--green-300);
+  --team-foreground: var(--brand-paper);
 
   /* --- Soft glows --- */
-  --glow-a1: color-mix(in oklch, var(--green-400) 28%, transparent);
+  --glow-a1: color-mix(in oklch, var(--green-200) 28%, transparent);
   --glow-a2: color-mix(in oklch, var(--green-300) 24%, transparent);
   --glow-a3: color-mix(in oklch, var(--a3) 22%, transparent);
 
@@ -157,12 +201,12 @@
   --pos-foreground-light: oklch(1 0 0);
   --pos-foreground-dark: var(--gray-950);
 
-  /* IDP and reserve roles reuse darker approved shades. */
+  /* IDP and reserve roles reuse contrast-safe approved shades. */
   --pos-ir: var(--gray-700);
   --pos-dl: var(--green-800);
   --pos-lb: var(--green-600);
   --pos-db: var(--gray-400);
-  --pos-idpflex: var(--green-500);
+  --pos-idpflex: var(--green-300);
 
   /* Legacy glass names resolve to named card layers. */
   --glass-1: var(--color-surface-card-primary);
@@ -243,11 +287,11 @@
 
   --scrollbar-size: 10px;
   --scrollbar-track: color-mix(in oklch, var(--color-surface-page) 90%, transparent);
-  --scrollbar-thumb: color-mix(in oklch, var(--green-400) 42%, var(--gray-700));
-  --scrollbar-thumb-hover: color-mix(in oklch, var(--green-300) 62%, var(--gray-600));
+  --scrollbar-thumb: color-mix(in oklch, var(--brand-sabbia) 42%, var(--green-800));
+  --scrollbar-thumb-hover: color-mix(in oklch, var(--brand-sabbia) 62%, var(--green-700));
 
   /* Legacy visual aliases remain here while older feature CSS is retired. */
-  --ffaa-accent: var(--accent-action);
+  --ffaa-accent: var(--green-300);
   --ffaa-surface: var(--color-surface-card-primary);
   --ffaa-surface-raised: var(--color-surface-card-secondary);
   --ffaa-surface-elevated: var(--color-surface-card-tertiary);

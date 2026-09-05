@@ -52,7 +52,7 @@
 .native-scoring-ingress input { min-width: 0; min-height: 40px; padding: 0 10px; border: 1px solid var(--line-1); background: var(--surface-raised); color: var(--text-0); }
 .native-scoring-actions { padding: 10px 12px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--line-0); }
 .native-scoring-actions button { display: inline-flex; align-items: center; gap: 7px; }
-.native-scoring-actions button:nth-child(2) { border-color: var(--accent-action); background: var(--accent-action); color: var(--on-accent); }
+.native-scoring-actions button:nth-child(2) { border-color: var(--color-button-primary-border); background: var(--color-button-primary); color: var(--color-button-primary-text); }
 .native-scoring-actions svg { width: 15px; }
 .native-scoring-message { margin: 0 12px 8px; padding: 9px 11px; border: 1px solid var(--line-1); }
 .native-scoring-message.is-error { border-color: color-mix(in srgb, var(--danger) 55%, var(--line-1)); color: var(--danger); }

@@ -24,8 +24,9 @@
   display: grid;
   grid-template-columns: minmax(440px, 0.9fr) minmax(560px, 1.1fr);
   align-items: stretch;
-  gap: clamp(28px, 3.5vw, 52px);
-  padding: var(--space-page-hero);
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
   border: 1px solid var(--color-border-strong);
   border-radius: var(--r-xl);
   background: var(--color-surface-card-primary);
@@ -35,7 +36,14 @@
 .platform-hero-copy {
   display: grid;
   min-width: 0;
+  padding: var(--space-page-hero);
   align-content: center;
+  background: var(--color-surface-warm);
+  color: var(--color-text-on-warm);
+}
+
+.platform-hero-copy .platform-kicker {
+  color: var(--color-text-on-warm-accent);
 }
 
 .platform-hero-copy h1 {
@@ -43,6 +51,7 @@
   margin: var(--space-4) 0 var(--space-4);
   font-size: min(var(--type-display-hero), 3.4rem);
   line-height: 0.96;
+  color: var(--color-text-on-warm);
   text-wrap: balance;
 }
 
@@ -54,7 +63,7 @@
 .platform-hero-copy > p {
   max-width: 62ch;
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--color-text-on-warm-secondary);
   font-size: 1rem;
   line-height: 1.62;
   text-wrap: pretty;
@@ -80,7 +89,7 @@
 
 .platform-primary-link {
   padding: 0 var(--space-4);
-  border: 1px solid var(--color-border-brand);
+  border: 1px solid var(--color-button-primary-border);
   border-radius: var(--r-md);
   background: var(--color-button-primary);
   color: var(--color-button-primary-text);
@@ -116,8 +125,8 @@
   min-width: 0;
   align-self: stretch;
   overflow: hidden;
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--r-lg);
+  border: 0;
+  border-radius: 0;
   background: var(--color-surface-card-secondary);
 }
 
@@ -418,7 +427,7 @@
   .platform-hero-copy,
   .platform-feature-index {
     width: 100%;
-    max-width: 780px;
+    max-width: none;
   }
 }
 
@@ -440,8 +449,12 @@
 
 @media (max-width: 700px) {
   .platform-hero {
+    padding: 0;
+    gap: 0;
+  }
+
+  .platform-hero-copy {
     padding: var(--space-5);
-    gap: var(--space-6);
   }
 
   .platform-hero-copy h1 {

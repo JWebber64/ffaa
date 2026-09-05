@@ -4,7 +4,7 @@
 .my-hq-gate h1 { max-width: 620px; margin: var(--space-3) auto; font-size: var(--type-display-page); line-height: var(--line-display); }
 .my-hq-gate p { max-width: 590px; margin: 0 auto var(--space-4); color: var(--text-secondary); line-height: 1.55; }
 .hq-kicker { color: var(--accent-action); font-size: .75rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
-.hq-primary-link { display: inline-flex; min-height: var(--control-height); padding: 0 var(--space-5); align-items: center; justify-self: center; gap: var(--space-2); border: 1px solid var(--color-border-brand); border-radius: var(--r-md); background: var(--color-button-primary); color: var(--color-button-primary-text); font-size: .8rem; font-weight: 850; }
+.hq-primary-link { display: inline-flex; min-height: var(--control-height); padding: 0 var(--space-5); align-items: center; justify-self: center; gap: var(--space-2); border: 1px solid var(--color-button-primary-border); border-radius: var(--r-md); background: var(--color-button-primary); color: var(--color-button-primary-text); font-size: .8rem; font-weight: 850; }
 .hq-gate-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--space-3); }
 .hq-gate-actions > a:not(.hq-primary-link) { display: inline-flex; min-height: var(--control-height); padding-inline: var(--space-4); align-items: center; border: 1px solid var(--line-1); border-radius: var(--r-md); color: var(--text-primary); font-size: .8rem; font-weight: 800; }
 

@@ -125,6 +125,17 @@ describe("shared layout density contract", () => {
     expect(design).toContain("independent feature chapters may use two equal columns");
   });
 
+  it("packs the three preparation tools without an empty desktop grid quadrant", () => {
+    const styles = readProjectFile("src/screens/tools/tools.css");
+
+    expect(styles).toMatch(
+      /@media \(min-width: 1180px\) \{[\s\S]*?\.tools-hub-organized \.tools-group\.is-prepare \.tools-card[\s\S]*?grid-column: span 4/,
+    );
+    expect(styles).toMatch(
+      /@media \(min-width: 821px\) and \(max-width: 1179px\) \{[\s\S]*?\.tools-group\.is-prepare \.tools-card\.is-wide[\s\S]*?grid-column: span 12/,
+    );
+  });
+
   it("documents why ordinary cards and heroes stay natural-height", () => {
     const design = readProjectFile("DESIGN.md");
     expect(design).toContain("This is an information-dense product, not a poster.");

@@ -3,66 +3,101 @@ version: alpha
 name: Fantasy Football presented by GameHQ
 description: Interface rules for the fantasy-football application.
 colors:
-  primary: "{colors.green-400}"
-  green-50: "oklch(0.97 0.025 150)"
-  green-100: "oklch(0.93 0.045 150)"
-  green-200: "oklch(0.86 0.08 150)"
-  green-300: "oklch(0.78 0.125 150)"
-  green-400: "oklch(0.7 0.155 150)"
-  green-500: "oklch(0.63 0.16 150)"
-  green-600: "oklch(0.55 0.145 150)"
-  green-700: "oklch(0.46 0.11 150)"
-  green-800: "oklch(0.38 0.075 150)"
-  green-900: "oklch(0.3 0.045 150)"
-  green-950: "oklch(0.22 0.025 150)"
-  gray-50: "oklch(0.97 0.006 160)"
-  gray-100: "oklch(0.92 0.008 160)"
-  gray-200: "oklch(0.84 0.009 160)"
-  gray-300: "oklch(0.74 0.011 160)"
-  gray-400: "oklch(0.64 0.012 160)"
-  gray-500: "oklch(0.54 0.012 160)"
-  gray-600: "oklch(0.44 0.012 160)"
-  gray-700: "oklch(0.35 0.012 160)"
-  gray-800: "oklch(0.27 0.011 160)"
-  gray-900: "oklch(0.21 0.009 160)"
-  gray-950: "oklch(0.16 0.008 160)"
-  color-surface-page: "{colors.gray-950}"
+  primary: "{colors.verde-bosco}"
+  verde-bosco: "#365A43"
+  ruggine: "#9C4F31"
+  sabbia: "#D8C6A8"
+  grigio-fumo: "#353A38"
+  paper: "#F5EEE3"
+  green-50: "#F0F4EE"
+  green-100: "#DCE7DC"
+  green-200: "#BFD1C0"
+  green-300: "#9DB89F"
+  green-400: "#78997F"
+  green-500: "#56775F"
+  green-600: "{colors.verde-bosco}"
+  green-700: "#2E4C39"
+  green-800: "#263F30"
+  green-900: "#1E3226"
+  green-950: "#17261D"
+  rust-50: "#FAF0EA"
+  rust-100: "#F0BDA6"
+  rust-200: "#E2A083"
+  rust-300: "#C77D5D"
+  rust-400: "#B66343"
+  rust-500: "{colors.ruggine}"
+  rust-600: "#814128"
+  rust-700: "#6A3522"
+  rust-800: "#51291C"
+  rust-900: "#3B2119"
+  gray-50: "{colors.paper}"
+  gray-100: "#E9DDCA"
+  gray-200: "{colors.sabbia}"
+  gray-300: "#B9B09F"
+  gray-400: "#96968E"
+  gray-500: "#646963"
+  gray-600: "#545954"
+  gray-700: "#454A46"
+  gray-800: "{colors.grigio-fumo}"
+  gray-900: "#292E2B"
+  gray-950: "#171A18"
+  color-surface-page: "{colors.verde-bosco}"
   color-surface-header: "{colors.gray-800}"
-  color-surface-card-primary: "{colors.gray-900}"
-  color-surface-card-secondary: "{colors.gray-800}"
-  color-surface-card-tertiary: "oklch(0.288 0.011 160)"
-  color-surface-overlay: "oklch(0.261 0.013 158)"
-  color-surface-field: "oklch(0.235 0.01 160)"
-  color-surface-field-hover: "{colors.gray-800}"
-  color-surface-field-disabled: "oklch(0.22 0.009 160)"
-  color-surface-hover: "oklch(0.277 0.018 155)"
-  color-surface-selected: "oklch(0.316 0.038 156)"
-  color-surface-table-header: "oklch(0.263 0.013 157)"
-  color-surface-table-row: "{colors.gray-900}"
-  color-surface-table-row-alt: "oklch(0.228 0.009 160)"
+  color-surface-card-primary: "{colors.green-900}"
+  color-surface-card-secondary: "{colors.green-800}"
+  color-surface-card-tertiary: "green-800 to green-700 mix"
+  color-surface-warm: "{colors.sabbia}"
+  color-surface-warm-subtle: "18% Sabbia into green-900"
+  color-surface-overlay: "gray-900 to green-950 mix"
+  color-surface-field: "gray-900 to green-950 mix"
+  color-surface-field-hover: "gray-800 to green-800 mix"
+  color-surface-field-disabled: "gray-900 to gray-800 mix"
+  color-surface-hover: "green-700 to green-800 mix"
+  color-surface-selected: "green-700 to verde-bosco mix"
+  color-surface-table-header: "green-950 to gray-900 mix"
+  color-surface-table-row: "{colors.green-900}"
+  color-surface-table-row-alt: "green-900 to green-800 mix"
+  color-surface-table-warm-row: "{colors.sabbia}"
+  color-surface-table-warm-row-alt: "90% Sabbia to paper"
+  color-surface-table-warm-row-hover: "84% Sabbia to green-300"
   color-surface-badge-neutral: "{colors.gray-700}"
-  color-surface-badge-brand: "oklch(0.322 0.044 153)"
-  color-border-subtle: "oklch(0.84 0.009 160 / 0.14)"
-  color-border-default: "oklch(0.84 0.009 160 / 0.24)"
-  color-border-strong: "oklch(0.92 0.008 160 / 0.38)"
-  color-border-brand: "oklch(0.7 0.155 150 / 0.58)"
+  color-surface-badge-brand: "green-700 to verde-bosco mix"
+  color-chart-plot: "{colors.sabbia}"
+  color-chart-grid: "16% gray-950"
+  color-chart-axis: "{colors.gray-950}"
+  color-chart-axis-muted: "{colors.gray-700}"
+  color-chart-reference: "62% rust-700"
+  color-chart-series-neutral: "{colors.green-700}"
+  color-chart-series-neutral-point: "{colors.green-900}"
+  color-chart-series-positive: "{colors.green-700}"
+  color-chart-series-negative: "status-danger to gray-950 mix"
+  color-chart-track: "14% gray-950"
+  color-border-subtle: "14% Sabbia"
+  color-border-default: "24% Sabbia"
+  color-border-strong: "38% warm paper"
+  color-border-brand: "58% green-300"
+  color-border-on-warm: "24% gray-950"
+  color-button-primary-border: "{colors.rust-300}"
   color-text-primary: "{colors.gray-50}"
-  color-text-secondary: "{colors.gray-200}"
-  color-text-muted: "{colors.gray-300}"
-  color-text-disabled: "{colors.gray-500}"
-  color-text-on-brand: "{colors.gray-950}"
-  color-text-link: "{colors.green-200}"
-  color-text-link-hover: "{colors.green-100}"
+  color-text-secondary: "{colors.gray-100}"
+  color-text-muted: "{colors.gray-200}"
+  color-text-disabled: "{colors.gray-300}"
+  color-text-on-brand: "{colors.gray-50}"
+  color-text-on-warm: "{colors.gray-950}"
+  color-text-on-warm-secondary: "{colors.gray-700}"
+  color-text-on-warm-accent: "{colors.rust-700}"
+  color-text-link: "{colors.rust-100}"
+  color-text-link-hover: "{colors.rust-50}"
   color-text-placeholder: "{colors.gray-400}"
-  color-button-primary: "{colors.green-400}"
-  color-button-primary-hover: "{colors.green-300}"
-  color-button-primary-text: "{colors.gray-950}"
+  color-button-primary: "{colors.ruggine}"
+  color-button-primary-hover: "{colors.rust-600}"
+  color-button-primary-text: "{colors.gray-50}"
   color-button-secondary: "{colors.gray-800}"
   color-button-secondary-hover: "{colors.gray-700}"
   color-button-secondary-text: "{colors.gray-50}"
-  color-button-quiet-hover: "oklch(0.63 0.16 150 / 0.11)"
-  color-field-focus: "{colors.green-400}"
-  color-status-success: "{colors.green-400}"
+  color-button-quiet-hover: "11% Sabbia"
+  color-field-focus: "{colors.rust-300}"
+  color-status-success: "{colors.green-200}"
   color-status-warning: "oklch(0.78 0.14 75)"
   color-status-danger: "oklch(0.68 0.19 25)"
   position-qb: "#dc2626"
@@ -77,7 +112,7 @@ colors:
   position-dl: "{colors.green-800}"
   position-lb: "{colors.green-600}"
   position-db: "{colors.gray-400}"
-  position-idp-flex: "{colors.green-500}"
+  position-idp-flex: "{colors.green-300}"
 typography:
   sans:
     fontFamily: "Manrope, IBM Plex Sans, Fira Sans, Noto Sans, sans-serif"
@@ -108,25 +143,31 @@ spacing:
 
 ## Overview
 
-Fantasy Football presented by GameHQ is a dark, information-dense workspace for drafts, league management, history, and research tools. Green is the product color, neutral gray establishes interface depth, and state changes remain legible through complete container boundaries.
+Fantasy Football presented by GameHQ is a dark, information-dense workspace for drafts, league management, history, and research tools. Verde Bosco (`#365A43`) is the dominant product color, Grigio Fumo (`#353A38`) establishes the shared header, Ruggine (`#9C4F31`) identifies primary actions, and Sabbia (`#D8C6A8`) warms the neutral hierarchy. State changes remain legible through complete container boundaries.
 
 ## Colors
 
-Use the shared green ramp for product actions, active navigation, selection, focus, links, and success. Use the shared gray ramp for the page, primary and secondary cards, fields, menus, toolbars, tables, quiet controls, and reserve positions.
+Use the Verde Bosco ramp for the page canvas, cards, active navigation, selection, connected state, and success so green remains more prominent than gray across every route. Use Grigio Fumo for the shared header, quiet controls, fields, menus, and overlays. Sabbia must own deliberate, visibly substantial warm surfaces: split-hero copy panels, source or methodology explanations, attribution panels, subdued summary bands, and the designated dense research matrices. It is not merely a text or border tint. Keep dense controls, general-purpose tables, and selected states green or Fumo so the interface remains green-led; the Stats Hub research table and Schedule Lab matchup matrix are deliberate Sabbia exceptions. Use the Ruggine ramp for primary button fills, action links, warm-surface accents, and focus emphasis; the exact default primary-button fill is `#9C4F31`.
 
 Blue, cyan, teal, and navy-blue surfaces are not general interface colors. This prohibition applies to backgrounds, cards, fields, borders, buttons, tabs, badges, charts, glows, and illustrations used as interface chrome. The canonical WR blue and FLEX cyan markers are position semantics, not general accents. Official team artwork may retain authentic brand colors, but those colors never transfer to the surrounding interface.
 
-Reserve gold for awards and milestones, red for danger and errors, and amber for warnings. Those semantic exceptions do not replace green as the only general product accent.
+Reserve gold for awards and milestones, red for danger and errors, and amber for warnings. Those semantic exceptions and Ruggine actions do not displace Verde Bosco as the dominant brand and canvas color.
+
+Charts and graphs use exact Sabbia as the plot-area background, including full scatter-plot fields, ranked-bar fields, and compact sparkline canvases. Gridlines, axes, tick labels, reference lines, and neutral series use contrast-safe dark green, ink, gray, or Ruggine roles on top of Sabbia. Position-coded points and legends keep the canonical position colors, while positive, warning, and negative marks keep their semantic colors. Sabbia is the canvas, not the plotted data.
+
+The Stats Hub research table uses exact Sabbia as its continuous body background. Alternating and hover body rows remain within the warm Sabbia family, while its column header stays on the shared dark table-header surface. All body labels, values, dividers, rank pills, and trend lines switch to their contrast-safe dark roles; helmets and position semantics keep their canonical colors.
+
+The Schedule Lab matchup matrix uses Sabbia only for the graph-like data canvas across the rank, team, summary, and weekly matchup body cells. Its column header stays on the shared dark table-header surface, while alternating and hover body rows remain within the Sabbia family and use dark on-warm dividers and labels. Favorable, neutral, tough, unknown, and bye states retain distinct text labels and contrast-safe semantic text colors without replacing the Sabbia cell background.
 
 ## Components
 
-The page background uses the page surface. The header and navigation use the header surface. Primary cards are outer page sections and main work areas. Secondary cards are nested summaries, metrics, roster rows, table groups, and supporting content inside a primary card. Tertiary cards are limited to a third nested layer such as an inset metric inside a secondary card.
+The page background uses the page surface. The header and navigation use the header surface. Primary cards are outer page sections and main work areas. Secondary cards are nested summaries, metrics, roster rows, table groups, and supporting content inside a primary card. Tertiary cards are limited to a third nested layer such as an inset metric inside a secondary card. Warm surfaces use exact Sabbia with the named dark text and border roles; the subtle warm surface may be used for compact supporting bands that must retain light text.
 
-Text inputs, numeric inputs, textareas, and select triggers use the shared field surface, default border, placeholder, hover, disabled, and green focus roles. Menus and modals use the overlay surface. Toolbars use the primary-card toolbar role. Selected options, navigation items, tabs, table rows, and toggles use the selected surface and brand border.
+Text inputs, numeric inputs, textareas, and select triggers use the shared Fumo field surface, default border, placeholder, hover, disabled, and Ruggine focus roles. Menus and modals use the overlay surface. Toolbars use the primary-card toolbar role. Selected options, navigation items, tabs, table rows, and toggles use the Bosco selected surface and brand border.
 
-Primary buttons use the green primary-button roles. Secondary buttons use the gray secondary-button roles. Quiet and ghost buttons are transparent until hover, and danger buttons use the danger role only for destructive actions.
+Primary buttons use the shared Ruggine primary-button roles on every page. Secondary buttons use the Fumo secondary-button roles. Quiet and ghost buttons are transparent until hover, and danger buttons use the danger role only for destructive actions.
 
-Tables use the table-header role, primary table-row role, alternate-row role, and shared hover role. Neutral badges use the neutral badge surface; product, connected, live, and success badges use the brand badge surface. Informational messages use a gray card with a green icon rather than a separate information color.
+Tables use the table-header role, primary table-row role, alternate-row role, and shared hover role. Neutral badges use the neutral badge surface; product, connected, live, and success badges use the brand badge surface. Informational messages use a dark green card with a green icon rather than a separate information color.
 
 Primary text, secondary text, muted text, disabled text, placeholder text, links, and on-brand text each use their named shared role. Borders use subtle, default, strong, or brand roles according to hierarchy; page-local border colors are not allowed.
 
@@ -158,7 +199,9 @@ Use the shared density roles in `src/styles/tokens.css`. The landing display is 
 
 Page heroes and cards use natural height. Do not add `min-height` merely to make a surface feel substantial, and do not vertically center short content inside a tall empty container. A minimum height is allowed only when it protects an interaction, visualization, media aspect ratio, loading skeleton, or explicitly designed empty state.
 
-Desktop pages should use the available shared content width. At a 900px-tall desktop viewport, the primary hero action and the beginning of the next useful content group should normally be visible without scrolling. Supporting images use an aspect ratio rather than a fixed tall height.
+Every section must earn its height with useful content, interaction, or necessary media. Large blank regions inside heroes, cards, panels, and split layouts are a layout defect, even when they are intended to feel dramatic or premium. Fix the underlying composition by reducing minimum height, padding, heading size, gaps, media height, or unbalanced columns. Never use empty canvas, oversized type, or decorative spacing to disguise a low-information section.
+
+Desktop pages should use the available shared content width. At a 900px-tall desktop viewport, the complete primary hero, its main action, and at least one complete useful follow-up group should normally be visible without scrolling. Supporting images use an aspect ratio rather than a fixed tall height.
 
 Group by proximity before adding another card. Use the compact spacing roles for card padding and related groups, the section role between separate tasks, and the page role only between page chapters. Repeated cards in one row may match height, but one card must not force unrelated rows or sections to reserve empty space.
 
@@ -180,7 +223,11 @@ Roster Legacy counts only stored `WeeklyPlayerResult` rows marked as starters an
 
 - Do use a full perimeter border when color identifies a position or state.
 - Do use the semantic color roles from `src/styles/tokens.css` for every shared surface, control, and text role.
-- Do keep green as the primary action and selection color across every page.
+- Do keep Verde Bosco dominant across page canvases, cards, navigation, and selected states.
+- Do give Sabbia ownership of a visible surface region on landing, source, methodology, or attribution layouts.
+- Do use exact Sabbia for every chart and graph plot-area background, including compact sparkline canvases.
+- Do use Sabbia for the Stats Hub research-table body and the Schedule Lab graph-like data body, including alternating rows, hover state, and sticky body cells; keep their column headers on the shared dark table-header surface.
+- Do use the shared Ruggine role for every primary button across every page.
 - Do use the named text, border, badge, table, overlay, toolbar, and status roles for their matching elements.
 - Do map outer and nested cards to the primary-card and secondary-card roles.
 - Do use the canonical position palette through the shared position utility and badge primitive.
@@ -191,17 +238,21 @@ Roster Legacy counts only stored `WeeklyPlayerResult` rows marked as starters an
 - Do use the shared custom select trigger and centered control glyph for every visible select field.
 - Do use the named display, page, section, panel, and card density roles.
 - Do keep page heroes and ordinary cards at natural height.
-- Do verify the first useful follow-up content appears in a 900px-tall desktop viewport.
+- Do verify the complete hero and at least one complete useful follow-up group fit in a 900px-tall desktop viewport.
+- Do shrink padding, gaps, type, media, and container height when a section leaves visibly unused space.
 - Do use one compact list or table shell for repeated editable records on desktop.
 - Do preserve approved route imagery through branch reconciliation and release promotion.
 - Do communicate clickability through clear labels, hierarchy, borders, underlines, and hover or focus states.
 - Do not use blue, cyan, teal, or navy-blue for general interface chrome; WR blue and FLEX cyan are the explicit position-marker exceptions.
 - Do not synthesize position CSS classes from raw labels or add page-local position color maps.
 - Do not tint, alpha-mix, or surface-mix a standalone position badge's semantic fill.
+- Do not recolor position-coded chart points or legends to Sabbia; keep their canonical semantic colors and visible abbreviations.
+- Do not use Sabbia for a plotted line or mark when the chart already uses Sabbia as its background.
 - Do not hard-code position colors in charts, legends, SVG marks, select swatches, borders, or glows.
 - Do not sample an official team or editorial-image color into interface chrome.
-- Do not create an orange or page-local primary-action color.
-- Do not hard-code a new gray or green when an existing ramp step or semantic role fits.
+- Do not create a page-local primary-action color or substitute an arbitrary orange for Ruggine.
+- Do not hard-code a new green, rust, sand, or gray when an existing ramp step or semantic role fits.
+- Do not reduce Sabbia to text and border tint while every substantial surface remains green or gray.
 - Do not use decorative left-edge stripes, left-only borders, inset left bars, or left-edge pseudo-elements to indicate selection, activity, status, position, or emphasis.
 - Do not replace approved imagery with generic AI-looking, hand-drawn, decorative, or placeholder artwork.
 - Do not give a nested input its own fill when the parent already owns the field surface.
@@ -209,5 +260,6 @@ Roster Legacy counts only stored `WeeklyPlayerResult` rows marked as starters an
 - Do not expose browser-native select arrows, draw page-local CSS chevrons, or offset a field glyph by eye.
 - Do not use oversized viewport-relative headings as the primary source of hierarchy.
 - Do not add empty height, padding, or spacer elements to make a page feel more important.
+- Do not leave large blank regions in heroes, cards, panels, or split columns for visual drama.
 - Do not wrap every repeated data row in its own padded card or repeat identical desktop field labels row after row.
 - Do not append decorative right-arrow icons or glyphs to buttons, links, feature rows, navigation links, or calls to action. Directional icons are reserved for controls where direction is the actual meaning; chevrons remain appropriate for disclosure and dropdown state.
