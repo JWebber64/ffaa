@@ -12,12 +12,13 @@ import {
   Gavel,
   Users,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 
 import { LeagueWorkspaceProvider } from "../features/league-workspace/LeagueWorkspaceContext";
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
 import { LeaguePlayerSheetProvider } from "../features/player-sheet/LeaguePlayerSheet";
+import { TeamIdentityMark } from "../ui/TeamIdentityMark";
 import { UniversalSelect } from "../ui/UniversalSelect";
 import { closeParentDisclosure, useDismissibleDisclosureMenus } from "../ui/disclosureMenu";
 import "./league-workspace.css";
@@ -34,16 +35,12 @@ const leagueDestinations = [
 ] as const;
 
 export function LeagueWorkspaceMark({ avatarUrl, teamName }: { avatarUrl?: string; teamName: string }) {
-  const [imageFailed, setImageFailed] = useState(false);
-
-  useEffect(() => setImageFailed(false), [avatarUrl]);
-
   return (
-    <span className="league-workspace-mark" aria-hidden="true">
-      {avatarUrl && !imageFailed
-        ? <img src={avatarUrl} alt="" decoding="async" onError={() => setImageFailed(true)} />
-        : teamName.slice(0, 2).toUpperCase()}
-    </span>
+    <TeamIdentityMark
+      {...(avatarUrl ? { avatarUrl } : {})}
+      className="league-workspace-mark"
+      name={teamName}
+    />
   );
 }
 

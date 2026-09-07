@@ -90,6 +90,7 @@ function connectionWithSnapshot(connection: SleeperLeagueConnectionSummary, data
     currentWeek: data.week,
     opponentName: data.opponentName,
     teamSnapshotAt: data.loadedAt,
+    ...(data.managerAvatarUrl ? { managerAvatarUrl: data.managerAvatarUrl } : {}),
     ...(data.leagueOwnerProviderUserId
       ? { leagueOwnerProviderUserId: data.leagueOwnerProviderUserId }
       : {}),

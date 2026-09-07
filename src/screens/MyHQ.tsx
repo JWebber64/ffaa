@@ -9,6 +9,7 @@ import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspace
 import { ManagerIdentityForm } from "../features/league-workspace/ManagerIdentityForm";
 import type { MyHQData } from "../features/my-hq/myHQ";
 import { PositionBadge } from "../ui/PositionBadge";
+import { TeamIdentityMark } from "../ui/TeamIdentityMark";
 import "./my-hq.css";
 
 function formatScore(value: number | null) {
@@ -147,11 +148,17 @@ export default function MyHQ() {
   }
 
   const data = state.data!;
+  const managerAvatarUrl = data.managerAvatarUrl || connection.managerAvatarUrl;
   return (
     <div className="my-hq">
       <header className="hq-team-bar">
         <div className="hq-team-identity">
-          <span className="hq-team-mark" aria-hidden="true">{initials(data.teamName)}</span>
+          <TeamIdentityMark
+            {...(managerAvatarUrl ? { avatarUrl: managerAvatarUrl } : {})}
+            className="hq-team-mark"
+            fallbackText={initials(data.teamName)}
+            name={data.teamName}
+          />
           <div>
             <span className="hq-kicker">My team · {data.week ? `Week ${data.week}` : "Preseason"}</span>
             <h1>{data.teamName}</h1>

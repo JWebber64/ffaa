@@ -16,6 +16,7 @@ import { useFirebaseSession } from "../lib/useFirebaseSession";
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import { ManagerIdentityForm } from "../features/league-workspace/ManagerIdentityForm";
 import { useMyTeamsPortfolio, type PortfolioTeam } from "../features/my-hq/useMyTeamsPortfolio";
+import { TeamIdentityMark } from "../ui/TeamIdentityMark";
 import "./my-teams.css";
 
 function snapshotAgeLabel(value: string | undefined) {
@@ -89,11 +90,15 @@ function PortfolioTeamRow({ team, activeLeagueId }: { team: PortfolioTeam; activ
     : data?.teamName || connection.managerTeamName || connection.managerDisplayName || "My team";
   const isActive = connection.leagueId === activeLeagueId;
   const openPath = `/league/${encodeURIComponent(connection.leagueId)}/team`;
+  const managerAvatarUrl = data?.managerAvatarUrl || connection.managerAvatarUrl;
 
   return (
     <article className={`${isActive ? "is-active " : ""}is-${state.status}`}>
       <div className="my-team-identity">
-        <span aria-hidden="true">{teamName.slice(0, 2).toUpperCase()}</span>
+        <TeamIdentityMark
+          {...(managerAvatarUrl ? { avatarUrl: managerAvatarUrl } : {})}
+          name={teamName}
+        />
         <div><small>{connection.leagueName}</small><h2>{teamName}</h2><p>{connection.season} · {connection.totalRosters || "—"} teams · {connection.status.replace(/_/g, " ")}</p></div>
       </div>
 
