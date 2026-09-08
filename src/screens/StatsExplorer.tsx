@@ -16,6 +16,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { TeamMark } from "@/components/player/TeamMark";
 import { StatsDataTable } from "@/components/stats/StatsDataTable";
+import { buildStatRanks } from "@/components/stats/statRanks";
 import type {
   StatsSortState,
   StatsTableColumn,
@@ -493,7 +494,10 @@ function playerColumns(
 
   const positionRankColumn: StatsTableColumn<HubPlayerRow> = {
     id: "positionRank",
-    label: "Pos Rk",
+    label: view === "leaders" ? leaderProjectionMode ? "Proj FPTS Pos Rk" : "FPTS Pos Rk" : "Pos Rk",
+    ...(view === "leaders" ? {
+      description: "Position rank by total fantasy points, independent of the selected sort stat.",
+    } : {}),
     sortValue: (row) => row.positionRank,
     render: (row) => (
       <span className="stats-hub-rank-pill">
@@ -1905,16 +1909,16 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
   const teamFilter = requestedTeamFilter === "ALL" || teams.includes(requestedTeamFilter)
     ? requestedTeamFilter
     : "ALL";
+  const eligiblePlayerRows = useMemo(() => playerRows.filter((row) =>
+    matchesPositionFilter(row.position, positionFilter) &&
+    (teamFilter === "ALL" || row.team === teamFilter),
+  ), [playerRows, positionFilter, teamFilter]);
   const filteredPlayerRows = useMemo(() => {
     const needle = search.trim().toLowerCase();
-    return playerRows.filter((row) => {
-      const positionMatches = matchesPositionFilter(row.position, positionFilter);
-      const teamMatches = teamFilter === "ALL" || row.team === teamFilter;
-      const searchMatches =
-        !needle || `${row.name} ${row.position} ${row.team} ${row.status}`.toLowerCase().includes(needle);
-      return positionMatches && teamMatches && searchMatches;
-    });
-  }, [playerRows, positionFilter, search, teamFilter]);
+    return eligiblePlayerRows.filter((row) =>
+      !needle || `${row.name} ${row.position} ${row.team} ${row.status}`.toLowerCase().includes(needle),
+    );
+  }, [eligiblePlayerRows, search]);
 
   const defenseRows = useMemo(() => buildDefenseMatchups(weeklyData?.rows ?? []), [weeklyData]);
   const filteredDefenseRows = useMemo(() => {
@@ -1938,6 +1942,16 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
   );
   const currentDefenseColumns = useMemo(() => defenseColumns(), []);
   const currentTeamColumns = useMemo(() => teamColumns(), []);
+  const playerRanking = useMemo(() => {
+    if (view !== "leaders" || sort.columnId === "player" || sort.columnId === "positionRank") return undefined;
+    const column = currentPlayerColumns.find((candidate) => candidate.id === sort.columnId);
+    if (!column) return undefined;
+    return {
+      label: column.id === "weeklyTrend" ? "Last 3" : column.label,
+      description: "Rank within the selected position, team, season, scoring, and game filters, before search or row limits. Highest unrounded value is #1; ties share a rank. Missing values are unranked.",
+      ranks: buildStatRanks(eligiblePlayerRows, column.sortValue),
+    };
+  }, [currentPlayerColumns, eligiblePlayerRows, sort.columnId, view]);
   const sortedPlayerRows = useMemo(
     () => sortRows(filteredPlayerRows, currentPlayerColumns, sort),
     [currentPlayerColumns, filteredPlayerRows, sort],
@@ -2142,6 +2156,7 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
       downloadCsv(
         `gamehq-${DRAFT_SEASON}-projected-leaders-${scoring}.csv`,
         [
+          ...(playerRanking ? [`${playerRanking.label} Rank`] : []),
           "Player",
           "Position",
           "Team",
@@ -2153,7 +2168,8 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
           "Projection Sources",
           "Bye",
         ],
-        filteredPlayerRows.map((row) => [
+        sortedPlayerRows.map((row) => [
+          ...(playerRanking ? [playerRanking.ranks.get(row.id) ?? ""] : []),
           row.name,
           row.position,
           row.team,
@@ -2255,8 +2271,8 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
     const includeCareerPpg = view === "leaders" && !leaderProjectionMode;
     downloadCsv(
       `gamehq-${view}-${view === "draft" ? DRAFT_SEASON : season}.csv`,
-      ["Player", "Position", "Team", "Games", "Fantasy Points", "FPG", ...(includeCareerPpg ? ["Career PPG"] : []), "Last 3", "Last 5", "Floor", "Ceiling", "Opportunities/G", "Target Share", "ADP", "ADP High", "ADP Low", "Times Drafted", "Projected Points", "GameHQ Fair Value", "Market Median", "Bye"],
-      filteredPlayerRows.map((row) => [row.name, row.position, row.team, row.games, row.fantasyPoints, row.fantasyPointsPerGame, ...(includeCareerPpg ? [row.careerFantasyPointsPerGame ?? ""] : []), row.last3FantasyPointsPerGame, row.last5FantasyPointsPerGame, row.floorFantasyPoints, row.ceilingFantasyPoints, row.opportunitiesPerGame, row.targetShare ?? "", row.adp ?? "", row.adpHigh ?? "", row.adpLow ?? "", row.timesDrafted ?? "", row.projectedFantasyPoints ?? "", row.auctionValue ?? "", row.marketValue ?? "", row.bye ?? ""]),
+      [...(playerRanking ? [`${playerRanking.label} Rank`] : []), "Player", "Position", "Team", "Games", "Fantasy Points", "FPG", ...(includeCareerPpg ? ["Career PPG"] : []), "Last 3", "Last 5", "Floor", "Ceiling", "Opportunities/G", "Target Share", "ADP", "ADP High", "ADP Low", "Times Drafted", "Projected Points", "GameHQ Fair Value", "Market Median", "Bye"],
+      (view === "leaders" ? sortedPlayerRows : filteredPlayerRows).map((row) => [...(playerRanking ? [playerRanking.ranks.get(row.id) ?? ""] : []), row.name, row.position, row.team, row.games, row.fantasyPoints, row.fantasyPointsPerGame, ...(includeCareerPpg ? [row.careerFantasyPointsPerGame ?? ""] : []), row.last3FantasyPointsPerGame, row.last5FantasyPointsPerGame, row.floorFantasyPoints, row.ceilingFantasyPoints, row.opportunitiesPerGame, row.targetShare ?? "", row.adp ?? "", row.adpHigh ?? "", row.adpLow ?? "", row.timesDrafted ?? "", row.projectedFantasyPoints ?? "", row.auctionValue ?? "", row.marketValue ?? "", row.bye ?? ""]),
     );
   }
 
@@ -2509,8 +2525,14 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
       </div>
 
       <div className="stats-hub-view-intro">
-        <div>
+        <div className="stats-hub-view-title">
           <h2>{viewCopy.title}</h2>
+          {playerRanking ? (
+            <span className="stats-hub-ranking-summary" title={playerRanking.description}>
+              Ranked by {playerRanking.label} · {positionFilter === "ALL" ? "All positions" : positionFilter}
+              {teamFilter === "ALL" ? "" : ` · ${teamFilter}`}
+            </span>
+          ) : null}
         </div>
         <div className="stats-hub-view-intro-actions">
           <span className="stats-hub-result-count">{viewResultCount.toLocaleString()} results</span>
@@ -2652,6 +2674,7 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
           <StatsDataTable
             rows={sortedPlayerRows.slice(0, rowLimit)}
             columns={currentPlayerColumns}
+            ranking={playerRanking}
             sort={sort}
             onSortChange={setSort}
             onRowSelect={(row) => setSelectedPlayerId(row.id)}

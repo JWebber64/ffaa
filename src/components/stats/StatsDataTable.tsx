@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useCallback, useId, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode, UIEvent } from "react";
+import "./StatsDataTable.css";
 
 export type StatsSortDirection = "asc" | "desc";
 
@@ -27,6 +28,11 @@ interface StatsDataTableProps<Row extends { id: string }> {
   onRowSelect?: (row: Row) => void;
   emptyMessage: string;
   caption: string;
+  ranking?: {
+    label: string;
+    description: string;
+    ranks: ReadonlyMap<string, number>;
+  } | undefined;
 }
 
 function nextSort(current: StatsSortState, columnId: string): StatsSortState {
@@ -51,6 +57,7 @@ export function StatsDataTable<Row extends { id: string }>({
   onRowSelect,
   emptyMessage,
   caption,
+  ranking,
 }: StatsDataTableProps<Row>) {
   const tableShellId = useId();
   const tableShellRef = useRef<HTMLDivElement>(null);
@@ -120,10 +127,15 @@ export function StatsDataTable<Row extends { id: string }>({
         className="stats-hub-table-shell"
         onScroll={(event) => syncHorizontalScroll(event, topScrollbarRef.current)}
       >
-        <table className="stats-hub-table">
+        <table className={`stats-hub-table${ranking ? " has-ranking" : ""}`}>
           <caption className="sr-only">{caption}</caption>
           <thead>
             <tr>
+              {ranking ? (
+                <th scope="col" className="stats-hub-stat-rank" title={ranking.description}>
+                  {ranking.label} RK
+                </th>
+              ) : null}
               {columns.map((column) => {
                 const active = sort.columnId === column.id;
                 return (
@@ -151,6 +163,9 @@ export function StatsDataTable<Row extends { id: string }>({
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
+                {ranking ? (
+                  <td className="stats-hub-stat-rank">{ranking.ranks.get(row.id) ?? "—"}</td>
+                ) : null}
                 {columns.map((column) => (
                   <td
                     key={column.id}

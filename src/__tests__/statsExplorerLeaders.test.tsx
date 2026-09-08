@@ -1,9 +1,9 @@
 /* @vitest-environment jsdom */
 
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import StatsExplorer from "@/screens/StatsExplorer";
 
@@ -138,6 +138,7 @@ function projection({
 }
 
 describe("StatsExplorer fantasy leaders", () => {
+  afterEach(cleanup);
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.buildPlayerStatRows.mockReturnValue([
@@ -197,7 +198,7 @@ describe("StatsExplorer fantasy leaders", () => {
     const table = screen.getByRole("table", { name: "Fantasy leaders player table" });
     await within(table).findByText("Volume Back");
 
-    const pointsHeader = within(table).getByRole("button", { name: /FPTS/ });
+    const pointsHeader = within(table).getByRole("button", { name: "FPTS" });
     expect(pointsHeader.closest("th")).toHaveAttribute("aria-sort", "descending");
 
     let rows = within(table).getAllByRole("row").slice(1);
@@ -215,5 +216,42 @@ describe("StatsExplorer fantasy leaders", () => {
     expect(rows[0]).toHaveTextContent("RB2");
     expect(rows[1]).toHaveTextContent("Volume Back");
     expect(rows[1]).toHaveTextContent("RB1");
+    expect(within(table).getByRole("columnheader", { name: "FPG RK" })).toBeInTheDocument();
+    expect(within(rows[0]!).getAllByRole("cell")[0]).toHaveTextContent(/^1$/);
+    expect(within(rows[1]!).getAllByRole("cell")[0]).toHaveTextContent(/^2$/);
+    expect(screen.getByText("Ranked by FPG · RB")).toBeInTheDocument();
+
+    fireEvent.click(within(table).getByRole("button", { name: "FPG" }));
+    rows = within(table).getAllByRole("row").slice(1);
+    expect(rows[0]).toHaveTextContent("Volume Back");
+    expect(within(rows[0]!).getAllByRole("cell")[0]).toHaveTextContent(/^2$/);
+    expect(pointsHeader.closest("th")).toHaveAttribute("aria-sort", "none");
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Search players" }), { target: { value: "Volume" } });
+    await waitFor(() => expect(within(table).getAllByRole("row")).toHaveLength(2));
+    expect(within(within(table).getAllByRole("row")[1]!).getAllByRole("cell")[0]).toHaveTextContent(/^2$/);
+    fireEvent.click(within(table).getByRole("button", { name: "Last 3" }));
+    expect(within(table).getByRole("columnheader", { name: "Last 3 RK" })).toBeInTheDocument();
+    expect(within(within(table).getAllByRole("row")[1]!).getAllByRole("cell")[0]).toHaveTextContent(/^2$/);
+  }, 60_000);
+
+  it("ranks across the full position population before search and the row limit", async () => {
+    mocks.loadWeeklyPlayerStats.mockResolvedValue({
+      rows: [], unavailableSeasons: [],
+      summaries: [
+        ...Array.from({ length: 55 }, (_, i) => summary({
+          id: `back-${i}`, name: `Back ${i}`, points: 550 - i, pointsPerGame: 55 - i, games: 10,
+        })),
+        { ...summary({ id: "receiver", name: "Receiver", points: 1000, pointsPerGame: 100, games: 10 }), position: "WR", positionGroup: "WR" },
+      ],
+    });
+    render(<MemoryRouter initialEntries={["/stats?season=2025&position=RB"]}><StatsExplorer /></MemoryRouter>);
+    const table = screen.getByRole("table", { name: "Fantasy leaders player table" });
+    await within(table).findByText("Back 0");
+    expect(within(table).getAllByRole("row")).toHaveLength(51);
+    expect(within(within(table).getAllByRole("row")[1]!).getAllByRole("cell")[0]).toHaveTextContent(/^1$/);
+    fireEvent.change(screen.getByRole("textbox", { name: "Search players" }), { target: { value: "Back 54" } });
+    await within(table).findByText("Back 54");
+    expect(within(within(table).getAllByRole("row")[1]!).getAllByRole("cell")[0]).toHaveTextContent(/^55$/);
   }, 60_000);
 });

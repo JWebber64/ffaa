@@ -1,0 +1,62 @@
+.stats-hub-table.has-ranking {
+  --stats-rank-width: 4.75rem;
+}
+
+.stats-hub-table.has-ranking th.is-sticky,
+.stats-hub-table.has-ranking td.is-sticky {
+  left: var(--stats-rank-width);
+}
+
+.stats-hub-table.has-ranking th.stats-hub-stat-rank,
+.stats-hub-table.has-ranking td.stats-hub-stat-rank {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  width: var(--stats-rank-width);
+  min-width: var(--stats-rank-width);
+  max-width: var(--stats-rank-width);
+  padding-inline: 8px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.stats-hub-table.has-ranking th.stats-hub-stat-rank {
+  z-index: 6;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: normal;
+}
+
+.stats-hub .stats-hub-table.has-ranking td.stats-hub-stat-rank {
+  color: var(--color-text-on-warm);
+}
+
+.stats-hub .stats-hub-table.has-ranking th[aria-sort="ascending"],
+.stats-hub .stats-hub-table.has-ranking th[aria-sort="descending"] {
+  background: var(--green-800);
+}
+
+.stats-hub .stats-hub-table.has-ranking th[aria-sort="ascending"] > button,
+.stats-hub .stats-hub-table.has-ranking th[aria-sort="descending"] > button {
+  color: var(--text-0);
+}
+
+.stats-hub-view-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+  min-width: 0;
+}
+
+.stats-hub-ranking-summary {
+  color: var(--text-2);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 640px) {
+  .stats-hub-table.has-ranking {
+    --stats-rank-width: 4.25rem;
+  }
+}
