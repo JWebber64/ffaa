@@ -6,7 +6,13 @@ colors:
   primary: "{colors.verde-bosco}"
   verde-bosco: "#365A43"
   ruggine: "#9C4F31"
-  sabbia: "#D8C6A8"
+  silver: "#E0E5E3"
+  silver-row-alt: "#D4DDDA"
+  silver-row-hover: "#C8D5CF"
+  silver-ink: "#18251F"
+  silver-ink-muted: "#3F5047"
+  silver-border: "#BAC7C0"
+  silver-accent: "#30513D"
   grigio-fumo: "#353A38"
   paper: "#F5EEE3"
   green-50: "#F0F4EE"
@@ -32,7 +38,7 @@ colors:
   rust-900: "#3B2119"
   gray-50: "{colors.paper}"
   gray-100: "#E9DDCA"
-  gray-200: "{colors.sabbia}"
+  gray-200: "{colors.silver}"
   gray-300: "#B9B09F"
   gray-400: "#96968E"
   gray-500: "#646963"
@@ -46,8 +52,8 @@ colors:
   color-surface-card-primary: "{colors.green-900}"
   color-surface-card-secondary: "{colors.green-800}"
   color-surface-card-tertiary: "green-800 to green-700 mix"
-  color-surface-warm: "{colors.sabbia}"
-  color-surface-warm-subtle: "18% Sabbia into green-900"
+  color-surface-warm: "{colors.silver}"
+  color-surface-warm-subtle: "18% Silver gray into green-900"
   color-surface-overlay: "gray-900 to green-950 mix"
   color-surface-field: "gray-900 to green-950 mix"
   color-surface-field-hover: "gray-800 to green-800 mix"
@@ -57,34 +63,34 @@ colors:
   color-surface-table-header: "green-950 to gray-900 mix"
   color-surface-table-row: "{colors.green-900}"
   color-surface-table-row-alt: "green-900 to green-800 mix"
-  color-surface-table-warm-row: "{colors.sabbia}"
-  color-surface-table-warm-row-alt: "90% Sabbia to paper"
-  color-surface-table-warm-row-hover: "84% Sabbia to green-300"
+  color-surface-table-warm-row: "{colors.silver}"
+  color-surface-table-warm-row-alt: "{colors.silver-row-alt}"
+  color-surface-table-warm-row-hover: "{colors.silver-row-hover}"
   color-surface-badge-neutral: "{colors.gray-700}"
   color-surface-badge-brand: "green-700 to verde-bosco mix"
-  color-chart-plot: "{colors.sabbia}"
+  color-chart-plot: "{colors.silver}"
   color-chart-grid: "16% gray-950"
-  color-chart-axis: "{colors.gray-950}"
-  color-chart-axis-muted: "{colors.gray-700}"
+  color-chart-axis: "{colors.silver-ink}"
+  color-chart-axis-muted: "{colors.silver-ink-muted}"
   color-chart-reference: "62% rust-700"
-  color-chart-series-neutral: "{colors.green-700}"
-  color-chart-series-neutral-point: "{colors.green-900}"
+  color-chart-series-neutral: "{colors.silver-accent}"
+  color-chart-series-neutral-point: "{colors.silver-accent}"
   color-chart-series-positive: "{colors.green-700}"
   color-chart-series-negative: "status-danger to gray-950 mix"
   color-chart-track: "14% gray-950"
-  color-border-subtle: "14% Sabbia"
-  color-border-default: "24% Sabbia"
+  color-border-subtle: "14% Silver gray"
+  color-border-default: "24% Silver gray"
   color-border-strong: "38% warm paper"
   color-border-brand: "58% green-300"
-  color-border-on-warm: "24% gray-950"
+  color-border-on-warm: "{colors.silver-border}"
   color-button-primary-border: "{colors.rust-300}"
   color-text-primary: "{colors.gray-50}"
   color-text-secondary: "{colors.gray-100}"
   color-text-muted: "{colors.gray-200}"
   color-text-disabled: "{colors.gray-300}"
   color-text-on-brand: "{colors.gray-50}"
-  color-text-on-warm: "{colors.gray-950}"
-  color-text-on-warm-secondary: "{colors.gray-700}"
+  color-text-on-warm: "{colors.silver-ink}"
+  color-text-on-warm-secondary: "{colors.silver-ink-muted}"
   color-text-on-warm-accent: "{colors.rust-700}"
   color-text-link: "{colors.rust-100}"
   color-text-link-hover: "{colors.rust-50}"
@@ -95,7 +101,7 @@ colors:
   color-button-secondary: "{colors.gray-800}"
   color-button-secondary-hover: "{colors.gray-700}"
   color-button-secondary-text: "{colors.gray-50}"
-  color-button-quiet-hover: "11% Sabbia"
+  color-button-quiet-hover: "11% Silver gray"
   color-field-focus: "{colors.rust-300}"
   color-status-success: "{colors.green-200}"
   color-status-warning: "oklch(0.78 0.14 75)"
@@ -143,25 +149,27 @@ spacing:
 
 ## Overview
 
-Fantasy Football presented by GameHQ is a dark, information-dense workspace for drafts, league management, history, and research tools. Verde Bosco (`#365A43`) is the dominant product color, Grigio Fumo (`#353A38`) establishes the shared header, Ruggine (`#9C4F31`) identifies primary actions, and Sabbia (`#D8C6A8`) warms the neutral hierarchy. State changes remain legible through complete container boundaries.
+Fantasy Football presented by GameHQ is a dark, information-dense workspace for drafts, league management, history, and research tools. Verde Bosco (`#365A43`) is the dominant product color, Grigio Fumo (`#353A38`) establishes the shared header, Ruggine (`#9C4F31`) identifies primary actions, and Silver gray (`#E0E5E3`) supplies the light neutral surfaces. State changes remain legible through complete container boundaries.
 
 ## Colors
 
-Use the Verde Bosco ramp for the page canvas, cards, active navigation, selection, connected state, and success so green remains more prominent than gray across every route. Use Grigio Fumo for the shared header, quiet controls, fields, menus, and overlays. Sabbia must own deliberate, visibly substantial warm surfaces: split-hero copy panels, source or methodology explanations, attribution panels, subdued summary bands, and the designated dense research matrices. It is not merely a text or border tint. Keep dense controls, general-purpose tables, and selected states green or Fumo so the interface remains green-led; the Stats Hub research table and Schedule Lab matchup matrix are deliberate Sabbia exceptions. Use the Ruggine ramp for primary button fills, action links, warm-surface accents, and focus emphasis; the exact default primary-button fill is `#9C4F31`.
+Use the Verde Bosco ramp for the page canvas, cards, active navigation, selection, connected state, and success so green remains more prominent than gray across every route. Use Grigio Fumo for the shared header, quiet controls, fields, menus, and overlays. Silver gray must own deliberate, visibly substantial light surfaces: split-hero copy panels, source or methodology explanations, attribution panels, subdued summary bands, and the designated dense research matrices. It is not merely a text or border tint. Keep dense controls, general-purpose tables, and selected states green or Fumo so the interface remains green-led; the Stats Hub research table and Schedule Lab matchup matrix are deliberate Silver gray exceptions. Use the Ruggine ramp for primary button fills, action links, light-surface accents, and focus emphasis; the exact default primary-button fill is `#9C4F31`.
+
+The approved Silver gray option replaces every former beige use, including shared accents, tinted backgrounds, muted text, borders, focus rings, and scrollbars. Existing `warm` role names remain compatibility names for the Silver gray system; they no longer authorize beige values. The exact palette, consumer inventory, and release checks are documented in `docs/SILVER_GRAY_PALETTE.md`.
 
 Blue, cyan, teal, and navy-blue surfaces are not general interface colors. This prohibition applies to backgrounds, cards, fields, borders, buttons, tabs, badges, charts, glows, and illustrations used as interface chrome. The canonical WR blue and FLEX cyan markers are position semantics, not general accents. Official team artwork may retain authentic brand colors, but those colors never transfer to the surrounding interface.
 
 Reserve gold for awards and milestones, red for danger and errors, and amber for warnings. Those semantic exceptions and Ruggine actions do not displace Verde Bosco as the dominant brand and canvas color.
 
-Charts and graphs use exact Sabbia as the plot-area background, including full scatter-plot fields, ranked-bar fields, and compact sparkline canvases. Gridlines, axes, tick labels, reference lines, and neutral series use contrast-safe dark green, ink, gray, or Ruggine roles on top of Sabbia. Position-coded points and legends keep the canonical position colors, while positive, warning, and negative marks keep their semantic colors. Sabbia is the canvas, not the plotted data.
+Charts and graphs use exact Silver gray as the plot-area background, including full scatter-plot fields, ranked-bar fields, and compact sparkline canvases. Gridlines, axes, tick labels, reference lines, and neutral series use contrast-safe dark green, ink, gray, or Ruggine roles on top of Silver gray. Position-coded points and legends keep the canonical position colors, while positive, warning, and negative marks keep their semantic colors. Silver gray is the canvas, not the plotted data.
 
-The Stats Hub research table uses exact Sabbia as its continuous body background. Alternating and hover body rows remain within the warm Sabbia family, while its column header stays on the shared dark table-header surface. All body labels, values, dividers, rank pills, and trend lines switch to their contrast-safe dark roles; helmets and position semantics keep their canonical colors.
+The Stats Hub research table uses exact Silver gray as its continuous body background. Alternating rows use `#D4DDDA` and hover rows use `#C8D5CF`, including sticky rank and player cells. Table sparklines inherit their row surface so alternating rows remain continuous. Its column header stays on the shared dark table-header surface. All body labels, values, dividers, rank pills, and trend lines switch to their contrast-safe dark roles; helmets and position semantics keep their canonical colors.
 
-The Schedule Lab matchup matrix uses Sabbia only for the graph-like data canvas across the rank, team, summary, and weekly matchup body cells. Its column header stays on the shared dark table-header surface, while alternating and hover body rows remain within the Sabbia family and use dark on-warm dividers and labels. Favorable, neutral, tough, unknown, and bye states retain distinct text labels and contrast-safe semantic text colors without replacing the Sabbia cell background.
+The Schedule Lab matchup matrix uses Silver gray only for the graph-like data canvas across the rank, team, summary, and weekly matchup body cells. Its column header stays on the shared dark table-header surface, while alternating and hover body rows remain within the Silver gray family and use dark on-warm dividers and labels. Favorable, neutral, tough, unknown, and bye states retain distinct text labels and contrast-safe semantic text colors without replacing the Silver gray cell background.
 
 ## Components
 
-The page background uses the page surface. The header and navigation use the header surface. Primary cards are outer page sections and main work areas. Secondary cards are nested summaries, metrics, roster rows, table groups, and supporting content inside a primary card. Tertiary cards are limited to a third nested layer such as an inset metric inside a secondary card. Warm surfaces use exact Sabbia with the named dark text and border roles; the subtle warm surface may be used for compact supporting bands that must retain light text.
+The page background uses the page surface. The header and navigation use the header surface. Primary cards are outer page sections and main work areas. Secondary cards are nested summaries, metrics, roster rows, table groups, and supporting content inside a primary card. Tertiary cards are limited to a third nested layer such as an inset metric inside a secondary card. Light surfaces use exact Silver gray with the named dark text and border roles; the subtle variant may be used for compact supporting bands that must retain light text.
 
 Text inputs, numeric inputs, textareas, and select triggers use the shared Fumo field surface, default border, placeholder, hover, disabled, and Ruggine focus roles. Menus and modals use the overlay surface. Toolbars use the primary-card toolbar role. Selected options, navigation items, tabs, table rows, and toggles use the Bosco selected surface and brand border.
 
@@ -234,9 +242,9 @@ Roster Legacy counts only stored `WeeklyPlayerResult` rows marked as starters an
 - Do use a full perimeter border when color identifies a position or state.
 - Do use the semantic color roles from `src/styles/tokens.css` for every shared surface, control, and text role.
 - Do keep Verde Bosco dominant across page canvases, cards, navigation, and selected states.
-- Do give Sabbia ownership of a visible surface region on landing, source, methodology, or attribution layouts.
-- Do use exact Sabbia for every chart and graph plot-area background, including compact sparkline canvases.
-- Do use Sabbia for the Stats Hub research-table body and the Schedule Lab graph-like data body, including alternating rows, hover state, and sticky body cells; keep their column headers on the shared dark table-header surface.
+- Do give Silver gray ownership of a visible surface region on landing, source, methodology, or attribution layouts.
+- Do use exact Silver gray for every chart and graph plot-area background, including compact sparkline canvases.
+- Do use Silver gray for the Stats Hub research-table body and the Schedule Lab graph-like data body, including alternating rows, hover state, and sticky body cells; keep their column headers on the shared dark table-header surface.
 - Do use the shared Ruggine role for every primary button across every page.
 - Do use the named text, border, badge, table, overlay, toolbar, and status roles for their matching elements.
 - Do map outer and nested cards to the primary-card and secondary-card roles.
@@ -256,13 +264,13 @@ Roster Legacy counts only stored `WeeklyPlayerResult` rows marked as starters an
 - Do not use blue, cyan, teal, or navy-blue for general interface chrome; WR blue and FLEX cyan are the explicit position-marker exceptions.
 - Do not synthesize position CSS classes from raw labels or add page-local position color maps.
 - Do not tint, alpha-mix, or surface-mix a standalone position badge's semantic fill.
-- Do not recolor position-coded chart points or legends to Sabbia; keep their canonical semantic colors and visible abbreviations.
-- Do not use Sabbia for a plotted line or mark when the chart already uses Sabbia as its background.
+- Do not recolor position-coded chart points or legends to Silver gray; keep their canonical semantic colors and visible abbreviations.
+- Do not use Silver gray for a plotted line or mark when the chart already uses Silver gray as its background.
 - Do not hard-code position colors in charts, legends, SVG marks, select swatches, borders, or glows.
 - Do not sample an official team or editorial-image color into interface chrome.
 - Do not create a page-local primary-action color or substitute an arbitrary orange for Ruggine.
 - Do not hard-code a new green, rust, sand, or gray when an existing ramp step or semantic role fits.
-- Do not reduce Sabbia to text and border tint while every substantial surface remains green or gray.
+- Do not reduce Silver gray to text and border tint while every substantial surface remains green or gray.
 - Do not use decorative left-edge stripes, left-only borders, inset left bars, or left-edge pseudo-elements to indicate selection, activity, status, position, or emphasis.
 - Do not replace approved imagery with generic AI-looking, hand-drawn, decorative, or placeholder artwork.
 - Do not give a nested input its own fill when the parent already owns the field surface.

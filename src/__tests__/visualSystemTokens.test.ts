@@ -43,7 +43,7 @@ function prohibitedInterfaceColors(path: string) {
     });
 }
 
-describe("shared Bosco, Ruggine, Sabbia, and Fumo visual system", () => {
+describe("shared Bosco, Ruggine, Silver gray, and Fumo visual system", () => {
   it("defines every site-wide element role in the shared token owner", () => {
     const tokens = readProjectFile("src/styles/tokens.css");
     const roles = [
@@ -109,25 +109,27 @@ describe("shared Bosco, Ruggine, Sabbia, and Fumo visual system", () => {
     for (const assignment of [
       "--brand-verde-bosco: #365a43",
       "--brand-ruggine: #9c4f31",
-      "--brand-sabbia: #d8c6a8",
+      "--brand-silver: #e0e5e3",
+      "--silver-row-alt: #d4ddda",
+      "--silver-row-hover: #c8d5cf",
       "--brand-fumo: #353a38",
       "--color-surface-page: var(--brand-verde-bosco)",
       "--color-button-primary: var(--brand-ruggine)",
       "--color-surface-header: var(--gray-800)",
-      "--color-surface-warm: var(--brand-sabbia)",
+      "--color-surface-warm: var(--brand-silver)",
     ]) expect(tokens).toContain(assignment);
 
     expect(design).toContain('verde-bosco: "#365A43"');
     expect(design).toContain('ruggine: "#9C4F31"');
-    expect(design).toContain('sabbia: "#D8C6A8"');
+    expect(design).toContain('silver: "#E0E5E3"');
     expect(design).toContain('grigio-fumo: "#353A38"');
     expect(design).toContain("Do keep Verde Bosco dominant");
     expect(design).toContain("Do use the shared Ruggine role for every primary button");
-    expect(design).toContain("Do give Sabbia ownership of a visible surface region");
-    expect(design).toContain("Do not reduce Sabbia to text and border tint");
+    expect(design).toContain("Do give Silver gray ownership of a visible surface region");
+    expect(design).toContain("Do not reduce Silver gray to text and border tint");
   });
 
-  it("gives Sabbia substantial, contrast-safe surface ownership", () => {
+  it("gives Silver gray substantial, contrast-safe surface ownership", () => {
     const landing = readProjectFile("src/screens_v2/landing-v2.css");
     const tools = readProjectFile("src/screens/tools/tools.css");
     const auction = readProjectFile("src/features/auction-values/auction-values.css");
@@ -141,15 +143,15 @@ describe("shared Bosco, Ruggine, Sabbia, and Fumo visual system", () => {
     expect(refinement).toMatch(/\.analytics-lab \.analytics-attribution \{[\s\S]*?background: var\(--color-surface-warm\)/);
   });
 
-  it("uses exact Sabbia for chart backgrounds without replacing position semantics", () => {
+  it("uses exact Silver gray for chart backgrounds without replacing position semantics", () => {
     const tokens = readProjectFile("src/styles/tokens.css");
     const charts = readProjectFile("src/styles/globals.css");
     const scatter = readProjectFile("src/components/analytics/AnalyticsScatterPlot.tsx");
     const design = readProjectFile("DESIGN.md");
 
-    expect(tokens).toContain("--color-chart-plot: var(--brand-sabbia)");
-    expect(tokens).toContain("--color-chart-axis: var(--gray-950)");
-    expect(tokens).toContain("--color-chart-series-neutral: var(--green-700)");
+    expect(tokens).toContain("--color-chart-plot: var(--brand-silver)");
+    expect(tokens).toContain("--color-chart-axis: var(--silver-ink)");
+    expect(tokens).toContain("--color-chart-series-neutral: var(--silver-accent)");
     expect(charts).toMatch(/\.stats-sparkline \{[\s\S]*?background: var\(--color-chart-plot\)/);
     expect(charts).toMatch(/\.stats-sparkline polyline \{[\s\S]*?stroke: var\(--color-chart-series-neutral\)/);
     expect(charts).toMatch(/\.analytics-scatter-frame \{[\s\S]*?background: var\(--color-chart-plot\)/);
@@ -158,25 +160,35 @@ describe("shared Bosco, Ruggine, Sabbia, and Fumo visual system", () => {
     expect(charts).toMatch(/\.analytics-ranked-bars \{[\s\S]*?background: var\(--color-chart-plot\)/);
     expect(charts).toMatch(/\.analytics-ranked-track \.is-neutral \{ background: var\(--color-chart-series-neutral\); \}/);
     expect(scatter).toContain("fill={positionColorVar(point.position)}");
-    expect(design).toContain("Charts and graphs use exact Sabbia as the plot-area background");
-    expect(design).toContain("Do not recolor position-coded chart points or legends to Sabbia");
-    expect(design).toContain("Do not use Sabbia for a plotted line or mark when the chart already uses Sabbia as its background");
+    expect(design).toContain("Charts and graphs use exact Silver gray as the plot-area background");
+    expect(design).toContain("Do not recolor position-coded chart points or legends to Silver gray");
+    expect(design).toContain("Do not use Silver gray for a plotted line or mark when the chart already uses Silver gray as its background");
   });
 
-  it("uses Sabbia as the Stats Hub research-table background", () => {
+  it("uses Silver gray as the Stats Hub research-table background", () => {
     const tokens = readProjectFile("src/styles/tokens.css");
     const refinement = readProjectFile("src/styles/refinement.css");
     const design = readProjectFile("DESIGN.md");
 
-    expect(tokens).toContain("--color-surface-table-warm-row: var(--brand-sabbia)");
+    expect(tokens).toContain("--color-surface-table-warm-row: var(--brand-silver)");
+    expect(tokens).toContain("--color-surface-table-warm-row-alt: var(--silver-row-alt)");
     expect(refinement).toMatch(/\.stats-hub \.stats-hub-table-shell \{[\s\S]*?background: var\(--color-surface-table-warm-row\)/);
     expect(refinement).toMatch(/\.stats-hub \.stats-hub-table th,[\s\S]*?background: var\(--color-surface-table-header\)/);
     expect(refinement).toMatch(/\.stats-hub \.stats-hub-table tbody tr \{[\s\S]*?--stats-hub-row-background: var\(--color-surface-table-warm-row\)/);
     expect(refinement).toMatch(/\.stats-hub \.stats-hub-player-copy strong \{[\s\S]*?color: var\(--color-text-on-warm\)/);
-    expect(design).toContain("The Stats Hub research table uses exact Sabbia as its continuous body background");
+    expect(refinement).toMatch(/\.stats-hub \.stats-hub-table \.stats-sparkline \{[\s\S]*?background: var\(--stats-hub-row-background\)/);
+    expect(design).toContain("The Stats Hub research table uses exact Silver gray as its continuous body background");
   });
 
-  it("uses Sabbia across the Schedule Lab matchup matrix", () => {
+  it("does not reintroduce the retired beige in runtime styles or tokens", () => {
+    for (const path of sourceFiles("src")) {
+      expect(readProjectFile(path), path).not.toMatch(
+        /#d8c6a8\b|rgba?\(\s*216[\s,]+198[\s,]+168\b|--brand-sabbia\b/i,
+      );
+    }
+  });
+
+  it("uses Silver gray across the Schedule Lab matchup matrix", () => {
     const tools = readProjectFile("src/screens/tools/tools.css");
     const design = readProjectFile("DESIGN.md");
 
@@ -187,7 +199,7 @@ describe("shared Bosco, Ruggine, Sabbia, and Fumo visual system", () => {
     expect(tools).toMatch(/\.schedule-cell \{[\s\S]*?background: var\(--schedule-row-background\)/);
     expect(tools).toMatch(/\.schedule-cell\.is-favorable \{ color: var\(--green-800\); \}/);
     expect(tools).toMatch(/\.schedule-cell\.is-tough \{ color: var\(--rust-700\); \}/);
-    expect(design).toContain("The Schedule Lab matchup matrix uses Sabbia only for the graph-like data canvas");
+    expect(design).toContain("The Schedule Lab matchup matrix uses Silver gray only for the graph-like data canvas");
   });
 
   it("keeps the shared product header lighter than the page canvas", () => {

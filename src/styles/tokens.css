@@ -5,12 +5,18 @@
   /*
    * Approved brand primitives.
    * Verde Bosco owns the canvas and selection, Ruggine owns primary actions,
-   * Sabbia supplies the warm neutral, and Grigio Fumo owns the header.
+   * Silver gray supplies the light neutral, and Grigio Fumo owns the header.
    * Position, warning, and danger colors remain semantic exceptions.
    */
   --brand-verde-bosco: #365a43;
   --brand-ruggine: #9c4f31;
-  --brand-sabbia: #d8c6a8;
+  --brand-silver: #e0e5e3;
+  --silver-row-alt: #d4ddda;
+  --silver-row-hover: #c8d5cf;
+  --silver-ink: #18251f;
+  --silver-ink-muted: #3f5047;
+  --silver-border: #bac7c0;
+  --silver-accent: #30513d;
   --brand-fumo: #353a38;
   --brand-paper: #f5eee3;
 
@@ -39,7 +45,7 @@
 
   --gray-50: var(--brand-paper);
   --gray-100: #e9ddca;
-  --gray-200: var(--brand-sabbia);
+  --gray-200: var(--brand-silver);
   --gray-300: #b9b09f;
   --gray-400: #96968e;
   --gray-500: #646963;
@@ -55,8 +61,9 @@
   --color-surface-card-primary: var(--green-900);
   --color-surface-card-secondary: var(--green-800);
   --color-surface-card-tertiary: color-mix(in oklch, var(--green-800) 72%, var(--green-700));
-  --color-surface-warm: var(--brand-sabbia);
-  --color-surface-warm-subtle: color-mix(in oklch, var(--brand-sabbia) 18%, var(--green-900));
+  /* Existing "warm" role names now resolve to the approved Silver gray palette. */
+  --color-surface-warm: var(--brand-silver);
+  --color-surface-warm-subtle: color-mix(in oklch, var(--brand-silver) 18%, var(--green-900));
   --color-surface-overlay: color-mix(in oklch, var(--gray-900) 72%, var(--green-950));
   --color-surface-field: color-mix(in oklch, var(--gray-900) 78%, var(--green-950));
   --color-surface-field-hover: color-mix(in oklch, var(--gray-800) 68%, var(--green-800));
@@ -72,20 +79,20 @@
   --color-surface-table-row: var(--color-surface-card-primary);
   --color-surface-table-row-alt: color-mix(in oklch, var(--color-surface-card-primary) 72%, var(--color-surface-card-secondary));
   --color-surface-table-row-hover: var(--color-surface-hover);
-  --color-surface-table-warm-row: var(--brand-sabbia);
-  --color-surface-table-warm-row-alt: color-mix(in oklch, var(--brand-sabbia) 90%, var(--brand-paper));
-  --color-surface-table-warm-row-hover: color-mix(in oklch, var(--brand-sabbia) 84%, var(--green-300));
+  --color-surface-table-warm-row: var(--brand-silver);
+  --color-surface-table-warm-row-alt: var(--silver-row-alt);
+  --color-surface-table-warm-row-hover: var(--silver-row-hover);
   --color-surface-badge-neutral: var(--gray-700);
   --color-surface-badge-brand: color-mix(in oklch, var(--green-700) 82%, var(--green-600));
 
-  /* Chart canvases use exact Sabbia; marks switch to contrast-safe dark roles. */
-  --color-chart-plot: var(--brand-sabbia);
+  /* Chart canvases use exact Silver gray; marks use contrast-safe dark roles. */
+  --color-chart-plot: var(--brand-silver);
   --color-chart-grid: color-mix(in oklch, var(--gray-950) 16%, transparent);
-  --color-chart-axis: var(--gray-950);
-  --color-chart-axis-muted: var(--gray-700);
+  --color-chart-axis: var(--silver-ink);
+  --color-chart-axis-muted: var(--silver-ink-muted);
   --color-chart-reference: color-mix(in oklch, var(--rust-700) 62%, transparent);
-  --color-chart-series-neutral: var(--green-700);
-  --color-chart-series-neutral-point: var(--green-900);
+  --color-chart-series-neutral: var(--silver-accent);
+  --color-chart-series-neutral-point: var(--silver-accent);
   --color-chart-series-positive: var(--green-700);
   --color-chart-series-negative: color-mix(in oklch, var(--color-status-danger) 86%, var(--gray-950));
   --color-chart-track: color-mix(in oklch, var(--gray-950) 14%, transparent);
@@ -95,15 +102,15 @@
   --color-border-default: color-mix(in oklch, var(--gray-200) 24%, transparent);
   --color-border-strong: color-mix(in oklch, var(--gray-100) 38%, transparent);
   --color-border-brand: color-mix(in oklch, var(--green-300) 58%, transparent);
-  --color-border-on-warm: color-mix(in oklch, var(--gray-950) 24%, transparent);
+  --color-border-on-warm: var(--silver-border);
   --color-button-primary-border: var(--rust-300);
   --color-text-primary: var(--gray-50);
   --color-text-secondary: var(--gray-100);
   --color-text-muted: var(--gray-200);
   --color-text-disabled: var(--gray-300);
   --color-text-on-brand: var(--gray-50);
-  --color-text-on-warm: var(--gray-950);
-  --color-text-on-warm-secondary: var(--gray-700);
+  --color-text-on-warm: var(--silver-ink);
+  --color-text-on-warm-secondary: var(--silver-ink-muted);
   --color-text-on-warm-accent: var(--rust-700);
   --color-text-link: var(--rust-100);
   --color-text-link-hover: var(--rust-50);
@@ -116,11 +123,11 @@
   --color-button-secondary: var(--gray-800);
   --color-button-secondary-hover: var(--gray-700);
   --color-button-secondary-text: var(--color-text-primary);
-  --color-button-quiet-hover: color-mix(in oklch, var(--brand-sabbia) 11%, transparent);
+  --color-button-quiet-hover: color-mix(in oklch, var(--brand-silver) 11%, transparent);
   --color-button-danger: color-mix(in oklch, var(--color-status-danger) 14%, var(--gray-800));
   --color-button-danger-hover: color-mix(in oklch, var(--color-status-danger) 21%, var(--gray-800));
   --color-field-focus: var(--rust-300);
-  --color-focus-ring: color-mix(in oklch, var(--brand-sabbia) 52%, transparent);
+  --color-focus-ring: color-mix(in oklch, var(--brand-silver) 52%, transparent);
 
   /* Status colors are reserved for meaning, not general decoration. */
   --color-status-success: var(--green-200);
@@ -163,7 +170,7 @@
   --a3: oklch(0.78 0.13 85);
   --accent-live: var(--color-status-success);
   --accent-action: var(--rust-100);
-  --accent-history: var(--brand-sabbia);
+  --accent-history: var(--brand-silver);
   --accent-danger: var(--color-status-danger);
   --brand-emerald: var(--green-400);
   --brand-leather: var(--brand-ruggine);
@@ -287,8 +294,8 @@
 
   --scrollbar-size: 10px;
   --scrollbar-track: color-mix(in oklch, var(--color-surface-page) 90%, transparent);
-  --scrollbar-thumb: color-mix(in oklch, var(--brand-sabbia) 42%, var(--green-800));
-  --scrollbar-thumb-hover: color-mix(in oklch, var(--brand-sabbia) 62%, var(--green-700));
+  --scrollbar-thumb: color-mix(in oklch, var(--brand-silver) 42%, var(--green-800));
+  --scrollbar-thumb-hover: color-mix(in oklch, var(--brand-silver) 62%, var(--green-700));
 
   /* Legacy visual aliases remain here while older feature CSS is retired. */
   --ffaa-accent: var(--green-300);
