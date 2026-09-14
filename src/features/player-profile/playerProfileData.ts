@@ -34,6 +34,8 @@ export type PlayerProfileCandidate = {
   projectedPoints?: number | null | undefined;
   projectedPointsPerGame?: number | null | undefined;
   weeklyProjectedPoints?: number | null | undefined;
+  weeklyActualPoints?: number | null | undefined;
+  weeklyActualPointsWeek?: number | null | undefined;
   historicalPointsPerGame?: number | null | undefined;
   last3PointsPerGame?: number | null | undefined;
   floorPoints?: number | null | undefined;
@@ -139,6 +141,8 @@ export function buildPlayerProfileDetail(
   const projectedPoints = firstNumber(candidate.projectedPoints, matched?.projectedPoints);
   const projectedPointsPerGame = firstNumber(candidate.projectedPointsPerGame, matched?.projectedPointsPerGame);
   const weeklyProjectedPoints = firstNumber(candidate.weeklyProjectedPoints, matched?.weeklyProjectedPoints);
+  const weeklyActualPoints = firstNumber(candidate.weeklyActualPoints, matched?.weeklyActualPoints);
+  const weeklyActualPointsWeek = firstNumber(candidate.weeklyActualPointsWeek, matched?.weeklyActualPointsWeek);
   const historicalPointsPerGame = firstNumber(candidate.historicalPointsPerGame, matched?.historicalPointsPerGame, summary?.selectedFantasyPointsPerGame);
   const last3PointsPerGame = firstNumber(candidate.last3PointsPerGame, matched?.last3PointsPerGame, summary?.last3FantasyPointsPerGame);
   const floorPoints = firstNumber(candidate.floorPoints, matched?.floorPoints, summary?.floorFantasyPoints);
@@ -205,7 +209,13 @@ export function buildPlayerProfileDetail(
     ...(status ? { status } : {}),
     summary: `${scoringLabel(scoring)} player profile · verified source data only`,
     overviewMetrics: [
-      metric("Week projection", numberText(weeklyProjectedPoints), weeklyProjectedPoints === null ? "No current-week projection" : "Connected league context"),
+      metric(
+        weeklyActualPoints === null ? "Week projection" : "Week score",
+        numberText(weeklyActualPoints ?? weeklyProjectedPoints, weeklyActualPoints === null ? 1 : 2),
+        weeklyActualPoints === null
+          ? weeklyProjectedPoints === null ? "No current-week projection" : "Connected league context"
+          : `Sleeper Week ${weeklyActualPointsWeek ?? "current"} scoring`,
+      ),
       metric("Season projection", numberText(projectedPoints), scoringLabel(scoring)),
       metric("Projected PPG", numberText(projectedPointsPerGame)),
       metric("Season PPG", numberText(historicalPointsPerGame), summary?.latestSeason ? String(summary.latestSeason) : "Latest available season"),

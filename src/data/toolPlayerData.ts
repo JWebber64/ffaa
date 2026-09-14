@@ -26,6 +26,9 @@ export interface ToolPlayer {
   weeklyProjectedPoints?: number | null;
   weeklyProjectionWeek?: number | null;
   weeklyProjectionOpponent?: string;
+  /** Authoritative current-week points returned by the connected Sleeper matchup. */
+  weeklyActualPoints?: number | null;
+  weeklyActualPointsWeek?: number | null;
   projectionSourceCount?: number;
   projectionLow?: number | null;
   projectionHigh?: number | null;

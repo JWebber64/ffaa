@@ -31,8 +31,10 @@ describe("team and matchup information hierarchy", () => {
     expect(matchup).toContain("data.starterLineup");
     expect(matchup).toContain("data.opponentStarterLineup");
     expect(matchup).toContain("data.opponentBench");
+    expect(matchup).toContain("weeklyActualPoints");
+    expect(matchup).toContain("LIVE");
     expect(matchup).toContain("weeklyProjectedPoints");
-    expect(matchup).toContain("projected points");
+    expect(matchup).toContain("score / projection");
     expect(matchup).not.toContain("Season baseline PPG");
   });
 

@@ -27,6 +27,8 @@ import {
   type LeagueWorkspaceValue,
 } from "./leagueWorkspaceState";
 
+const LIVE_SCORE_REFRESH_MS = 30_000;
+
 function snapshotChanged(connection: SleeperLeagueConnectionSummary, data: MyHQData) {
   return connection.managerTeamName !== data.teamName
     || connection.managerRecord !== data.record
@@ -189,16 +191,27 @@ export function LeagueWorkspaceProvider({ children }: { children: ReactNode }) {
     }
 
     const controller = new AbortController();
-    setTeamState({ status: "loading", data: null, error: "" });
-    void loadSleeperPlayerDirectory()
-      .catch(() => [])
-      .then((sleeperRows) => loadMyHQ(
-        currentConnection,
-        sleeperRows.length ? buildCurrentToolPlayers(scoring, [], {}, sleeperRows) : players,
-        controller.signal,
-        sleeperRows,
-      ))
-      .then((data) => {
+    const sleeperRowsPromise = loadSleeperPlayerDirectory().catch(() => []);
+    let inFlight = false;
+
+    const refreshTeam = async (showLoading: boolean) => {
+      if (inFlight || controller.signal.aborted) return;
+      inFlight = true;
+      if (showLoading) {
+        setTeamState((current) => current.status === "ready"
+          ? current
+          : { status: "loading", data: null, error: "" });
+      }
+
+      try {
+        const sleeperRows = await sleeperRowsPromise;
+        const data = await loadMyHQ(
+          currentConnection,
+          sleeperRows.length ? buildCurrentToolPlayers(scoring, [], {}, sleeperRows) : players,
+          controller.signal,
+          sleeperRows,
+        );
+        if (controller.signal.aborted) return;
         setTeamState({ status: "ready", data, error: "" });
         if (snapshotChanged(currentConnection, data)) {
           rememberConnection({
@@ -215,17 +228,32 @@ export function LeagueWorkspaceProvider({ children }: { children: ReactNode }) {
             teamSnapshotAt: new Date().toISOString(),
           });
         }
-      })
-      .catch((error: unknown) => {
+      } catch (error) {
         if (controller.signal.aborted) return;
         setTeamState({
           status: "error",
           data: null,
           error: error instanceof Error ? error.message : "The active team could not be loaded.",
         });
-      });
+      } finally {
+        inFlight = false;
+      }
+    };
 
-    return () => controller.abort();
+    void refreshTeam(true);
+    const refreshInterval = window.setInterval(() => {
+      if (document.visibilityState === "visible") void refreshTeam(false);
+    }, LIVE_SCORE_REFRESH_MS);
+    const refreshOnVisible = () => {
+      if (document.visibilityState === "visible") void refreshTeam(false);
+    };
+    document.addEventListener("visibilitychange", refreshOnVisible);
+
+    return () => {
+      controller.abort();
+      window.clearInterval(refreshInterval);
+      document.removeEventListener("visibilitychange", refreshOnVisible);
+    };
   }, [connection?.leagueId, dataLeagueId, managerProviderUserId, players, rememberConnection, scoring]);
 
   const value = useMemo<LeagueWorkspaceValue>(() => ({

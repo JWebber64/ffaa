@@ -43,6 +43,7 @@ const data: MyHQData = {
   opponentProviderUserId: "opponent-1",
   teamScore: null,
   opponentScore: null,
+  livePlayerScoreCount: 0,
   teamProjectedPoints: null,
   opponentProjectedPoints: null,
   starterLineup: [],

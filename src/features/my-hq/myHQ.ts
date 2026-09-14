@@ -39,7 +39,13 @@ type SleeperRoster = {
   starters?: string[] | null;
   settings?: Record<string, number> | null;
 };
-type SleeperMatchup = { roster_id: number; matchup_id?: number | null; points?: number | null; custom_points?: number | null };
+type SleeperMatchup = {
+  roster_id: number;
+  matchup_id?: number | null;
+  points?: number | null;
+  custom_points?: number | null;
+  players_points?: Record<string, number | null> | null;
+};
 type SleeperTransaction = {
   transaction_id: string;
   type: string;
@@ -102,6 +108,7 @@ export type MyHQData = {
   opponentProviderUserId: string;
   teamScore: number | null;
   opponentScore: number | null;
+  livePlayerScoreCount: number;
   teamProjectedPoints: number | null;
   opponentProjectedPoints: number | null;
   starterLineup: MyHQLineupEntry[];
@@ -125,10 +132,25 @@ function numberValue(value: unknown) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function scoreValue(matchup?: SleeperMatchup) {
+function finiteValue(value: unknown) {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+export function sleeperMatchupScore(matchup?: SleeperMatchup) {
   if (!matchup) return null;
-  if (Number.isFinite(Number(matchup.custom_points))) return Number(matchup.custom_points);
-  return Number.isFinite(Number(matchup.points)) ? Number(matchup.points) : null;
+  const customPoints = finiteValue(matchup.custom_points);
+  return customPoints ?? finiteValue(matchup.points);
+}
+
+export function indexSleeperMatchupPlayerPoints(matchup?: SleeperMatchup) {
+  const points = new Map<string, number>();
+  for (const [playerId, value] of Object.entries(matchup?.players_points ?? {})) {
+    const score = finiteValue(value);
+    if (score !== null) points.set(playerId, score);
+  }
+  return points;
 }
 
 function lineupWeeklyProjection(players: ToolPlayer[]) {
@@ -157,12 +179,16 @@ function withWeeklyProjection(
   sleeperId: string,
   week: number,
   projections: Map<string, SleeperWeeklyProjection>,
+  livePlayerPoints: Map<string, number>,
 ): ToolPlayer {
   const projection = sleeperId ? projections.get(sleeperId) : undefined;
+  const livePoints = sleeperId ? livePlayerPoints.get(sleeperId) : undefined;
   return {
     ...player,
     weeklyProjectedPoints: projection?.week === week ? projection.points : null,
     weeklyProjectionWeek: week,
+    weeklyActualPoints: livePoints ?? null,
+    weeklyActualPointsWeek: livePoints === undefined ? null : week,
     ...(projection?.opponent ? { weeklyProjectionOpponent: projection.opponent } : {}),
   };
 }
@@ -445,11 +471,20 @@ export async function loadMyHQ(
   const userRoster = rosters.find((roster) => rosterOwnerIds(roster).includes(connection.managerProviderUserId!));
   if (!userRoster) throw new Error(`${connection.managerDisplayName ?? "Your Sleeper account"} does not own a roster in this league.`);
   const managerUser = users.find((user) => user.user_id === connection.managerProviderUserId);
+  const userMatchup = matchups.find((matchup) => matchup.roster_id === userRoster.roster_id);
+  const opponentMatchup = userMatchup?.matchup_id == null
+    ? undefined
+    : matchups.find((matchup) => matchup.matchup_id === userMatchup.matchup_id && matchup.roster_id !== userRoster.roster_id);
+  const opponentRoster = rosters.find((roster) => roster.roster_id === opponentMatchup?.roster_id);
+  const livePlayerPoints = new Map([
+    ...indexSleeperMatchupPlayerPoints(userMatchup),
+    ...indexSleeperMatchupPlayerPoints(opponentMatchup),
+  ]);
 
   const playerById = new Map<string, ToolPlayer>();
   for (const player of allPlayers) {
     const sleeperId = player.sleeperId?.trim() || "";
-    const enrichedPlayer = withWeeklyProjection(player, sleeperId, matchupWeek, weeklyProjections);
+    const enrichedPlayer = withWeeklyProjection(player, sleeperId, matchupWeek, weeklyProjections, livePlayerPoints);
     playerById.set(player.id, enrichedPlayer);
     if (sleeperId) playerById.set(sleeperId, enrichedPlayer);
   }
@@ -464,7 +499,7 @@ export async function loadMyHQ(
     const fallback = sleeperRow ? sleeperFallbackPlayer(sleeperRow) : null;
     if (fallback) playerById.set(
       playerId,
-      withWeeklyProjection(fallback, playerId, matchupWeek, weeklyProjections),
+      withWeeklyProjection(fallback, playerId, matchupWeek, weeklyProjections, livePlayerPoints),
     );
   }
   const starterIds = userRoster.starters ?? [];
@@ -480,11 +515,6 @@ export async function loadMyHQ(
   const bench = rosterPlayerIds.flatMap((id) => starterIdSet.has(id) ? [] : playerById.get(id) ?? []);
   const allRosteredIds = new Set(rosters.flatMap((roster) => roster.players ?? []));
   const availableRecommendations = buildAvailableRecommendations(allPlayers, allRosteredIds, bench, starterSlots);
-  const userMatchup = matchups.find((matchup) => matchup.roster_id === userRoster.roster_id);
-  const opponentMatchup = userMatchup?.matchup_id == null
-    ? undefined
-    : matchups.find((matchup) => matchup.matchup_id === userMatchup.matchup_id && matchup.roster_id !== userRoster.roster_id);
-  const opponentRoster = rosters.find((roster) => roster.roster_id === opponentMatchup?.roster_id);
   const opponentStarterIds = opponentRoster?.starters ?? [];
   const opponentStarterIdSet = new Set(opponentStarterIds.filter((id) => id && id !== "0"));
   const opponentStarterLineup = opponentStarterIds.map((id, index): MyHQLineupEntry => {
@@ -522,7 +552,7 @@ export async function loadMyHQ(
   }
   const closest = [...pairedMatchups.values()]
     .filter((pair) => pair.length === 2)
-    .map((pair) => ({ pair, margin: Math.abs((scoreValue(pair[0]) ?? 0) - (scoreValue(pair[1]) ?? 0)) }))
+    .map((pair) => ({ pair, margin: Math.abs((sleeperMatchupScore(pair[0]) ?? 0) - (sleeperMatchupScore(pair[1]) ?? 0)) }))
     .sort((left, right) => left.margin - right.margin)[0];
   const closestMatchup = closest
     ? `${teamNameForRoster(rosters.find((roster) => roster.roster_id === closest.pair[0]!.roster_id), users)} vs ${teamNameForRoster(rosters.find((roster) => roster.roster_id === closest.pair[1]!.roster_id), users)} · ${closest.margin.toFixed(2)}-point margin`
@@ -548,8 +578,9 @@ export async function loadMyHQ(
       || users.find((user) => user.is_owner)?.user_id
       || "",
     opponentProviderUserId,
-    teamScore: scoreValue(userMatchup),
-    opponentScore: scoreValue(opponentMatchup),
+    teamScore: sleeperMatchupScore(userMatchup),
+    opponentScore: sleeperMatchupScore(opponentMatchup),
+    livePlayerScoreCount: livePlayerPoints.size,
     teamProjectedPoints: lineupWeeklyProjection(starters),
     opponentProjectedPoints: lineupWeeklyProjection(opponentStarters),
     starterLineup,
@@ -576,9 +607,11 @@ export async function loadMyHQ(
       .sort((left, right) => numberValue(right.created) - numberValue(left.created))
       .slice(0, 4)
       .map((transaction) => transactionLabel(transaction, playerById)),
-    projectionNote: projectionError
-      ? `Week ${matchupWeek} projections are unavailable (${projectionError}) Season averages are not substituted.`
-      : `Player values use Sleeper’s current Week ${matchupWeek} ${projectionScoring.label} projection feed. Players absent from that feed show a dash; season averages are not substituted.`,
+    projectionNote: livePlayerPoints.size
+      ? `Sleeper is returning ${livePlayerPoints.size} current Week ${matchupWeek} player score${livePlayerPoints.size === 1 ? "" : "s"}. LIVE values use this league’s Sleeper scoring; players without a returned score keep their ${projectionScoring.label} projection.`
+      : projectionError
+        ? `Week ${matchupWeek} projections are unavailable (${projectionError}) Season averages are not substituted.`
+        : `Sleeper has not returned player scores for Week ${matchupWeek} yet. Player values use its current ${projectionScoring.label} projection feed; players absent from that feed show a dash, not a season average.`,
     loadedAt: new Date().toISOString(),
   };
 }

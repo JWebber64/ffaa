@@ -36,4 +36,22 @@ describe("shared player profile data", () => {
     expect(profile.usageMetrics.find((metric) => metric.label === "Targets/G")?.value).toBe("5.2");
     expect(profile.sources.map((source) => source.name)).toEqual(expect.arrayContaining(["nflverse", "Sleeper", "ESPN NFL headlines"]));
   });
+
+  it("prefers a connected Sleeper Week score over the pregame projection", () => {
+    const profile = buildPlayerProfileDetail({
+      id: "live-player",
+      sleeperId: "7523",
+      name: "Live Player",
+      position: "QB",
+      team: "BUF",
+      weeklyProjectedPoints: 18.6,
+      weeklyActualPoints: 26.1,
+      weeklyActualPointsWeek: 1,
+    });
+
+    expect(profile.overviewMetrics.find((metric) => metric.label === "Week score")).toMatchObject({
+      value: "26.10",
+      helper: "Sleeper Week 1 scoring",
+    });
+  });
 });

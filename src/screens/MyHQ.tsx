@@ -20,16 +20,21 @@ function initials(name: string) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "FF";
 }
 
-function formatPlayerProjection(player: ToolPlayer | null) {
-  return player?.weeklyProjectedPoints === null || player?.weeklyProjectedPoints === undefined
-    ? "—"
-    : player.weeklyProjectedPoints.toFixed(1);
+function playerWeekValue(player: ToolPlayer | null) {
+  if (player?.weeklyActualPoints !== null && player?.weeklyActualPoints !== undefined) {
+    return { label: "LIVE", value: player.weeklyActualPoints.toFixed(2) };
+  }
+  if (player?.weeklyProjectedPoints !== null && player?.weeklyProjectedPoints !== undefined) {
+    return { label: "PROJ", value: player.weeklyProjectedPoints.toFixed(1) };
+  }
+  return { label: "—", value: "—" };
 }
 
 function TeamRosterRow({ player, slot, scoring, bench = false }: { player: ToolPlayer | null; slot: string; scoring: ToolScoring; bench?: boolean }) {
   const detail = player
     ? [player.team || "FA", player.byeWeek ? `Bye ${player.byeWeek}` : "", player.injuryStatus || ""].filter(Boolean).join(" · ")
     : "No player assigned";
+  const points = playerWeekValue(player);
   return (
     <div className={`hq-roster-row ${bench ? "is-bench" : ""}`} role="row">
       <div role="cell"><span className="hq-roster-mobile-label">Slot</span><PositionBadge className="hq-position" position={slot}>{slot.replace(/_/g, " ")}</PositionBadge></div>
@@ -45,8 +50,8 @@ function TeamRosterRow({ player, slot, scoring, bench = false }: { player: ToolP
         {player?.injuryStatus || (player?.status && player.status !== "Active" ? player.status : "Active")}
       </div>
       <div className="hq-roster-points" role="cell">
-        <span className="hq-roster-mobile-label">Projection</span>
-        <strong>{formatPlayerProjection(player)}</strong><small> PTS</small>
+        <span className="hq-roster-mobile-label">Week score</span>
+        <strong>{points.value}</strong><small> {points.label}</small>
       </div>
     </div>
   );
@@ -61,7 +66,7 @@ function TeamRoster({ data, scoring }: { data: MyHQData; scoring: ToolScoring })
       </header>
       <div className="hq-roster-table" role="table" aria-label={`${data.teamName} roster`}>
         <div className="hq-roster-columns" role="row">
-          <span role="columnheader">Slot</span><span role="columnheader">Player</span><span role="columnheader">Status</span><span role="columnheader">Week projection</span>
+          <span role="columnheader">Slot</span><span role="columnheader">Player</span><span role="columnheader">Status</span><span role="columnheader">Week score / projection</span>
         </div>
         <div role="rowgroup">
           {data.starterLineup.map((entry, index) => <TeamRosterRow key={`${entry.slot}-${entry.player?.id ?? index}`} player={entry.player} slot={entry.slot} scoring={scoring} />)}

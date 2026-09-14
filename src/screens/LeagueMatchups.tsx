@@ -47,20 +47,25 @@ function formatLiveScore(value: number | null) {
   return value === null ? "—" : value.toFixed(2);
 }
 
-function formatPlayerProjection(player: ToolPlayer | null) {
-  return player?.weeklyProjectedPoints === null || player?.weeklyProjectedPoints === undefined
-    ? "—"
-    : player.weeklyProjectedPoints.toFixed(1);
+function playerWeekValue(player: ToolPlayer | null) {
+  if (player?.weeklyActualPoints !== null && player?.weeklyActualPoints !== undefined) {
+    return { label: "LIVE", value: player.weeklyActualPoints.toFixed(2) };
+  }
+  if (player?.weeklyProjectedPoints !== null && player?.weeklyProjectedPoints !== undefined) {
+    return { label: "PROJ", value: player.weeklyProjectedPoints.toFixed(1) };
+  }
+  return { label: "—", value: "—" };
 }
 
 function MatchupPlayerSide({ player, side, scoring }: { player: ToolPlayer | null; side: "left" | "right"; scoring: ToolScoring }) {
   const detail = player
     ? [player.position, player.team || "FA", player.byeWeek ? `Bye ${player.byeWeek}` : "", player.injuryStatus || ""].filter(Boolean).join(" · ")
     : "No player assigned";
+  const points = playerWeekValue(player);
   return (
     <div className={`league-h2h-player is-${side}`}>
       <PlayerProfileButton player={player} scoring={scoring} className="league-h2h-profile"><strong>{player?.name ?? "Open slot"}</strong><small>{detail}</small></PlayerProfileButton>
-      <b>{formatPlayerProjection(player)}<small>PROJ</small></b>
+      <b aria-label={points.label === "—" ? "No Week score or projection" : `${points.label === "LIVE" ? "Live" : "Projected"} Week points ${points.value}`}>{points.value}<small>{points.label}</small></b>
     </div>
   );
 }
@@ -94,7 +99,9 @@ function ConnectedTeamMatchup({ data, scoring }: { data: MyHQData; scoring: Tool
     <div className="league-season-page league-personal-matchup">
       <header className="league-compact-page-heading">
         <div><span>My matchup · {data.leagueName}</span><h1>{data.week ? `Week ${data.week}` : "Next matchup"}</h1></div>
-        <small>Current Sleeper rosters · Week {data.week || 1} projections</small>
+        <small>{data.livePlayerScoreCount
+          ? `${data.livePlayerScoreCount} Sleeper LIVE scores · refreshes every 30 seconds while this tab is visible`
+          : `Week ${data.week || 1} projections · waiting for Sleeper scores`}</small>
       </header>
 
       <section className="league-head-to-head" aria-label={`${data.teamName} versus ${data.opponentName}`}>
@@ -106,7 +113,7 @@ function ConnectedTeamMatchup({ data, scoring }: { data: MyHQData; scoring: Tool
 
         {hasOpponent ? (
           <>
-            <div className="league-h2h-section-label"><span>Starters</span><small>Week {data.week || 1} projected points</small></div>
+            <div className="league-h2h-section-label"><span>Starters</span><small>Week {data.week || 1} score / projection</small></div>
             <MatchupLineupRows left={data.starterLineup} right={data.opponentStarterLineup} scoring={scoring} />
             {(leftBench.length || rightBench.length) ? <div className="league-h2h-section-label"><span>Bench</span><small>Roster depth</small></div> : null}
             <MatchupLineupRows left={leftBench} right={rightBench} scoring={scoring} bench />
@@ -116,7 +123,7 @@ function ConnectedTeamMatchup({ data, scoring }: { data: MyHQData; scoring: Tool
 
       <div className="league-projection-note">
         <Info aria-hidden="true" />
-        <p><strong>Scores come from the current Sleeper matchup.</strong> {data.projectionNote}</p>
+        <p><strong>Current scores come from the Sleeper matchup.</strong> {data.projectionNote}</p>
       </div>
     </div>
   );
