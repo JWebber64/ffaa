@@ -218,7 +218,22 @@ The pulse writes:
 reports/value-source-pulse.json
 ```
 
-It checks:
+The pulse reads Sleeper's public NFL state first and chooses a monitoring mode.
+During the regular season and postseason, in-season checks are primary:
+
+- Current-week Sleeper player projections, including usable fantasy-point row count and newest source timestamp
+- Current-week Sleeper league matchup scores for the configured public league; a changed score payload is reported as a source change
+- Sleeper player-map health, current add/drop trends, and LeagueLogs market rankings
+- Populated season-long caches that still support PROJ, FAIR, Team Rater, Auction Builder, and player comparisons
+
+The default monitored league is the public G.O.A.T. League. Override it without
+changing code when another public Sleeper league is the operational target:
+
+```bash
+npm run values:pulse --league=123456789012345678
+```
+
+During preseason, it checks:
 
 - WinWithOdds CSV availability and row count
 - FFToday and CBS season-projection page availability
@@ -229,6 +244,10 @@ It checks:
 - Sharp, 4for4, Fantasy Football Calculator, RotoBaller, Fantasy Footballers, FantasyNerds, FFToolbox, and BeatADP public page availability
 - Sleeper NFL state and trending add/drop endpoints
 - Local import files for every manual source and Sleeper
+
+Preseason-only page checks are skipped after the regular season begins. Empty
+optional preseason imports become `not_configured`, not warnings. Their
+populated caches remain visible because season-long tools may still use them.
 
 Sleeper note: the full Sleeper player map is a large endpoint. The pulse only calls it once per day unless forced:
 
@@ -261,7 +280,7 @@ We are not integrating paid/commercial or account-backed fantasy-data APIs. The 
   terms require written permission. RTSports currently states that its AAV data
   may not be displayed or used for derivative works without express permission,
   so it is research-only unless that permission is obtained.
-- Use `npm run values:pulse` twice per day to flag public-source errors and empty import files.
+- Use `npm run values:pulse` daily. In season, treat weekly Sleeper projections, score changes, trends, player-map health, and LeagueLogs as actionable; do not revive inactive preseason-only warnings.
 - Do not import or monitor prior-season pages as current sources. FFToolbox has an import slot, but no public 2026 auction page is currently wired into the pulse.
 
 Source trust is configured in:

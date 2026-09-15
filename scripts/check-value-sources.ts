@@ -3,6 +3,14 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import * as cheerio from "cheerio";
+import {
+  emptyImportStatus,
+  monitoringModeForSeasonType,
+  shouldCheckPreseasonSource,
+  sleeperMatchupMetrics,
+  sleeperProjectionMetrics,
+  type PulseMonitoringMode,
+} from "./value-source-pulse-policy";
 
 type PulseStatus = "ok" | "changed" | "warning" | "error" | "skipped" | "not_configured";
 
@@ -19,11 +27,19 @@ type PulseSource = {
   rowCount?: number;
   contentLength?: number;
   hash?: string;
+  dataUpdatedAt?: string;
   message: string;
 };
 
 type PulseReport = {
   generatedAt: string;
+  monitoringMode: PulseMonitoringMode;
+  nflContext?: {
+    season: string;
+    week: number;
+    seasonType: string;
+    seasonHasScores: boolean;
+  };
   summary: {
     ok: number;
     changed: number;
@@ -56,8 +72,20 @@ const FANTASY_SEASON = 2026;
 const SLEEPER_CACHE_PATH = path.resolve(`src/data/players-${FANTASY_SEASON}-sleeper.json`);
 const SLEEPER_PUBLIC_CACHE_PATH = path.resolve(`public/data/players-${FANTASY_SEASON}-sleeper.json`);
 const USER_AGENT = "FFAA value pulse (+local draft value monitor)";
+const DEFAULT_PULSE_LEAGUE_ID = "1385319428408774656";
 
-const HTTP_SOURCES = [
+type HttpSourceDefinition = {
+  id: string;
+  label: string;
+  kind: "public-endpoint" | "public-page";
+  url: string;
+  expect?: string;
+  rowMode?: "csv" | "html-table" | "json-array" | "sleeper-projections" | "sleeper-matchups";
+  preseasonOnly?: boolean;
+  maxAgeHours?: number;
+};
+
+const HTTP_SOURCES: HttpSourceDefinition[] = [
   {
     id: "winwithodds_csv",
     label: "WinWithOdds Vegas projections CSV",
@@ -65,6 +93,7 @@ const HTTP_SOURCES = [
     url: "https://winwithodds.com/download/season_long_proj_table.csv",
     expect: "Projections",
     rowMode: "csv",
+    preseasonOnly: true,
   },
   {
     id: "leaguelogs_market",
@@ -80,6 +109,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.fftoday.com/rankings/26-av-ppr.html",
     expect: "Max Bid",
+    preseasonOnly: true,
   },
   {
     id: "fftoday_projections",
@@ -87,6 +117,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
     expect: "Puka Nacua",
+    preseasonOnly: true,
   },
   {
     id: "cbs_projections",
@@ -94,6 +125,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.cbssports.com/fantasy/football/stats/WR/2026/season/projections/nonppr/",
     expect: "Puka Nacua",
+    preseasonOnly: true,
   },
   {
     id: "sports_illustrated_auction",
@@ -101,6 +133,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.si.com/fantasy/2026-football-running-back-rankings-seasonal-leagues",
     expect: "Auction",
+    preseasonOnly: true,
   },
   {
     id: "usa_today_auction",
@@ -108,6 +141,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://sports.yahoo.com/articles/2026-fantasy-football-rankings-updated-224612057.html",
     expect: "Jahmyr Gibbs",
+    preseasonOnly: true,
   },
   {
     id: "yafsb_auction_aav",
@@ -115,6 +149,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://yafsb.com/fantasy-football/auction-draft-values/?scoring_type=half_ppr&league_size=12&is_superflex=False&is_dynasty=False&is_rookies=False",
     expect: "Sleeper auction drafts",
+    preseasonOnly: true,
   },
   {
     id: "footballguys_auction",
@@ -122,6 +157,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.footballguys.com/salary-cap-auction-values?pos=all",
     expect: "Jahmyr Gibbs",
+    preseasonOnly: true,
   },
   {
     id: "sportsbrackets_auction",
@@ -129,6 +165,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://sportsbrackets.net/2026/07/24/2026-fantasy-football-auction-values-printable/",
     expect: "$200",
+    preseasonOnly: true,
   },
   {
     id: "fantasypros_auction",
@@ -136,6 +173,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.fantasypros.com/nfl/auction-values/calculator.php",
     expect: "Auction",
+    preseasonOnly: true,
   },
   {
     id: "rotowire_auction",
@@ -143,6 +181,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.rotowire.com/football/auction-values.php",
     expect: "Auction Values",
+    preseasonOnly: true,
   },
   {
     id: "draftsharks_auction",
@@ -150,6 +189,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.draftsharks.com/auction-values",
     expect: "Auction",
+    preseasonOnly: true,
   },
   {
     id: "yahoo_salary_cap",
@@ -157,6 +197,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://football.fantasysports.yahoo.com/f1/draftanalysis?type=salcap",
     expect: "salary",
+    preseasonOnly: true,
   },
   {
     id: "sharp_projections",
@@ -164,6 +205,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.sharpfootballanalysis.com/fantasy/fantasy-football-projections/",
     expect: "export CSV",
+    preseasonOnly: true,
   },
   {
     id: "fourforfour_adp",
@@ -171,6 +213,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.4for4.com/adp",
     expect: "ADP",
+    preseasonOnly: true,
   },
   {
     id: "fantasyfootballcalculator_adp",
@@ -178,6 +221,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://fantasyfootballcalculator.com/adp",
     expect: "CSV",
+    preseasonOnly: true,
   },
   {
     id: "rotoballer_cheatsheet",
@@ -185,6 +229,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.rotoballer.com/free-fantasy-football-draft-cheat-sheet",
     expect: ".csv",
+    preseasonOnly: true,
   },
   {
     id: "footballers_rankings",
@@ -192,6 +237,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.thefantasyfootballers.com/2026-running-back-rankings-draft/",
     expect: "Rankings",
+    preseasonOnly: true,
   },
   {
     id: "fantasynerds_auction_public",
@@ -199,6 +245,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.fantasynerds.com/nfl/auction",
     expect: "Auction",
+    preseasonOnly: true,
   },
   {
     id: "beatadp_market",
@@ -206,6 +253,7 @@ const HTTP_SOURCES = [
     kind: "public-page" as const,
     url: "https://www.beatadp.com/platform-adp",
     expect: "Consensus",
+    preseasonOnly: true,
   },
   {
     id: "sleeper_state",
@@ -275,51 +323,61 @@ const LOCAL_IMPORTS = [
     id: "fantasypros_import",
     label: "FantasyPros imported values",
     file: "src/data/players-2026-fantasypros-values.json",
+    preseasonOnly: true,
   },
   {
     id: "rotowire_import",
     label: "RotoWire imported values",
     file: "src/data/players-2026-rotowire.json",
+    preseasonOnly: true,
   },
   {
     id: "yahoo_import",
     label: "Yahoo imported values",
     file: "src/data/players-2026-yahoo-values.json",
+    preseasonOnly: true,
   },
   {
     id: "sharp_import",
     label: "Sharp Football Analysis imported projections",
     file: "src/data/players-2026-sharp.json",
+    preseasonOnly: true,
   },
   {
     id: "fourforfour_import",
     label: "4for4 imported ADP",
     file: "src/data/players-2026-4for4.json",
+    preseasonOnly: true,
   },
   {
     id: "fantasyfootballcalculator_import",
     label: "Fantasy Football Calculator imported ADP",
     file: "src/data/players-2026-fantasyfootballcalculator.json",
+    preseasonOnly: true,
   },
   {
     id: "rotoballer_import",
     label: "RotoBaller imported cheat sheet",
     file: "src/data/players-2026-rotoballer.json",
+    preseasonOnly: true,
   },
   {
     id: "footballers_import",
     label: "Fantasy Footballers imported rankings",
     file: "src/data/players-2026-footballers.json",
+    preseasonOnly: true,
   },
   {
     id: "fftoolbox_import",
     label: "FullTime Fantasy / FFToolbox imported auction values",
     file: "src/data/players-2026-fftoolbox.json",
+    preseasonOnly: true,
   },
   {
     id: "beatadp_import",
     label: "BeatADP imported market ADP",
     file: "src/data/players-2026-beatadp.json",
+    preseasonOnly: true,
   },
   {
     id: "sleeper_player_map_local",
@@ -490,7 +548,7 @@ function normalizeSleeperPlayers(raw: Record<string, unknown>) {
 }
 
 async function checkHttpSource(
-  definition: (typeof HTTP_SOURCES)[number],
+  definition: HttpSourceDefinition,
   previous: Map<string, PulseSource>
 ): Promise<PulseSource> {
   const checkedAt = new Date().toISOString();
@@ -498,6 +556,12 @@ async function checkHttpSource(
   try {
     const result = await fetchText(definition.url);
     const contentLength = result.text.length;
+    const projectionMetrics = definition.rowMode === "sleeper-projections"
+      ? sleeperProjectionMetrics(result.text)
+      : undefined;
+    const matchupMetrics = definition.rowMode === "sleeper-matchups"
+      ? sleeperMatchupMetrics(result.text)
+      : undefined;
     const rowCount =
       definition.rowMode === "csv"
         ? csvRowCount(result.text)
@@ -505,17 +569,28 @@ async function checkHttpSource(
           ? htmlTableRowCount(result.text)
         : definition.rowMode === "json-array"
           ? jsonArrayCount(result.text)
+          : definition.rowMode === "sleeper-projections"
+            ? projectionMetrics?.rowCount
+          : definition.rowMode === "sleeper-matchups"
+            ? matchupMetrics?.rowCount
           : undefined;
     const hash = hashText(result.text);
     const expectedFound = definition.expect
       ? result.text.toLowerCase().includes(definition.expect.toLowerCase())
       : true;
-    const status: PulseStatus = !result.ok ? "error" : expectedFound ? "ok" : "warning";
+    const stale = projectionMetrics?.dataUpdatedAt && definition.maxAgeHours
+      ? hoursSince(projectionMetrics.dataUpdatedAt) > definition.maxAgeHours
+      : false;
+    const status: PulseStatus = !result.ok ? "error" : expectedFound && !stale ? "ok" : "warning";
     const message = !result.ok
       ? `HTTP ${result.httpStatus}`
+      : stale
+        ? `${rowCount ?? 0} rows reachable, but the newest update is older than ${definition.maxAgeHours} hours (${projectionMetrics?.dataUpdatedAt})`
       : expectedFound
         ? rowCount !== undefined
-          ? `${rowCount} rows reachable`
+          ? definition.rowMode === "sleeper-matchups"
+            ? `${rowCount} team score rows reachable; ${matchupMetrics?.playerPointRows ?? 0} include player points`
+            : `${rowCount} rows reachable${projectionMetrics?.dataUpdatedAt ? `; newest update ${projectionMetrics.dataUpdatedAt}` : ""}`
           : "Reachable"
         : `Reachable but expected marker '${definition.expect}' was not found`;
     const base: Omit<PulseSource, "changed"> = {
@@ -529,6 +604,7 @@ async function checkHttpSource(
       httpStatus: result.httpStatus,
       contentLength,
       hash,
+      ...(projectionMetrics?.dataUpdatedAt ? { dataUpdatedAt: projectionMetrics.dataUpdatedAt } : {}),
       message,
       ...(rowCount !== undefined ? { rowCount } : {}),
     };
@@ -558,7 +634,8 @@ async function checkHttpSource(
 
 async function checkLocalImport(
   definition: (typeof LOCAL_IMPORTS)[number],
-  previous: Map<string, PulseSource>
+  previous: Map<string, PulseSource>,
+  monitoringMode: PulseMonitoringMode,
 ): Promise<PulseSource> {
   const checkedAt = new Date().toISOString();
   const filePath = path.resolve(definition.file);
@@ -572,7 +649,9 @@ async function checkLocalImport(
         ? Object.keys(parsed).length
         : 0;
     const hash = hashText(content);
-    const status: PulseStatus = rowCount > 0 ? "ok" : "warning";
+    const status: PulseStatus = rowCount > 0
+      ? "ok"
+      : emptyImportStatus(monitoringMode, definition.preseasonOnly);
     const base: Omit<PulseSource, "changed"> = {
       id: definition.id,
       label: definition.label,
@@ -582,7 +661,11 @@ async function checkLocalImport(
       rowCount,
       contentLength: content.length,
       hash,
-      message: rowCount > 0 ? `${rowCount} local rows available` : "No imported rows yet",
+      message: rowCount > 0
+        ? `${rowCount} local rows available`
+        : status === "not_configured"
+          ? "Optional preseason import; inactive during the regular season"
+          : "No imported rows yet",
     };
     const changed = changedFromPrevious(base, previous.get(definition.id));
 
@@ -675,7 +758,7 @@ function summarize(sources: PulseSource[]): PulseReport["summary"] {
   };
 }
 
-function recommendations(sources: PulseSource[]) {
+function recommendations(sources: PulseSource[], monitoringMode: PulseMonitoringMode) {
   const notes: string[] = [];
   const emptyImports = sources.filter(
     (source) => source.kind === "local-import" && source.status === "warning"
@@ -685,10 +768,87 @@ function recommendations(sources: PulseSource[]) {
       `Import files still empty: ${emptyImports.map((source) => source.label).join(", ")}.`
     );
   }
-  notes.push(
-    "Sleeper's documented draft API can provide actual winning auction bids for a user-supplied draft. Do not ingest its undocumented suggested-price feed without written permission."
-  );
+  if (monitoringMode === "in-season") {
+    notes.push(
+      "In-season mode prioritizes current-week Sleeper projections, league score changes, the player map, trends, and LeagueLogs. Preseason-only page checks and empty optional imports are inactive."
+    );
+  } else {
+    notes.push(
+      "Sleeper's documented draft API can provide actual winning auction bids for a user-supplied draft. Do not ingest its undocumented suggested-price feed without written permission."
+    );
+  }
   return notes;
+}
+
+type SleeperNflState = {
+  season?: unknown;
+  week?: unknown;
+  display_week?: unknown;
+  season_type?: unknown;
+  season_has_scores?: unknown;
+};
+
+async function checkSleeperState(previous: Map<string, PulseSource>) {
+  const definition: HttpSourceDefinition = {
+    id: "sleeper_state",
+    label: "Sleeper NFL state",
+    kind: "public-endpoint",
+    url: "https://api.sleeper.app/v1/state/nfl",
+    expect: "season",
+  };
+  const source = await checkHttpSource(definition, previous);
+  if (source.status === "error") return { source, context: undefined };
+  try {
+    const result = await fetchText(definition.url);
+    const state = JSON.parse(result.text) as SleeperNflState;
+    const season = String(state.season ?? FANTASY_SEASON);
+    const week = Math.max(1, Math.round(Number(state.display_week ?? state.week) || 1));
+    const seasonType = String(state.season_type ?? "pre");
+    const seasonHasScores = state.season_has_scores === true;
+    source.message = `${season} ${seasonType}, Week ${week}${seasonHasScores ? "; scores available" : ""}`;
+    return { source, context: { season, week, seasonType, seasonHasScores } };
+  } catch (error) {
+    source.status = "warning";
+    source.message = error instanceof Error ? error.message : "Sleeper NFL state could not be parsed";
+    return { source, context: undefined };
+  }
+}
+
+function skippedPreseasonSource(definition: HttpSourceDefinition): PulseSource {
+  return {
+    id: definition.id,
+    label: definition.label,
+    kind: definition.kind,
+    url: definition.url,
+    status: "skipped",
+    changed: false,
+    checkedAt: new Date().toISOString(),
+    message: "Preseason-only reachability check skipped in in-season mode",
+  };
+}
+
+function sleeperWeeklySources(context: NonNullable<PulseReport["nflContext"]>, leagueId: string): HttpSourceDefinition[] {
+  const projectionParams = new URLSearchParams({ season_type: context.seasonType });
+  for (const position of ["QB", "RB", "WR", "TE", "K", "DEF"]) projectionParams.append("position[]", position);
+  return [
+    {
+      id: "sleeper_weekly_projections",
+      label: `Sleeper Week ${context.week} player projections`,
+      kind: "public-endpoint",
+      url: `https://api.sleeper.app/projections/nfl/${encodeURIComponent(context.season)}/${context.week}?${projectionParams.toString()}`,
+      expect: "pts_half_ppr",
+      rowMode: "sleeper-projections",
+      maxAgeHours: 72,
+    },
+    {
+      id: "sleeper_league_matchups",
+      label: `Sleeper Week ${context.week} league scores`,
+      kind: "public-endpoint",
+      url: `https://api.sleeper.app/v1/league/${encodeURIComponent(leagueId)}/matchups/${context.week}`,
+      expect: "roster_id",
+      rowMode: "sleeper-matchups",
+    },
+  ];
 }
 
 function printSummary(report: PulseReport) {
@@ -704,23 +864,35 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
   const forceSleeperPlayers = readFlag(args, "force-sleeper-players");
   const failOnError = readFlag(args, "fail-on-error");
+  const leagueId = String(args.get("league") || process.env.FFAA_PULSE_LEAGUE_ID || DEFAULT_PULSE_LEAGUE_ID);
   const previous = await readPreviousReport();
+  const sleeperState = await checkSleeperState(previous);
+  const monitoringMode = monitoringModeForSeasonType(sleeperState.context?.seasonType);
 
   const httpSources = await Promise.all(
-    HTTP_SOURCES.map((definition) => checkHttpSource(definition, previous))
+    HTTP_SOURCES
+      .filter((definition) => definition.id !== "sleeper_state")
+      .map((definition) => shouldCheckPreseasonSource(monitoringMode, definition.preseasonOnly)
+        ? checkHttpSource(definition, previous)
+        : Promise.resolve(skippedPreseasonSource(definition)))
   );
+  const weeklySources = sleeperState.context && monitoringMode === "in-season"
+    ? await Promise.all(sleeperWeeklySources(sleeperState.context, leagueId).map((definition) => checkHttpSource(definition, previous)))
+    : [];
   const sleeperPlayers = await checkSleeperPlayers(previous, forceSleeperPlayers);
   const localSources = await Promise.all(
-    LOCAL_IMPORTS.map((definition) => checkLocalImport(definition, previous))
+    LOCAL_IMPORTS.map((definition) => checkLocalImport(definition, previous, monitoringMode))
   );
-  const sources = [...httpSources, sleeperPlayers, ...localSources].sort((left, right) =>
+  const sources = [sleeperState.source, ...weeklySources, ...httpSources, sleeperPlayers, ...localSources].sort((left, right) =>
     left.id.localeCompare(right.id)
   );
   const report: PulseReport = {
     generatedAt: new Date().toISOString(),
+    monitoringMode,
+    ...(sleeperState.context ? { nflContext: sleeperState.context } : {}),
     summary: summarize(sources),
     sources,
-    recommendations: recommendations(sources),
+    recommendations: recommendations(sources, monitoringMode),
   };
 
   await fs.mkdir(path.dirname(REPORT_PATH), { recursive: true });
