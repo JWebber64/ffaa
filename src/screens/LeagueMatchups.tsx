@@ -60,6 +60,12 @@ function playerWeekValue(player: ToolPlayer | null) {
   return { label: "—", value: "—" };
 }
 
+function playerWeekAriaLabel(label: string, value: string) {
+  if (label === "—") return "No Week score or projection";
+  const spokenLabel = label === "LIVE" ? "Live" : label === "FINAL" ? "Final" : "Projected";
+  return `${spokenLabel} Week points ${value}`;
+}
+
 function MatchupPlayerSide({ player, side, scoring }: { player: ToolPlayer | null; side: "left" | "right"; scoring: ToolScoring }) {
   const detail = player
     ? [player.position, player.team || "FA", player.byeWeek ? `Bye ${player.byeWeek}` : "", player.injuryStatus || ""].filter(Boolean).join(" · ")
@@ -71,7 +77,7 @@ function MatchupPlayerSide({ player, side, scoring }: { player: ToolPlayer | nul
         <TeamMark team={player?.team} size="xs" title={player ? `${player.name} ${player.team || "FA"} helmet` : "Team helmet unavailable"} />
         <span className="league-h2h-profile-copy"><strong>{player?.name ?? "Open slot"}</strong><small>{detail}</small><small className="league-h2h-stat-line" title="Sleeper weekly stat line">{weeklyStatLineText(player)}</small></span>
       </PlayerProfileButton>
-      <b aria-label={points.label === "—" ? "No Week score or projection" : `${points.label === "LIVE" ? "Live" : "Projected"} Week points ${points.value}`}>{points.value}<small>{points.label}</small></b>
+      <b aria-label={playerWeekAriaLabel(points.label, points.value)}>{points.value}<small>{points.label}</small></b>
     </div>
   );
 }
