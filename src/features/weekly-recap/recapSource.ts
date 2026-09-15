@@ -4,6 +4,8 @@ import { loadSleeperPlayerDirectory } from "../../data/sleeperPlayerDirectory";
 import { loadSleeperWeeklyStats, type SleeperWeeklyStatLine } from "../my-hq/sleeperWeeklyStats";
 import { weeklyStatLineText } from "../my-hq/weeklyStatLine";
 import { buildMatchupRecap, type MatchupRecap, type RecapTeam } from "./matchupRecap";
+import type { LeagueHistorySnapshot } from "../league-history/domain/types";
+import { buildRecapRivalry, unavailableRivalry, withRivalrySection, type RecapRivalryWeek } from "./recapRivalry";
 
 const API = "https://api.sleeper.app/v1";
 const requests = new Map<string, { expires: number; promise: Promise<unknown> }>();
@@ -76,6 +78,7 @@ export function buildRecapWeek(input: {
       id: String(row.roster_id),
       name: typeof teamName === "string" && teamName.trim() ? teamName : user?.display_name || user?.username || `Team ${row.roster_id}`,
       managerIds: [roster?.owner_id, ...(roster?.co_owners ?? [])].filter((id): id is string => Boolean(id)),
+      primaryManagerId: roster?.owner_id ?? null,
       score,
       lineupComplete: Boolean(row.players?.length && starterIds.size === starterSlotCount && [...starterIds].every((id) => row.players!.includes(id))),
       benchEligibilityKnown: false,
@@ -162,4 +165,55 @@ export async function loadRecapWeek(leagueId: string, season?: number, requested
   ]);
   if (![rows, rosters, users].every(Array.isArray)) throw new Error("The weekly box score is incomplete. Please try again.");
   return buildRecapWeek({ league, state, week, rows, rosters, users, players, stats, updatedAt: new Date().toISOString() });
+}
+
+const rivalryHistory = new Map<string, { expires: number; promise: Promise<LeagueHistorySnapshot> }>();
+
+function loadRivalryArchive(leagueId: string) {
+  const cached = rivalryHistory.get(leagueId);
+  if (cached && cached.expires > Date.now()) return cached.promise;
+  const promise = (async () => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return await Promise.race([
+        import("../league-history/persistence/firebaseLeagueHistory").then(({ loadLeagueHistory }) => loadLeagueHistory(leagueId, { refresh: true })),
+        new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error("History request timed out.")), 12_000); }),
+      ]);
+    } finally {
+      clearTimeout(timer);
+    }
+  })().catch((error: unknown) => { rivalryHistory.delete(leagueId); throw error; });
+  if (rivalryHistory.size >= 32) rivalryHistory.delete(rivalryHistory.keys().next().value!);
+  rivalryHistory.set(leagueId, { expires: Date.now() + 5 * 60_000, promise });
+  return promise;
+}
+
+async function previousRecapWeeks(league: SleeperLeague, throughWeek: number) {
+  const start = league.settings.start_week;
+  const first = typeof start === "number" && start > 0 ? Math.floor(start) : 1;
+  const weeks: RecapRivalryWeek[] = [];
+  // All reports share these requests; keep historical source concurrency bounded.
+  for (let batch = first; batch < throughWeek; batch += 4) {
+    const loaded = await Promise.all(Array.from({ length: Math.min(4, throughWeek - batch) }, async (_, offset) => {
+      const week = batch + offset;
+      const rows = await read<SleeperMatchupRow[]>(`league/${league.league_id}/matchups/${week}`);
+      if (!Array.isArray(rows) || !rows.length) throw new Error("An earlier weekly box score is unavailable.");
+      return { week, rows };
+    }));
+    weeks.push(...loaded);
+  }
+  return weeks;
+}
+
+export async function loadRecapRivalries(data: RecapWeek): Promise<RecapWeek> {
+  if (data.status !== "final" || !data.recaps.length) return data;
+  try {
+    const [snapshot, previousWeeks] = await Promise.all([
+      loadRivalryArchive(data.league.league_id),
+      previousRecapWeeks(data.league, data.week),
+    ]);
+    return { ...data, recaps: data.recaps.map((recap) => withRivalrySection(recap, buildRecapRivalry(recap, snapshot, previousWeeks))) };
+  } catch {
+    return { ...data, recaps: data.recaps.map((recap) => withRivalrySection(recap, unavailableRivalry())) };
+  }
 }

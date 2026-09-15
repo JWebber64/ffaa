@@ -1,7 +1,7 @@
 import { optimizeLegalLineup, type LineupPlayer } from "../league-history/analytics/lineupOptimizer";
 import { positionColorKey } from "../../ui/positionColors";
 
-export const RECAP_VERSION = "matchup-recap-v1";
+export const RECAP_VERSION = "matchup-recap-v2";
 
 export interface RecapPlayer extends LineupPlayer {
   statLine?: string | undefined;
@@ -11,6 +11,7 @@ export interface RecapTeam {
   id: string;
   name: string;
   managerIds: string[];
+  primaryManagerId?: string | null;
   score: number;
   players: RecapPlayer[];
   lineupComplete: boolean;

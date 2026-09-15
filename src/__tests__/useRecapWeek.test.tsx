@@ -1,16 +1,50 @@
 /* @vitest-environment jsdom */
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-const load = vi.hoisted(() => vi.fn());
-vi.mock("../features/weekly-recap/recapSource", () => ({ loadRecapWeek: load }));
+const { load, enrich } = vi.hoisted(() => ({ load: vi.fn(), enrich: vi.fn() }));
+vi.mock("../features/weekly-recap/recapSource", () => ({ loadRecapWeek: load, loadRecapRivalries: enrich }));
 import { useRecapWeek } from "../features/weekly-recap/useRecapWeek";
 import type { RecapWeek } from "../features/weekly-recap/recapSource";
 
-beforeEach(() => { vi.useFakeTimers(); load.mockReset(); vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible"); });
+beforeEach(() => { vi.useFakeTimers(); load.mockReset(); enrich.mockReset().mockImplementation(async (data: RecapWeek) => data); vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible"); });
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); });
 const week = (number: number, status: "final" | "pending" = "final") => ({ week: number, status, recaps: [] }) as unknown as RecapWeek;
 
 describe("recap loading and refresh lifecycle", () => {
+  it("shows the main report while history loads, then adds the rivalry", async () => {
+    let finish: (value: RecapWeek) => void = () => {};
+    const base = week(1);
+    const enriched = { ...base, updatedAt: "enriched" };
+    load.mockResolvedValue(base);
+    enrich.mockReturnValueOnce(new Promise<RecapWeek>((resolve) => { finish = resolve; }));
+    const { result } = renderHook(() => useRecapWeek("123", 2026, 1));
+    await act(async () => {});
+    expect(result.current.data).toBe(base);
+    await act(async () => { finish(enriched); });
+    expect(result.current.data).toBe(enriched);
+  });
+  it("does not let slow history overwrite a newer score correction for the same week", async () => {
+    let finishOld: (value: RecapWeek) => void = () => {};
+    const corrected = { ...week(1), updatedAt: "corrected" };
+    load.mockResolvedValueOnce(week(1)).mockResolvedValueOnce(corrected);
+    enrich.mockReturnValueOnce(new Promise<RecapWeek>((resolve) => { finishOld = resolve; }));
+    const { result } = renderHook(() => useRecapWeek("123", 2026, 1));
+    await act(async () => {});
+    await act(async () => { await vi.advanceTimersByTimeAsync(60_000); });
+    await act(async () => { finishOld(week(1)); });
+    expect(result.current.data).toBe(corrected);
+  });
+  it("ignores late history from a previously selected week", async () => {
+    let finishOld: (value: RecapWeek) => void = () => {};
+    load.mockResolvedValueOnce(week(1)).mockResolvedValueOnce(week(2));
+    enrich.mockReturnValueOnce(new Promise<RecapWeek>((resolve) => { finishOld = resolve; }));
+    const { result, rerender } = renderHook(({ selected }) => useRecapWeek("123", 2026, selected), { initialProps: { selected: 1 } });
+    await act(async () => {});
+    rerender({ selected: 2 });
+    await act(async () => {});
+    await act(async () => { finishOld(week(1)); });
+    expect(result.current.data?.week).toBe(2);
+  });
   it("checks visible pages each minute and picks up finalization without a generate button", async () => {
     load.mockResolvedValueOnce(week(1, "pending")).mockResolvedValueOnce(week(1));
     const { result } = renderHook(() => useRecapWeek("123", 2026, 1));

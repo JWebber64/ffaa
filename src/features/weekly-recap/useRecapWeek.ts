@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { loadRecapWeek, type RecapWeek } from "./recapSource";
+import { loadRecapWeek, loadRecapRivalries, type RecapWeek } from "./recapSource";
 
 export function useRecapWeek(leagueId: string, season?: number, week?: number) {
   const key = `${leagueId}/${season ?? "latest"}/${week ?? "latest"}`;
@@ -8,11 +8,17 @@ export function useRecapWeek(leagueId: string, season?: number, week?: number) {
   useEffect(() => {
     if (!leagueId) return;
     let active = true;
+    let latestRequest = 0;
     const load = () => {
-      void loadRecapWeek(leagueId, season, week).then((data) => {
-        if (active) setState({ key, data, error: "" });
+      const request = ++latestRequest;
+      void loadRecapWeek(leagueId, season, week).then(async (data) => {
+        if (!active || request !== latestRequest) return;
+        setState({ key, data, error: "" });
+        // The historical archive must not delay the final score and main story.
+        const enriched = await loadRecapRivalries(data);
+        if (active && request === latestRequest) setState({ key, data: enriched, error: "" });
       }).catch((error: unknown) => {
-        if (active) setState({ key, data: null, error: error instanceof Error ? error.message : "The recap could not be loaded." });
+        if (active && request === latestRequest) setState({ key, data: null, error: error instanceof Error ? error.message : "The recap could not be loaded." });
       });
     };
     load();
