@@ -17,6 +17,7 @@ import { useLeagueSeasonManagement } from "../features/league-season/useLeagueSe
 import { useLeagueWeekLineups } from "../features/league-season/useLeagueWeekLineups";
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import type { MyHQData, MyHQLineupEntry } from "../features/my-hq/myHQ";
+import { weeklyStatLineText } from "../features/my-hq/weeklyStatLine";
 import { useOptionalLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
 import { PositionBadge } from "../ui/PositionBadge";
 import { UniversalSelect } from "../ui/UniversalSelect";
@@ -64,7 +65,7 @@ function MatchupPlayerSide({ player, side, scoring }: { player: ToolPlayer | nul
   const points = playerWeekValue(player);
   return (
     <div className={`league-h2h-player is-${side}`}>
-      <PlayerProfileButton player={player} scoring={scoring} className="league-h2h-profile"><strong>{player?.name ?? "Open slot"}</strong><small>{detail}</small></PlayerProfileButton>
+      <PlayerProfileButton player={player} scoring={scoring} className="league-h2h-profile"><strong>{player?.name ?? "Open slot"}</strong><small>{detail}</small><small className="league-h2h-stat-line" title="Sleeper weekly stat line">{weeklyStatLineText(player)}</small></PlayerProfileButton>
       <b aria-label={points.label === "—" ? "No Week score or projection" : `${points.label === "LIVE" ? "Live" : "Projected"} Week points ${points.value}`}>{points.value}<small>{points.label}</small></b>
     </div>
   );
@@ -100,7 +101,7 @@ function ConnectedTeamMatchup({ data, scoring }: { data: MyHQData; scoring: Tool
       <header className="league-compact-page-heading">
         <div><span>My matchup · {data.leagueName}</span><h1>{data.week ? `Week ${data.week}` : "Next matchup"}</h1></div>
         <small>{data.livePlayerScoreCount
-          ? `${data.livePlayerScoreCount} Sleeper LIVE scores · refreshes every 30 seconds while this tab is visible`
+          ? `${data.livePlayerScoreCount} LIVE scores · ${data.weeklyStatLineCount ?? 0} weekly stat lines · refreshes every 30 seconds while this tab is visible`
           : `Week ${data.week || 1} projections · waiting for Sleeper scores`}</small>
       </header>
 

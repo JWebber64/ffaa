@@ -10,6 +10,10 @@ import {
   loadSleeperWeeklyProjections,
   type SleeperWeeklyProjection,
 } from "./sleeperWeeklyProjections";
+import {
+  loadSleeperWeeklyStats,
+  type SleeperWeeklyStatLine,
+} from "./sleeperWeeklyStats";
 
 const SLEEPER_API = "https://api.sleeper.app/v1";
 
@@ -109,6 +113,7 @@ export type MyHQData = {
   teamScore: number | null;
   opponentScore: number | null;
   livePlayerScoreCount: number;
+  weeklyStatLineCount?: number;
   teamProjectedPoints: number | null;
   opponentProjectedPoints: number | null;
   starterLineup: MyHQLineupEntry[];
@@ -180,15 +185,19 @@ function withWeeklyProjection(
   week: number,
   projections: Map<string, SleeperWeeklyProjection>,
   livePlayerPoints: Map<string, number>,
+  weeklyStats: Map<string, SleeperWeeklyStatLine>,
 ): ToolPlayer {
   const projection = sleeperId ? projections.get(sleeperId) : undefined;
   const livePoints = sleeperId ? livePlayerPoints.get(sleeperId) : undefined;
+  const weeklyStatLine = sleeperId ? weeklyStats.get(sleeperId) : undefined;
   return {
     ...player,
     weeklyProjectedPoints: projection?.week === week ? projection.points : null,
     weeklyProjectionWeek: week,
     weeklyActualPoints: livePoints ?? null,
     weeklyActualPointsWeek: livePoints === undefined ? null : week,
+    weeklyStatLine: weeklyStatLine?.week === week ? weeklyStatLine : null,
+    weeklyStatLineWeek: week,
     ...(projection?.opponent ? { weeklyProjectionOpponent: projection.opponent } : {}),
   };
 }
@@ -452,7 +461,8 @@ export async function loadMyHQ(
   const matchupWeek = Math.max(1, week);
   const projectionScoring = weeklyProjectionScoring(connection, league);
   let projectionError = "";
-  const [matchups, transactions, weeklyProjections] = await Promise.all([
+  let statsError = "";
+  const [matchups, transactions, weeklyProjections, weeklyStats] = await Promise.all([
     week > 0
       ? sleeperJson<SleeperMatchup[]>(`/league/${connection.leagueId}/matchups/${matchupWeek}`, signal)
       : Promise.resolve([]),
@@ -465,6 +475,10 @@ export async function loadMyHQ(
     ).catch((error: unknown) => {
       projectionError = error instanceof Error ? error.message : "Unknown projection error.";
       return new Map<string, SleeperWeeklyProjection>();
+    }),
+    loadSleeperWeeklyStats(league.season, matchupWeek, state.season_type || "regular").catch((error: unknown) => {
+      statsError = error instanceof Error ? error.message : "Unknown stats error.";
+      return new Map<string, SleeperWeeklyStatLine>();
     }),
   ]);
 
@@ -484,7 +498,7 @@ export async function loadMyHQ(
   const playerById = new Map<string, ToolPlayer>();
   for (const player of allPlayers) {
     const sleeperId = player.sleeperId?.trim() || "";
-    const enrichedPlayer = withWeeklyProjection(player, sleeperId, matchupWeek, weeklyProjections, livePlayerPoints);
+    const enrichedPlayer = withWeeklyProjection(player, sleeperId, matchupWeek, weeklyProjections, livePlayerPoints, weeklyStats);
     playerById.set(player.id, enrichedPlayer);
     if (sleeperId) playerById.set(sleeperId, enrichedPlayer);
   }
@@ -499,7 +513,7 @@ export async function loadMyHQ(
     const fallback = sleeperRow ? sleeperFallbackPlayer(sleeperRow) : null;
     if (fallback) playerById.set(
       playerId,
-      withWeeklyProjection(fallback, playerId, matchupWeek, weeklyProjections, livePlayerPoints),
+      withWeeklyProjection(fallback, playerId, matchupWeek, weeklyProjections, livePlayerPoints, weeklyStats),
     );
   }
   const starterIds = userRoster.starters ?? [];
@@ -525,6 +539,10 @@ export async function loadMyHQ(
   const opponentBench = (opponentRoster?.players ?? []).flatMap((id) => (
     opponentStarterIdSet.has(id) ? [] : playerById.get(id) ?? []
   ));
+  const weeklyStatLineCount = [...new Set([
+    ...(userRoster.players ?? []),
+    ...(opponentRoster?.players ?? []),
+  ])].filter((playerId) => weeklyStats.has(playerId)).length;
   const opponentProviderUserId = opponentRoster ? rosterOwnerIds(opponentRoster)[0] ?? "" : "";
   const sortedRosters = [...rosters].sort((left, right) =>
     numberValue(right.settings?.wins) - numberValue(left.settings?.wins)
@@ -581,6 +599,7 @@ export async function loadMyHQ(
     teamScore: sleeperMatchupScore(userMatchup),
     opponentScore: sleeperMatchupScore(opponentMatchup),
     livePlayerScoreCount: livePlayerPoints.size,
+    weeklyStatLineCount,
     teamProjectedPoints: lineupWeeklyProjection(starters),
     opponentProjectedPoints: lineupWeeklyProjection(opponentStarters),
     starterLineup,
@@ -608,10 +627,10 @@ export async function loadMyHQ(
       .slice(0, 4)
       .map((transaction) => transactionLabel(transaction, playerById)),
     projectionNote: livePlayerPoints.size
-      ? `Sleeper is returning ${livePlayerPoints.size} current Week ${matchupWeek} player score${livePlayerPoints.size === 1 ? "" : "s"}. LIVE values use this league’s Sleeper scoring; players without a returned score keep their ${projectionScoring.label} projection.`
+      ? `Sleeper is returning ${livePlayerPoints.size} current Week ${matchupWeek} player score${livePlayerPoints.size === 1 ? "" : "s"} and ${weeklyStatLineCount} weekly stat line${weeklyStatLineCount === 1 ? "" : "s"}. LIVE values use this league’s Sleeper scoring; players without a returned score keep their ${projectionScoring.label} projection.${statsError ? ` Weekly stat lines are temporarily unavailable (${statsError}).` : ""}`
       : projectionError
-        ? `Week ${matchupWeek} projections are unavailable (${projectionError}) Season averages are not substituted.`
-        : `Sleeper has not returned player scores for Week ${matchupWeek} yet. Player values use its current ${projectionScoring.label} projection feed; players absent from that feed show a dash, not a season average.`,
+        ? `Week ${matchupWeek} projections are unavailable (${projectionError}) Season averages are not substituted.${statsError ? ` Weekly stat lines are also temporarily unavailable (${statsError}).` : ""}`
+        : `Sleeper has not returned player scores for Week ${matchupWeek} yet. Player values use its current ${projectionScoring.label} projection feed; players absent from that feed show a dash, not a season average.${statsError ? ` Weekly stat lines are temporarily unavailable (${statsError}).` : ""}`,
     loadedAt: new Date().toISOString(),
   };
 }
