@@ -16,6 +16,7 @@ type ProjectionRow = {
   team?: string;
   scoring: Scoring;
   projectedPoints: number;
+  games?: number;
   receptions?: number;
   updatedAt: string;
 };
@@ -166,6 +167,7 @@ async function scrapeCbs() {
       const team = cleanText($(element).find(".CellPlayerName--long .CellPlayerName-team").text());
       const projectedPoints = numberValue(cells.at(-2));
       if (!name || projectedPoints === undefined) return;
+      const games = numberValue(cells[1]);
       const receptions = config.receptionsIndex === undefined
         ? undefined
         : numberValue(cells[config.receptionsIndex]);
@@ -179,13 +181,24 @@ async function scrapeCbs() {
         ...(team ? { team } : {}),
         scoring: "standard",
         projectedPoints,
+        ...(games !== undefined ? { games } : {}),
         ...(receptions !== undefined ? { receptions } : {}),
         updatedAt: FETCHED_AT,
       });
     });
   }
 
-  return dedupeRows(rows);
+  const deduped = dedupeRows(rows);
+  const seasonScaleRows = deduped.filter((row) => (row.games ?? 0) >= 10);
+  const maximumProjection = Math.max(...deduped.map((row) => row.projectedPoints), 0);
+  if (seasonScaleRows.length < 100 || maximumProjection < 250) {
+    throw new Error(
+      `page returned in-season stats instead of season projections ` +
+      `(${seasonScaleRows.length} rows with 10+ games, max ${maximumProjection} points)`,
+    );
+  }
+
+  return deduped;
 }
 
 async function readExistingRows() {

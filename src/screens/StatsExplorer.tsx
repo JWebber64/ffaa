@@ -2325,7 +2325,7 @@ export default function StatsExplorer({ embeddedLeagueId, embeddedLeagueName }: 
           <div className="stats-hub-note stats-auction-attribution">
             <Database size={17} aria-hidden="true" />
             <span>
-              LeagueLogs is a market-index signal converted into GameHQ dollars, not a published auction price. <a href="https://developer.leaguelogs.com/" target="_blank" rel="noreferrer">Powered by LeagueLogs API <ExternalLink size={12} aria-hidden="true" /></a>
+              LeagueLogs is a market-index signal converted into GameHQ dollars, not a published auction price. <a href="https://leaguelogs.com/rankings" target="_blank" rel="noreferrer">Powered by LeagueLogs public rankings <ExternalLink size={12} aria-hidden="true" /></a>
             </span>
           </div>
           <div className="stats-hub-note">

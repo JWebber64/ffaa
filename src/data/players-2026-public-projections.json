@@ -5617,7 +5617,7 @@
     "team": "BUF",
     "scoring": "halfPpr",
     "projectedPoints": 384.2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5629,7 +5629,7 @@
     "team": "NE",
     "scoring": "halfPpr",
     "projectedPoints": 335.3,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5641,7 +5641,7 @@
     "team": "BAL",
     "scoring": "halfPpr",
     "projectedPoints": 334.8,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5654,7 +5654,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 331.4,
     "receptions": 72,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5666,7 +5666,7 @@
     "team": "WAS",
     "scoring": "halfPpr",
     "projectedPoints": 331,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5678,7 +5678,7 @@
     "team": "PHI",
     "scoring": "halfPpr",
     "projectedPoints": 327.8,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5691,7 +5691,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 324.9,
     "receptions": 84,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5703,7 +5703,7 @@
     "team": "DEN",
     "scoring": "halfPpr",
     "projectedPoints": 322.2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5715,7 +5715,7 @@
     "team": "CIN",
     "scoring": "halfPpr",
     "projectedPoints": 321.3,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5727,7 +5727,7 @@
     "team": "SF",
     "scoring": "halfPpr",
     "projectedPoints": 317,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5739,19 +5739,7 @@
     "team": "CHI",
     "scoring": "halfPpr",
     "projectedPoints": 316,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=10",
-    "season": 2026,
-    "name": "Dak Prescott",
-    "pos": "QB",
-    "team": "DAL",
-    "scoring": "halfPpr",
-    "projectedPoints": 315.3,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5763,7 +5751,19 @@
     "team": "NYG",
     "scoring": "halfPpr",
     "projectedPoints": 315.2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=10",
+    "season": 2026,
+    "name": "Dak Prescott",
+    "pos": "QB",
+    "team": "DAL",
+    "scoring": "halfPpr",
+    "projectedPoints": 313.7,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5775,7 +5775,7 @@
     "team": "LAC",
     "scoring": "halfPpr",
     "projectedPoints": 312.8,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5787,7 +5787,7 @@
     "team": "JAC",
     "scoring": "halfPpr",
     "projectedPoints": 312,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5799,7 +5799,7 @@
     "team": "DET",
     "scoring": "halfPpr",
     "projectedPoints": 311.4,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5811,7 +5811,7 @@
     "team": "NO",
     "scoring": "halfPpr",
     "projectedPoints": 307.7,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5823,7 +5823,7 @@
     "team": "KC",
     "scoring": "halfPpr",
     "projectedPoints": 306.7,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5835,7 +5835,7 @@
     "team": "MIN",
     "scoring": "halfPpr",
     "projectedPoints": 306.3,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5848,7 +5848,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 304.9,
     "receptions": 82,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5860,7 +5860,19 @@
     "team": "LAR",
     "scoring": "halfPpr",
     "projectedPoints": 303.9,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=10",
+    "season": 2026,
+    "name": "Jordan Love",
+    "pos": "QB",
+    "team": "GB",
+    "scoring": "halfPpr",
+    "projectedPoints": 292.7,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5872,7 +5884,7 @@
     "team": "TB",
     "scoring": "halfPpr",
     "projectedPoints": 288.6,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5884,7 +5896,7 @@
     "team": "MIA",
     "scoring": "halfPpr",
     "projectedPoints": 287.7,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5896,32 +5908,7 @@
     "team": "SEA",
     "scoring": "halfPpr",
     "projectedPoints": 287.7,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=10",
-    "season": 2026,
-    "name": "Jordan Love",
-    "pos": "QB",
-    "team": "GB",
-    "scoring": "halfPpr",
-    "projectedPoints": 282.7,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Puka Nacua",
-    "pos": "WR",
-    "team": "LAR",
-    "scoring": "halfPpr",
-    "projectedPoints": 281.3,
-    "receptions": 116,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5933,7 +5920,20 @@
     "team": "IND",
     "scoring": "halfPpr",
     "projectedPoints": 277.3,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "season": 2026,
+    "name": "Puka Nacua",
+    "pos": "WR",
+    "team": "LAR",
+    "scoring": "halfPpr",
+    "projectedPoints": 275.8,
+    "receptions": 113,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5946,7 +5946,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 272.5,
     "receptions": 116,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5957,9 +5957,9 @@
     "pos": "RB",
     "team": "IND",
     "scoring": "halfPpr",
-    "projectedPoints": 268.5,
-    "receptions": 36,
-    "updatedAt": "2026-08-27"
+    "projectedPoints": 272.1,
+    "receptions": 39,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5971,7 +5971,7 @@
     "team": "CAR",
     "scoring": "halfPpr",
     "projectedPoints": 263.1,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5983,7 +5983,7 @@
     "team": "HOU",
     "scoring": "halfPpr",
     "projectedPoints": 262.2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -5996,7 +5996,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 259.2,
     "receptions": 32,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6009,7 +6009,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 258.6,
     "receptions": 119,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6022,7 +6022,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 255.6,
     "receptions": 105,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6035,7 +6035,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 251.6,
     "receptions": 16,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6047,7 +6047,7 @@
     "team": "NYJ",
     "scoring": "halfPpr",
     "projectedPoints": 250.5,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6059,7 +6059,7 @@
     "team": "TEN",
     "scoring": "halfPpr",
     "projectedPoints": 249.2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6071,7 +6071,7 @@
     "team": "PIT",
     "scoring": "halfPpr",
     "projectedPoints": 246,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6083,7 +6083,7 @@
     "team": "ARI",
     "scoring": "halfPpr",
     "projectedPoints": 245.6,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6096,7 +6096,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 241.5,
     "receptions": 52,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6109,7 +6109,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 241.3,
     "receptions": 42,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6122,7 +6122,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 239.2,
     "receptions": 56,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6135,7 +6135,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 237.8,
     "receptions": 55,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6148,7 +6148,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 236.9,
     "receptions": 42,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6161,7 +6161,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 234.3,
     "receptions": 56,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6174,7 +6174,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 231.9,
     "receptions": 56,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6187,20 +6187,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 230.6,
     "receptions": 34,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
     "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
     "season": 2026,
-    "name": "Josh Jacobs",
+    "name": "Javonte Williams",
     "pos": "RB",
-    "team": "GB",
+    "team": "DAL",
     "scoring": "halfPpr",
-    "projectedPoints": 226.7,
-    "receptions": 35,
-    "updatedAt": "2026-08-27"
+    "projectedPoints": 224.3,
+    "receptions": 34,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6213,7 +6213,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 222.7,
     "receptions": 99,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6226,7 +6226,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 222,
     "receptions": 47,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6239,20 +6239,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 218.3,
     "receptions": 95,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Javonte Williams",
-    "pos": "RB",
-    "team": "DAL",
-    "scoring": "halfPpr",
-    "projectedPoints": 216.8,
-    "receptions": 33,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6263,9 +6250,9 @@
     "pos": "RB",
     "team": "NYG",
     "scoring": "halfPpr",
-    "projectedPoints": 215.4,
-    "receptions": 44,
-    "updatedAt": "2026-08-27"
+    "projectedPoints": 212.9,
+    "receptions": 43,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6278,7 +6265,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 209.2,
     "receptions": 87,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
+    "season": 2026,
+    "name": "Travis Etienne",
+    "pos": "RB",
+    "team": "NO",
+    "scoring": "halfPpr",
+    "projectedPoints": 207.9,
+    "receptions": 44,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6291,7 +6291,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 207.3,
     "receptions": 38,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6303,7 +6303,7 @@
     "team": "LV",
     "scoring": "halfPpr",
     "projectedPoints": 206.9,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6316,20 +6316,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 205.2,
     "receptions": 97,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Travis Etienne",
-    "pos": "RB",
-    "team": "NO",
-    "scoring": "halfPpr",
-    "projectedPoints": 204.9,
-    "receptions": 44,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6342,7 +6329,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 204,
     "receptions": 39,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6355,7 +6342,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 202.3,
     "receptions": 103,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6368,7 +6355,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 200.5,
     "receptions": 86,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6381,7 +6368,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 200.1,
     "receptions": 79,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6394,7 +6381,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 198.9,
     "receptions": 104,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6407,7 +6394,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 197,
     "receptions": 38,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6420,7 +6407,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 196.2,
     "receptions": 93,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6433,7 +6420,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 195.5,
     "receptions": 100,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6446,7 +6433,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 193.3,
     "receptions": 30,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6459,7 +6446,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 193.1,
     "receptions": 79,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6472,7 +6459,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 190.2,
     "receptions": 81,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6485,7 +6472,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 189.7,
     "receptions": 83,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6498,7 +6485,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 189.2,
     "receptions": 74,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6511,7 +6498,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 188,
     "receptions": 66,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6524,7 +6511,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 186.1,
     "receptions": 70,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6537,7 +6524,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 185.6,
     "receptions": 78,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6550,7 +6537,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 183.1,
     "receptions": 78,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6563,7 +6550,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 182.9,
     "receptions": 34,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6576,7 +6563,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 181.2,
     "receptions": 32,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6589,7 +6576,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 180.8,
     "receptions": 41,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6600,22 +6587,9 @@
     "pos": "RB",
     "team": "NE",
     "scoring": "halfPpr",
-    "projectedPoints": 175.2,
-    "receptions": 43,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "TreVeyon Henderson",
-    "pos": "RB",
-    "team": "NE",
-    "scoring": "halfPpr",
-    "projectedPoints": 174.3,
-    "receptions": 34,
-    "updatedAt": "2026-08-27"
+    "projectedPoints": 178.9,
+    "receptions": 44,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6628,7 +6602,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 172.7,
     "receptions": 65,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6641,7 +6615,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 172,
     "receptions": 69,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6654,7 +6628,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 171.5,
     "receptions": 71,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6667,7 +6641,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 171.1,
     "receptions": 65,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6680,7 +6654,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 170.7,
     "receptions": 72,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6693,7 +6667,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 169.8,
     "receptions": 31,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6706,7 +6680,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 169.6,
     "receptions": 76,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6719,7 +6693,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 169,
     "receptions": 65,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
+    "season": 2026,
+    "name": "TreVeyon Henderson",
+    "pos": "RB",
+    "team": "NE",
+    "scoring": "halfPpr",
+    "projectedPoints": 168.8,
+    "receptions": 33,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6732,7 +6719,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 166.9,
     "receptions": 70,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6745,7 +6732,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 165.2,
     "receptions": 16,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6758,7 +6745,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 163.9,
     "receptions": 67,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
+    "season": 2026,
+    "name": "MarShawn Lloyd",
+    "pos": "RB",
+    "team": "GB",
+    "scoring": "halfPpr",
+    "projectedPoints": 163.4,
+    "receptions": 27,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6771,7 +6771,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 162.2,
     "receptions": 65,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6784,7 +6784,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 161.5,
     "receptions": 34,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6797,7 +6797,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 161.3,
     "receptions": 64,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6810,7 +6810,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 158.3,
     "receptions": 63,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6822,7 +6822,7 @@
     "team": "ATL",
     "scoring": "halfPpr",
     "projectedPoints": 158,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6835,7 +6835,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 157.3,
     "receptions": 73,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6848,7 +6848,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 155.7,
     "receptions": 76,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6861,7 +6861,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 152.6,
     "receptions": 78,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6874,7 +6874,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 151.7,
     "receptions": 60,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6887,7 +6887,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 151.4,
     "receptions": 30,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6900,7 +6900,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 151.3,
     "receptions": 66,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6912,7 +6912,7 @@
     "team": "DAL",
     "scoring": "halfPpr",
     "projectedPoints": 150,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6925,7 +6925,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 149.2,
     "receptions": 65,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6938,7 +6938,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 148.6,
     "receptions": 77,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6951,7 +6951,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 147.9,
     "receptions": 42,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6964,7 +6964,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 147.6,
     "receptions": 76,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -6976,20 +6976,7 @@
     "team": "CLE",
     "scoring": "halfPpr",
     "projectedPoints": 146.7,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Jakobi Meyers",
-    "pos": "WR",
-    "team": "JAC",
-    "scoring": "halfPpr",
-    "projectedPoints": 143.6,
-    "receptions": 67,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7001,7 +6988,7 @@
     "team": "LAC",
     "scoring": "halfPpr",
     "projectedPoints": 143,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7014,7 +7001,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 142.4,
     "receptions": 62,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7027,20 +7014,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 141.9,
     "receptions": 68,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
     "season": 2026,
-    "name": "Xavier Worthy",
-    "pos": "WR",
-    "team": "KC",
+    "name": "George Kittle",
+    "pos": "TE",
+    "team": "SF",
     "scoring": "halfPpr",
-    "projectedPoints": 139.6,
-    "receptions": 57,
-    "updatedAt": "2026-08-27"
+    "projectedPoints": 141.5,
+    "receptions": 64,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7053,7 +7040,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 139.2,
     "receptions": 56,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7066,7 +7053,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 139.2,
     "receptions": 66,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7078,7 +7065,7 @@
     "team": "SEA",
     "scoring": "halfPpr",
     "projectedPoints": 138,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7090,7 +7077,20 @@
     "team": "HOU",
     "scoring": "halfPpr",
     "projectedPoints": 138,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
+    "season": 2026,
+    "name": "Sam LaPorta",
+    "pos": "TE",
+    "team": "DET",
+    "scoring": "halfPpr",
+    "projectedPoints": 138,
+    "receptions": 63,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7103,7 +7103,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 137.6,
     "receptions": 62,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7116,7 +7116,33 @@
     "scoring": "halfPpr",
     "projectedPoints": 137.6,
     "receptions": 73,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "season": 2026,
+    "name": "Xavier Worthy",
+    "pos": "WR",
+    "team": "KC",
+    "scoring": "halfPpr",
+    "projectedPoints": 137.1,
+    "receptions": 56,
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "season": 2026,
+    "name": "Jakobi Meyers",
+    "pos": "WR",
+    "team": "JAC",
+    "scoring": "halfPpr",
+    "projectedPoints": 136.6,
+    "receptions": 63,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7129,7 +7155,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 136.6,
     "receptions": 72,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7142,7 +7168,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 136.3,
     "receptions": 55,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7154,7 +7180,7 @@
     "team": "CLE",
     "scoring": "halfPpr",
     "projectedPoints": 136.1,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7167,7 +7193,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 136.1,
     "receptions": 77,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7180,20 +7206,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 135.2,
     "receptions": 12,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
-    "season": 2026,
-    "name": "Sam LaPorta",
-    "pos": "TE",
-    "team": "DET",
-    "scoring": "halfPpr",
-    "projectedPoints": 135,
-    "receptions": 61,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7206,7 +7219,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 134.9,
     "receptions": 58,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "season": 2026,
+    "name": "Quentin Johnston",
+    "pos": "WR",
+    "team": "LAC",
+    "scoring": "halfPpr",
+    "projectedPoints": 134.2,
+    "receptions": 51,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7219,7 +7245,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 133.5,
     "receptions": 32,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7231,20 +7257,7 @@
     "team": "DEN",
     "scoring": "halfPpr",
     "projectedPoints": 133,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Quentin Johnston",
-    "pos": "WR",
-    "team": "LAC",
-    "scoring": "halfPpr",
-    "projectedPoints": 131.7,
-    "receptions": 50,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7256,7 +7269,7 @@
     "team": "TB",
     "scoring": "halfPpr",
     "projectedPoints": 131,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7269,7 +7282,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 131,
     "receptions": 61,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7282,7 +7295,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 130.9,
     "receptions": 57,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7294,7 +7307,7 @@
     "team": "SF",
     "scoring": "halfPpr",
     "projectedPoints": 130,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7306,7 +7319,7 @@
     "team": "KC",
     "scoring": "halfPpr",
     "projectedPoints": 130,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7319,7 +7332,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 129.9,
     "receptions": 37,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7332,7 +7345,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 129.5,
     "receptions": 37,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7345,7 +7358,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 128.7,
     "receptions": 68,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7358,7 +7371,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 127.9,
     "receptions": 44,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7371,7 +7384,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 127.7,
     "receptions": 20,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7384,7 +7397,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 127.5,
     "receptions": 58,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7397,7 +7410,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 127.2,
     "receptions": 54,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7408,7 +7421,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 126,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7420,7 +7433,7 @@
     "team": "BUF",
     "scoring": "halfPpr",
     "projectedPoints": 126,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7433,7 +7446,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 125.9,
     "receptions": 13,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7446,7 +7459,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 125.3,
     "receptions": 12,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7458,7 +7471,20 @@
     "team": "JAC",
     "scoring": "halfPpr",
     "projectedPoints": 125,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
+    "season": 2026,
+    "name": "Dalton Kincaid",
+    "pos": "TE",
+    "team": "BUF",
+    "scoring": "halfPpr",
+    "projectedPoints": 125,
+    "receptions": 55,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7470,7 +7496,7 @@
     "team": "DET",
     "scoring": "halfPpr",
     "projectedPoints": 125,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7482,7 +7508,7 @@
     "team": "BAL",
     "scoring": "halfPpr",
     "projectedPoints": 125,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7494,7 +7520,7 @@
     "team": "MIN",
     "scoring": "halfPpr",
     "projectedPoints": 125,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7507,7 +7533,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 124.6,
     "receptions": 58,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7519,7 +7545,7 @@
     "team": "NE",
     "scoring": "halfPpr",
     "projectedPoints": 124,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7531,20 +7557,7 @@
     "team": "CHI",
     "scoring": "halfPpr",
     "projectedPoints": 124,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
-    "season": 2026,
-    "name": "George Kittle",
-    "pos": "TE",
-    "team": "SF",
-    "scoring": "halfPpr",
-    "projectedPoints": 124,
-    "receptions": 57,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7557,7 +7570,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 124,
     "receptions": 71,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7569,30 +7582,19 @@
     "team": "GB",
     "scoring": "halfPpr",
     "projectedPoints": 124,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
     "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=80",
     "season": 2026,
-    "name": "Blake Grupe",
+    "name": "Spencer Shrader",
     "pos": "K",
     "team": "IND",
     "scoring": "halfPpr",
     "projectedPoints": 123,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=99",
-    "season": 2026,
-    "name": "Denver Broncos",
-    "pos": "DEF",
-    "scoring": "halfPpr",
-    "projectedPoints": 121,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7604,20 +7606,7 @@
     "team": "CIN",
     "scoring": "halfPpr",
     "projectedPoints": 121,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
-    "season": 2026,
-    "name": "Dalton Kincaid",
-    "pos": "TE",
-    "team": "BUF",
-    "scoring": "halfPpr",
-    "projectedPoints": 120.5,
-    "receptions": 52,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7629,7 +7618,7 @@
     "team": "PIT",
     "scoring": "halfPpr",
     "projectedPoints": 120,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7641,7 +7630,7 @@
     "team": "NO",
     "scoring": "halfPpr",
     "projectedPoints": 120,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7653,7 +7642,7 @@
     "team": "LAR",
     "scoring": "halfPpr",
     "projectedPoints": 120,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7665,7 +7654,7 @@
     "team": "PHI",
     "scoring": "halfPpr",
     "projectedPoints": 120,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7678,7 +7667,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 119.9,
     "receptions": 55,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7691,7 +7680,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 119.7,
     "receptions": 56,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7704,19 +7693,19 @@
     "scoring": "halfPpr",
     "projectedPoints": 119.7,
     "receptions": 56,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
     "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=80",
     "season": 2026,
-    "name": "Ben Sauls",
+    "name": "Dominic Zvada",
     "pos": "K",
     "team": "NYG",
     "scoring": "halfPpr",
     "projectedPoints": 119,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7729,7 +7718,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 118.9,
     "receptions": 49,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7740,7 +7729,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 118,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7753,7 +7742,18 @@
     "scoring": "halfPpr",
     "projectedPoints": 117.6,
     "receptions": 56,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=99",
+    "season": 2026,
+    "name": "Denver Broncos",
+    "pos": "DEF",
+    "scoring": "halfPpr",
+    "projectedPoints": 117,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7766,7 +7766,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 116.1,
     "receptions": 67,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7777,7 +7777,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 116,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7790,7 +7790,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 115.6,
     "receptions": 60,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7803,7 +7803,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 113.1,
     "receptions": 53,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7815,7 +7815,7 @@
     "team": "ARI",
     "scoring": "halfPpr",
     "projectedPoints": 112,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7827,7 +7827,7 @@
     "team": "WAS",
     "scoring": "halfPpr",
     "projectedPoints": 112,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7838,7 +7838,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 112,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7851,7 +7851,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 111.8,
     "receptions": 49,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
+    "season": 2026,
+    "name": "Josh Jacobs",
+    "pos": "RB",
+    "team": "GB",
+    "scoring": "halfPpr",
+    "projectedPoints": 111.8,
+    "receptions": 15,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7864,7 +7877,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 111.6,
     "receptions": 54,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7875,7 +7888,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 111,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7887,7 +7900,7 @@
     "team": "MIA",
     "scoring": "halfPpr",
     "projectedPoints": 111,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7898,7 +7911,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 110,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7910,7 +7923,7 @@
     "team": "CAR",
     "scoring": "halfPpr",
     "projectedPoints": 110,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7923,7 +7936,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 109.5,
     "receptions": 52,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7935,7 +7948,7 @@
     "team": "LV",
     "scoring": "halfPpr",
     "projectedPoints": 109,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7947,7 +7960,7 @@
     "team": "ATL",
     "scoring": "halfPpr",
     "projectedPoints": 109,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7960,7 +7973,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 108,
     "receptions": 47,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7973,20 +7986,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 108,
     "receptions": 51,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Alvin Kamara",
-    "pos": "RB",
-    "team": "NO",
-    "scoring": "halfPpr",
-    "projectedPoints": 107.3,
-    "receptions": 34,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -7997,7 +7997,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 107,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8010,7 +8010,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 106.6,
     "receptions": 51,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8022,7 +8022,7 @@
     "team": "TEN",
     "scoring": "halfPpr",
     "projectedPoints": 106,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8033,7 +8033,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 106,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8046,7 +8046,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 105.6,
     "receptions": 27,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8059,7 +8059,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 105.1,
     "receptions": 50,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8072,7 +8072,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 104.3,
     "receptions": 59,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8083,7 +8083,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 104,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8096,7 +8096,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 103.2,
     "receptions": 44,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8107,7 +8107,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 103,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8120,19 +8120,19 @@
     "scoring": "halfPpr",
     "projectedPoints": 102.1,
     "receptions": 55,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
     "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=80",
     "season": 2026,
-    "name": "Jason Sanders",
+    "name": "Blake Grupe",
     "pos": "K",
     "team": "NYJ",
     "scoring": "halfPpr",
     "projectedPoints": 102,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8145,7 +8145,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 101.4,
     "receptions": 54,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8157,7 +8157,7 @@
     "team": "CLE",
     "scoring": "halfPpr",
     "projectedPoints": 101,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8170,7 +8170,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 100.7,
     "receptions": 19,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8183,7 +8183,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 100,
     "receptions": 42,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8194,7 +8194,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 99,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8207,7 +8207,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 99,
     "receptions": 39,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8218,7 +8218,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 99,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8230,7 +8230,7 @@
     "team": "ATL",
     "scoring": "halfPpr",
     "projectedPoints": 98.8,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8241,7 +8241,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 98,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8254,7 +8254,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 97,
     "receptions": 53,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8265,7 +8265,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 97,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8278,7 +8278,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 96.9,
     "receptions": 54,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8291,7 +8291,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 96.9,
     "receptions": 38,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8302,7 +8302,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 95,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8315,7 +8315,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 94.9,
     "receptions": 57,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8328,7 +8328,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 94.3,
     "receptions": 39,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8341,7 +8341,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 94.1,
     "receptions": 40,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8352,7 +8352,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 94,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8363,7 +8363,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 94,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8376,7 +8376,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 93.7,
     "receptions": 43,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
+    "season": 2026,
+    "name": "Kenyon Sadiq",
+    "pos": "TE",
+    "team": "NYJ",
+    "scoring": "halfPpr",
+    "projectedPoints": 93.2,
+    "receptions": 45,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8387,7 +8400,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 93,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8400,7 +8413,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 92.2,
     "receptions": 10,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8411,7 +8424,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 92,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8424,20 +8437,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 91.7,
     "receptions": 44,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Tyrone Tracy Jr.",
-    "pos": "RB",
-    "team": "NYG",
-    "scoring": "halfPpr",
-    "projectedPoints": 91.5,
-    "receptions": 28,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8448,7 +8448,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 91,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8459,7 +8459,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 91,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8472,7 +8472,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 90.5,
     "receptions": 43,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8485,7 +8485,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 90.2,
     "receptions": 36,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8496,7 +8496,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 90,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8509,7 +8509,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 89.6,
     "receptions": 43,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8522,7 +8522,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 86,
     "receptions": 45,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8533,33 +8533,20 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 86,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
     "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
     "season": 2026,
-    "name": "MarShawn Lloyd",
+    "name": "Alvin Kamara",
     "pos": "RB",
-    "team": "GB",
+    "team": "NO",
     "scoring": "halfPpr",
-    "projectedPoints": 85.9,
-    "receptions": 16,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
-    "season": 2026,
-    "name": "Mason Taylor",
-    "pos": "TE",
-    "team": "NYJ",
-    "scoring": "halfPpr",
-    "projectedPoints": 85.1,
-    "receptions": 50,
-    "updatedAt": "2026-08-27"
+    "projectedPoints": 84.8,
+    "receptions": 29,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8572,7 +8559,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 84.7,
     "receptions": 42,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8585,7 +8572,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 84.6,
     "receptions": 40,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8598,7 +8585,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 84.2,
     "receptions": 41,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8609,7 +8596,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 84,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8622,7 +8609,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 83.7,
     "receptions": 36,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8635,7 +8622,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 83.1,
     "receptions": 37,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8646,7 +8633,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 83,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8657,7 +8644,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 82,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8670,7 +8657,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 81.5,
     "receptions": 43,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8683,7 +8670,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 81.4,
     "receptions": 38,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8696,7 +8683,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 80.5,
     "receptions": 9,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8709,20 +8696,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 80.5,
     "receptions": 36,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Isiah Pacheco",
-    "pos": "RB",
-    "team": "DET",
-    "scoring": "halfPpr",
-    "projectedPoints": 79.8,
-    "receptions": 20,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8735,7 +8709,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 79.7,
     "receptions": 38,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8746,7 +8720,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 79,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8759,7 +8733,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 78.5,
     "receptions": 18,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8772,20 +8746,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 78.2,
     "receptions": 28,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Isaac TeSlaa",
-    "pos": "WR",
-    "team": "DET",
-    "scoring": "halfPpr",
-    "projectedPoints": 77.5,
-    "receptions": 30,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8798,7 +8759,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 77.4,
     "receptions": 45,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8809,46 +8770,20 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 77,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
-    "season": 2026,
-    "name": "Kenyon Sadiq",
-    "pos": "TE",
-    "team": "NYJ",
-    "scoring": "halfPpr",
-    "projectedPoints": 77,
-    "receptions": 39,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
-    "season": 2026,
-    "name": "Oronde Gadsden",
-    "pos": "TE",
-    "team": "LAC",
-    "scoring": "halfPpr",
-    "projectedPoints": 76.4,
-    "receptions": 34,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
     "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
     "season": 2026,
-    "name": "Darius Slayton",
+    "name": "Isaac TeSlaa",
     "pos": "WR",
-    "team": "NYG",
+    "team": "DET",
     "scoring": "halfPpr",
-    "projectedPoints": 76.1,
-    "receptions": 31,
-    "updatedAt": "2026-08-27"
+    "projectedPoints": 75.6,
+    "receptions": 29,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8859,7 +8794,20 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 75,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
+    "season": 2026,
+    "name": "Mason Taylor",
+    "pos": "TE",
+    "team": "NYJ",
+    "scoring": "halfPpr",
+    "projectedPoints": 75,
+    "receptions": 43,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8870,7 +8818,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 75,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8883,7 +8831,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 74.5,
     "receptions": 34,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8896,7 +8844,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 73.6,
     "receptions": 34,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8909,7 +8857,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 72.9,
     "receptions": 35,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8922,7 +8870,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 72.1,
     "receptions": 31,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8933,7 +8881,7 @@
     "pos": "DEF",
     "scoring": "halfPpr",
     "projectedPoints": 71,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8946,7 +8894,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 70.4,
     "receptions": 30,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8959,7 +8907,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 70.3,
     "receptions": 27,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8972,7 +8920,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 69.5,
     "receptions": 32,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -8985,20 +8933,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 68.6,
     "receptions": 25,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "KaVontae Turpin",
-    "pos": "WR",
-    "team": "DAL",
-    "scoring": "halfPpr",
-    "projectedPoints": 68.3,
-    "receptions": 23,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9011,7 +8946,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 68.2,
     "receptions": 10,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9024,7 +8959,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 68.1,
     "receptions": 34,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9037,7 +8972,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 67.6,
     "receptions": 34,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9050,7 +8985,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 67.5,
     "receptions": 28,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9063,7 +8998,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 66.2,
     "receptions": 16,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9076,7 +9011,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 66.1,
     "receptions": 31,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
+    "season": 2026,
+    "name": "Oronde Gadsden",
+    "pos": "TE",
+    "team": "LAC",
+    "scoring": "halfPpr",
+    "projectedPoints": 65.9,
+    "receptions": 31,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9089,7 +9037,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 64.6,
     "receptions": 27,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "season": 2026,
+    "name": "KaVontae Turpin",
+    "pos": "WR",
+    "team": "DAL",
+    "scoring": "halfPpr",
+    "projectedPoints": 64.3,
+    "receptions": 21,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9102,20 +9063,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 64.2,
     "receptions": 29,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Olamide Zaccheaus",
-    "pos": "WR",
-    "team": "ATL",
-    "scoring": "halfPpr",
-    "projectedPoints": 64.2,
-    "receptions": 29,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9128,20 +9076,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 64,
     "receptions": 21,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
-    "season": 2026,
-    "name": "Dawson Knox",
-    "pos": "TE",
-    "team": "BUF",
-    "scoring": "halfPpr",
-    "projectedPoints": 63.9,
-    "receptions": 26,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9154,7 +9089,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 63.6,
     "receptions": 31,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9165,9 +9100,22 @@
     "pos": "RB",
     "team": "LAC",
     "scoring": "halfPpr",
-    "projectedPoints": 61.6,
+    "projectedPoints": 63.6,
     "receptions": 19,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
+    "season": 2026,
+    "name": "Najee Harris",
+    "pos": "RB",
+    "team": "NYG",
+    "scoring": "halfPpr",
+    "projectedPoints": 61.6,
+    "receptions": 9,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9180,7 +9128,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 61.5,
     "receptions": 30,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9193,7 +9141,33 @@
     "scoring": "halfPpr",
     "projectedPoints": 61.5,
     "receptions": 12,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
+    "season": 2026,
+    "name": "Dawson Knox",
+    "pos": "TE",
+    "team": "BUF",
+    "scoring": "halfPpr",
+    "projectedPoints": 61.4,
+    "receptions": 25,
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "season": 2026,
+    "name": "Olamide Zaccheaus",
+    "pos": "WR",
+    "team": "ATL",
+    "scoring": "halfPpr",
+    "projectedPoints": 61.2,
+    "receptions": 27,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9206,20 +9180,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 61.1,
     "receptions": 5,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Andrei Iosivas",
-    "pos": "WR",
-    "team": "CIN",
-    "scoring": "halfPpr",
-    "projectedPoints": 60.6,
-    "receptions": 27,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9232,7 +9193,33 @@
     "scoring": "halfPpr",
     "projectedPoints": 60.5,
     "receptions": 28,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
+    "season": 2026,
+    "name": "Tyrone Tracy Jr.",
+    "pos": "RB",
+    "team": "NYG",
+    "scoring": "halfPpr",
+    "projectedPoints": 60.3,
+    "receptions": 15,
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
+    "season": 2026,
+    "name": "Emmett Johnson",
+    "pos": "RB",
+    "team": "KC",
+    "scoring": "halfPpr",
+    "projectedPoints": 60.1,
+    "receptions": 18,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9245,7 +9232,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 60.1,
     "receptions": 29,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "season": 2026,
+    "name": "Darius Slayton",
+    "pos": "WR",
+    "team": "NYG",
+    "scoring": "halfPpr",
+    "projectedPoints": 59.1,
+    "receptions": 25,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9257,7 +9257,7 @@
     "team": "LV",
     "scoring": "halfPpr",
     "projectedPoints": 58.5,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9270,7 +9270,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 58.1,
     "receptions": 9,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9283,20 +9283,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 56.7,
     "receptions": 24,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
     "season": 2026,
-    "name": "Cyrus Allen",
-    "pos": "WR",
-    "team": "KC",
+    "name": "Malik Davis",
+    "pos": "RB",
+    "team": "DAL",
     "scoring": "halfPpr",
     "projectedPoints": 56.5,
-    "receptions": 26,
-    "updatedAt": "2026-08-27"
+    "receptions": 10,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9309,20 +9309,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 56.3,
     "receptions": 27,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
     "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
     "season": 2026,
-    "name": "Tutu Atwell",
+    "name": "Cyrus Allen",
     "pos": "WR",
-    "team": "MIA",
+    "team": "KC",
     "scoring": "halfPpr",
-    "projectedPoints": 55.1,
-    "receptions": 23,
-    "updatedAt": "2026-08-27"
+    "projectedPoints": 55,
+    "receptions": 25,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9335,7 +9335,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 54.9,
     "receptions": 26,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9348,7 +9348,33 @@
     "scoring": "halfPpr",
     "projectedPoints": 54.2,
     "receptions": 23,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "season": 2026,
+    "name": "Andrei Iosivas",
+    "pos": "WR",
+    "team": "CIN",
+    "scoring": "halfPpr",
+    "projectedPoints": 54.1,
+    "receptions": 24,
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
+    "season": 2026,
+    "name": "Isiah Pacheco",
+    "pos": "RB",
+    "team": "DET",
+    "scoring": "halfPpr",
+    "projectedPoints": 54.1,
+    "receptions": 12,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9361,7 +9387,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 53.4,
     "receptions": 11,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9374,20 +9400,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 53.2,
     "receptions": 21,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Emari Demercado",
-    "pos": "RB",
-    "team": "KC",
-    "scoring": "halfPpr",
-    "projectedPoints": 52.5,
-    "receptions": 19,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9400,7 +9413,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 52.2,
     "receptions": 24,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9413,7 +9426,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 52,
     "receptions": 11,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9426,20 +9439,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 51.9,
     "receptions": 9,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
-    "season": 2026,
-    "name": "Jake Tonges",
-    "pos": "TE",
-    "team": "SF",
-    "scoring": "halfPpr",
-    "projectedPoints": 51,
-    "receptions": 25,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9452,7 +9452,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 51,
     "receptions": 27,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9465,7 +9465,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 50.2,
     "receptions": 22,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9478,7 +9478,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 49.2,
     "receptions": 9,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9491,7 +9491,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 48.6,
     "receptions": 11,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "season": 2026,
+    "name": "Jahan Dotson",
+    "pos": "WR",
+    "team": "ATL",
+    "scoring": "halfPpr",
+    "projectedPoints": 47.9,
+    "receptions": 19,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9504,7 +9517,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 47.5,
     "receptions": 22,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9517,7 +9530,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 46.4,
     "receptions": 22,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9530,7 +9543,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 45.6,
     "receptions": 20,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9543,20 +9556,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 45.5,
     "receptions": 18,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Jahan Dotson",
-    "pos": "WR",
-    "team": "ATL",
-    "scoring": "halfPpr",
-    "projectedPoints": 45.4,
-    "receptions": 18,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9569,7 +9569,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 45.1,
     "receptions": 23,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9582,7 +9582,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 45.1,
     "receptions": 20,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9595,7 +9595,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 44.5,
     "receptions": 22,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
+    "season": 2026,
+    "name": "Charlie Kolar",
+    "pos": "TE",
+    "team": "LAC",
+    "scoring": "halfPpr",
+    "projectedPoints": 43.4,
+    "receptions": 25,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9608,33 +9621,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 43,
     "receptions": 19,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Najee Harris",
-    "pos": "RB",
-    "team": "NYG",
-    "scoring": "halfPpr",
-    "projectedPoints": 41.9,
-    "receptions": 5,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Jaydon Blue",
-    "pos": "RB",
-    "team": "DAL",
-    "scoring": "halfPpr",
-    "projectedPoints": 41,
-    "receptions": 11,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9647,7 +9634,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 39.4,
     "receptions": 23,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9660,33 +9647,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 39.3,
     "receptions": 17,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
     "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
     "season": 2026,
-    "name": "Jordan James",
+    "name": "Kaelon Black",
     "pos": "RB",
     "team": "SF",
     "scoring": "halfPpr",
     "projectedPoints": 39.1,
     "receptions": 7,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Tank Dell",
-    "pos": "WR",
-    "team": "HOU",
-    "scoring": "halfPpr",
-    "projectedPoints": 38.7,
-    "receptions": 20,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9699,33 +9673,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 38.2,
     "receptions": 14,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Emmett Johnson",
-    "pos": "RB",
-    "team": "KC",
-    "scoring": "halfPpr",
-    "projectedPoints": 37.8,
-    "receptions": 11,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Dont'e Thornton Jr.",
-    "pos": "WR",
-    "team": "LV",
-    "scoring": "halfPpr",
-    "projectedPoints": 37.7,
-    "receptions": 18,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9738,20 +9686,59 @@
     "scoring": "halfPpr",
     "projectedPoints": 37.7,
     "receptions": 20,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
     "season": 2026,
-    "name": "Charlie Kolar",
-    "pos": "TE",
-    "team": "LAC",
+    "name": "Malik Benson",
+    "pos": "WR",
+    "team": "LV",
     "scoring": "halfPpr",
-    "projectedPoints": 37.4,
-    "receptions": 21,
-    "updatedAt": "2026-08-27"
+    "projectedPoints": 37.7,
+    "receptions": 18,
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "season": 2026,
+    "name": "Chris Bell",
+    "pos": "WR",
+    "team": "MIA",
+    "scoring": "halfPpr",
+    "projectedPoints": 37.1,
+    "receptions": 17,
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
+    "season": 2026,
+    "name": "Chris Brooks",
+    "pos": "RB",
+    "team": "GB",
+    "scoring": "halfPpr",
+    "projectedPoints": 36.8,
+    "receptions": 15,
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
+    "season": 2026,
+    "name": "Jacob Saylors",
+    "pos": "RB",
+    "team": "DET",
+    "scoring": "halfPpr",
+    "projectedPoints": 36.5,
+    "receptions": 6,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9764,20 +9751,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 36.2,
     "receptions": 18,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Jeremy McNichols",
-    "pos": "RB",
-    "team": "WAS",
-    "scoring": "halfPpr",
-    "projectedPoints": 36.1,
-    "receptions": 16,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9790,7 +9764,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 36,
     "receptions": 11,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9803,20 +9777,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 35.9,
     "receptions": 22,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Malik Davis",
-    "pos": "RB",
-    "team": "DAL",
-    "scoring": "halfPpr",
-    "projectedPoints": 35.1,
-    "receptions": 5,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9829,20 +9790,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 34.6,
     "receptions": 16,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
     "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
     "season": 2026,
-    "name": "Kaelon Black",
+    "name": "Jordan James",
     "pos": "RB",
     "team": "SF",
     "scoring": "halfPpr",
     "projectedPoints": 34.5,
     "receptions": 5,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9855,7 +9816,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 34.4,
     "receptions": 16,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9868,7 +9829,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 33.9,
     "receptions": 19,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9881,7 +9842,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 33.2,
     "receptions": 17,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9894,7 +9855,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 33,
     "receptions": 16,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9907,7 +9868,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 33,
     "receptions": 11,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9920,7 +9881,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 32.9,
     "receptions": 8,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9932,20 +9893,7 @@
     "team": "ARI",
     "scoring": "halfPpr",
     "projectedPoints": 32.4,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Christian Kirk",
-    "pos": "WR",
-    "team": "SF",
-    "scoring": "halfPpr",
-    "projectedPoints": 32.1,
-    "receptions": 15,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9958,7 +9906,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 31.2,
     "receptions": 15,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9971,7 +9919,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 31.1,
     "receptions": 15,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9984,7 +9932,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 31,
     "receptions": 8,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -9997,7 +9945,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 30.7,
     "receptions": 12,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10010,7 +9958,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 30.5,
     "receptions": 14,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10023,7 +9971,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 30.1,
     "receptions": 16,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
+    "season": 2026,
+    "name": "Jake Tonges",
+    "pos": "TE",
+    "team": "SF",
+    "scoring": "halfPpr",
+    "projectedPoints": 30,
+    "receptions": 15,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10036,7 +9997,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 29.4,
     "receptions": 13,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10049,7 +10010,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 29.1,
     "receptions": 15,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10062,7 +10023,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 28.8,
     "receptions": 7,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10075,7 +10036,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 28.4,
     "receptions": 13,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10088,7 +10049,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 28.3,
     "receptions": 14,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
+    "season": 2026,
+    "name": "Kendre Miller",
+    "pos": "RB",
+    "team": "NO",
+    "scoring": "halfPpr",
+    "projectedPoints": 28.2,
+    "receptions": 5,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10101,7 +10075,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 28.1,
     "receptions": 15,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
+    "season": 2026,
+    "name": "Tank Dell",
+    "pos": "WR",
+    "team": "HOU",
+    "scoring": "halfPpr",
+    "projectedPoints": 27.5,
+    "receptions": 13,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10114,7 +10101,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 27.4,
     "receptions": 10,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10127,20 +10114,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 26.8,
     "receptions": 14,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
     "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
     "season": 2026,
-    "name": "Tez Johnson",
+    "name": "Ted Hurst",
     "pos": "WR",
     "team": "TB",
     "scoring": "halfPpr",
     "projectedPoints": 26.2,
     "receptions": 13,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10153,7 +10140,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 25.5,
     "receptions": 12,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10166,20 +10153,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 25.4,
     "receptions": 13,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Chris Brooks",
-    "pos": "RB",
-    "team": "GB",
-    "scoring": "halfPpr",
-    "projectedPoints": 25.4,
-    "receptions": 9,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10192,7 +10166,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 25.4,
     "receptions": 4,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10205,7 +10179,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 24.9,
     "receptions": 13,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10218,7 +10192,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 24.7,
     "receptions": 13,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10231,20 +10205,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 23.7,
     "receptions": 4,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "DJ Giddens",
-    "pos": "RB",
-    "team": "IND",
-    "scoring": "halfPpr",
-    "projectedPoints": 23.5,
-    "receptions": 2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10257,7 +10218,20 @@
     "scoring": "halfPpr",
     "projectedPoints": 23.5,
     "receptions": 12,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
+    "season": 2026,
+    "name": "Emari Demercado",
+    "pos": "RB",
+    "team": "DAL",
+    "scoring": "halfPpr",
+    "projectedPoints": 23.1,
+    "receptions": 5,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10270,7 +10244,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 23,
     "receptions": 11,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10283,7 +10257,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 22.7,
     "receptions": 10,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10296,7 +10270,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 20.4,
     "receptions": 10,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10308,20 +10282,7 @@
     "team": "NYG",
     "scoring": "halfPpr",
     "projectedPoints": 19.9,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Brandon Aiyuk",
-    "pos": "WR",
-    "team": "SF",
-    "scoring": "halfPpr",
-    "projectedPoints": 19.5,
-    "receptions": 7,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10333,19 +10294,20 @@
     "team": "IND",
     "scoring": "halfPpr",
     "projectedPoints": 19.3,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=10",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
     "season": 2026,
-    "name": "Quinn Ewers",
-    "pos": "QB",
-    "team": "MIA",
+    "name": "DJ Giddens",
+    "pos": "RB",
+    "team": "IND",
     "scoring": "halfPpr",
-    "projectedPoints": 18.2,
-    "updatedAt": "2026-08-27"
+    "projectedPoints": 17.5,
+    "receptions": 2,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10357,7 +10319,7 @@
     "team": "MIN",
     "scoring": "halfPpr",
     "projectedPoints": 17.2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10370,7 +10332,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 15.6,
     "receptions": 6,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10382,33 +10344,7 @@
     "team": "KC",
     "scoring": "halfPpr",
     "projectedPoints": 15.4,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Mitchell Tinsley",
-    "pos": "WR",
-    "team": "CIN",
-    "scoring": "halfPpr",
-    "projectedPoints": 14.4,
-    "receptions": 8,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Kaleb Johnson",
-    "pos": "RB",
-    "team": "PIT",
-    "scoring": "halfPpr",
-    "projectedPoints": 13.4,
-    "receptions": 2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10420,19 +10356,7 @@
     "team": "DAL",
     "scoring": "halfPpr",
     "projectedPoints": 13.3,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=10",
-    "season": 2026,
-    "name": "Tyrod Taylor",
-    "pos": "QB",
-    "team": "GB",
-    "scoring": "halfPpr",
-    "projectedPoints": 13.3,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10444,20 +10368,7 @@
     "team": "HOU",
     "scoring": "halfPpr",
     "projectedPoints": 13.2,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=30",
-    "season": 2026,
-    "name": "Greg Dortch",
-    "pos": "WR",
-    "team": "DET",
-    "scoring": "halfPpr",
-    "projectedPoints": 13.1,
-    "receptions": 9,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10470,7 +10381,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 12.7,
     "receptions": 4,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10482,7 +10393,7 @@
     "team": "CHI",
     "scoring": "halfPpr",
     "projectedPoints": 12.4,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10495,7 +10406,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 12.3,
     "receptions": 7,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10507,7 +10418,7 @@
     "team": "PIT",
     "scoring": "halfPpr",
     "projectedPoints": 12.1,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10519,20 +10430,7 @@
     "team": "NYJ",
     "scoring": "halfPpr",
     "projectedPoints": 12,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Jawhar Jordan",
-    "pos": "RB",
-    "team": "HOU",
-    "scoring": "halfPpr",
-    "projectedPoints": 12,
-    "receptions": 3,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10544,7 +10442,7 @@
     "team": "CAR",
     "scoring": "halfPpr",
     "projectedPoints": 12,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10556,20 +10454,7 @@
     "team": "BUF",
     "scoring": "halfPpr",
     "projectedPoints": 11.8,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=40",
-    "season": 2026,
-    "name": "Hunter Long",
-    "pos": "TE",
-    "team": "JAC",
-    "scoring": "halfPpr",
-    "projectedPoints": 11.7,
-    "receptions": 7,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10581,7 +10466,7 @@
     "team": "SF",
     "scoring": "halfPpr",
     "projectedPoints": 11.2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10594,7 +10479,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 10.9,
     "receptions": 7,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10607,7 +10492,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 10.3,
     "receptions": 2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10619,7 +10504,7 @@
     "team": "TEN",
     "scoring": "halfPpr",
     "projectedPoints": 10.2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10632,7 +10517,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 10.1,
     "receptions": 2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10644,7 +10529,7 @@
     "team": "LAR",
     "scoring": "halfPpr",
     "projectedPoints": 9.8,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10657,7 +10542,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 9.5,
     "receptions": 7,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10670,7 +10555,19 @@
     "scoring": "halfPpr",
     "projectedPoints": 9.4,
     "receptions": 1,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
+  },
+  {
+    "sourceId": "fftoday-projections",
+    "source": "FFToday projections",
+    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=10",
+    "season": 2026,
+    "name": "Tyrod Taylor",
+    "pos": "QB",
+    "team": "GB",
+    "scoring": "halfPpr",
+    "projectedPoints": 9.3,
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10682,20 +10579,7 @@
     "team": "NO",
     "scoring": "halfPpr",
     "projectedPoints": 9.1,
-    "updatedAt": "2026-08-27"
-  },
-  {
-    "sourceId": "fftoday-projections",
-    "source": "FFToday projections",
-    "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=20",
-    "season": 2026,
-    "name": "Kendre Miller",
-    "pos": "RB",
-    "team": "NO",
-    "scoring": "halfPpr",
-    "projectedPoints": 8.7,
-    "receptions": 2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10708,7 +10592,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 8.5,
     "receptions": 2,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10720,7 +10604,7 @@
     "team": "LAC",
     "scoring": "halfPpr",
     "projectedPoints": 7.7,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10732,7 +10616,7 @@
     "team": "WAS",
     "scoring": "halfPpr",
     "projectedPoints": 7,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10744,19 +10628,19 @@
     "team": "BAL",
     "scoring": "halfPpr",
     "projectedPoints": 6.5,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
     "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=10",
     "season": 2026,
-    "name": "Nick Mullens",
+    "name": "Quinn Ewers",
     "pos": "QB",
     "team": "JAC",
     "scoring": "halfPpr",
     "projectedPoints": 5.7,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10768,7 +10652,7 @@
     "team": "DEN",
     "scoring": "halfPpr",
     "projectedPoints": 5,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10780,7 +10664,7 @@
     "team": "NE",
     "scoring": "halfPpr",
     "projectedPoints": 4.9,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10792,7 +10676,7 @@
     "team": "CIN",
     "scoring": "halfPpr",
     "projectedPoints": 4.4,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10804,7 +10688,7 @@
     "team": "PHI",
     "scoring": "halfPpr",
     "projectedPoints": 4.1,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10816,19 +10700,19 @@
     "team": "DET",
     "scoring": "halfPpr",
     "projectedPoints": 4,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
     "source": "FFToday projections",
     "sourceUrl": "https://www.fftoday.com/rankings/playerproj.php?Season=2026&PosID=10",
     "season": 2026,
-    "name": "Jake Browning",
+    "name": "Jalon Daniels",
     "pos": "QB",
     "team": "TB",
     "scoring": "halfPpr",
     "projectedPoints": 3.8,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10840,7 +10724,7 @@
     "team": "SEA",
     "scoring": "halfPpr",
     "projectedPoints": 2.5,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10853,7 +10737,7 @@
     "scoring": "halfPpr",
     "projectedPoints": 0,
     "receptions": 0,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   },
   {
     "sourceId": "fftoday-projections",
@@ -10866,6 +10750,6 @@
     "scoring": "halfPpr",
     "projectedPoints": 0,
     "receptions": 0,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-09-06"
   }
 ]

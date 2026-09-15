@@ -260,7 +260,7 @@ const SOURCE_DEFINITIONS: SourceDefinition[] = [
   {
     sourceId: "leaguelogs-ppr",
     source: "LeagueLogs PPR Market Index",
-    sourceUrl: "https://developer.leaguelogs.com/",
+    sourceUrl: "https://leaguelogs.com/rankings/redraft/ppr",
     rows: leagueLogsRows,
     kind: "mixed",
     weight: 0.55,
@@ -270,7 +270,7 @@ const SOURCE_DEFINITIONS: SourceDefinition[] = [
   {
     sourceId: "leaguelogs-half-ppr",
     source: "LeagueLogs half-PPR Market Index",
-    sourceUrl: "https://developer.leaguelogs.com/",
+    sourceUrl: "https://leaguelogs.com/rankings/redraft/half-ppr",
     rows: leagueLogsRows,
     kind: "mixed",
     weight: 0.55,

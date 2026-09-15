@@ -7,7 +7,7 @@ import { PDFParse } from "pdf-parse";
 const FANTASY_SEASON = 2026;
 const SOURCE_URL = "https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf";
 const SOURCE_LABEL = "ESPN Mike Clay 2026 projections";
-const UPDATED_AT = "2026-06-22";
+const UPDATED_AT_FALLBACK = "2026-06-22";
 const REPORT_PATH = path.resolve("reports/NFLDK2026_CS_ClayProjections2026.pdf");
 const OUTPUT_JSON = path.resolve(`src/data/players-${FANTASY_SEASON}-espn-clay-projections.json`);
 
@@ -45,6 +45,14 @@ type ProjectionRow = {
   extraPointsMade?: number | undefined;
   extraPointAttempts?: number | undefined;
   extraPointPercentage?: number | undefined;
+};
+
+const MINIMUM_ROWS_BY_POSITION: Record<Position, number> = {
+  QB: 35,
+  RB: 85,
+  WR: 130,
+  TE: 55,
+  K: 25,
 };
 
 const TEAM_ALIASES: Record<string, string> = {
@@ -170,7 +178,7 @@ function baseRow(
     id: toId(pos, name),
     season: FANTASY_SEASON,
     source: SOURCE_LABEL,
-    updatedAt: UPDATED_AT,
+    updatedAt: UPDATED_AT_FALLBACK,
     rank,
     name,
     pos,
@@ -276,6 +284,12 @@ async function main() {
   const parser = new PDFParse({ data: buffer });
 
   try {
+    const info = await parser.getInfo();
+    const dates = info.getDateNode();
+    const sourceDate = dates.ModDate ?? dates.CreationDate;
+    const updatedAt = sourceDate && Number.isFinite(sourceDate.getTime())
+      ? sourceDate.toISOString().slice(0, 10)
+      : UPDATED_AT_FALLBACK;
     const rows: ProjectionRow[] = [];
     rows.push(...parseQuarterbacks(await getPageText(parser, 35)));
 
@@ -290,8 +304,23 @@ async function main() {
     }
     rows.push(...parseKickers(await getPageText(parser, 57)));
 
-    if (rows.length < 400) {
-      throw new Error(`Parsed only ${rows.length} ESPN Clay projection rows; expected 400+.`);
+    for (const row of rows) row.updatedAt = updatedAt;
+
+    const counts = Object.fromEntries(
+      Object.keys(MINIMUM_ROWS_BY_POSITION).map((position) => [
+        position,
+        rows.filter((row) => row.pos === position).length,
+      ]),
+    ) as Record<Position, number>;
+    const shortPositions = Object.entries(MINIMUM_ROWS_BY_POSITION)
+      .filter(([position, minimum]) => counts[position as Position] < minimum)
+      .map(([position, minimum]) => `${position} ${counts[position as Position]}/${minimum}`);
+    if (rows.length < 350 || shortPositions.length) {
+      throw new Error(
+        `ESPN Clay projection validation failed: ${rows.length} total rows; ` +
+        `position counts ${Object.entries(counts).map(([position, count]) => `${position}=${count}`).join(", ")}` +
+        (shortPositions.length ? `; below minimum: ${shortPositions.join(", ")}` : ""),
+      );
     }
 
     rows.sort((left, right) => {
@@ -301,7 +330,10 @@ async function main() {
 
     await fs.mkdir(path.dirname(OUTPUT_JSON), { recursive: true });
     await fs.writeFile(OUTPUT_JSON, `${JSON.stringify(rows, null, 2)}\n`, "utf8");
-    console.log(`Wrote ${rows.length} ESPN Clay projection rows to ${OUTPUT_JSON}`);
+    console.log(
+      `Wrote ${rows.length} ESPN Clay projection rows (${Object.entries(counts).map(([position, count]) => `${position}=${count}`).join(", ")}) ` +
+      `dated ${updatedAt} to ${OUTPUT_JSON}`,
+    );
   } finally {
     await parser.destroy();
   }

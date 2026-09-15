@@ -2,6 +2,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import * as cheerio from "cheerio";
 
 type PulseStatus = "ok" | "changed" | "warning" | "error" | "skipped" | "not_configured";
 
@@ -67,10 +68,11 @@ const HTTP_SOURCES = [
   },
   {
     id: "leaguelogs_market",
-    label: "LeagueLogs redraft PPR Market Index",
-    kind: "public-endpoint" as const,
-    url: "https://developer.leaguelogs.com/v1/market/redraft-1qb-12t-ppr1",
-    expect: "sleeperPlayerId",
+    label: "LeagueLogs redraft PPR rankings",
+    kind: "public-page" as const,
+    url: "https://leaguelogs.com/rankings/redraft/ppr",
+    expect: "LeagueLogs Market Index",
+    rowMode: "html-table",
   },
   {
     id: "fftoday_auction",
@@ -425,6 +427,11 @@ function jsonArrayCount(text: string) {
   }
 }
 
+function htmlTableRowCount(text: string) {
+  const $ = cheerio.load(text);
+  return $("table tbody tr").filter((_, element) => $(element).children("td").length > 1).length;
+}
+
 function normalizeSleeperPlayers(raw: Record<string, unknown>) {
   return Object.values(raw)
     .flatMap((value): SleeperPlayer[] => {
@@ -494,6 +501,8 @@ async function checkHttpSource(
     const rowCount =
       definition.rowMode === "csv"
         ? csvRowCount(result.text)
+        : definition.rowMode === "html-table"
+          ? htmlTableRowCount(result.text)
         : definition.rowMode === "json-array"
           ? jsonArrayCount(result.text)
           : undefined;

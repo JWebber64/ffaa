@@ -25,10 +25,10 @@ The value engine can use these sources:
 - Footballguys public top-15 preview
 - FantasyNerds public top-10 preview
 - SportsBrackets printable consensus board (display-only)
-- LeagueLogs Market Index (free API, attribution required)
+- LeagueLogs Market Index (public ranking pages, attribution required)
 - WinWithOdds Vegas projections
 - ESPN Mike Clay season projections
-- Sleeper 2026 Season projections read from the public league Players table
+- Sleeper 2026 Season projections captured manually from the rendered league Players table
 - FFToday public season projections
 - CBS Sports public season projections
 - FantasyPros auction/projection exports
@@ -151,7 +151,9 @@ This writes:
 - `reports/public-projection-sources.json`
 
 Sleeper is captured from the rendered website rather than an undocumented
-projection endpoint. Its current public 2026 Season/PPR capture is stored in
+projection endpoint. The league Players route currently redirects signed-out
+browsers to login, so this source stays manual and is never refreshed with
+stored cookies or unattended account access. Its current 2026 Season/PPR capture is stored in
 `src/data/players-2026-sleeper-projections.json`, with the source URL, scoring,
 stat line, and capture date on every row.
 
@@ -249,8 +251,8 @@ included as one independent projection vote after scoring normalization.
 
 We are not integrating paid/commercial or account-backed fantasy-data APIs. The workflow is:
 
-- Keep WinWithOdds, FFToday, and CBS automated for projection refreshes.
-- Refresh Sleeper season projections from the rendered public league page.
+- Keep ESPN Clay, WinWithOdds, FFToday, and CBS automated for projection refreshes.
+- Refresh Sleeper season projections only through an explicit rendered-page capture; do not automate login or reuse account cookies.
 - Pull the ESPN 2026 salary-cap PDF with `npm run espn:pull`.
 - Build the active 2026 player pool with `npm run players:pull`. If FantasyPros does not expose a parsable table, this falls back to the current ESPN sheet and refuses to write an empty pool.
 - Use Sleeper public data for player IDs, league/draft metadata, and trend signals.
