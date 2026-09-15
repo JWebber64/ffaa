@@ -50,6 +50,7 @@ Reads are deduplicated for 30 seconds; the visible page checks each minute. Erro
 ```powershell
 npx vitest run src/__tests__/matchupRecap.test.ts src/__tests__/recapRivalry.test.ts src/__tests__/recapRivalrySource.test.ts src/__tests__/weeklyRecapUi.test.tsx src/__tests__/useRecapWeek.test.tsx src/__tests__/leagueHistoryImportingState.test.tsx src/__tests__/teamAndMatchupLayout.test.ts src/__tests__/lineupOptimizer.test.ts src/__tests__/sleeperWeeklyStats.test.ts --pool=threads --maxWorkers=2
 npx vitest run src/__tests__/positionColorSystem.test.tsx src/__tests__/positionToggle.test.tsx src/__tests__/positionSelectionConsistency.test.ts src/__tests__/visualSystemTokens.test.ts
+npx vitest run src/__tests__/typographyGuard.test.ts src/__tests__/appHeaderAlignment.test.ts src/__tests__/brandMarkGuard.test.ts
 npm run lint
 npm run build:vercel
 ```
