@@ -24,6 +24,7 @@ import { PositionBadge } from "../ui/PositionBadge";
 import { UniversalSelect } from "../ui/UniversalSelect";
 import "./league-season.css";
 import { NativeLiveMatchupWorkspace } from "../features/native-scoring/NativeLiveMatchupWorkspace";
+import { PersonalMatchupRecap } from "../features/weekly-recap/PersonalMatchupRecap";
 
 function clampWeek(value: string | null) {
   const parsed = Number(value);
@@ -122,6 +123,8 @@ function ConnectedTeamMatchup({ data, scoring }: { data: MyHQData; scoring: Tool
           <span className="league-h2h-versus" aria-hidden="true">VS</span>
           <div className="is-right"><span>Opponent</span><strong>{data.opponentName}</strong><small>{data.opponentRecord} · {data.opponentProjectedPoints?.toFixed(1) ?? "—"} projected</small><b>{formatLiveScore(data.opponentScore)}</b></div>
         </header>
+
+        <PersonalMatchupRecap data={data} />
 
         {hasOpponent ? (
           <>

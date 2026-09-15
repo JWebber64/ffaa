@@ -1,0 +1,76 @@
+.weekly-recap { border: 1px solid var(--color-border-default); border-radius: var(--r-lg); overflow: clip; background: var(--color-surface-card-primary); min-width: 0; }
+.weekly-recap-cover { background: var(--color-surface-warm); color: var(--color-text-on-warm); padding: clamp(18px, 2.5vw, 28px); }
+.weekly-recap-edition { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-bottom: 14px; border-bottom: 1px solid var(--color-border-on-warm); font-size: 12px; font-weight: 750; letter-spacing: .055em; text-transform: uppercase; }
+.weekly-recap-edition > span:first-child { display: inline-flex; align-items: center; gap: 8px; }
+.weekly-recap-cover-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .55fr); gap: clamp(20px, 3vw, 40px); align-items: center; padding-top: 20px; }
+.weekly-recap-cover-grid[data-result="false"] { grid-template-columns: minmax(0, 1fr); }
+.weekly-recap-kicker { font-size: 12px; text-transform: uppercase; font-weight: 800; letter-spacing: .08em; }
+.weekly-recap h2 { margin: 8px 0 12px; font-family: var(--font-display); font-size: var(--type-title-section); line-height: 1.12; text-wrap: balance; color: inherit; overflow-wrap: anywhere; }
+.weekly-recap-lead { margin: 0; font-size: 16px; line-height: 1.65; text-wrap: pretty; max-width: 72ch; }
+.weekly-recap-result > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--color-border-on-warm); }
+.weekly-recap-result span { font-size: 14px; font-weight: 750; overflow-wrap: anywhere; }
+.weekly-recap-result small { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-top: 4px; color: var(--color-text-on-warm-secondary); }
+.weekly-recap-result strong { font-family: var(--font-display); font-size: 32px; font-variant-numeric: tabular-nums; line-height: 1; }
+.weekly-recap-result p { font-size: 12px; margin: 12px 0 0; color: var(--color-text-on-warm-secondary); }
+.weekly-recap-disclosure > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 24px; cursor: pointer; font-size: 15px; font-weight: 750; list-style: none; color: var(--color-text-primary); }
+.weekly-recap-disclosure > summary::-webkit-details-marker { display: none; }
+.weekly-recap-disclosure > summary small { color: var(--color-text-secondary); font-weight: 500; }
+.weekly-recap-disclosure[open] > summary { border-bottom: 1px solid var(--color-border-default); }
+.weekly-recap-disclosure[open] > summary > svg { transform: rotate(180deg); }
+.weekly-recap-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(230px, .44fr); gap: 32px; padding: clamp(18px, 2.5vw, 28px); }
+.weekly-recap-story { min-width: 0; }
+.weekly-recap-story section + section { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--color-border-default); }
+.weekly-recap h3 { font-size: 19px; line-height: 1.3; margin: 0 0 12px; text-wrap: balance; color: var(--color-text-primary); }
+.weekly-recap-story p { max-width: 76ch; font-size: 16px; line-height: 1.8; margin: 0 0 16px; color: var(--color-text-secondary); text-wrap: pretty; overflow-wrap: anywhere; }
+.weekly-recap-story p:last-child { margin-bottom: 0; }
+.weekly-recap-notebook { min-width: 0; border-left: 1px solid var(--color-border-default); padding-left: 24px; }
+.weekly-recap-notebook section + section { margin-top: 32px; }
+.weekly-recap-spotlight { border-bottom: 1px solid var(--color-border-default); padding-bottom: 24px; }
+.weekly-recap-spotlight .weekly-recap-kicker { color: var(--color-text-secondary); }
+.weekly-recap-big-score { display: block; font-family: var(--font-display); font-size: 64px; line-height: 1.05; font-variant-numeric: tabular-nums; margin: 16px 0 20px; color: var(--color-text-primary); }
+.weekly-recap-big-score small { display: block; font-family: var(--font-sans); font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-top: 4px; }
+.weekly-recap-notebook p { font-size: 14px; line-height: 1.6; color: var(--color-text-secondary); margin: 8px 0; }
+.weekly-recap-notebook .weekly-recap-statline { margin-top: 16px; }
+.weekly-recap-position-table table { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: 13px; font-variant-numeric: tabular-nums; }
+.weekly-recap-position-table th, .weekly-recap-position-table td { padding: 12px 4px; border-bottom: 1px solid var(--color-border-default); text-align: right; overflow-wrap: anywhere; }
+.weekly-recap-position-table th:first-child { width: 50px; text-align: left; }
+.weekly-recap-position-table thead th { font-size: 11px; line-height: 1.5; color: var(--color-text-secondary); }
+.weekly-recap-footer { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; border-top: 1px solid var(--color-border-default); padding: 20px 24px; color: var(--color-text-secondary); font-size: 13px; line-height: 1.6; }
+.weekly-recap-footer details { max-width: 76ch; }
+.weekly-recap-footer summary { cursor: pointer; }
+.weekly-recap-footer a { display: inline-flex; align-items: center; gap: 4px; color: var(--color-text-link); flex-shrink: 0; }
+.weekly-recap-personal { margin: 0; min-width: 0; }
+.weekly-recap-context { margin: 12px 0; font-size: 13px; color: var(--color-text-secondary); }
+.weekly-recap-archive-link { display: inline-block; margin: 12px 0 18px; color: var(--color-text-link); font-size: 14px; }
+.weekly-recap-notice { display: flex; justify-content: space-between; gap: 16px; align-items: center; border: 1px solid var(--color-border-default); padding: 20px; border-radius: var(--r-lg); background: var(--color-surface-card-primary); }
+.weekly-recap-notice strong { font-size: 17px; }
+.weekly-recap-notice p { font-size: 15px; line-height: 1.6; color: var(--color-text-secondary); margin: 6px 0 0; }
+.weekly-recap-notice button { cursor: pointer; padding: 10px 14px; border-radius: var(--r-md); border: 1px solid var(--color-border-default); color: var(--color-text-primary); background: var(--color-surface-card-secondary); flex-shrink: 0; }
+.weekly-recap-page { display: grid; gap: 24px; padding: clamp(16px, 2vw, 28px); min-width: 0; }
+.weekly-recap-page-heading { display: flex; gap: 24px; justify-content: space-between; align-items: center; }
+.weekly-recap-page-heading h1 { font-family: var(--font-display); font-size: var(--type-display-page); line-height: 1.1; margin: 8px 0; }
+.weekly-recap-page-heading span { color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .08em; font-size: 12px; font-weight: 700; }
+.weekly-recap-page-heading p, .weekly-recap-archive-note { color: var(--color-text-secondary); line-height: 1.6; margin: 0; }
+.weekly-recap-page-heading a { color: var(--color-text-link); white-space: nowrap; font-size: 14px; }
+.weekly-recap-controls { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; }
+.weekly-recap-controls label { display: grid; gap: 7px; min-width: 126px; font-size: 13px; }
+.weekly-recap-controls > span { padding-bottom: 10px; color: var(--color-text-secondary); font-size: 14px; }
+.weekly-recap-controls .weekly-recap-matchup-control { width: min(440px, 100%); min-width: 0; }
+.weekly-recap-archive-note { font-size: 13px; }
+.weekly-recap summary:focus-visible, .weekly-recap a:focus-visible, .weekly-recap-page a:focus-visible, .weekly-recap-notice button:focus-visible { outline: 2px solid var(--color-text-link); outline-offset: 4px; }
+@media (max-width: 900px) {
+  .weekly-recap-cover-grid { grid-template-columns: minmax(0, 1fr); }
+  .weekly-recap-result { max-width: none; }
+  .weekly-recap-body { grid-template-columns: minmax(0, 1fr); }
+  .weekly-recap-notebook { border-left: 0; border-top: 1px solid var(--color-border-default); padding: 24px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .weekly-recap-notebook section + section { margin-top: 0; }
+  .weekly-recap-spotlight { border-bottom: 0; }
+}
+@media (max-width: 540px) {
+  .weekly-recap-edition { font-size: 11px; }
+  .weekly-recap-disclosure > summary { padding: 16px 18px; }
+  .weekly-recap-notebook { grid-template-columns: minmax(0, 1fr); }
+  .weekly-recap-footer, .weekly-recap-page-heading { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .weekly-recap-notice { align-items: flex-start; flex-direction: column; }
+  .weekly-recap-controls > span { width: 100%; padding-bottom: 0; }
+}

@@ -38,6 +38,8 @@ import type { LeagueHistorySnapshot } from "../domain/types";
 import { closeParentDisclosure, useDismissibleDisclosureMenus } from "../../../ui/disclosureMenu";
 import { LeagueHistoryImportingState } from "./LeagueHistoryImportingState";
 import "./league-history.css";
+import { useOptionalLeagueWorkspace } from "../../league-workspace/leagueWorkspaceState";
+import { WeeklyRecapPage } from "../../weekly-recap/WeeklyRecapPage";
 
 const HISTORY_NAV_GROUPS = [
   { label: "People", roots: ["managers", "h2h", "rivalries"], links: [
@@ -85,7 +87,8 @@ function LeagueHistoryLayout() {
   const location = useLocation();
   const navigationRef = useRef<HTMLElement>(null);
   useDismissibleDisclosureMenus(navigationRef);
-  const state = useLeagueHistory(leagueId);
+  const workspace = useOptionalLeagueWorkspace();
+  const state = useLeagueHistory(workspace ? workspace.dataLeagueId : leagueId);
   const metadataSnapshot = state.data;
   const pageMetadata = historyMetadata(metadataSnapshot, location.pathname);
   useRouteMetadata({
@@ -138,6 +141,7 @@ function LeagueHistoryLayout() {
       <nav className="history-nav" aria-label="League history navigation" ref={navigationRef}>
         <NavLink to={leagueHistoryPath(leagueId, "")} end><Trophy size={15} aria-hidden="true" /><span>Overview</span></NavLink>
         <NavLink to={leagueHistoryPath(leagueId, "week")}><CalendarDays size={15} aria-hidden="true" /><span>This Week</span></NavLink>
+        <NavLink to={leagueHistoryPath(leagueId, "recaps")}><BookOpen size={15} aria-hidden="true" /><span>Weekly recaps</span></NavLink>
         {HISTORY_NAV_GROUPS.map((group) => {
           const active = group.roots.some((root) => location.pathname.includes(`/${root}`));
           return (
@@ -172,6 +176,7 @@ function LeagueHistoryRouteFallback() {
 export default function LeagueHistoryApp() {
   return (
     <Routes>
+      <Route path="recaps" element={<WeeklyRecapPage />} />
       <Route element={<LeagueHistoryLayout />}>
         <Route index element={<LeagueDashboardPage />} />
         <Route path="week" element={<WeekPage />} />

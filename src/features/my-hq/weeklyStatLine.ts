@@ -39,7 +39,7 @@ function add(chunks: string[], stats: Record<string, number>, key: string, label
   if (value !== null) chunks.push(`${count(value)} ${label}`);
 }
 
-export function weeklyStatLineText(player: Pick<ToolPlayer, "position" | "weeklyStatLine"> | null) {
+export function weeklyStatLineText(player: { position: string; weeklyStatLine?: ToolPlayer["weeklyStatLine"] } | null) {
   const line = player?.weeklyStatLine;
   if (!line || !Object.keys(line.stats).length) return "Stat line unavailable";
   const stats = line.stats;

@@ -50,6 +50,7 @@ Before Production, inspect computed styles on desktop and mobile for:
 - Stats filters, including K and DEF URL state
 - Offline Draft setup, team board, numbered slots, bench, and IR
 - League players, teams, lineup, matchups, and My Team when data is available
+- Weekly recap position-battle tables on My Matchup and History → Weekly recaps (`RecapArticle`); flex starters are grouped at their natural position, and each row uses the shared `PositionBadge` without fill or foreground overrides
 - Hosted draft player lists, nomination controls, mobile manager roster, and team detail panels
 
 Verify the exact Production asset and confirm that the deployed chart chunk no longer contains a local position palette.

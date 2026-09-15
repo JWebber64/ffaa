@@ -35,7 +35,7 @@ export function useLeagueHistoryWeeks(routeId: string, snapshot: LeagueHistorySn
       return () => { active = false; };
     }
     setState({ status: "loading", data: snapshot, error: "" });
-    void loadLeagueHistoryWeeks(routeId).then((weeks) => {
+    void loadLeagueHistoryWeeks(snapshot.league.currentExternalLeagueId || routeId).then((weeks) => {
       if (!active) return;
       setState({
         status: "ready",

@@ -19,6 +19,7 @@ export function useLeagueHistory(routeId: string) {
     let active = true;
     const controller = new AbortController();
     setState({ status: "loading", data: null, error: "" });
+    if (!routeId) return () => { active = false; controller.abort(); };
     const load = async () => {
       try {
         const data = await loadLeagueHistory(routeId, { refresh: refreshKey > 0 });

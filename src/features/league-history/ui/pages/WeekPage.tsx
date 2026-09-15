@@ -81,6 +81,8 @@ export function WeekPage() {
         week={selected.week}
       />
 
+      <Link className="history-action-link" to={`/league/${leagueId}/history/recaps?season=${selected.season}&week=${selected.week}`}>Read this week’s detailed matchup recaps →</Link>
+
       {weekState.status === "error" ? (
         <section className="history-week-notice" data-status="error" role="alert">
           <div><strong>Weekly data could not be loaded</strong><span>{weekState.error}</span></div>
