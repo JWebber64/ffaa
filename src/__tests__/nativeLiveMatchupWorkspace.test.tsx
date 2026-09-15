@@ -5,6 +5,7 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 
 import { NativeLiveMatchupWorkspace } from "../features/native-scoring/NativeLiveMatchupWorkspace";
+import { nativeScoreStatus } from "../features/native-scoring/nativeScoreStatus";
 import type { CanonicalLeagueWorkspace } from "../features/league-domain/types";
 
 vi.mock("../features/native-scoring/useNativeScoring", () => ({
@@ -38,6 +39,12 @@ const workspace: CanonicalLeagueWorkspace = {
 };
 
 describe("native live matchup workspace", () => {
+  it("labels only active games live and completed game sets final", () => {
+    expect(nativeScoreStatus({ activeNflGameIds: ["game-1"], gameStatuses: { "game-1": "in_progress" } })).toBe("Live");
+    expect(nativeScoreStatus({ activeNflGameIds: [], gameStatuses: { "game-1": "final", "game-2": "canceled" } })).toBe("Final");
+    expect(nativeScoreStatus({ activeNflGameIds: [], gameStatuses: { "game-1": "scheduled", "game-2": "final" } })).toBe("Projected");
+  });
+
   it("shows current weekly scoring, calculations, correction and stale-data state without calling season PPG live points", () => {
     render(<MemoryRouter initialEntries={["/league/league-1/matchup?week=1"]}><NativeLiveMatchupWorkspace workspace={workspace} personalOnly /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "Week 1 live scoring" })).toBeTruthy();

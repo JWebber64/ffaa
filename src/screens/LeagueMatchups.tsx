@@ -17,7 +17,7 @@ import { useLeagueSeasonManagement } from "../features/league-season/useLeagueSe
 import { useLeagueWeekLineups } from "../features/league-season/useLeagueWeekLineups";
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import type { MyHQData, MyHQLineupEntry } from "../features/my-hq/myHQ";
-import { weeklyStatLineText } from "../features/my-hq/weeklyStatLine";
+import { weeklyScoreStatus, weeklyStatLineText } from "../features/my-hq/weeklyStatLine";
 import { TeamMark } from "../components/player/TeamMark";
 import { useOptionalLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
 import { PositionBadge } from "../ui/PositionBadge";
@@ -51,7 +51,8 @@ function formatLiveScore(value: number | null) {
 
 function playerWeekValue(player: ToolPlayer | null) {
   if (player?.weeklyActualPoints !== null && player?.weeklyActualPoints !== undefined) {
-    return { label: "LIVE", value: player.weeklyActualPoints.toFixed(2) };
+    const status = weeklyScoreStatus(player);
+    return { label: status === "live" ? "LIVE" : "FINAL", value: player.weeklyActualPoints.toFixed(2) };
   }
   if (player?.weeklyProjectedPoints !== null && player?.weeklyProjectedPoints !== undefined) {
     return { label: "PROJ", value: player.weeklyProjectedPoints.toFixed(1) };
@@ -105,7 +106,7 @@ function ConnectedTeamMatchup({ data, scoring }: { data: MyHQData; scoring: Tool
       <header className="league-compact-page-heading">
         <div><span>My matchup · {data.leagueName}</span><h1>{data.week ? `Week ${data.week}` : "Next matchup"}</h1></div>
         <small>{data.livePlayerScoreCount
-          ? `${data.livePlayerScoreCount} LIVE scores · ${data.weeklyStatLineCount ?? 0} weekly stat lines · refreshes every 30 seconds while this tab is visible`
+          ? `${data.livePlayerScoreCount} current scores · ${data.weeklyStatLineCount ?? 0} weekly stat lines · refreshes every 30 seconds while this tab is visible`
           : `Week ${data.week || 1} projections · waiting for Sleeper scores`}</small>
       </header>
 

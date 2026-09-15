@@ -1,9 +1,27 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { normalizeSleeperWeeklyStatRow, loadSleeperWeeklyStats } from "../features/my-hq/sleeperWeeklyStats";
-import { weeklyStatLineText } from "../features/my-hq/weeklyStatLine";
+import { weeklyScoreStatus, weeklyStatLineText } from "../features/my-hq/weeklyStatLine";
 
 describe("Sleeper weekly stat lines", () => {
+  it("labels a returned score from a completed game as final", () => {
+    expect(weeklyScoreStatus({
+      weeklyActualPoints: 26.1,
+      weeklyStatLine: { playerId: "7523", season: "2026", week: 1, team: "JAX", opponent: "CAR", gameDate: "2026-09-13", gameId: "202610115", stats: {} },
+    }, new Date("2026-09-15T12:00:00-04:00"))).toBe("final");
+  });
+
+  it("keeps a returned score live only for a same-day game", () => {
+    expect(weeklyScoreStatus({
+      weeklyActualPoints: 3.2,
+      weeklyStatLine: { playerId: "7523", season: "2026", week: 1, team: "CIN", opponent: "CLE", gameDate: "2026-09-15", gameId: "202610115", stats: {} },
+    }, new Date("2026-09-15T12:00:00-04:00"))).toBe("live");
+  });
+
+  it("does not call an undated score live", () => {
+    expect(weeklyScoreStatus({ weeklyActualPoints: 0, weeklyStatLine: null })).toBe("final");
+  });
+
   it("normalizes numeric stats and keeps the game context", () => {
     const line = normalizeSleeperWeeklyStatRow({
       player_id: "7523",
