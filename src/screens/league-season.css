@@ -359,8 +359,12 @@
 .league-h2h-row > .league-position { justify-self: center; }
 .league-h2h-player { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; }
 .league-h2h-player > div { min-width: 0; display: grid; gap: 2px; }
-.league-h2h-profile { min-width: 0; display: grid; gap: 2px; text-align: left; }
-.league-h2h-player.is-right .league-h2h-profile { text-align: right; }
+.league-h2h-profile { min-width: 0; display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; gap: 7px; text-align: left; }
+.league-h2h-profile .team-mark { --team-mark-size: 30px; }
+.league-h2h-profile-copy { min-width: 0; display: grid; gap: 2px; }
+.league-h2h-player.is-right .league-h2h-profile { grid-template-columns: minmax(0, 1fr) 30px; text-align: right; }
+.league-h2h-player.is-right .league-h2h-profile .team-mark { grid-column: 2; grid-row: 1; }
+.league-h2h-player.is-right .league-h2h-profile-copy { grid-column: 1; grid-row: 1; }
 .league-h2h-player strong { overflow: hidden; color: var(--text-0); font-size: .75rem; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .league-h2h-player small { overflow: hidden; color: var(--text-2); font-size: .61rem; line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .league-h2h-player .league-h2h-stat-line { color: var(--text-1); font-size: .6rem; }
@@ -658,6 +662,13 @@
   .league-h2h-row { min-height: 62px; padding: 7px 8px; grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr); gap: 5px; }
   .league-h2h-row > .league-position { min-width: 36px; padding-inline: 4px; font-size: .54rem; }
   .league-h2h-player { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .league-h2h-profile,
+  .league-h2h-player.is-right .league-h2h-profile { grid-template-columns: 26px minmax(0, 1fr); gap: 5px; text-align: left; }
+  .league-h2h-profile .team-mark { --team-mark-size: 26px; }
+  .league-h2h-player.is-right .league-h2h-profile .team-mark,
+  .league-h2h-player.is-right .league-h2h-profile-copy { grid-column: auto; grid-row: auto; }
+  .league-h2h-player.is-right .league-h2h-profile { direction: rtl; }
+  .league-h2h-player.is-right .league-h2h-profile-copy { direction: ltr; text-align: right; }
   .league-h2h-player > b { grid-row: auto; grid-column: 1; justify-self: start; display: flex; gap: 3px; font-size: .68rem; text-align: left; }
   .league-h2h-player.is-right { grid-template-columns: minmax(0, 1fr); }
   .league-h2h-player.is-right > div,
