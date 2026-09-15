@@ -22,8 +22,8 @@ afterEach(() => { cleanup(); vi.clearAllMocks(); });
 const recap = buildMatchupRecap({
   id: "1", leagueName: "Test League", season: 2026, week: 1, status: "final", rosterPositions: ["QB"],
   teams: [
-    { id: "1", name: "Home team", managerIds: ["me"], score: 32, lineupComplete: true, players: [{ providerPlayerId: "p1", playerName: "Star QB", position: "QB", isStarter: true, fantasyPoints: 32 }] },
-    { id: "2", name: "Away team", managerIds: ["them"], score: 20, lineupComplete: true, players: [{ providerPlayerId: "p2", playerName: "Other QB", position: "QB", isStarter: true, fantasyPoints: 20 }] },
+    { id: "1", name: "Home team", managerIds: ["me"], score: 32, lineupComplete: true, players: [{ providerPlayerId: "p1", playerName: "Star QB", position: "QB", lineupSlot: "QB", isStarter: true, fantasyPoints: 32 }] },
+    { id: "2", name: "Away team", managerIds: ["them"], score: 20, lineupComplete: true, players: [{ providerPlayerId: "p2", playerName: "Other QB", position: "QB", lineupSlot: "QB", isStarter: true, fantasyPoints: 20 }] },
   ], weekScores: [], leagueWeekComplete: false, sourceUrl: "https://sleeper.com", updatedAt: "2026-09-15T00:00:00Z",
 })!;
 const routeId = "487ce74f-0f9a-4fd8-893e-8284b7c54d52";

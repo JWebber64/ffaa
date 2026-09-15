@@ -6,6 +6,8 @@ export interface LineupPlayer {
   position: string;
   isStarter: boolean;
   fantasyPoints: number | null;
+  /** Recorded starter slot, when supplied by the weekly provider. Never inferred by the optimizer. */
+  lineupSlot?: string;
 }
 
 export interface LineupAssignment {

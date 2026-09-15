@@ -6,6 +6,8 @@ import { weeklyStatLineText } from "../my-hq/weeklyStatLine";
 import { buildMatchupRecap, type MatchupRecap, type RecapTeam } from "./matchupRecap";
 import type { LeagueHistorySnapshot } from "../league-history/domain/types";
 import { buildRecapRivalry, unavailableRivalry, withRivalrySection, type RecapRivalryWeek } from "./recapRivalry";
+import { recapSlotLabel, recordedStarterSlots } from "./recapPresentation";
+import { recapNextMatchups, recapRecordChanges, type RecapNextMatchup, type RecapRecordChange } from "./recapWeekContext";
 
 const API = "https://api.sleeper.app/v1";
 const requests = new Map<string, { expires: number; promise: Promise<unknown> }>();
@@ -44,6 +46,11 @@ export type RecapWeek = {
   lastCompletedWeek: number;
   status: "final" | "pending" | "empty";
   recaps: MatchupRecap[];
+  teams?: RecapTeam[];
+  leagueWeekComplete?: boolean;
+  recordChanges?: RecapRecordChange[];
+  nextMatchups?: RecapNextMatchup[];
+  contextLoaded?: boolean;
   updatedAt: string;
 };
 
@@ -65,18 +72,26 @@ export function buildRecapWeek(input: {
   if (week > lastCompletedWeek) return result;
   const directory = new Map(players.map((player) => [String(player.playerId), player]));
   const teams = new Map<number, RecapTeam>();
-  const starterSlotCount = league.roster_positions.filter((slot) => !["BN", "BENCH", "IR", "RESERVE", "TAXI"].includes(slot)).length;
+  const slots = recordedStarterSlots(league.roster_positions);
+  const starterSlotCount = slots.length;
   for (const row of rows) {
     const score = officialRecapScore(row);
-    if (score === null) continue;
+    if (score === null || rows.filter((candidate) => candidate.roster_id === row.roster_id).length !== 1) continue;
     const roster = rosters.find((candidate) => candidate.roster_id === row.roster_id);
     const user = users.find((candidate) => candidate.user_id === roster?.owner_id);
     const starterIds = new Set((row.starters ?? []).filter((id) => id && id !== "0"));
     const ids = [...new Set([...(row.players ?? []), ...starterIds])].filter((id) => id && id !== "0");
     const teamName = user?.metadata?.team_name;
+    const customAvatar = user?.metadata?.avatar;
+    const avatarUrl = typeof customAvatar === "string" && /^https:\/\//iu.test(customAvatar) ? customAvatar
+      : user?.avatar ? `https://sleepercdn.com/avatars/thumbs/${encodeURIComponent(user.avatar)}` : "";
+    // Preserve original indexes, including empty slots. Filtering first would
+    // silently move a later WR into RB/FLEX when an earlier starter is empty.
+    const slotByPlayer = new Map((row.starters ?? []).flatMap((id, index) => id && id !== "0" && slots[index] ? [[id, slots[index]!] as const] : []));
     teams.set(row.roster_id, {
       id: String(row.roster_id),
       name: typeof teamName === "string" && teamName.trim() ? teamName : user?.display_name || user?.username || `Team ${row.roster_id}`,
+      avatarUrl,
       managerIds: [roster?.owner_id, ...(roster?.co_owners ?? [])].filter((id): id is string => Boolean(id)),
       primaryManagerId: roster?.owner_id ?? null,
       score,
@@ -91,6 +106,9 @@ export function buildRecapWeek(input: {
           playerName: player?.name || `Player ${id}`,
           position,
           isStarter: starterIds.has(id),
+          ...(slotByPlayer.has(id) ? { lineupSlot: recapSlotLabel(slotByPlayer.get(id)!) } : {}),
+          ...(typeof player?.team === "string" ? { nflTeam: player.team } : {}),
+          ...(/^\d+$/u.test(id) ? { headshotUrl: `https://sleepercdn.com/content/nfl/players/${encodeURIComponent(id)}.jpg` } : {}),
           fantasyPoints: finite(row.players_points?.[id]) ? row.players_points![id]! : null,
           statLine: statLine === "Stat line unavailable" ? undefined : statLine,
         };
@@ -102,6 +120,13 @@ export function buildRecapWeek(input: {
     if (row.matchup_id === null || row.matchup_id === undefined) continue;
     groups.set(row.matchup_id, [...(groups.get(row.matchup_id) ?? []), row]);
   }
+  result.teams = [...teams.values()];
+  const pairedTeams = [...teams.values()].filter((team) => {
+    const row = rows.find((candidate) => String(candidate.roster_id) === team.id);
+    return row?.matchup_id != null && groups.get(row.matchup_id)?.length === 2;
+  });
+  result.leagueWeekComplete = rows.length === league.total_rosters && new Set(rows.map((row) => row.roster_id)).size === league.total_rosters
+    && rows.every((row) => row.matchup_id === null || (teams.has(row.roster_id) && groups.get(row.matchup_id)?.length === 2));
   for (const [id, pair] of groups) {
     if (pair.length !== 2 || pair[0]!.roster_id === pair[1]!.roster_id) continue;
     const ordered = [...pair].sort((a, b) => a.roster_id - b.roster_id);
@@ -111,9 +136,9 @@ export function buildRecapWeek(input: {
     const recap = buildMatchupRecap({
       id: String(id), leagueName: league.name, season: Number(league.season), week, status: "final", teams: [left, right],
       rosterPositions: league.roster_positions,
-      weekScores: [...teams.values()].map((team) => ({ id: team.id, score: team.score })),
-      leagueWeekComplete: teams.size === league.total_rosters && rows.length === league.total_rosters
-        && rows.every((row) => row.matchup_id !== null && groups.get(row.matchup_id)?.length === 2),
+      weekScores: pairedTeams.map((team) => ({ id: team.id, score: team.score, name: team.name, avatarUrl: team.avatarUrl ?? "" })),
+      leagueWeekComplete: result.leagueWeekComplete,
+      scoring: league.scoring_settings.rec === 1 ? "ppr" : league.scoring_settings.rec === 0 ? "standard" : "halfPpr",
       sourceUrl: `https://sleeper.com/leagues/${league.league_id}/matchup`, updatedAt,
     });
     if (recap) result.recaps.push(recap);
@@ -207,13 +232,15 @@ async function previousRecapWeeks(league: SleeperLeague, throughWeek: number) {
 
 export async function loadRecapRivalries(data: RecapWeek): Promise<RecapWeek> {
   if (data.status !== "final" || !data.recaps.length) return data;
-  try {
-    const [snapshot, previousWeeks] = await Promise.all([
+    const [history, earlier, next] = await Promise.allSettled([
       loadRivalryArchive(data.league.league_id),
       previousRecapWeeks(data.league, data.week),
+      data.week < 18 ? read<SleeperMatchupRow[]>(`league/${data.league.league_id}/matchups/${data.week + 1}`) : Promise.resolve([] as SleeperMatchupRow[]),
     ]);
-    return { ...data, recaps: data.recaps.map((recap) => withRivalrySection(recap, buildRecapRivalry(recap, snapshot, previousWeeks))) };
-  } catch {
-    return { ...data, recaps: data.recaps.map((recap) => withRivalrySection(recap, unavailableRivalry())) };
-  }
+    return { ...data, contextLoaded: true,
+      recordChanges: earlier.status === "fulfilled" ? recapRecordChanges(data, earlier.value) : [],
+      nextMatchups: next.status === "fulfilled" && Array.isArray(next.value) ? recapNextMatchups(data.teams ?? [], next.value) : [],
+      recaps: data.recaps.map((recap) => withRivalrySection(recap,
+        history.status === "fulfilled" && earlier.status === "fulfilled" ? buildRecapRivalry(recap, history.value, earlier.value) : unavailableRivalry())),
+    };
 }

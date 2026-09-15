@@ -18,6 +18,6 @@ export function PersonalMatchupRecap({ data }: { data: MyHQData }) {
           <p>{state.error || (!state.data ? "Reading the recorded lineup and final result." : state.data.status === "pending" ? "Your detailed recap appears automatically after Sleeper marks the week complete." : "A complete paired result is needed before we can write the story.")}</p></div>
         {state.error ? <button type="button" onClick={state.refresh}>Try again</button> : null}
       </div>}
-    <Link className="weekly-recap-archive-link" to={archive}>Browse every weekly recap →</Link>
+    <Link className="weekly-recap-archive-link" to={recap ? `${archive}?season=${recap.season}&week=${recap.week}` : archive}>Read the league edition &amp; weekly awards →</Link>
   </section>;
 }

@@ -81,7 +81,7 @@ export function WeekPage() {
         week={selected.week}
       />
 
-      <Link className="history-action-link" to={`/league/${leagueId}/history/recaps?season=${selected.season}&week=${selected.week}`}>Read this week’s detailed matchup recaps →</Link>
+      <Link className="history-action-link" to={`/league/${leagueId}/history/recaps?season=${selected.season}&week=${selected.week}`}>Read GameHQ Weekly · League edition, illustrated matchups &amp; awards →</Link>
 
       {weekState.status === "error" ? (
         <section className="history-week-notice" data-status="error" role="alert">

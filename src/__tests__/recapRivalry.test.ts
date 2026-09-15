@@ -33,7 +33,11 @@ const text = (section: ReturnType<typeof buildRecapRivalry>) => section.paragrap
 describe("the recap rivalry ledger", () => {
   it("writes 5–2 across three seasons, following managers despite renamed teams and changed roster IDs", () => {
     const snapshot = history([[2024, 1, 120, 100], [2024, 8, 100, 110], [2024, 17, 130, 100], [2025, 1, 90, 110], [2025, 8, 130, 110], [2025, 17, 140, 110]]);
-    const story = text(buildRecapRivalry(report(), snapshot, []));
+    const section = buildRecapRivalry(report(), snapshot, []);
+    const story = text(section);
+    expect(section.rivalry).toMatchObject({ winsA: 5, winsB: 2, ties: 0, seasons: [2024, 2025, 2026], streak: { teamId: "3", count: 3 } });
+    expect(section.rivalry?.meetings).toHaveLength(7);
+    expect(section.rivalry?.meetings.at(-1)).toMatchObject({ season: 2026, week: 1 });
     expect(story).toContain("Renamed Alpha's recorded head-to-head record against Renamed Beta to 5–2 across 3 seasons (2024–2026)");
     expect(story).toContain("2025 Week 17: Renamed Alpha beat Renamed Beta 140.00–110.00");
     expect(story).toContain("3 straight recorded meetings");

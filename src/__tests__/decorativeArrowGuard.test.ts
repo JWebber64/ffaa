@@ -6,6 +6,10 @@ import { describe, expect, it } from "vitest";
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const sourceRoot = resolve(projectRoot, "src");
 const adjacentSeasonPagination = "src/features/league-history/ui/pages/SeasonsPage.tsx";
+const recapComparisons = [
+  { path: "src/features/weekly-recap/RecapGraphics.tsx", label: 'aria-label="replace with"' },
+  { path: "src/features/weekly-recap/LeagueRecapArticle.tsx", label: 'aria-label="became"' },
+];
 
 function tsxFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -16,13 +20,18 @@ function tsxFiles(directory: string): string[] {
 }
 
 describe("decorative arrow contract", () => {
-  it("reserves right-arrow icons for controls where direction is the actual meaning", () => {
+  it("reserves right-arrow icons for directional controls and explicit before/after comparisons", () => {
     const uses = tsxFiles(sourceRoot).flatMap((path) => {
       const source = readFileSync(path, "utf8");
       return source.includes("<ArrowRight") ? [relative(projectRoot, path).replace(/\\/g, "/")] : [];
     });
 
-    expect(uses).toEqual([adjacentSeasonPagination]);
+    expect(uses.sort()).toEqual([adjacentSeasonPagination, ...recapComparisons.map((entry) => entry.path)].sort());
+    for (const comparison of recapComparisons) {
+      const source = readFileSync(resolve(projectRoot, comparison.path), "utf8");
+      expect(source.match(/<ArrowRight\b/g)).toHaveLength(1);
+      expect(source).toContain(comparison.label);
+    }
 
     const pagination = readFileSync(resolve(projectRoot, adjacentSeasonPagination), "utf8");
     expect(pagination.match(/<ArrowRight\b/g)).toHaveLength(1);

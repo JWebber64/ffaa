@@ -1,15 +1,19 @@
-import { optimizeLegalLineup, type LineupPlayer } from "../league-history/analytics/lineupOptimizer";
-import { positionColorKey } from "../../ui/positionColors";
+import { optimizeLegalLineup, type LineupPlayer, type LineupOptimizationResult } from "../league-history/analytics/lineupOptimizer";
+import { playerReference, recapSlotLabel, resolveRecapText, type RecapText, type RivalryGraphic } from "./recapPresentation";
+import type { ToolScoring } from "../../data/toolPlayerData";
 
-export const RECAP_VERSION = "matchup-recap-v2";
+export const RECAP_VERSION = "matchup-recap-v3";
 
 export interface RecapPlayer extends LineupPlayer {
   statLine?: string | undefined;
+  nflTeam?: string;
+  headshotUrl?: string;
 }
 
 export interface RecapTeam {
   id: string;
   name: string;
+  avatarUrl?: string;
   managerIds: string[];
   primaryManagerId?: string | null;
   score: number;
@@ -27,8 +31,9 @@ export interface RecapMatchup {
   status: "final" | "pending";
   teams: [RecapTeam, RecapTeam];
   rosterPositions: string[];
-  weekScores: Array<{ id: string; score: number }>;
+  weekScores: Array<{ id: string; score: number; name?: string; avatarUrl?: string }>;
   leagueWeekComplete: boolean;
+  scoring?: ToolScoring;
   sourceUrl: string;
   updatedAt: string;
 }
@@ -47,7 +52,10 @@ export interface MatchupRecap {
   winnerId: string | null;
   spotlight: { player: RecapPlayer; teamName: string } | null;
   positions: Array<{ position: string; left: number; right: number }>;
-  sections: Array<{ id: string; title: string; paragraphs: string[] }>;
+  sections: Array<{ id: string; title: string; paragraphs: string[]; richParagraphs?: RecapText[][]; rivalry?: RivalryGraphic }>;
+  benches: Array<{ teamId: string; analytics: LineupOptimizationResult | null }>;
+  leagueScores: RecapMatchup["weekScores"];
+  scoring: ToolScoring;
   caveats: string[];
   sourceUrl: string;
   updatedAt: string;
@@ -56,7 +64,7 @@ export interface MatchupRecap {
 
 const points = (value: number) => value.toFixed(2);
 const rounded = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100;
-const normalizePositionLabel = (position: string) => (positionColorKey(position) ?? position).toUpperCase();
+const slotFor = (player: RecapPlayer) => player.lineupSlot ? recapSlotLabel(player.lineupSlot) : "";
 const scored = (player: RecapPlayer) => player.fantasyPoints !== null && Number.isFinite(player.fantasyPoints);
 
 function starters(team: RecapTeam) {
@@ -64,10 +72,18 @@ function starters(team: RecapTeam) {
     .sort((a, b) => b.fantasyPoints! - a.fantasyPoints! || a.providerPlayerId.localeCompare(b.providerPlayerId));
 }
 
-function completeStarters(team: RecapTeam) {
+export function completeRecapStarters(team: RecapTeam) {
   const starting = team.players.filter((player) => player.isStarter);
   return team.lineupComplete && starting.length > 0 && starting.every(scored)
     && Math.abs(starting.reduce((sum, player) => sum + player.fantasyPoints!, 0) - team.score) <= 0.02;
+}
+
+const completeStarters = completeRecapStarters;
+
+export function recapBenchAnalytics(team: RecapTeam, slots: string[]) {
+  if (!completeStarters(team) || !team.players.every(scored)) return null;
+  const analytics = optimizeLegalLineup(team.players, slots, { isComplete: true });
+  return analytics.status === "valid" && analytics.actualAssignments.length ? analytics : null;
 }
 
 function performanceParagraph(team: RecapTeam) {
@@ -79,21 +95,21 @@ function performanceParagraph(team: RecapTeam) {
   const share = completeStarters(team) && team.score > 0 && topSum > 0 && topSum <= team.score ? `—${Math.round(topSum / team.score * 100)}% of the team's score` : "";
   const line = best.statLine ? ` The NFL stat line: ${best.statLine}.` : "";
   const support = named.length
-    ? ` ${named.map((player) => `${player.playerName} (${points(player.fantasyPoints!)})`).join(" and ")} supplied the supporting cast. Those ${named.length + 1} starters combined for ${points(topSum)} points${share}.`
+    ? ` ${named.map((player) => `${playerReference(player)} (${points(player.fantasyPoints!)})`).join(" and ")} supplied the supporting cast. Those ${named.length + 1} starters combined for ${points(topSum)} points${share}.`
     : "";
   const depth = players.slice(3);
   const depthScore = rounded(depth.reduce((sum, player) => sum + player.fantasyPoints!, 0));
   const depthStory = depth.length && completeStarters(team)
-    ? ` Beyond the headliners, the other ${depth.length} starters supplied ${points(depthScore)} points. ${depth.slice(0, 2).map((player) => `${player.playerName} added ${points(player.fantasyPoints!)}`).join(" and ")}${depth.length > 2 ? ", keeping the score moving outside the top three" : ""}.`
+    ? ` Beyond the headliners, the other ${depth.length} starters supplied ${points(depthScore)} points. ${depth.slice(0, 2).map((player) => `${playerReference(player)} added ${points(player.fantasyPoints!)}`).join(" and ")}${depth.length > 2 ? ", keeping the score moving outside the top three" : ""}.`
     : "";
   const zeroes = players.filter((player) => player.fantasyPoints === 0);
   const low = players.at(-1);
   const finish = zeroes.length
-    ? ` ${zeroes.map((player) => player.playerName).join(" and ")} finished on zero; ${zeroes.length === 1 ? "that starting spot" : "those starting spots"} left the rest of the lineup doing the heavy lifting.`
+    ? ` ${zeroes.map(playerReference).join(" and ")} finished on zero; ${zeroes.length === 1 ? "that starting spot" : "those starting spots"} left the rest of the lineup doing the heavy lifting.`
     : low && low !== best && low.fantasyPoints! < 5
-      ? ` At the other end, ${low.playerName}'s ${points(low.fantasyPoints!)} points made that spot a quiet corner of the box score.`
+      ? ` At the other end, ${playerReference(low)}'s ${points(low.fantasyPoints!)} points made that spot a quiet corner of the box score.`
       : "";
-  return `${best.playerName} set the pace for ${team.name} with ${points(best.fantasyPoints!)} points.${line}${support}${depthStory}${finish}`;
+  return `${playerReference(best)} set the pace for ${team.name} with ${points(best.fantasyPoints!)} points.${line}${support}${depthStory}${finish}`;
 }
 
 function benchParagraph(team: RecapTeam, opponent: RecapTeam, slots: string[]) {
@@ -115,7 +131,7 @@ function benchParagraph(team: RecapTeam, opponent: RecapTeam, slots: string[]) {
   }
   const swap = analytics.bestMissedSubstitution;
   const swapSentence = swap
-    ? ` The best one-player change was ${swap.incomingPlayerName} (${points(swap.incomingPoints)}) for ${swap.outgoingPlayerName} (${points(swap.outgoingPoints)}), worth ${points(swap.gain)} extra points with any necessary flex rearrangement.`
+    ? ` The best one-player change was ${playerReference({ providerPlayerId: swap.incomingPlayerId, playerName: swap.incomingPlayerName })} (${points(swap.incomingPoints)}) for ${playerReference({ providerPlayerId: swap.outgoingPlayerId, playerName: swap.outgoingPlayerName })} (${points(swap.outgoingPoints)}), worth ${points(swap.gain)} extra points with any necessary flex rearrangement.`
     : "";
   const hypothetical = swap ? rounded(team.score + swap.gain) : null;
   const lost = team.score < opponent.score;
@@ -150,7 +166,7 @@ function leagueParagraph(team: RecapTeam, opponent: RecapTeam, matchup: RecapMat
       : above === 0 && tied === 0
         ? " Nobody in the league put up more. This was the week's scoring standard."
         : "";
-  return `${team.name} ranked ${rank} in weekly scoring. Against every other team's score, it would have gone ${beaten}–${above}${tied ? `–${tied}` : ""}.${result}`;
+  return `${team.name} ranked ${rank} in weekly scoring among teams with paired matchups. Against every other competing team's score, it would have gone ${beaten}–${above}${tied ? `–${tied}` : ""}.${result}`;
 }
 
 export function buildMatchupRecap(matchup: RecapMatchup): MatchupRecap | null {
@@ -181,13 +197,14 @@ export function buildMatchupRecap(matchup: RecapMatchup): MatchupRecap | null {
     ? `${left.name} and ${right.name} finished Week ${matchup.week} locked at ${points(left.score)} apiece. All those lineup decisions, all those points, and neither side gets an outright victory. The box score still has plenty to say about how they got there.`
     : `${winner.name} beat ${loser.name} ${points(winner.score)}–${points(loser.score)} in Week ${matchup.week}, a ${points(margin)}-point margin. ${margin < 5 ? "Every fraction mattered in this one; a small swing would have told a very different story." : margin >= 40 ? "That is a result with some volume behind it. The winning lineup left plenty for the group chat to discuss." : "The final score settles the result. The players and lineup choices explain where the separation came from."}`;
   const positions: MatchupRecap["positions"] = [];
-  if (completeStarters(left) && completeStarters(right)) {
-    const allPositions = [...new Set([...left.players, ...right.players].filter((p) => p.isStarter).map((p) => normalizePositionLabel(p.position)))];
+  const slotsKnown = matchup.teams.every((team) => team.players.filter((p) => p.isStarter).every((p) => Boolean(p.lineupSlot)));
+  if (completeStarters(left) && completeStarters(right) && slotsKnown) {
+    const allPositions = [...new Set([...left.players, ...right.players].filter((p) => p.isStarter).map(slotFor))];
     for (const position of allPositions) {
-      const total = (team: RecapTeam) => rounded(starters(team).filter((p) => normalizePositionLabel(p.position) === position).reduce((sum, p) => sum + p.fantasyPoints!, 0));
+      const total = (team: RecapTeam) => rounded(starters(team).filter((p) => slotFor(p) === position).reduce((sum, p) => sum + p.fantasyPoints!, 0));
       positions.push({ position, left: total(left), right: total(right) });
     }
-    const order = ["QB", "RB", "WR", "TE", "K", "DST"];
+    const order = ["QB", "RB", "WR", "TE", "FLEX", "WR/RB", "REC FLEX", "SFLEX", "K", "DST"];
     positions.sort((a, b) => (order.indexOf(a.position) + 1 || 99) - (order.indexOf(b.position) + 1 || 99));
   }
   const edge = [...positions].sort((a, b) => Math.abs(b.left - b.right) - Math.abs(a.left - a.right))[0];
@@ -196,16 +213,16 @@ export function buildMatchupRecap(matchup: RecapMatchup): MatchupRecap | null {
     const leader = edge.left > edge.right ? left : right;
     const other = leader.id === left.id ? right : left;
     const difference = rounded(Math.abs(edge.left - edge.right));
-    const edgePlayers = starters(leader).filter((p) => normalizePositionLabel(p.position) === edge.position);
+    const edgePlayers = starters(leader).filter((p) => slotFor(p) === edge.position);
     sections.push({ id: "separation", title: tied || leader.id !== winner.id ? "The positional tug-of-war" : "Where the game was won", paragraphs: [
-      `The largest positional gap came at ${edge.position}: ${leader.name} got ${points(Math.max(edge.left, edge.right))} from those starters, against ${points(Math.min(edge.left, edge.right))} for ${other.name}. ${edgePlayers.map((p) => `${p.playerName} (${points(p.fantasyPoints!)})`).join(" and ")} built that ${points(difference)}-point edge. ${tied ? "The other positions brought the two teams back level." : leader.id !== winner.id ? "That advantage was real, but the rest of the lineup could not turn it into a win." : difference > margin ? "That position's advantage was larger than the final margin; the rest of the scoring narrowed the gap." : "It was the biggest positional contribution to the winning margin."} Flex starters are counted at their player position.`,
+      `The largest positional gap came at ${edge.position}: ${leader.name} got ${points(Math.max(edge.left, edge.right))} from those starters, against ${points(Math.min(edge.left, edge.right))} for ${other.name}. ${edgePlayers.map((p) => `${playerReference(p)} (${points(p.fantasyPoints!)})`).join(" and ")} built that ${points(difference)}-point edge. ${tied ? "The other positions brought the two teams back level." : leader.id !== winner.id ? "That advantage was real, but the rest of the lineup could not turn it into a win." : difference > margin ? "That position's advantage was larger than the final margin; the rest of the scoring narrowed the gap." : "It was the biggest positional contribution to the winning margin."} FLEX players count in their recorded FLEX slot, not again at RB, WR or TE.`,
     ] });
     const counter = [...positions].filter((row) => row !== edge && row.left !== row.right)
       .sort((a, b) => Math.abs(b.left - b.right) - Math.abs(a.left - a.right))[0];
     if (counter) {
       const counterLeader = counter.left > counter.right ? left : right;
-      const contribution = starters(counterLeader).filter((p) => normalizePositionLabel(p.position) === counter.position)
-        .map((p) => `${p.playerName} (${points(p.fantasyPoints!)})`).join(" and ");
+      const contribution = starters(counterLeader).filter((p) => slotFor(p) === counter.position)
+        .map((p) => `${playerReference(p)} (${points(p.fantasyPoints!)})`).join(" and ");
       sections[0]!.paragraphs.push(`${counterLeader.id === leader.id ? "There was another useful edge" : "The counterpunch came"} at ${counter.position}. ${counterLeader.name} outscored the other side ${points(Math.max(counter.left, counter.right))}–${points(Math.min(counter.left, counter.right))} there, led by ${contribution}. That was a ${points(Math.abs(counter.left - counter.right))}-point positional difference ${counterLeader.id === winner.id && !tied ? "in the winner's favor" : "for a lineup that still had work to do elsewhere"}. Position totals describe the final scoring balance, not the order in which those points arrived.`);
     }
   }
@@ -220,6 +237,11 @@ export function buildMatchupRecap(matchup: RecapMatchup): MatchupRecap | null {
   if (records.length) sections.push({ id: "record", title: "What goes in the book", paragraphs: [`Head-to-head records through Week ${matchup.week}: ${records.join("; ")}. These records count completed head-to-head games, with any league-median bonus result excluded.`] });
   const caveats = ["Scores use the league's Sleeper scoring and can change with official corrections. No saved pregame projection is available for this report; no upset or projection-beating claim is made."];
   if (!completeStarters(left) || !completeStarters(right)) caveats.push("Some recorded lineup details are incomplete or player totals differ from the official score. Player highlights cover only the available evidence; positional comparisons are withheld.");
+  if (!slotsKnown) caveats.push("Recorded starter slots are unavailable. FLEX assignments are never inferred from player position, so the slot battle is withheld.");
+  for (const section of sections) {
+    section.richParagraphs = section.paragraphs.map(resolveRecapText);
+    section.paragraphs = section.richParagraphs.map((paragraph) => paragraph.map((part) => part.text).join(""));
+  }
   const text = [lead, ...sections.flatMap((section) => section.paragraphs)].join(" ");
   return {
     id: matchup.id, version: RECAP_VERSION, leagueName: matchup.leagueName,
@@ -227,6 +249,9 @@ export function buildMatchupRecap(matchup: RecapMatchup): MatchupRecap | null {
     teams: matchup.teams, winnerId: tied ? null : winner.id,
     spotlight: best ? { player: best, teamName: winner.name } : null,
     positions, sections, caveats, sourceUrl: matchup.sourceUrl, updatedAt: matchup.updatedAt,
+    benches: matchup.teams.map((team) => ({ teamId: team.id, analytics: recapBenchAnalytics(team, matchup.rosterPositions) })),
+    leagueScores: matchup.leagueWeekComplete ? matchup.weekScores : [],
+    scoring: matchup.scoring ?? "halfPpr",
     wordCount: text.split(/\s+/u).length,
   };
 }

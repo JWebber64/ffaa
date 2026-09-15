@@ -27,6 +27,7 @@ const POSITION_COLOR_ALIASES: Record<string, PositionColorKey> = {
   RBWRTE: "flex",
   RECFLEX: "flex",
   WRRBFLEX: "flex",
+  WRRB: "flex",
   SUPERFLEX: "flex",
   SFLEX: "flex",
   OP: "flex",

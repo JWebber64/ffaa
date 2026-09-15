@@ -237,6 +237,16 @@ Manager Draft DNA is descriptive, not a grade or recommendation. It may show pos
 
 Roster Legacy counts only stored `WeeklyPlayerResult` rows marked as starters and connects them to permanent manager identity through the recorded weekly roster and season franchise. Position leaders rank by recorded starts, then observed starter points, then player name. Missing points remain unavailable rather than zero, incomplete weekly-player coverage is labeled `Provisional`, and roster-slot assignment or historical NFL-team affiliation must not be inferred from the current payload.
 
+## GameHQ Weekly editorial graphics
+
+Weekly editions keep the Silver cover and green reading surface. Each major section places its data graphic beside the relevant writing: Silver lineup-slot battle, opposing player portraits and real NFL helmets, Silver rivalry ledger with team avatars and dated meeting receipts, legal-bench comparisons, and a ranked scoring ladder. Keep these full-width and stack comparative pairs on phones. Display-font scores have a line-height of at least 1.1 and tabular numerals. No decorative animation or fabricated timeline is needed.
+
+Directional arrows inside the bench replacement and before/after record graphics encode an actual transition, with explicit `replace with` / `became` labels. They are not decorations appended to headings or ordinary actions; the decorative-arrow guard permits only these comparison uses alongside season pagination.
+
+Player references are generated with stable IDs; first mentions within a section have a compact portrait and helmet, with later mentions using the same profile action without repeated imagery. Missing images retain a legible fallback and player name. Current directory artwork must never be presented as a verified historical NFL affiliation. Shared team marks own fantasy-team avatars.
+
+FLEX scoring follows the recorded starter slot, not natural eligibility, and cannot be counted again at RB/WR/TE. League positional honors rank starting players at their natural positions; FLEX/SFLEX/restricted-flex honors are separately labeled slot awards. A player may earn both honors without duplicating points. The rivalry graphic and written record consume the same cutoff-aware meeting ledger. See `docs/WEEKLY_RECAPS.md` for availability, evidence, and correction rules.
+
 ## Do's and Don'ts
 
 - Do use a full perimeter border when color identifies a position or state.

@@ -2,9 +2,10 @@ import { calculateHeadToHead } from "../league-history/analytics/headToHead";
 import type { LeagueHistorySnapshot } from "../league-history/domain/types";
 import type { SleeperMatchupRow } from "../league-history/provider/sleeperTypes";
 import type { MatchupRecap } from "./matchupRecap";
+import type { RivalryMeeting } from "./recapPresentation";
 
 export type RecapRivalryWeek = { week: number; rows: SleeperMatchupRow[] };
-type Meeting = { season: number; week: number; scoreA: number; scoreB: number };
+type Meeting = RivalryMeeting;
 type Section = MatchupRecap["sections"][number];
 const finite = (value: unknown): value is number => typeof value === "number" && Number.isFinite(value);
 const score = (row: SleeperMatchupRow) => finite(row.custom_points) ? row.custom_points : finite(row.points) ? row.points : null;
@@ -92,24 +93,26 @@ export function buildRecapRivalry(
     stakes = " Neither manager adds a win to the ledger this time.";
   }
   const paragraphs = [opening + stakes];
+  let streak = 0;
+  if (recap.winnerId) {
+    for (const meeting of [...meetings].reverse()) {
+      const won = winner.id === a.id ? meeting.scoreA > meeting.scoreB : meeting.scoreB > meeting.scoreA;
+      if (!won) break;
+      streak += 1;
+    }
+  }
   if (lastMeeting) {
     const previousWinner = lastMeeting.scoreA > lastMeeting.scoreB ? a : b;
     const previousLoser = previousWinner.id === a.id ? b : a;
     const last = lastMeeting.scoreA === lastMeeting.scoreB
       ? `Their previous meeting, in ${lastMeeting.season} Week ${lastMeeting.week}, ended level at ${lastMeeting.scoreA.toFixed(2)}.`
       : `Their previous meeting was ${lastMeeting.season} Week ${lastMeeting.week}: ${previousWinner.name} beat ${previousLoser.name} ${Math.max(lastMeeting.scoreA, lastMeeting.scoreB).toFixed(2)}–${Math.min(lastMeeting.scoreA, lastMeeting.scoreB).toFixed(2)}.`;
-    let streak = 0;
-    if (recap.winnerId) {
-      for (const meeting of [...meetings].reverse()) {
-        const won = winner.id === a.id ? meeting.scoreA > meeting.scoreB : meeting.scoreB > meeting.scoreA;
-        if (!won) break;
-        streak += 1;
-      }
-    }
     paragraphs.push(last + (streak >= 2 ? ` ${winner.name} has now won ${streak} straight recorded meetings. The receipts are piling up.` : ""));
   }
   paragraphs.push(`Includes this result and recorded regular-season and playoff weekly meetings through ${recap.season} Week ${recap.week}. The record follows the managers through team-name changes; names here match this recap. It is based on the available league archive, not unrecorded seasons.`);
-  return { id: "rivalry", title: "The rivalry ledger", paragraphs };
+  return { id: "rivalry", title: "The rivalry ledger", paragraphs,
+    rivalry: { winsA, winsB, ties, seasons, meetings, streak: streak >= 2 ? { teamId: winner.id, count: streak } : null },
+  };
 }
 
 export function withRivalrySection(recap: MatchupRecap, section: Section): MatchupRecap {

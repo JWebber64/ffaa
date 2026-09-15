@@ -13,7 +13,10 @@ function finalWeek(week = 1) {
   });
 }
 const story = (data: Awaited<ReturnType<typeof loadRecapRivalries>>) => data.recaps[0]!.sections.find((section) => section.id === "rivalry")!.paragraphs.join(" ");
-beforeEach(() => { loadHistory.mockReset().mockResolvedValue({ managers: [], seasons: [], franchises: [], matchups: [] }); });
+beforeEach(() => {
+  loadHistory.mockReset().mockResolvedValue({ managers: [], seasons: [], franchises: [], matchups: [] });
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
+});
 afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
 
 describe("read-only historical recap enrichment", () => {
@@ -28,8 +31,8 @@ describe("read-only historical recap enrichment", () => {
     const input = finalWeek(7);
     input.recaps.push({ ...input.recaps[0]!, id: "second-report" });
     const [result] = await Promise.all([loadRecapRivalries(input), loadRecapRivalries(input)]);
-    expect(fetcher).toHaveBeenCalledTimes(6);
-    expect(maximum).toBeLessThanOrEqual(4);
+    expect(fetcher).toHaveBeenCalledTimes(7); // Six prior weeks plus one shared next-week schedule read.
+    expect(maximum).toBeLessThanOrEqual(5); // Four historical reads plus the independent schedule.
     expect(loadHistory).toHaveBeenCalledTimes(1);
     expect(loadHistory).toHaveBeenCalledWith(input.league.league_id, { refresh: true });
     expect(story(result!)).toContain("to 1–6 in 2026");
@@ -40,7 +43,8 @@ describe("read-only historical recap enrichment", () => {
     const fetcher = vi.fn(); vi.stubGlobal("fetch", fetcher);
     const input = finalWeek(4); input.league.settings.start_week = 4;
     expect(story(await loadRecapRivalries(input))).toContain("to 1–0");
-    expect(fetcher).not.toHaveBeenCalled();
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(fetcher.mock.calls[0]?.[0]).toContain("/matchups/5"); // Upcoming pairings, not pre-start history.
   });
   it("keeps the main report when history is unavailable and retries a failed archive read", async () => {
     const input = finalWeek();

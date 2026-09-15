@@ -3,13 +3,13 @@ import { buildMatchupRecap, type RecapMatchup, type RecapPlayer } from "../featu
 import { buildRecapWeek, completedRecapWeek, officialRecapScore } from "../features/weekly-recap/recapSource";
 import type { SleeperLeague } from "../features/league-history/provider/sleeperTypes";
 
-const player = (id: string, position: string, points: number | null, isStarter = true): RecapPlayer => ({ providerPlayerId: id, playerName: id, position, fantasyPoints: points, isStarter });
+const player = (id: string, position: string, points: number | null, isStarter = true, lineupSlot = position): RecapPlayer => ({ providerPlayerId: id, playerName: id, position, fantasyPoints: points, isStarter, ...(isStarter ? { lineupSlot } : {}) });
 function matchup(): RecapMatchup {
   return {
     id: "4", leagueName: "The GOAT League", season: 2026, week: 1, status: "final", rosterPositions: ["QB", "RB", "FLEX", "BN"],
     teams: [
-      { id: "1", name: "The Home Team", managerIds: ["u1"], score: 44, lineupComplete: true, benchEligibilityKnown: true, players: [player("Quarterback A", "QB", 20), player("Running Back A", "RB", 20), player("Receiver A", "WR", 4), player("Bench Hero", "RB", 15, false)] },
-      { id: "2", name: "The Away Team", managerIds: ["u2"], score: 51, lineupComplete: true, benchEligibilityKnown: true, players: [player("Quarterback B", "QB", 15), player("Running Back B", "RB", 31), player("Tight End B", "TE", 5), player("Bench B", "WR", 2, false)] },
+      { id: "1", name: "The Home Team", managerIds: ["u1"], score: 44, lineupComplete: true, benchEligibilityKnown: true, players: [player("Quarterback A", "QB", 20), player("Running Back A", "RB", 20), player("Receiver A", "WR", 4, true, "FLEX"), player("Bench Hero", "RB", 15, false)] },
+      { id: "2", name: "The Away Team", managerIds: ["u2"], score: 51, lineupComplete: true, benchEligibilityKnown: true, players: [player("Quarterback B", "QB", 15), player("Running Back B", "RB", 31), player("Tight End B", "TE", 5, true, "FLEX"), player("Bench B", "WR", 2, false)] },
     ], weekScores: [{ id: "1", score: 44 }, { id: "2", score: 51 }, { id: "3", score: 20 }, { id: "4", score: 10 }], leagueWeekComplete: true, sourceUrl: "https://sleeper.com", updatedAt: "2026-09-15T00:00:00Z",
   };
 }
