@@ -35,7 +35,9 @@
 .hq-roster-row:hover { background: var(--surface-hover); }
 .hq-roster-row > div { min-width: 0; }
 .hq-roster-player { display: grid; grid-template-columns: minmax(180px, 1.1fr) minmax(180px, 1fr); align-items: center; column-gap: var(--space-5); }
-.hq-roster-profile { display: grid; gap: 2px; }
+.hq-roster-player-main { min-width: 0; display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; gap: var(--space-2); }
+.hq-roster-player-main .team-mark { --team-mark-size: 30px; }
+.hq-roster-profile { min-width: 0; display: grid; gap: 2px; }
 .hq-roster-player strong { overflow: hidden; color: var(--text-primary); line-height: 1.22; text-overflow: ellipsis; white-space: nowrap; }
 .hq-roster-player small,
 .hq-roster-points small { color: var(--text-muted); font-size: .65rem; }
@@ -120,6 +122,8 @@
   .hq-roster-row { min-height: 62px; padding: 8px var(--space-3); grid-template-columns: 56px minmax(0, 1fr) 68px; gap: var(--space-2); }
   .hq-roster-status { display: none; }
   .hq-roster-player { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .hq-roster-player-main { grid-template-columns: 28px minmax(0, 1fr); }
+  .hq-roster-player-main .team-mark { --team-mark-size: 28px; }
   .hq-roster-stat-line { grid-column: 1; white-space: normal; }
   .hq-roster-mobile-label { display: block; margin-bottom: 2px; color: var(--text-muted); font-size: .52rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
   .hq-roster-player .hq-roster-mobile-label { display: none; }

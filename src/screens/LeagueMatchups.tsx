@@ -18,6 +18,7 @@ import { useLeagueWeekLineups } from "../features/league-season/useLeagueWeekLin
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import type { MyHQData, MyHQLineupEntry } from "../features/my-hq/myHQ";
 import { weeklyStatLineText } from "../features/my-hq/weeklyStatLine";
+import { TeamMark } from "../components/player/TeamMark";
 import { useOptionalLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
 import { PositionBadge } from "../ui/PositionBadge";
 import { UniversalSelect } from "../ui/UniversalSelect";
@@ -65,7 +66,10 @@ function MatchupPlayerSide({ player, side, scoring }: { player: ToolPlayer | nul
   const points = playerWeekValue(player);
   return (
     <div className={`league-h2h-player is-${side}`}>
-      <PlayerProfileButton player={player} scoring={scoring} className="league-h2h-profile"><strong>{player?.name ?? "Open slot"}</strong><small>{detail}</small><small className="league-h2h-stat-line" title="Sleeper weekly stat line">{weeklyStatLineText(player)}</small></PlayerProfileButton>
+      <PlayerProfileButton player={player} scoring={scoring} className="league-h2h-profile">
+        <TeamMark team={player?.team} size="xs" title={player ? `${player.name} ${player.team || "FA"} helmet` : "Team helmet unavailable"} />
+        <span className="league-h2h-profile-copy"><strong>{player?.name ?? "Open slot"}</strong><small>{detail}</small><small className="league-h2h-stat-line" title="Sleeper weekly stat line">{weeklyStatLineText(player)}</small></span>
+      </PlayerProfileButton>
       <b aria-label={points.label === "—" ? "No Week score or projection" : `${points.label === "LIVE" ? "Live" : "Projected"} Week points ${points.value}`}>{points.value}<small>{points.label}</small></b>
     </div>
   );

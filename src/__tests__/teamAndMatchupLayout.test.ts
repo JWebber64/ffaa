@@ -35,16 +35,19 @@ describe("team and matchup information hierarchy", () => {
     expect(matchup).toContain("LIVE");
     expect(matchup).toContain("weeklyProjectedPoints");
     expect(matchup).toContain("weeklyStatLineText");
+    expect(matchup).toContain("<TeamMark team={player?.team}");
     expect(matchup).toContain("score / projection");
     expect(matchup).not.toContain("Season baseline PPG");
   });
 
   it("keeps both layouts compact and row-driven at mobile width", () => {
+    const team = source("src/screens/MyHQ.tsx");
     const teamStyles = source("src/screens/my-hq.css");
     const matchupStyles = source("src/screens/league-season.css");
 
     expect(teamStyles).toContain(".hq-roster-row");
     expect(teamStyles).toContain(".hq-roster-stat-line");
+    expect(team).toContain("<TeamMark team={player?.team}");
     expect(teamStyles).not.toContain(".hq-hero");
     expect(matchupStyles).toContain(".league-h2h-row");
     expect(matchupStyles).toContain("grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr)");

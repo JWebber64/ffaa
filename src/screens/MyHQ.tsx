@@ -9,6 +9,7 @@ import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspace
 import { ManagerIdentityForm } from "../features/league-workspace/ManagerIdentityForm";
 import type { MyHQData } from "../features/my-hq/myHQ";
 import { weeklyStatLineText } from "../features/my-hq/weeklyStatLine";
+import { TeamMark } from "../components/player/TeamMark";
 import { PositionBadge } from "../ui/PositionBadge";
 import { TeamIdentityMark } from "../ui/TeamIdentityMark";
 import "./my-hq.css";
@@ -41,11 +42,14 @@ function TeamRosterRow({ player, slot, scoring, bench = false }: { player: ToolP
       <div role="cell"><span className="hq-roster-mobile-label">Slot</span><PositionBadge className="hq-position" position={slot}>{slot.replace(/_/g, " ")}</PositionBadge></div>
       <div className="hq-roster-player" role="cell">
         <span className="hq-roster-mobile-label">Player</span>
-        <PlayerProfileButton player={player} scoring={scoring} className="hq-roster-profile">
-          <strong>{player?.name ?? "Open slot"}</strong>
-          <small>{detail}</small>
-          <small className="hq-roster-stat-line" title="Sleeper weekly stat line">{weeklyStatLineText(player)}</small>
-        </PlayerProfileButton>
+        <div className="hq-roster-player-main">
+          <TeamMark team={player?.team} size="xs" title={player ? `${player.name} ${player.team || "FA"} helmet` : "Team helmet unavailable"} />
+          <PlayerProfileButton player={player} scoring={scoring} className="hq-roster-profile">
+            <strong>{player?.name ?? "Open slot"}</strong>
+            <small>{detail}</small>
+          </PlayerProfileButton>
+        </div>
+        <small className="hq-roster-stat-line" title="Sleeper weekly stat line">{weeklyStatLineText(player)}</small>
       </div>
       <div className="hq-roster-status" role="cell">
         <span className="hq-roster-mobile-label">Status</span>
