@@ -8,6 +8,7 @@ import type { SleeperLeagueConnectionSummary } from "../features/league-hq/sleep
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
 import { ManagerIdentityForm } from "../features/league-workspace/ManagerIdentityForm";
 import type { MyHQData } from "../features/my-hq/myHQ";
+import { weeklyStatLineText } from "../features/my-hq/weeklyStatLine";
 import { PositionBadge } from "../ui/PositionBadge";
 import { TeamIdentityMark } from "../ui/TeamIdentityMark";
 import "./my-hq.css";
@@ -43,6 +44,7 @@ function TeamRosterRow({ player, slot, scoring, bench = false }: { player: ToolP
         <PlayerProfileButton player={player} scoring={scoring} className="hq-roster-profile">
           <strong>{player?.name ?? "Open slot"}</strong>
           <small>{detail}</small>
+          <small className="hq-roster-stat-line" title="Sleeper weekly stat line">{weeklyStatLineText(player)}</small>
         </PlayerProfileButton>
       </div>
       <div className="hq-roster-status" role="cell">
@@ -66,7 +68,7 @@ function TeamRoster({ data, scoring }: { data: MyHQData; scoring: ToolScoring })
       </header>
       <div className="hq-roster-table" role="table" aria-label={`${data.teamName} roster`}>
         <div className="hq-roster-columns" role="row">
-          <span role="columnheader">Slot</span><span role="columnheader">Player</span><span role="columnheader">Status</span><span role="columnheader">Week score / projection</span>
+          <span role="columnheader">Slot</span><span role="columnheader">Player · weekly stat line</span><span role="columnheader">Status</span><span role="columnheader">Week score / projection</span>
         </div>
         <div role="rowgroup">
           {data.starterLineup.map((entry, index) => <TeamRosterRow key={`${entry.slot}-${entry.player?.id ?? index}`} player={entry.player} slot={entry.slot} scoring={scoring} />)}

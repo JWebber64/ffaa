@@ -5,6 +5,7 @@ import { loadPlayerPool } from "@/data/loadPlayerPool";
 import type { WeeklyPlayerSummary } from "@/data/weeklyPlayerStats";
 import type { PlayerValueSource } from "@/types/draft";
 import type { LoadPlayerPoolOptions } from "@/data/loadPlayerPool";
+import type { SleeperWeeklyStatLine } from "@/features/my-hq/sleeperWeeklyStats";
 
 export type ToolScoring = "standard" | "halfPpr" | "ppr";
 export type ToolPosition = "QB" | "RB" | "WR" | "TE" | "K" | "DEF";
@@ -29,6 +30,8 @@ export interface ToolPlayer {
   /** Authoritative current-week points returned by the connected Sleeper matchup. */
   weeklyActualPoints?: number | null;
   weeklyActualPointsWeek?: number | null;
+  weeklyStatLine?: SleeperWeeklyStatLine | null;
+  weeklyStatLineWeek?: number | null;
   projectionSourceCount?: number;
   projectionLow?: number | null;
   projectionHigh?: number | null;
