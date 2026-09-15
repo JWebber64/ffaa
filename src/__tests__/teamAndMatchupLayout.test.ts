@@ -33,6 +33,8 @@ describe("team and matchup information hierarchy", () => {
     expect(matchup).toContain("data.opponentBench");
     expect(matchup).toContain("weeklyActualPoints");
     expect(matchup).toContain("LIVE");
+    expect(matchup).toContain("FINAL");
+    expect(matchup).toContain("weeklyScoreStatus");
     expect(matchup).toContain("weeklyProjectedPoints");
     expect(matchup).toContain("weeklyStatLineText");
     expect(matchup).toContain("<TeamMark team={player?.team}");

@@ -627,7 +627,7 @@ export async function loadMyHQ(
       .slice(0, 4)
       .map((transaction) => transactionLabel(transaction, playerById)),
     projectionNote: livePlayerPoints.size
-      ? `Sleeper is returning ${livePlayerPoints.size} current Week ${matchupWeek} player score${livePlayerPoints.size === 1 ? "" : "s"} and ${weeklyStatLineCount} weekly stat line${weeklyStatLineCount === 1 ? "" : "s"}. LIVE values use this league’s Sleeper scoring; players without a returned score keep their ${projectionScoring.label} projection.${statsError ? ` Weekly stat lines are temporarily unavailable (${statsError}).` : ""}`
+      ? `Sleeper is returning ${livePlayerPoints.size} current Week ${matchupWeek} player score${livePlayerPoints.size === 1 ? "" : "s"} and ${weeklyStatLineCount} weekly stat line${weeklyStatLineCount === 1 ? "" : "s"}. Current score values use this league’s Sleeper scoring; players without a returned score keep their ${projectionScoring.label} projection.${statsError ? ` Weekly stat lines are temporarily unavailable (${statsError}).` : ""}`
       : projectionError
         ? `Week ${matchupWeek} projections are unavailable (${projectionError}) Season averages are not substituted.${statsError ? ` Weekly stat lines are also temporarily unavailable (${statsError}).` : ""}`
         : `Sleeper has not returned player scores for Week ${matchupWeek} yet. Player values use its current ${projectionScoring.label} projection feed; players absent from that feed show a dash, not a season average.${statsError ? ` Weekly stat lines are temporarily unavailable (${statsError}).` : ""}`,

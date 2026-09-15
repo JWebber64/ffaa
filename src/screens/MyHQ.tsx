@@ -8,7 +8,7 @@ import type { SleeperLeagueConnectionSummary } from "../features/league-hq/sleep
 import { useLeagueWorkspace } from "../features/league-workspace/leagueWorkspaceState";
 import { ManagerIdentityForm } from "../features/league-workspace/ManagerIdentityForm";
 import type { MyHQData } from "../features/my-hq/myHQ";
-import { weeklyStatLineText } from "../features/my-hq/weeklyStatLine";
+import { weeklyScoreStatus, weeklyStatLineText } from "../features/my-hq/weeklyStatLine";
 import { TeamMark } from "../components/player/TeamMark";
 import { PositionBadge } from "../ui/PositionBadge";
 import { TeamIdentityMark } from "../ui/TeamIdentityMark";
@@ -24,7 +24,8 @@ function initials(name: string) {
 
 function playerWeekValue(player: ToolPlayer | null) {
   if (player?.weeklyActualPoints !== null && player?.weeklyActualPoints !== undefined) {
-    return { label: "LIVE", value: player.weeklyActualPoints.toFixed(2) };
+    const status = weeklyScoreStatus(player);
+    return { label: status === "live" ? "LIVE" : "FINAL", value: player.weeklyActualPoints.toFixed(2) };
   }
   if (player?.weeklyProjectedPoints !== null && player?.weeklyProjectedPoints !== undefined) {
     return { label: "PROJ", value: player.weeklyProjectedPoints.toFixed(1) };

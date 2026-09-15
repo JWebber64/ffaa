@@ -1,5 +1,31 @@
 import type { ToolPlayer } from "../../data/toolPlayerData";
 
+export type WeeklyScoreStatus = "live" | "final";
+
+function easternDateKey(value: Date) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(value);
+}
+
+/**
+ * Sleeper's matchup payload exposes current player points but not game state.
+ * The weekly stats feed gives us the NFL game date, so prior dates are final;
+ * same-day returned scores are the only scores presented as live.
+ */
+export function weeklyScoreStatus(
+  player: Pick<ToolPlayer, "weeklyActualPoints" | "weeklyStatLine"> | null,
+  now: Date = new Date(),
+): WeeklyScoreStatus | null {
+  if (player?.weeklyActualPoints === null || player?.weeklyActualPoints === undefined) return null;
+  const gameDate = player.weeklyStatLine?.gameDate?.trim() ?? "";
+  if (!/^\d{4}-\d{2}-\d{2}$/u.test(gameDate)) return "final";
+  return gameDate < easternDateKey(now) ? "final" : "live";
+}
+
 function statValue(stats: Record<string, number>, key: string) {
   return Object.prototype.hasOwnProperty.call(stats, key) ? (stats[key] ?? null) : null;
 }
