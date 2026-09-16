@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildMatchupRecap, type RecapMatchup, type RecapPlayer } from "../features/weekly-recap/matchupRecap";
+import { allocateWeeklyLeadClosings, buildMatchupRecap, type RecapMatchup, type RecapPlayer } from "../features/weekly-recap/matchupRecap";
 import { buildRecapWeek, completedRecapWeek, officialRecapScore } from "../features/weekly-recap/recapSource";
 import type { SleeperLeague } from "../features/league-history/provider/sleeperTypes";
 
@@ -17,6 +17,18 @@ const story = (input: RecapMatchup) => buildMatchupRecap(input)!.sections.flatMa
 const league: SleeperLeague = { league_id: "123", season: "2026", sport: "nfl", name: "Test league", status: "in_season", total_rosters: 2, roster_positions: ["QB", "RB", "FLEX", "BN"], settings: { last_scored_leg: 1 }, scoring_settings: {} };
 
 describe("detailed weekly matchup narratives", () => {
+  it("allocates distinct, deterministic result closings within a week", () => {
+    const matchups = [
+      { id: "1", winnerName: "Alpha", loserName: "Beta", margin: 30.42 },
+      { id: "2", winnerName: "Gamma", loserName: "Delta", margin: 16.24 },
+    ];
+    const first = allocateWeeklyLeadClosings(matchups);
+    const second = allocateWeeklyLeadClosings([...matchups].reverse());
+    expect(new Set(first.values()).size).toBe(2);
+    expect([...first.values()].every((closing) => !closing.includes("The final score settles the result"))).toBe(true);
+    expect(first).toEqual(second);
+  });
+
   it("writes a substantial, deterministic story with both teams and verified position edges", () => {
     const input = matchup();
     const before = JSON.stringify(input);

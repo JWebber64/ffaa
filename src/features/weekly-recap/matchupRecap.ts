@@ -47,6 +47,7 @@ export interface MatchupRecap {
   headline: string;
   label: string;
   lead: string;
+  leadClosing: string | null;
   margin: number;
   teams: [RecapTeam, RecapTeam];
   winnerId: string | null;
@@ -66,6 +67,68 @@ const points = (value: number) => value.toFixed(2);
 const rounded = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100;
 const slotFor = (player: RecapPlayer) => player.lineupSlot ? recapSlotLabel(player.lineupSlot) : "";
 const scored = (player: RecapPlayer) => player.fantasyPoints !== null && Number.isFinite(player.fantasyPoints);
+
+type LeadClosingInput = { id: string; winnerName: string; loserName: string; margin: number };
+type LeadClosingVariant = { id: string; write: (input: LeadClosingInput) => string };
+
+const CLOSE_LEAD_CLOSINGS: readonly LeadClosingVariant[] = [
+  { id: "close-decimals", write: ({ winnerName }) => `Every decimal mattered for ${winnerName}; the lineup split shows where the breathing room came from.` },
+  { id: "close-survival", write: ({ winnerName }) => `${winnerName} survived a narrow margin, and the starter totals explain the difference.` },
+  { id: "close-room", write: ({ winnerName }) => `The score gave ${winnerName} just enough room; the player-by-player breakdown shows why.` },
+  { id: "close-sliver", write: ({ winnerName }) => `The ${winnerName} lineup found the sliver it needed; the box score fills in the close finish.` },
+];
+
+const STANDARD_LEAD_CLOSINGS: readonly LeadClosingVariant[] = [
+  { id: "standard-scoreboard", write: ({ winnerName }) => `The scoreboard favored ${winnerName}; the starter totals show where the separation took shape.` },
+  { id: "standard-daylight", write: ({ winnerName }) => `${winnerName} created the margin across its lineup, and the position-by-position numbers fill in the story.` },
+  { id: "standard-headline", write: ({ winnerName }) => `For ${winnerName}, the margin was the headline; the player splits provide the useful detail.` },
+  { id: "standard-edge", write: ({ winnerName }) => `The ${winnerName} lineup supplied the edge, with the box score showing how it accumulated.` },
+  { id: "standard-balance", write: ({ winnerName }) => `${winnerName} held the advantage through the scoring balance; the lineup details explain the distance.` },
+  { id: "standard-breakdown", write: ({ winnerName }) => `The result belongs to ${winnerName}, and the starter breakdown shows which choices created the gap.` },
+];
+
+const STATEMENT_LEAD_CLOSINGS: readonly LeadClosingVariant[] = [
+  { id: "statement-reach", write: ({ winnerName }) => `${winnerName} put the result beyond reach; the lineup detail shows how the distance piled up.` },
+  { id: "statement-lineup", write: ({ winnerName }) => `The scoreboard belonged to ${winnerName}, whose starting lineup made this one a statement.` },
+  { id: "statement-scale", write: ({ winnerName }) => `${winnerName} turned a wide gap into a decisive result; the player totals show the scale of it.` },
+  { id: "statement-cast", write: ({ winnerName }) => `The ${winnerName} lineup left little doubt, with contributors adding to a decisive margin.` },
+  { id: "statement-room", write: ({ winnerName }) => `${winnerName} had room to spare, and the box score makes the source of that distance clear.` },
+];
+
+function leadClosingVariants(margin: number) {
+  return margin < 5 ? CLOSE_LEAD_CLOSINGS : margin >= 40 ? STATEMENT_LEAD_CLOSINGS : STANDARD_LEAD_CLOSINGS;
+}
+
+function stableHash(value: string) {
+  let hash = 0;
+  for (const character of value) hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
+  return hash;
+}
+
+/** Allocate the visible result sentence once per weekly edition, not once per matchup. */
+export function allocateWeeklyLeadClosings(matchups: LeadClosingInput[]) {
+  const used = new Set<string>();
+  const allocated = new Map<string, string>();
+  const ordered = [...matchups].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }) || a.winnerName.localeCompare(b.winnerName));
+  for (const matchup of ordered) {
+    if (matchup.margin === 0) continue;
+    const variants = leadClosingVariants(matchup.margin);
+    const start = stableHash(`${matchup.id}:${matchup.winnerName}:${matchup.margin}`) % variants.length;
+    const candidates = variants.map((_, offset) => {
+      const variant = variants[(start + offset) % variants.length]!;
+      return variant.write(matchup);
+    });
+    const closing = candidates.find((text) => !used.has(text))
+      ?? `${matchup.winnerName} finished ahead of ${matchup.loserName} by ${points(matchup.margin)} points; the starter totals show where the gap came from.`;
+    used.add(closing);
+    allocated.set(matchup.id, closing);
+  }
+  return allocated;
+}
+
+function defaultLeadClosing(input: LeadClosingInput) {
+  return allocateWeeklyLeadClosings([input]).get(input.id)!;
+}
 
 function starters(team: RecapTeam) {
   return team.players.filter((player) => player.isStarter && scored(player))
@@ -169,7 +232,7 @@ function leagueParagraph(team: RecapTeam, opponent: RecapTeam, matchup: RecapMat
   return `${team.name} ranked ${rank} in weekly scoring among teams with paired matchups. Against every other competing team's score, it would have gone ${beaten}–${above}${tied ? `–${tied}` : ""}.${result}`;
 }
 
-export function buildMatchupRecap(matchup: RecapMatchup): MatchupRecap | null {
+export function buildMatchupRecap(matchup: RecapMatchup, options: { leadClosing?: string } = {}): MatchupRecap | null {
   if (matchup.status !== "final" || matchup.teams.some((team) => !Number.isFinite(team.score))) return null;
   const [left, right] = matchup.teams;
   const margin = rounded(Math.abs(left.score - right.score));
@@ -193,9 +256,10 @@ export function buildMatchupRecap(matchup: RecapMatchup): MatchupRecap | null {
               `${best.playerName} delivers. ${winner.name} cashes in.`,
             ][Number(matchup.id.replace(/\D/g, "").slice(-3) || 0) % 3]!
             : `${winner.name} gets the last word in Week ${matchup.week}`;
+  const leadClosing = tied ? null : options.leadClosing ?? defaultLeadClosing({ id: matchup.id, winnerName: winner.name, loserName: loser.name, margin });
   const lead = tied
     ? `${left.name} and ${right.name} finished Week ${matchup.week} locked at ${points(left.score)} apiece. All those lineup decisions, all those points, and neither side gets an outright victory. The box score still has plenty to say about how they got there.`
-    : `${winner.name} beat ${loser.name} ${points(winner.score)}–${points(loser.score)} in Week ${matchup.week}, a ${points(margin)}-point margin. ${margin < 5 ? "Every fraction mattered in this one; a small swing would have told a very different story." : margin >= 40 ? "That is a result with some volume behind it. The winning lineup left plenty for the group chat to discuss." : "The final score settles the result. The players and lineup choices explain where the separation came from."}`;
+    : `${winner.name} beat ${loser.name} ${points(winner.score)}–${points(loser.score)} in Week ${matchup.week}, a ${points(margin)}-point margin. ${leadClosing}`;
   const positions: MatchupRecap["positions"] = [];
   const slotsKnown = matchup.teams.every((team) => team.players.filter((p) => p.isStarter).every((p) => Boolean(p.lineupSlot)));
   if (completeStarters(left) && completeStarters(right) && slotsKnown) {
@@ -245,7 +309,7 @@ export function buildMatchupRecap(matchup: RecapMatchup): MatchupRecap | null {
   const text = [lead, ...sections.flatMap((section) => section.paragraphs)].join(" ");
   return {
     id: matchup.id, version: RECAP_VERSION, leagueName: matchup.leagueName,
-    season: matchup.season, week: matchup.week, headline, label, lead, margin,
+    season: matchup.season, week: matchup.week, headline, label, lead, leadClosing, margin,
     teams: matchup.teams, winnerId: tied ? null : winner.id,
     spotlight: best ? { player: best, teamName: winner.name } : null,
     positions, sections, caveats, sourceUrl: matchup.sourceUrl, updatedAt: matchup.updatedAt,

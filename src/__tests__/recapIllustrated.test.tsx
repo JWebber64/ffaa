@@ -137,6 +137,19 @@ describe("league edition awards and weekly context", () => {
 });
 
 describe("illustrated recap rendering", () => {
+  it("keeps each weekly roundup result closing distinct", () => {
+    const input = source();
+    input.rows[0]!.points = 100;
+    input.rows[1]!.points = 70;
+    input.rows[2]!.points = 110;
+    input.rows[3]!.points = 80;
+    const recaps = buildRecapWeek(input).recaps;
+    const closings = recaps.map((recap) => recap.leadClosing).filter((closing): closing is string => Boolean(closing));
+    expect(closings).toHaveLength(recaps.length);
+    expect(new Set(closings).size).toBe(closings.length);
+    expect(closings.every((closing) => !closing.includes("The final score settles the result"))).toBe(true);
+  });
+
   it("renders distinct FLEX graphics, pictured mentions, and the shared profile action", () => {
     const recap = buildRecapWeek(source()).recaps[0]!;
     const openPlayerProfile = vi.fn();

@@ -3,7 +3,7 @@ import type { SleeperPlayerRow } from "../../data/playerStatCategories";
 import { loadSleeperPlayerDirectory } from "../../data/sleeperPlayerDirectory";
 import { loadSleeperWeeklyStats, type SleeperWeeklyStatLine } from "../my-hq/sleeperWeeklyStats";
 import { weeklyStatLineText } from "../my-hq/weeklyStatLine";
-import { buildMatchupRecap, type MatchupRecap, type RecapTeam } from "./matchupRecap";
+import { allocateWeeklyLeadClosings, buildMatchupRecap, type MatchupRecap, type RecapTeam } from "./matchupRecap";
 import type { LeagueHistorySnapshot } from "../league-history/domain/types";
 import { buildRecapRivalry, unavailableRivalry, withRivalrySection, type RecapRivalryWeek } from "./recapRivalry";
 import { recapSlotLabel, recordedStarterSlots } from "./recapPresentation";
@@ -127,20 +127,29 @@ export function buildRecapWeek(input: {
   });
   result.leagueWeekComplete = rows.length === league.total_rosters && new Set(rows.map((row) => row.roster_id)).size === league.total_rosters
     && rows.every((row) => row.matchup_id === null || (teams.has(row.roster_id) && groups.get(row.matchup_id)?.length === 2));
+  const pairedMatchups: Array<{ id: string; left: RecapTeam; right: RecapTeam }> = [];
   for (const [id, pair] of groups) {
     if (pair.length !== 2 || pair[0]!.roster_id === pair[1]!.roster_id) continue;
     const ordered = [...pair].sort((a, b) => a.roster_id - b.roster_id);
     const left = teams.get(ordered[0]!.roster_id);
     const right = teams.get(ordered[1]!.roster_id);
     if (!left || !right) continue;
+    pairedMatchups.push({ id: String(id), left, right });
+  }
+  const leadClosings = allocateWeeklyLeadClosings(pairedMatchups.map(({ id, left, right }) => {
+    const winner = left.score >= right.score ? left : right;
+    const loser = winner.id === left.id ? right : left;
+    return { id, winnerName: winner.name, loserName: loser.name, margin: Math.abs(left.score - right.score) };
+  }));
+  for (const { id, left, right } of pairedMatchups) {
     const recap = buildMatchupRecap({
-      id: String(id), leagueName: league.name, season: Number(league.season), week, status: "final", teams: [left, right],
+      id, leagueName: league.name, season: Number(league.season), week, status: "final", teams: [left, right],
       rosterPositions: league.roster_positions,
       weekScores: pairedTeams.map((team) => ({ id: team.id, score: team.score, name: team.name, avatarUrl: team.avatarUrl ?? "" })),
       leagueWeekComplete: result.leagueWeekComplete,
       scoring: league.scoring_settings.rec === 1 ? "ppr" : league.scoring_settings.rec === 0 ? "standard" : "halfPpr",
       sourceUrl: `https://sleeper.com/leagues/${league.league_id}/matchup`, updatedAt,
-    });
+    }, leadClosings.has(id) ? { leadClosing: leadClosings.get(id)! } : {});
     if (recap) result.recaps.push(recap);
   }
   if (result.recaps.length) result.status = "final";
