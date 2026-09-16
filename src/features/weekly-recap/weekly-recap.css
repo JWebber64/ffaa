@@ -11,7 +11,7 @@
 .weekly-recap-lead { margin: 0; font-size: 16px; line-height: 1.65; text-wrap: pretty; max-width: 72ch; }
 .weekly-recap-cover-brief { display: grid; align-content: end; gap: 8px; min-width: 0; min-height: 100%; border-left: 1px solid var(--color-border-on-warm); padding: 20px 0 2px clamp(20px, 2.5vw, 32px); }
 .weekly-recap-cover-brief > span { color: var(--color-text-on-warm-secondary); font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
-.weekly-recap-cover-brief > strong { color: var(--color-surface-card-primary); font-family: var(--font-display); font-size: clamp(52px, 6vw, 78px); font-weight: 800; line-height: .9; font-variant-numeric: tabular-nums; }
+.weekly-recap-cover-brief > strong { color: var(--color-surface-card-primary); font-family: var(--font-display); font-size: clamp(52px, 6vw, 78px); font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .weekly-recap-cover-brief ul { display: grid; gap: 5px; padding: 12px 0 0; margin: 0; border-top: 1px solid var(--color-border-on-warm); list-style: none; color: var(--color-text-on-warm-secondary); font-size: 12px; line-height: 1.35; }
 .weekly-recap-cover-brief li::before { content: "·"; display: inline-block; margin-right: 7px; color: var(--color-text-on-warm-accent); font-weight: 900; }
 .weekly-recap-result > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--color-border-on-warm); }
@@ -65,7 +65,7 @@
 .recap-section-heading > span { font-variant-numeric: tabular-nums; font-size: 12px; color: var(--color-text-secondary); }
 .weekly-recap .recap-section-heading h3 { margin: 0; }
 .recap-team-identity { display: inline-flex; align-items: center; gap: 10px; width: 100%; min-width: 0; font-size: 13px; font-weight: 700; line-height: 1.4; }
-.recap-team-identity > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recap-team-identity > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.4; }
 .recap-team-identity .team-identity-mark { width: 34px; height: 34px; flex: 0 0 34px; overflow: hidden; border: 1px solid color-mix(in oklch, var(--color-text-on-warm) 20%, transparent); border-radius: 50%; background: var(--color-surface-card-secondary); font-size: 11px; }
 .recap-graphic { margin: 0 0 22px; padding: clamp(16px, 2.3vw, 24px); border: 1px solid var(--color-border-on-warm); border-radius: var(--r-md); background: var(--color-surface-table-warm-row-alt); color: var(--color-text-on-warm); min-width: 0; }
 .recap-graphic figcaption { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; font-weight: 800; line-height: 1.5; padding-bottom: 16px; }
