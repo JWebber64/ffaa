@@ -31,8 +31,13 @@ export function LeagueRecapArticle({ week, archive }: { week: RecapWeek; archive
     .sort((a, b) => DESK_ORDER.indexOf(a.awardType) - DESK_ORDER.indexOf(b.awardType) || a.sourceKey.localeCompare(b.sourceKey));
   const featureRivalry = feature?.sections.find((section) => section.id === "rivalry");
   const awardPlayer = (award: typeof awards[number]) => teams.find((team) => Number(team.id) === award.providerRosterId)?.players.find((player) => player.providerPlayerId === award.providerPlayerId);
+  const editionBrief = [
+    `${week.recaps.length} matchup${week.recaps.length === 1 ? "" : "s"}`,
+    `${honors.length} position honor${honors.length === 1 ? "" : "s"}`,
+    `${week.recaps.length ? "final scores" : "source pending"}`,
+  ];
   return <article className="weekly-recap league-recap" aria-label={`League weekly edition, ${week.league.season} Week ${week.week}`}>
-    <header className="weekly-recap-cover"><div className="weekly-recap-edition"><span><BookOpen size={16} aria-hidden="true" /> GameHQ Weekly · League edition</span><span>{week.league.season} / Week {week.week} / {edition.complete ? "Final" : "Partial source"}</span></div><h2>{edition.headline}</h2><p className="weekly-recap-lead">{edition.lead}</p></header>
+    <header className="weekly-recap-cover"><div className="weekly-recap-edition"><span><BookOpen size={16} aria-hidden="true" /> GameHQ Weekly · League edition</span><span>{week.league.season} / Week {week.week} / {edition.complete ? "Final" : "Partial source"}</span></div><div className="weekly-recap-cover-copy"><h2>{edition.headline}</h2><p className="weekly-recap-lead">{edition.lead}</p></div><aside className="weekly-recap-cover-brief" aria-label="Edition brief"><span>Edition brief</span><strong>{String(week.week).padStart(2, "0")}</strong><ul>{editionBrief.map((item) => <li key={item}>{item}</li>)}</ul></aside></header>
     <div className="weekly-recap-body"><div className="weekly-recap-story">
       <section className="recap-story-section"><header className="recap-section-heading"><span>01</span><BookOpen size={20} aria-hidden="true" /><h3>The week, in words</h3></header>
         {feature ? <figure className="recap-feature-game recap-graphic"><figcaption>Matchup in focus <span>{feature.label}</span></figcaption><div>{feature.teams.map((team) => <div key={team.id}><RecapTeamIdentity team={team} /><strong>{team.score.toFixed(2)}</strong><span>{team.id === feature.winnerId ? "Winner" : feature.winnerId ? "Final" : "Tie"}</span></div>)}</div><p><strong>{feature.margin.toFixed(2)}</strong> {feature.winnerId ? "points between them" : "points of separation"}</p><Link to={permalink(feature.id)}>Read the matchup story <ArrowUpRight size={14} aria-hidden="true" /></Link></figure> : null}
