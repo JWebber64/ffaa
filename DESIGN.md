@@ -245,7 +245,7 @@ Directional arrows inside the bench replacement and before/after record graphics
 
 Player references are generated with stable IDs; first mentions within a section have a compact portrait and helmet, with later mentions using the same profile action without repeated imagery. Missing images retain a legible fallback and player name. Current directory artwork must never be presented as a verified historical NFL affiliation. Shared team marks own fantasy-team avatars.
 
-FLEX scoring follows the recorded starter slot, not natural eligibility, and cannot be counted again at RB/WR/TE. League positional honors rank starting players at their natural positions; FLEX/SFLEX/restricted-flex honors are separately labeled slot awards. A player may earn both honors without duplicating points. The rivalry graphic and written record consume the same cutoff-aware meeting ledger. See `docs/WEEKLY_RECAPS.md` for availability, evidence, and correction rules.
+FLEX scoring follows the recorded starter slot, not natural eligibility, and cannot be counted again at RB/WR/TE. League positional honors rank only players recorded in that exact natural slot; a TE/RB/WR started in FLEX cannot win the natural-position honor. FLEX/SFLEX/restricted-flex honors are separately labeled slot awards, and each player honor uses the player's one recorded starting slot. The rivalry graphic and written record consume the same cutoff-aware meeting ledger. See `docs/WEEKLY_RECAPS.md` for availability, evidence, and correction rules.
 
 ## Do's and Don'ts
 

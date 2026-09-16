@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { optimizeLegalLineup, type LineupPlayer } from "../features/league-history/analytics/lineupOptimizer";
 import { generateWeeklyAwards, type WeeklyAwardRosterInput } from "../features/league-history/analytics/weeklyAwards";
 
-function player(id: string, position: string, fantasyPoints: number, isStarter: boolean): LineupPlayer {
-  return { providerPlayerId: id, playerName: id === "9226" ? "De'Von Achane" : id, position, fantasyPoints, isStarter };
+function player(id: string, position: string, fantasyPoints: number, isStarter: boolean, lineupSlot?: string): LineupPlayer {
+  return { providerPlayerId: id, playerName: id === "9226" ? "De'Von Achane" : id, position, fantasyPoints, isStarter, ...(lineupSlot ? { lineupSlot } : {}) };
 }
 
 function roster(providerRosterId: number, score: number, pointsLeft: number, efficiency: number, players: LineupPlayer[], isComplete = true): WeeklyAwardRosterInput {
@@ -66,6 +66,44 @@ describe("deterministic weekly awards", () => {
     const second = generateWeeklyAwards(structuredClone(input)).map((award) => award.sourceKey);
     expect(second).toEqual(first);
     expect(new Set(first).size).toBe(first.length);
+  });
+
+  it("uses the recorded starting slot for every natural-position honor", () => {
+    const players = [
+      player("qb-natural", "QB", 20, true, "QB"),
+      player("rb-natural", "RB", 15, true, "RB"),
+      player("rb-flex", "RB", 40, true, "FLEX"),
+      player("wr-natural", "WR", 16, true, "WR"),
+      player("wr-flex", "WR", 35, true, "FLEX"),
+      player("te-natural", "TE", 18, true, "TE"),
+      player("te-flex", "TE", 30, true, "FLEX"),
+      player("k-natural", "K", 14, true, "K"),
+      player("def-natural", "DEF", 13, true, "DEF"),
+    ];
+    const awards = generateWeeklyAwards({
+      leagueExternalId: "slot-aware",
+      season: 2026,
+      week: 1,
+      rosters: [roster(99, players.reduce((sum, entry) => sum + entry.fantasyPoints!, 0), 0, 1, players)],
+      matchups: [],
+      includePositionAwards: true,
+    });
+    const positional = awards.filter((award) => award.awardType === "top_position_player");
+    expect(Object.fromEntries(positional.map((award) => [award.position, award.providerPlayerId]))).toEqual({
+      QB: "qb-natural",
+      RB: "rb-natural",
+      WR: "wr-natural",
+      TE: "te-natural",
+      K: "k-natural",
+      DST: "def-natural",
+    });
+    expect(awards.find((award) => award.awardType === "top_flex_player")).toMatchObject({ position: "FLEX", providerPlayerId: "rb-flex", numericValue: 40 });
+  });
+
+  it("withholds slot-based position honors when slot evidence is unavailable", () => {
+    const awards = generateWeeklyAwards({ ...input, includePositionAwards: true });
+    expect(awards.filter((award) => ["top_position_player", "top_flex_player"].includes(award.awardType))).toEqual([]);
+    expect(awards.some((award) => award.awardType === "top_starting_player")).toBe(true);
   });
 
   it("excludes incomplete preseason data", () => {

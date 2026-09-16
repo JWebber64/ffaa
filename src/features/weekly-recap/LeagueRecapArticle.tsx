@@ -45,7 +45,7 @@ export function LeagueRecapArticle({ week, archive }: { week: RecapWeek; archive
         {!edition.complete ? <p className="recap-data-note">The full league write-up and awards appear automatically when every result is available. The completed matchup stories below remain readable.</p> : null}
       </section>
       <section className="recap-story-section"><header className="recap-section-heading"><span>02</span><Crown size={20} aria-hidden="true" /><h3>Team of the Week</h3></header>
-        <p>The best starting performances at each natural position, plus separate honors for the players actually started in FLEX slots. Equal scores share the spotlight.</p>
+        <p>The best performances from players recorded in each natural position slot, plus separate honors for the players actually started in FLEX slots. Equal scores share the spotlight.</p>
         {mvp.length ? <div className="recap-mvp-banner"><div><Crown size={32} aria-hidden="true" /><span>{mvp.length > 1 ? "Shared weekly MVP" : "Weekly MVP"}</span><strong>{mvp[0]!.numericValue.toFixed(2)}</strong><small>fantasy points</small></div><div>{mvp.map((award) => {
           const player = awardPlayer(award);
           const team = teams.find((team) => Number(team.id) === award.providerRosterId)!;

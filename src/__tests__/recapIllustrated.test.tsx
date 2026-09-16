@@ -82,7 +82,7 @@ describe("league edition awards and weekly context", () => {
     expect(edition.awards.filter((award) => award.awardType === "narrow_escape")).toHaveLength(2);
     expect(edition.awards.find((award) => award.awardType === "top_flex_player")).toMatchObject({ providerPlayerId: "13", numericValue: 30, position: "FLEX" });
     expect(edition.awards.find((award) => award.awardType === "bench_disaster")).toMatchObject({ providerRosterId: 1, numericValue: 22 });
-    expect(edition.awards.every((award) => award.calculationVersion === "weekly-awards-v2")).toBe(true);
+    expect(edition.awards.every((award) => award.calculationVersion === "weekly-awards-v3")).toBe(true);
     expect(edition.paragraphs.length).toBeGreaterThanOrEqual(3);
   });
   it("withholds only affected award families for incomplete evidence and follows score corrections", () => {

@@ -1,7 +1,7 @@
 import type { LineupOptimizationResult, LineupPlayer } from "./lineupOptimizer";
 import { positionColorKey } from "../../../ui/positionColors";
 
-export const WEEKLY_AWARD_CALCULATION_VERSION = "weekly-awards-v2";
+export const WEEKLY_AWARD_CALCULATION_VERSION = "weekly-awards-v3";
 
 export type WeeklyAwardType =
   | "weekly_high_score"
@@ -48,7 +48,7 @@ export interface GeneratedWeeklyAward {
   numericValue: number;
   sourceType: "weekly_roster_result" | "matchup";
   sourceProviderMatchupId: string | null;
-  calculationVersion: typeof WEEKLY_AWARD_CALCULATION_VERSION | "weekly-awards-v1";
+  calculationVersion: typeof WEEKLY_AWARD_CALCULATION_VERSION | "weekly-awards-v1" | "weekly-awards-v2";
   position?: string;
 }
 
@@ -59,6 +59,16 @@ interface Candidate {
 
 function finite(value: number | null | undefined) {
   return typeof value === "number" && Number.isFinite(value);
+}
+
+function normalizedPosition(value: string | undefined) {
+  return (positionColorKey(value) ?? value?.trim().toUpperCase() ?? "").toUpperCase();
+}
+
+function startedInNaturalPosition(player: LineupPlayer) {
+  const position = normalizedPosition(player.position);
+  const slot = normalizedPosition(player.lineupSlot);
+  return Boolean(slot) && slot === position && positionColorKey(player.lineupSlot) !== "flex";
 }
 
 function winners<T>(candidates: T[], value: (candidate: T) => number, direction: "asc" | "desc" = "desc") {
@@ -153,10 +163,14 @@ export function generateWeeklyAwards(input: {
   const starters = playerCandidates.filter((candidate) => candidate.player.isStarter);
   if (starterEvidence || input.leagueComplete === undefined) {
     for (const top of winners(starters, (candidate) => candidate.value)) generated.push(award(leagueExternalId, season, week, "top_starting_player", top.roster.providerRosterId, top.value, "Top Starting Player", `${top.player.playerName} scored ${top.value.toFixed(2)} as a starter.`, "weekly_roster_result", { player: top.player }));
-    if (input.includePositionAwards) {
-      const positions = [...new Set(starters.map((candidate) => (positionColorKey(candidate.player.position) ?? candidate.player.position).toUpperCase()))].filter(Boolean);
+    const recordedSlotEvidence = starters.every((candidate) => Boolean(candidate.player.lineupSlot));
+    if (input.includePositionAwards && recordedSlotEvidence) {
+      // A player's natural eligibility is not the same as the slot they
+      // occupied. A TE/RB/WR in FLEX belongs to the FLEX honor only.
+      const naturalStarters = starters.filter((candidate) => startedInNaturalPosition(candidate.player));
+      const positions = [...new Set(naturalStarters.map((candidate) => normalizedPosition(candidate.player.position)))].filter(Boolean);
       for (const position of positions) {
-        const eligible = starters.filter((candidate) => (positionColorKey(candidate.player.position) ?? candidate.player.position).toUpperCase() === position);
+        const eligible = naturalStarters.filter((candidate) => normalizedPosition(candidate.player.position) === position);
         for (const top of winners(eligible, (candidate) => candidate.value)) generated.push(award(leagueExternalId, season, week, "top_position_player", top.roster.providerRosterId, top.value, `${position} of the Week`, `Highest-scoring starting ${position}: ${top.value.toFixed(2)} points.`, "weekly_roster_result", { player: top.player, position }));
       }
       if (starters.every((candidate) => candidate.player.lineupSlot)) {
