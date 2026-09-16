@@ -1,10 +1,10 @@
-import { ArrowLeft, CalendarDays, Flame, Swords, Trophy } from "lucide-react";
+import { ArrowLeft, Flame, Swords, Trophy } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { UniversalSelect } from "../../../../ui/UniversalSelect";
 import { calculateHeadToHead } from "../../analytics";
-import type { HeadToHeadStats, LeagueHistorySnapshot } from "../../domain/types";
+import type { HeadToHeadStats, LeagueHistorySnapshot, RivalryMeeting } from "../../domain/types";
 import { useLeagueHistorySnapshot } from "../historyContext";
 import { formatNumber } from "../format";
 import { leagueRivalryPath, resolveLeagueHistoryManagerId } from "../leagueRoutes";
@@ -88,6 +88,122 @@ function rivalryLabels(snapshot: LeagueHistorySnapshot, managerAId: string, mana
   return labels;
 }
 
+function managerInitials(displayName: string) {
+  return displayName
+    .split(/\s+/u)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
+
+function RivalryLedgerGraphic({
+  stats,
+  seasons,
+}: {
+  stats: HeadToHeadStats;
+  seasons: Array<[number, RivalryMeeting[]]>;
+}) {
+  return (
+    <section className="history-panel history-ledger-panel" aria-labelledby="history-rivalry-ledger-title">
+      <header className="history-ledger-header">
+        <div>
+          <span>Season by season</span>
+          <h2 id="history-rivalry-ledger-title">Rivalry ledger</h2>
+          <p>Every recorded meeting, turned into a season-by-season scoreline.</p>
+        </div>
+        <div className="history-ledger-count" aria-label={`${stats.meetings.length} recorded meetings`}>
+          <strong>{stats.meetings.length}</strong>
+          <span>meetings</span>
+          <small>{seasons.length} seasons on file</small>
+        </div>
+      </header>
+
+      <div className="history-ledger-graphic">
+        <div className="history-ledger-contestants">
+          <div className="history-ledger-team is-a">
+            <div className="history-ledger-avatar">
+              {stats.managerA.avatarUrl ? <img src={stats.managerA.avatarUrl} alt="" /> : <span>{managerInitials(stats.managerA.displayName)}</span>}
+            </div>
+            <div>
+              <span>{stats.managerA.displayName}</span>
+              <strong>{stats.winsA}</strong>
+              <small>all-time wins</small>
+            </div>
+          </div>
+          <div className="history-ledger-versus" aria-hidden="true">
+            <Swords size={22} />
+            <strong>VS</strong>
+            <span>{stats.ties ? `${stats.ties} ties` : `${stats.meetings.length} battles`}</span>
+          </div>
+          <div className="history-ledger-team is-b">
+            <div className="history-ledger-avatar">
+              {stats.managerB.avatarUrl ? <img src={stats.managerB.avatarUrl} alt="" /> : <span>{managerInitials(stats.managerB.displayName)}</span>}
+            </div>
+            <div>
+              <span>{stats.managerB.displayName}</span>
+              <strong>{stats.winsB}</strong>
+              <small>all-time wins</small>
+            </div>
+          </div>
+        </div>
+
+        <div className="history-ledger-key" aria-hidden="true">
+          <span><i className="is-a" />{stats.managerA.displayName}</span>
+          <span><i className="is-b" />{stats.managerB.displayName}</span>
+          <span>season record · points scored</span>
+        </div>
+
+        <div className="history-ledger-season-grid">
+          {seasons.map(([season, meetings]) => {
+            const aWins = meetings.filter((meeting) => meeting.winnerManagerId === stats.managerA.id).length;
+            const bWins = meetings.filter((meeting) => meeting.winnerManagerId === stats.managerB.id).length;
+            const ties = meetings.length - aWins - bWins;
+            const pointsA = meetings.reduce((total, meeting) => total + meeting.managerAScore, 0);
+            const pointsB = meetings.reduce((total, meeting) => total + meeting.managerBScore, 0);
+            const winner = aWins === bWins ? "even" : aWins > bWins ? "a" : "b";
+            const outcome = winner === "even" ? "Season split" : `${winner === "a" ? stats.managerA.displayName : stats.managerB.displayName} edge`;
+            const record = `${aWins}-${bWins}${ties ? `-${ties}` : ""}`;
+            return (
+              <Link
+                className={`history-ledger-season is-${winner}`}
+                key={season}
+                to={`../../seasons/${season}`}
+                aria-label={`${season}: ${stats.managerA.displayName} ${record} ${stats.managerB.displayName}, ${meetings.length} meetings`}
+              >
+                <div className="history-ledger-season-meta">
+                  <strong>{season}</strong>
+                  <span>{meetings.length} {meetings.length === 1 ? "meeting" : "meetings"}</span>
+                </div>
+                <div className="history-ledger-record" aria-hidden="true">
+                  <strong>{aWins}</strong>
+                  <span>–</span>
+                  <strong>{bWins}</strong>
+                </div>
+                <div className="history-ledger-bar" aria-hidden="true">
+                  <span className="is-a" style={{ width: `${(aWins / Math.max(meetings.length, 1)) * 100}%` }} />
+                  <span className="is-b" style={{ width: `${(bWins / Math.max(meetings.length, 1)) * 100}%` }} />
+                </div>
+                <div className="history-ledger-points">
+                  <span><strong>{formatNumber(pointsA)}</strong><small>{stats.managerA.displayName}</small></span>
+                  <span><strong>{formatNumber(pointsB)}</strong><small>{stats.managerB.displayName}</small></span>
+                </div>
+                <div className="history-ledger-outcome"><span>{outcome}</span><small>Open {season} archive</small></div>
+              </Link>
+            );
+          })}
+        </div>
+
+        <footer className="history-ledger-footer">
+          <span>W–L{stats.ties ? "–T" : ""} from {stats.managerA.displayName}’s perspective</span>
+          <span>Point totals include every recorded meeting</span>
+        </footer>
+      </div>
+    </section>
+  );
+}
+
 export function RivalryPage() {
   const snapshot = useLeagueHistorySnapshot();
   const { managerAId: managerARouteId = "", managerBId: managerBRouteId = "" } = useParams();
@@ -98,6 +214,7 @@ export function RivalryPage() {
   const labels = rivalryLabels(snapshot, managerAId, managerBId);
   const meetingsBySeason = new Map<number, typeof stats.meetings>();
   for (const meeting of stats.meetings) meetingsBySeason.set(meeting.season, [...(meetingsBySeason.get(meeting.season) ?? []), meeting]);
+  const ledgerSeasons = [...meetingsBySeason.entries()].sort((a, b) => b[0] - a[0]);
 
   return (
     <main className="history-content">
@@ -109,6 +226,8 @@ export function RivalryPage() {
       </section>
       {labels.length ? <div className="history-label-row">{labels.map((label) => <span key={label}><Flame size={13} />{label}</span>)}</div> : null}
 
+      <RivalryLedgerGraphic stats={stats} seasons={ledgerSeasons} />
+
       <section className="history-stat-grid">
         <article><span>Regular season</span><strong>{stats.regularSeasonWinsA}-{stats.regularSeasonWinsB}</strong><small>{stats.meetings.length - stats.playoffMeetings} meetings</small></article>
         <article><span>Playoffs</span><strong>{stats.playoffWinsA}-{stats.playoffWinsB}</strong><small>{stats.playoffMeetings} meetings</small></article>
@@ -118,24 +237,14 @@ export function RivalryPage() {
         <article><span>Longest streaks</span><strong>{stats.longestStreakA} / {stats.longestStreakB}</strong><small>{stats.managerA.displayName} / {stats.managerB.displayName}</small></article>
       </section>
 
-      <section className="history-section-grid">
-        <article className="history-panel">
-          <header><div><span>Rivalry records</span><h2>Defining games</h2></div><Trophy /></header>
-          <div className="history-rivalry-facts">
-            <div><span>Biggest victory</span><strong>{formatNumber(stats.biggestVictory ? Math.abs(stats.biggestVictory.managerAScore - stats.biggestVictory.managerBScore) : null)}</strong><small>{stats.biggestVictory?.season} Week {stats.biggestVictory?.matchup.week}</small></div>
-            <div><span>Closest game</span><strong>{formatNumber(stats.closestGame ? Math.abs(stats.closestGame.managerAScore - stats.closestGame.managerBScore) : null)}</strong><small>{stats.closestGame?.season} Week {stats.closestGame?.matchup.week}</small></div>
-            <div><span>Highest combined</span><strong>{formatNumber(stats.highestScoringGame ? stats.highestScoringGame.managerAScore + stats.highestScoringGame.managerBScore : null)}</strong><small>{stats.highestScoringGame?.season}</small></div>
-            <div><span>Season sweeps</span><strong>{stats.seasonSweepsA} / {stats.seasonSweepsB}</strong><small>{stats.managerA.displayName} / {stats.managerB.displayName}</small></div>
-          </div>
-        </article>
-        <article className="history-panel">
-          <header><div><span>Season by season</span><h2>Rivalry ledger</h2></div><CalendarDays /></header>
-          <div className="history-season-rivalries">{[...meetingsBySeason.entries()].sort((a, b) => b[0] - a[0]).map(([season, meetings]) => {
-            const aWins = meetings.filter((meeting) => meeting.winnerManagerId === stats.managerA.id).length;
-            const bWins = meetings.filter((meeting) => meeting.winnerManagerId === stats.managerB.id).length;
-            return <div key={season}><Link to={`../../seasons/${season}`}>{season}</Link><strong>{aWins}-{bWins}{meetings.length - aWins - bWins ? `-${meetings.length - aWins - bWins}` : ""}</strong><span>{meetings.length} meetings</span></div>;
-          })}</div>
-        </article>
+      <section className="history-panel history-defining-panel">
+        <header><div><span>Rivalry records</span><h2>Defining games</h2></div><Trophy /></header>
+        <div className="history-rivalry-facts">
+          <div><span>Biggest victory</span><strong>{formatNumber(stats.biggestVictory ? Math.abs(stats.biggestVictory.managerAScore - stats.biggestVictory.managerBScore) : null)}</strong><small>{stats.biggestVictory?.season} Week {stats.biggestVictory?.matchup.week}</small></div>
+          <div><span>Closest game</span><strong>{formatNumber(stats.closestGame ? Math.abs(stats.closestGame.managerAScore - stats.closestGame.managerBScore) : null)}</strong><small>{stats.closestGame?.season} Week {stats.closestGame?.matchup.week}</small></div>
+          <div><span>Highest combined</span><strong>{formatNumber(stats.highestScoringGame ? stats.highestScoringGame.managerAScore + stats.highestScoringGame.managerBScore : null)}</strong><small>{stats.highestScoringGame?.season}</small></div>
+          <div><span>Season sweeps</span><strong>{stats.seasonSweepsA} / {stats.seasonSweepsB}</strong><small>{stats.managerA.displayName} / {stats.managerB.displayName}</small></div>
+        </div>
       </section>
 
       <section className="history-panel">
