@@ -142,6 +142,9 @@ export default function AppShellV2() {
   })();
   const workspaceLeagueId = routeLeagueId || activeLeagueId;
   const activeConnection = connections.find((connection) => connection.leagueId === workspaceLeagueId);
+  const headerConnection = connections.find((connection) => connection.leagueId === routeLeagueId)
+    ?? connections.find((connection) => connection.leagueId === activeLeagueId)
+    ?? connections[0];
   const workspaceBase = workspaceLeagueId ? `/league/${encodeURIComponent(workspaceLeagueId)}` : "";
   const isDraft = isPathActive(location.pathname, ["/draft", "/offline-draft", "/draft-order"]);
   const isDraftNavigation = isDraft || isPathActive(location.pathname, ["/host", "/join", "/results"]);
@@ -201,9 +204,8 @@ export default function AppShellV2() {
                   aria-label="Active fantasy team and league"
                   className="league-context-select"
                   onValueChange={switchLeague}
-                  value={activeConnection?.leagueId ?? ""}
+                  value={headerConnection?.leagueId ?? ""}
                 >
-                  {!activeConnection ? <option value="">Choose a connected team</option> : null}
                   {connections.map((connection) => <option key={connection.leagueId} value={connection.leagueId}>{connectionTeamLabel(connection)}</option>)}
                 </UniversalSelect>
               </div>

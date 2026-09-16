@@ -46,6 +46,14 @@ describe("global and league navigation", () => {
     expect(within(mobile).getByRole("link", { name: "Team" })).toHaveClass("active");
   });
 
+  it("keeps the remembered team visible in the header while a native route resolves", () => {
+    const nativeId = "11111111-1111-4111-8111-111111111111";
+    shell(`/league/${nativeId}/team`);
+
+    expect(screen.getByRole("button", { name: "Active fantasy team and league: My team · Connected league" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Active fantasy team and league: Choose a connected team" })).not.toBeInTheDocument();
+  });
+
   it("offers a global exit from a league and dismisses More when it is selected", () => {
     const mobile = shell(`/league/${leagueId}/team`);
     const menu = within(mobile).getByText("More").closest("details")!;
