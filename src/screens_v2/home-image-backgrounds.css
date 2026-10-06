@@ -1,0 +1,141 @@
+/* Approved home photography: the copy and links remain above full-panel art. */
+.platform-hero .platform-feature-index {
+  position: relative;
+  isolation: isolate;
+  --home-photo-ink: 20, 34, 25;
+}
+
+.platform-hero .platform-feature-index::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(var(--home-photo-ink), .94) 0%, rgba(var(--home-photo-ink), .85) 40%, rgba(var(--home-photo-ink), .59) 68%, rgba(var(--home-photo-ink), .20) 100%);
+  content: "";
+}
+
+.platform-hero .platform-feature-index figure img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border: 0;
+  object-fit: cover;
+  object-position: 76% center;
+}
+
+.platform-hero .platform-feature-index > header {
+  box-sizing: border-box;
+  min-height: 64px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 14px 24px;
+}
+
+.platform-hero .platform-feature-index nav a {
+  box-sizing: border-box;
+  min-height: 86px;
+  padding: 12px 24px;
+  background: transparent;
+  border-color: rgb(255 255 255 / 16%);
+}
+
+.platform-hero .platform-feature-index nav a > span {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 450px;
+  gap: 6px;
+}
+
+.platform-hero .platform-feature-index nav small {
+  display: block;
+  max-width: 43ch;
+  font-size: .875rem;
+  line-height: 1.45;
+}
+
+.platform-hero .platform-feature-index :is(nav small, figcaption span, header > span) {
+  color: var(--color-text-secondary);
+}
+
+.platform-hero .platform-feature-index figure {
+  display: block;
+  margin-top: auto;
+  padding: 18px 24px;
+  background: rgba(var(--home-photo-ink), .28);
+}
+
+.platform-hero .platform-feature-index figcaption {
+  padding: 0;
+  gap: 4px;
+}
+
+.platform-hero .platform-feature-index figcaption span {
+  max-width: 48ch;
+}
+
+.platform-hero .platform-feature-index nav a:hover {
+  background: rgb(255 255 255 / 6%);
+}
+
+.platform-chapters article {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  --home-photo-ink: 18, 31, 23;
+}
+
+.platform-chapters article > figure {
+  position: absolute;
+  grid-area: auto;
+  inset: 0;
+  z-index: -2;
+  width: auto;
+  height: auto;
+  max-width: none;
+  margin: 0;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+}
+
+.platform-chapters article > figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(.7);
+}
+
+.platform-chapters article::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(var(--home-photo-ink), .96) 0%, rgba(var(--home-photo-ink), .92) 27%, rgba(var(--home-photo-ink), .78) 51%, rgba(var(--home-photo-ink), .40) 76%, rgba(var(--home-photo-ink), .22) 100%);
+  content: "";
+}
+
+@media (min-width: 1101px) {
+  .platform-hero .platform-feature-index nav a > span {
+    max-width: calc(100% - 160px);
+  }
+}
+
+@media (max-width: 850px) {
+  .platform-chapters article > figure { width: auto; }
+}
+
+@media (max-width: 760px) {
+  .platform-chapters article::before {
+    background: linear-gradient(90deg, rgba(var(--home-photo-ink), .93), rgba(var(--home-photo-ink), .79));
+  }
+}
+
+@media (max-width: 600px) {
+  .platform-hero .platform-feature-index::before { background: rgba(var(--home-photo-ink), .82); }
+  .platform-hero .platform-feature-index > header { padding: 16px; }
+  .platform-hero .platform-feature-index nav a { padding: 14px 16px; }
+  .platform-hero .platform-feature-index nav a > span { max-width: none; }
+  .platform-hero .platform-feature-index figure { padding: 18px 16px; }
+}

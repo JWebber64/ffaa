@@ -215,6 +215,8 @@ Group by proximity before adding another card. Use the compact spacing roles for
 
 On wide landing pages, independent feature chapters may use two equal columns with secondary-card surfaces. Collapse them to one column before image, title, or body-copy measures become cramped, and keep the DOM reading order unchanged.
 
+The approved homepage uses the existing stadium photograph across the right hero panel and the existing editorial photographs across all four capability cards. Copy and links sit over dark directional overlays, with the scene more visible toward the right edge. Hero feature titles stack above descriptions. On phones, strengthen the overlay beneath full-width copy. Preserve the feature-card dimensions and keep this photography treatment scoped to the public home.
+
 Home always means the product landing page at `/ff/`, including when a manager has connected teams. The brand and global Home link share that destination. Name the league overview **League home**. Choose mobile navigation from the current route, not the remembered team; keep global Home and My Teams accessible from More inside a league. Team and Matchup must never both expose the current-page state.
 
 Each team row owns its decision and evidence. A compact status band may summarize urgency counts, but must not repeat those same decisions in a second queue. Keep account sync in a supporting footer and cross-league alerts only when they add information across teams. Nested history and research screens reuse the outer league gutters and compact identity row. Independent columns align to their own content; the four history overview metrics occupy one complete desktop row.

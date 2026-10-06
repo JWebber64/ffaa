@@ -3,6 +3,7 @@ import { Radio } from "lucide-react";
 import { appUrl } from "../lib/appBasePath";
 import { useSleeperLeagueConnections } from "../features/league-hq/sleeperConnections";
 import "./landing-v2.css";
+import "./home-image-backgrounds.css";
 
 const platformFeatures = [
   {
