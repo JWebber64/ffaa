@@ -24,6 +24,7 @@ import { closeParentDisclosure, useDismissibleDisclosureMenus } from "../ui/disc
 import "./league-workspace.css";
 
 const leagueDestinations = [
+  { section: "daily-brief", label: "Daily Fantasy Brief", icon: BookOpen },
   { section: "standings", label: "Standings", icon: Trophy },
   { section: "schedule", label: "Schedule", icon: CalendarDays },
   { section: "teams", label: "All teams", icon: Users },

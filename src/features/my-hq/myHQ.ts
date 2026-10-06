@@ -18,6 +18,7 @@ import {
 const SLEEPER_API = "https://api.sleeper.app/v1";
 
 type SleeperLeague = {
+  total_rosters?: number;
   league_id: string;
   name: string;
   season: string;
@@ -41,6 +42,8 @@ type SleeperRoster = {
   co_owners?: string[] | null;
   players?: string[] | null;
   starters?: string[] | null;
+  reserve?: string[] | null;
+  taxi?: string[] | null;
   settings?: Record<string, number> | null;
 };
 type SleeperMatchup = {
@@ -95,6 +98,8 @@ export type MyHQLineupEntry = {
 };
 
 export type MyHQData = {
+  rosterCoverageComplete?: boolean;
+  scoringSettings?: Record<string, number>;
   leagueId: string;
   leagueName: string;
   season: string;
@@ -123,6 +128,9 @@ export type MyHQData = {
   opponentBench: ToolPlayer[];
   starterSlots: string[];
   rosteredPlayerIds: string[];
+  ownRosterPlayerIds?: string[];
+  reservePlayerIds?: string[];
+  starterPlayerIds?: string[];
   alerts: MyHQPlayerAlert[];
   decisions: MyHQDecision[];
   availableRecommendations: MyHQPlayerRecommendation[];
@@ -609,6 +617,11 @@ export async function loadMyHQ(
     opponentBench,
     starterSlots,
     rosteredPlayerIds: [...allRosteredIds],
+    ownRosterPlayerIds: [...rosterPlayerIds],
+    reservePlayerIds: [...(userRoster.reserve ?? []), ...(userRoster.taxi ?? [])],
+    starterPlayerIds: [...starterIdSet],
+    scoringSettings: league.scoring_settings ?? {},
+    rosterCoverageComplete: Number.isInteger(league.total_rosters) && league.total_rosters === rosters.length && new Set(rosters.map(roster => roster.roster_id)).size === rosters.length && rosters.every(roster => Array.isArray(roster.players)),
     alerts,
     decisions: buildMyHQDecisions(
       connection.leagueId,

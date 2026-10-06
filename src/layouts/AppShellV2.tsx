@@ -24,6 +24,7 @@ const draftLinks: MenuLink[] = [
 ];
 
 const researchLinks: MenuLink[] = [
+  { to: "/daily-brief", label: "Daily Fantasy Brief", detail: "Game recaps and waiver options", icon: BookOpen },
   { to: "/stats", label: "Rankings and stats", detail: "Rankings, values, and profiles", icon: BookOpen },
   { to: "/auction-values", label: "Auction Values", detail: "Compare and print public salary-cap sheets", icon: Gavel },
   { to: "/analytics", label: "Analytics", detail: "Trends and scoring views", icon: BarChart3 },
@@ -148,7 +149,7 @@ export default function AppShellV2() {
   const workspaceBase = workspaceLeagueId ? `/league/${encodeURIComponent(workspaceLeagueId)}` : "";
   const isDraft = isPathActive(location.pathname, ["/draft", "/offline-draft", "/draft-order"]);
   const isDraftNavigation = isDraft || isPathActive(location.pathname, ["/host", "/join", "/results"]);
-  const isResearch = isPathActive(location.pathname, ["/stats", "/auction-values", "/analytics", "/tools"]);
+  const isResearch = isPathActive(location.pathname, ["/daily-brief", "/stats", "/auction-values", "/analytics", "/tools"]);
   const isTeams = isPathActive(location.pathname, ["/teams"]);
   const isWorkspace = Boolean(routeLeagueId);
   const isTeamHome = location.pathname === `${workspaceBase}/team`;

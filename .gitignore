@@ -8,6 +8,8 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.local/
+api/daily-brief/.generated/
 api/league-history/.generated/
 api/league-commands/.generated/
 dist

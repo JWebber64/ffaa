@@ -17,7 +17,26 @@ const testFirebaseEnv = {
 } as const;
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react()],
+  plugins: [react(), {
+    name: 'football-daily-brief-api',
+    configureServer(server) {
+      server.middlewares.use(async (request, response, next) => {
+        const url = new URL(request.url ?? '/', 'http://127.0.0.1');
+        if (!['/api/daily-brief', '/ff/api/daily-brief'].includes(url.pathname)) { next(); return; }
+        const [{ briefResponse }, { footballBrief }, { localBriefStore }] = await Promise.all([
+          server.ssrLoadModule('/server/daily-brief/handler.ts'),
+          server.ssrLoadModule('/server/daily-brief/footballProvider.ts'),
+          server.ssrLoadModule('/server/daily-brief/localStore.ts'),
+        ]);
+        const headers = new Headers();
+        for (const [name, value] of Object.entries(request.headers)) if (typeof value === 'string') headers.set(name, value);
+        const result: Response = await briefResponse(new Request(url, { method: request.method ?? 'GET', headers }), { store: () => localBriefStore(), provider: footballBrief });
+        response.statusCode = result.status;
+        result.headers.forEach((value, name) => response.setHeader(name, value));
+        response.end(Buffer.from(await result.arrayBuffer()));
+      });
+    },
+  }],
   define: mode === 'test'
     ? Object.fromEntries(Object.entries(testFirebaseEnv).map(([key, value]) => [
       `import.meta.env.${key}`,

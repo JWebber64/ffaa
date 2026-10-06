@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "brief:generate": "tsx scripts/generate-daily-brief.ts",
     "dev": "vite --debug=false",
     "build": "tsc -b && vite build",
-    "build:functions": "node scripts/build-league-history-function.mjs && node scripts/build-league-command-function.mjs",
+    "build:functions": "node scripts/build-league-history-function.mjs && node scripts/build-league-command-function.mjs && node scripts/build-daily-brief-function.mjs",
     "build:vercel": "npm run build:functions && tsc -b && tsc -p tsconfig.api.json && vite build --base=/ff/",
     "build:vercel:artifact": "npm run build:vercel",
     "build:scripts": "tsc -p tsconfig.scripts.json",

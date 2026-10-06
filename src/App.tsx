@@ -15,6 +15,7 @@ import { PlayerProfileProvider } from "./features/player-profile/PlayerProfilePr
 import AppShellV2 from "./layouts/AppShellV2";
 
 const StatsExplorer = lazy(() => import("./screens/StatsExplorer"));
+const FootballBriefPage = lazy(() => import("./features/daily-brief/FootballBriefPage"));
 const AuctionValuesPage = lazy(() => import("./features/auction-values/AuctionValuesPage"));
 const AnalyticsLab = lazy(() =>
   import("./screens/AnalyticsLab").then((module) => ({ default: module.AnalyticsLab })),
@@ -71,6 +72,7 @@ function AppRoutes() {
     location.pathname.startsWith("/teams") ||
     location.pathname.startsWith("/leagues") ||
     location.pathname.startsWith("/stats") ||
+    location.pathname.startsWith("/daily-brief") ||
     location.pathname.startsWith("/auction-values") ||
     location.pathname.startsWith("/analytics") ||
     location.pathname.startsWith("/tools") ||
@@ -99,6 +101,7 @@ function AppRoutes() {
           <Route path="/teams" element={<MyTeams />} />
           <Route path="/leagues" element={<LeagueHQ />} />
           <Route path="/stats" element={<StatsExplorer />} />
+          <Route path="/daily-brief" element={<FootballBriefPage />} />
           <Route path="/auction-values" element={<AuctionValuesPage />} />
           <Route path="/auction-values/source/:sourceId" element={<AuctionValuesPage />} />
           <Route path="/auction-values/print" element={<AuctionValuesPage />} />
@@ -118,6 +121,7 @@ function AppRoutes() {
             <Route path="team/matchup" element={<LeagueMatchups personalOnly />} />
             <Route path="matchup" element={<LeagueMatchups personalOnly />} />
             <Route path="players" element={<LeaguePlayers />} />
+            <Route path="daily-brief" element={<FootballBriefPage />} />
             <Route path="standings" element={<LeagueOverview />} />
             <Route path="teams" element={<LeagueTeams />} />
             <Route path="teams/:teamId" element={<LeagueTeams />} />

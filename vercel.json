@@ -3,6 +3,14 @@
   "buildCommand": "npm run release:verify",
   "outputDirectory": "dist",
   "functions": {
+    "api/daily-brief/index.js": {
+      "maxDuration": 300,
+      "includeFiles": "api/daily-brief/.generated/index.js"
+    },
+    "api/daily-brief/cron.js": {
+      "maxDuration": 300,
+      "includeFiles": "api/daily-brief/.generated/index.js"
+    },
     "api/league-history/import.js": {
       "maxDuration": 300,
       "includeFiles": "api/league-history/.generated/import.js"
@@ -17,6 +25,10 @@
     }
   },
   "crons": [
+    {
+      "path": "/api/daily-brief/cron",
+      "schedule": "0 12 * * *"
+    },
     {
       "path": "/api/league-commands/waiver-cron",
       "schedule": "0 0 * * *"
@@ -35,6 +47,10 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/ff/api/daily-brief",
+      "destination": "/api/daily-brief"
+    },
     {
       "source": "/ff/espn-nfl-news",
       "destination": "https://www.espn.com/espn/rss/nfl/news"

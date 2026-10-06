@@ -52,5 +52,8 @@ Before Production, inspect computed styles on desktop and mobile for:
 - League players, teams, lineup, matchups, and My Team when data is available
 - GameHQ Weekly on My Matchup and History → Weekly recaps: `RecapGraphics` uses recorded lineup-slot battle bars, with FLEX separate from RB/WR/TE and SFLEX/restricted-flex lanes distinct. Bars resolve `positionColorVar()`; labels, headliner profiles, and `LeagueRecapArticle` positional awards use `PositionBadge` without fill or foreground overrides. The `WR/RB` display alias resolves to canonical FLEX cyan. Numeric labels accompany bars, including negative values.
 - Hosted draft player lists, nomination controls, mobile manager roster, and team detail panels
+- Daily Fantasy Brief: Who's Hot, public low-rostered standouts, your players, waiver candidates and saved watchlist use the shared `PositionBadge` without overriding its fill or foreground. The compact public rows place that badge beside the profile name and a provider-linked portrait; mobile preserves the badge's semantic colors and sizing. Platform/scoring/position/threshold discovery controls reuse `UniversalSelect`; plain position labels introduce no feature palette. Bench replacement selectors and observed-result rows use plain player names and inherit shared control styling.
+
+Daily Brief scoring sparklines and usage bars encode numeric performance using the shared feature accent and numeric labels. They do not encode position; adjacent player identities retain `PositionBadge`. Scoreboard logos identify NFL teams, independently of position semantics.
 
 Verify the exact Production asset and confirm that the deployed chart chunk no longer contains a local position palette.
