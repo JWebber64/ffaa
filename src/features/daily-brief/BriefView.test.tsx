@@ -1,3 +1,4 @@
+import { UniversalSelect } from "../../ui/UniversalSelect";
 // @vitest-environment jsdom
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -11,7 +12,7 @@ const report: BriefEdition = { version: 1, sport: "football", date: "2026-10-05"
  observations: ["1", "2"].map((id, i) => ({ id, providerId: String(100 + i), name: i ? "Available player" : "Owned player", position: "WR", team: "BUF", gameId: "g1", date: "2026-10-05", stats: { rec: 5, targets: 8 }, sourceUrl: "https://example.com/stats" })) };
 function view(edition = report, league: LeagueBriefContext | null = context, latest = report.date) {
  return render(<MemoryRouter><BriefView edition={edition} archive={[{ date: latest, generatedAt: report.generatedAt, revision: "test", status: "complete" }]} expectedDate="2026-10-05" context={league}
- renderPlayer={player => <span>{player.name}</span>} renderWatch={() => <button>Watch player</button>} renderDatePicker={() => <select aria-label="Edition archive" />} leagueTo="/players" connectTo="/leagues" /></MemoryRouter>);
+ renderPlayer={player => <span>{player.name}</span>} renderWatch={() => <button>Watch player</button>} renderDatePicker={() => <UniversalSelect aria-label="Edition archive"><option value="2026-10-05">2026-10-05</option></UniversalSelect>} leagueTo="/players" connectTo="/leagues" /></MemoryRouter>);
 }
 describe("daily brief presentation", () => {
  it("keeps owned players in your roster section and out of pickup options", () => {

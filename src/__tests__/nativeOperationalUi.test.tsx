@@ -2,7 +2,7 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { NativeLeagueHomeWorkspace } from "../features/league-home/NativeLeagueHomeWorkspace";
 import type { CanonicalLeagueWorkspace } from "../features/league-domain/types";
@@ -26,6 +26,12 @@ const workspace: CanonicalLeagueWorkspace = { league: { id: "league-1", name: "N
 function SheetTrigger() { const { openPlayer } = useLeaguePlayerSheet(); return <button type="button" onClick={() => openPlayer({ playerId: "2026-RB-jahmyr-gibbs", currentWeek: 1, leagueState: "owned", ownership: "Sunday Best", rosterFit: "RB starter", actionLabel: "Manage lineup", actionTo: "/league/league-1/team" })}>Open player</button>; }
 
 describe("Phase 10 operational UI", () => {
+  beforeEach(() => {
+    // Keep the fixture's September deadlines in the future regardless of the release date.
+    vi.spyOn(Date, "now").mockReturnValue(Date.parse("2026-09-03T10:00:00.000Z"));
+  });
+  afterEach(() => vi.restoreAllMocks());
+
   it("opens one accessible player evidence sheet, closes with Escape, and restores focus", () => {
     render(<MemoryRouter><LeaguePlayerSheetProvider><SheetTrigger /></LeaguePlayerSheetProvider></MemoryRouter>);
     const trigger = screen.getByRole("button", { name: "Open player" }); trigger.focus(); fireEvent.click(trigger);

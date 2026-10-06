@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { UniversalSelect } from "../../ui/UniversalSelect";
 import type { BriefEdition, BriefStartPlan, LeagueBriefContext, Observation } from "./model";
 import { defaultDiscoveryPreferences, discoveryPreferencesSchema, discoverPlayers, percentageFor, platformNames, staleSnapshot, type DiscoveryPreferences } from "./discovery";
 import { performanceLine, recentPlayers, scoredObservation, statLabels, type BriefCandidate } from "./ranking";
@@ -27,7 +28,7 @@ export function DiscoveryView({ edition, context, now, connectTo, renderPlayer, 
   }
   const result = discoverPlayers(edition, preferences, context), platform = platformNames[preferences.platform];
   const stale = staleSnapshot(result.snapshot, now), available = Boolean(result.snapshot?.entries.length);
-  const choice = renderChoice ?? ((label, value, choices, onChange) => <select aria-label={label} value={value} onChange={event => onChange(event.currentTarget.value)}>{choices.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select>);
+  const choice = renderChoice ?? ((label, value, choices, onChange) => <UniversalSelect aria-label={label} value={value} onChange={event => onChange(event.currentTarget.value)}>{choices.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</UniversalSelect>);
   const positions = edition.sport === "football" ? ["QB", "RB", "WR", "TE"] : ["C", "LW", "RW", "D", "G"];
   const scoring = edition.sport === "football" ? [{ value: "ppr", label: "PPR" }, { value: "halfPpr", label: "Half PPR" }, { value: "standard", label: "Standard" }] : [{ value: "hockeyPoints", label: "Brief points" }, { value: "categories", label: "Category contributions" }];
   const rosterFresh = Boolean(context?.complete && now - Date.parse(context.snapshotAt) <= 48 * 60 * 60 * 1000 && Date.parse(context.snapshotAt) <= now + 5 * 60 * 1000);

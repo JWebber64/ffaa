@@ -37,7 +37,7 @@
 .brief-risk { max-width:76ch; }
 .brief-comparison { margin-block:14px; }
 .brief-comparison summary { cursor:pointer; font-weight:600; }
-.brief-stream-plan { border-left:2px solid var(--brief-border); padding-left:14px; margin-block:14px; }
+.brief-stream-plan { border:1px solid var(--brief-border); padding:14px; margin-block:14px; }
 .brief-stream-plan ul,.brief-alerts { padding-left:20px; line-height:1.6; }
 .brief-tracking-action { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-block:14px; }
 .brief-outcomes { list-style:none; padding:0; }
