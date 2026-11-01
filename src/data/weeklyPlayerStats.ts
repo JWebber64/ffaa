@@ -161,6 +161,9 @@ function parseCsv(text: string): CsvRow[] {
   }
 
   const headers = records[0] ?? [];
+  if (!["player_id", "season", "week"].every((field) => headers.includes(field))) {
+    throw new Error("nflverse weekly player stats returned an invalid CSV.");
+  }
   return records.slice(1).flatMap((values) => {
     if (!values.length || values.every((value) => value === "")) return [];
 

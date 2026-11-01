@@ -1,9 +1,10 @@
 import { appUrl } from "@/lib/appBasePath";
+import { FANTASY_SEASON } from "@/config/fantasySeason";
 
 export type PlayerCareerScoringMode = "standard" | "halfPpr" | "ppr";
 
 export const NFLVERSE_CAREER_MIN_SEASON = 1999;
-export const NFLVERSE_CAREER_LATEST_SEASON = 2025;
+export const NFLVERSE_CAREER_LATEST_SEASON = FANTASY_SEASON;
 
 export type PlayerCareerSeason = {
   playerId: string;

@@ -4,6 +4,9 @@ import type {
   StatsPlayerSource,
 } from "@/components/stats/StatsPlayerDrawer";
 import { buildPlayerGameLog } from "@/data/playerGameLog";
+import { NFLVERSE_CAREER_LATEST_SEASON } from "@/data/playerCareerStats";
+import { summarizeWeeklyPlayerStats, type WeeklyPlayerSummary } from "@/data/weeklyPlayerStats";
+import sleeperProjectionRows from "@/data/players-2026-sleeper-projections.json";
 import {
   buildCurrentToolPlayers,
   normalizeToolName,
@@ -28,6 +31,7 @@ export type PlayerProfileCandidate = {
   byeWeek?: number | null | undefined;
   rank?: number | null | undefined;
   positionRank?: number | null | undefined;
+  posRank?: number | null | undefined;
   adp?: number | null | undefined;
   auctionValue?: number | null | undefined;
   marketValue?: number | null | undefined;
@@ -128,6 +132,7 @@ function scoringLabel(scoring: ToolScoring) {
 export function buildPlayerProfileDetail(
   candidate: PlayerProfileCandidate,
   scoring: ToolScoring = "halfPpr",
+  loadedSummary?: WeeklyPlayerSummary | null,
 ): StatsPlayerDetail {
   const matched = resolveToolPlayer(candidate, scoring);
   const name = candidateName(candidate) || matched?.name || "Unknown player";
@@ -137,25 +142,44 @@ export function buildPlayerProfileDetail(
   const sleeperId = candidateSleeperId(candidate) || matched?.sleeperId || (/^\d+$/.test(id) ? id : "");
   const injuryStatus = String(candidate.injuryStatus ?? matched?.injuryStatus ?? "").trim();
   const status = injuryStatus || String(candidate.status ?? matched?.status ?? "").trim();
-  const summary = candidate.summary ?? matched?.summary ?? null;
+  const suppliedSummary = loadedSummary === undefined ? candidate.summary ?? matched?.summary : loadedSummary;
+  // Season metrics must never combine several seasons or retain a caller's
+  // old averages after fresh weekly rows arrive.
+  const summary = suppliedSummary?.weeklyRows.length
+    ? summarizeWeeklyPlayerStats(suppliedSummary.weeklyRows.filter((row) => row.season === suppliedSummary.latestSeason))[0] ?? null
+    : suppliedSummary ?? null;
   const projectedPoints = firstNumber(candidate.projectedPoints, matched?.projectedPoints);
   const projectedPointsPerGame = firstNumber(candidate.projectedPointsPerGame, matched?.projectedPointsPerGame);
   const weeklyProjectedPoints = firstNumber(candidate.weeklyProjectedPoints, matched?.weeklyProjectedPoints);
   const weeklyActualPoints = firstNumber(candidate.weeklyActualPoints, matched?.weeklyActualPoints);
   const weeklyActualPointsWeek = firstNumber(candidate.weeklyActualPointsWeek, matched?.weeklyActualPointsWeek);
-  const historicalPointsPerGame = firstNumber(candidate.historicalPointsPerGame, matched?.historicalPointsPerGame, summary?.selectedFantasyPointsPerGame);
-  const last3PointsPerGame = firstNumber(candidate.last3PointsPerGame, matched?.last3PointsPerGame, summary?.last3FantasyPointsPerGame);
-  const floorPoints = firstNumber(candidate.floorPoints, matched?.floorPoints, summary?.floorFantasyPoints);
-  const ceilingPoints = firstNumber(candidate.ceilingPoints, matched?.ceilingPoints, summary?.ceilingFantasyPoints);
-  const opportunitiesPerGame = firstNumber(candidate.opportunitiesPerGame, matched?.opportunitiesPerGame);
-  const carriesPerGame = firstNumber(candidate.carriesPerGame, matched?.carriesPerGame);
-  const targetsPerGame = firstNumber(candidate.targetsPerGame, matched?.targetsPerGame);
-  const targetShare = firstNumber(candidate.targetShare, matched?.targetShare);
-  const airYardsShare = firstNumber(candidate.airYardsShare, matched?.airYardsShare);
+  const useSummary = summary !== null || loadedSummary !== undefined;
+  const historicalPointsPerGame = useSummary ? summary?.selectedFantasyPointsPerGame ?? null : firstNumber(candidate.historicalPointsPerGame, matched?.historicalPointsPerGame);
+  const last3PointsPerGame = useSummary ? summary?.last3FantasyPointsPerGame ?? null : firstNumber(candidate.last3PointsPerGame, matched?.last3PointsPerGame);
+  const floorPoints = useSummary ? summary?.floorFantasyPoints ?? null : firstNumber(candidate.floorPoints, matched?.floorPoints);
+  const ceilingPoints = useSummary ? summary?.ceilingFantasyPoints ?? null : firstNumber(candidate.ceilingPoints, matched?.ceilingPoints);
+  const games = summary?.games ?? 0;
+  const perGame = (total: number | undefined) => games > 0 && total !== undefined ? total / games : null;
+  const opportunitiesPerGame = useSummary ? perGame(summary ? summary.totals.carries + summary.totals.targets : undefined) : firstNumber(candidate.opportunitiesPerGame, matched?.opportunitiesPerGame);
+  const carriesPerGame = useSummary ? perGame(summary?.totals.carries) : firstNumber(candidate.carriesPerGame, matched?.carriesPerGame);
+  const targetsPerGame = useSummary ? perGame(summary?.totals.targets) : firstNumber(candidate.targetsPerGame, matched?.targetsPerGame);
+  const targetShare = useSummary ? summary?.averageMetrics.targetShare ?? null : firstNumber(candidate.targetShare, matched?.targetShare);
+  const airYardsShare = useSummary ? summary?.averageMetrics.airYardsShare ?? null : firstNumber(candidate.airYardsShare, matched?.airYardsShare);
   const byeWeek = firstNumber(candidate.byeWeek, matched?.byeWeek);
   const rank = firstNumber(candidate.rank, matched?.rank);
-  const positionRank = firstNumber(candidate.positionRank, matched?.positionRank);
-  const adp = firstNumber(candidate.adp, matched?.adp);
+  const importedAdp = sleeperProjectionRows.find((row) => normalizeToolName(row.name) === normalizeToolName(name) && normalizeToolPosition(row.pos) === position);
+  const suppliedPositionRank = firstNumber(candidate.positionRank, candidate.posRank, matched?.positionRank);
+  const peerRanks = currentPlayers(scoring).flatMap((player) => player.position === position && player.rank !== null ? [player.rank] : []);
+  const matchedRank = matched?.rank ?? null;
+  const derivedPositionRank = matchedRank !== null && rank === matchedRank
+    ? 1 + peerRanks.filter((peerRank) => peerRank < matchedRank).length : null;
+  const positionRank = suppliedPositionRank ?? derivedPositionRank;
+  const suppliedAdp = firstNumber(candidate.adp, matched?.adp);
+  const adp = suppliedAdp ?? firstNumber(importedAdp?.adp);
+  const adpHelper = suppliedAdp !== null ? "Imported draft ADP" : adp !== null
+    ? `Sleeper PPR · ${importedAdp!.season} · ${importedAdp!.updatedAt}` : "No sourced draft ADP available";
+  const seasonHelper = summary ? `${summary.latestSeason} · ${games} games · through Week ${summary.latestWeek}` : `No ${NFLVERSE_CAREER_LATEST_SEASON} regular-season sample`;
+  const missingUsage = position === "DEF" ? "Not available for team D/ST" : "Not supplied by this season's source";
   const auctionValue = firstNumber(candidate.auctionValue, matched?.auctionValue);
   const marketValue = firstNumber(candidate.marketValue, matched?.marketValue);
   const valueSources = candidate.valueSources ?? matched?.valueSources ?? [];
@@ -163,9 +187,12 @@ export function buildPlayerProfileDetail(
     {
       name: "nflverse",
       detail: "Regular-season game logs and career-by-season totals. Missing source rows remain unavailable rather than being estimated.",
-      updatedAt: "Career coverage through 2025",
+      updatedAt: `Career coverage through ${NFLVERSE_CAREER_LATEST_SEASON}`,
     },
   ];
+  if (suppliedAdp === null && adp !== null && importedAdp) {
+    sources.push({ name: "Sleeper draft ADP", detail: `${importedAdp.season} PPR draft ADP from the imported Sleeper snapshot. This is draft-market context, not an in-season rest-of-season rank.`, updatedAt: importedAdp.updatedAt });
+  }
 
   if (sleeperId) {
     sources.push({
@@ -218,25 +245,26 @@ export function buildPlayerProfileDetail(
       ),
       metric("Season projection", numberText(projectedPoints), scoringLabel(scoring)),
       metric("Projected PPG", numberText(projectedPointsPerGame)),
-      metric("Season PPG", numberText(historicalPointsPerGame), summary?.latestSeason ? String(summary.latestSeason) : "Latest available season"),
-      metric("Last 3", numberText(last3PointsPerGame)),
-      metric("Floor / ceiling", floorPoints === null && ceilingPoints === null ? "—" : `${numberText(floorPoints)} / ${numberText(ceilingPoints)}`),
+      metric("Season PPG", numberText(historicalPointsPerGame), seasonHelper),
+      metric("Last 3", numberText(last3PointsPerGame), summary ? `${summary.latestSeason} · last ${Math.min(3, games)} games` : seasonHelper),
+      metric("Floor / ceiling", floorPoints === null && ceilingPoints === null ? "—" : `${numberText(floorPoints)} / ${numberText(ceilingPoints)}`, summary ? `${summary.latestSeason} · 25th / 75th percentile` : seasonHelper),
       metric("Overall rank", rank === null ? "—" : `#${Math.round(rank)}`),
-      metric("Position rank", positionRank === null ? "—" : `${position}${Math.round(positionRank)}`),
-      metric("ADP", numberText(adp)),
+      metric("Position rank", positionRank === null ? "—" : `${position}${Math.round(positionRank)}`, suppliedPositionRank !== null ? "Imported position rank" : positionRank !== null ? "Within current overall rankings" : "No sourced ranking available"),
+      metric("ADP", numberText(adp), adpHelper),
       metric("GameHQ fair", moneyText(auctionValue)),
       metric("Market median", moneyText(marketValue)),
       metric("Bye week", byeWeek === null ? "—" : String(Math.round(byeWeek))),
     ],
     usageMetrics: [
-      metric("Opportunities/G", numberText(opportunitiesPerGame)),
-      metric("Carries/G", numberText(carriesPerGame)),
-      metric("Targets/G", numberText(targetsPerGame)),
-      metric("Target share", percentText(targetShare)),
-      metric("Air-yard share", percentText(airYardsShare)),
-      metric("Games sampled", summary?.games ? String(summary.games) : "—"),
+      metric("Opportunities/G", numberText(opportunitiesPerGame), opportunitiesPerGame === null ? missingUsage : seasonHelper),
+      metric("Carries/G", numberText(carriesPerGame), carriesPerGame === null ? missingUsage : seasonHelper),
+      metric("Targets/G", numberText(targetsPerGame), targetsPerGame === null ? missingUsage : seasonHelper),
+      metric("Target share", percentText(targetShare), targetShare === null ? missingUsage : seasonHelper),
+      metric("Air-yard share", percentText(airYardsShare), airYardsShare === null ? missingUsage : seasonHelper),
+      metric("Games sampled", summary?.games ? String(summary.games) : "—", summary ? `${summary.latestSeason} regular season` : missingUsage),
     ],
     weeks: buildPlayerGameLog(summary?.weeklyRows ?? []),
+    weeksCoverFullSeason: loadedSummary !== undefined,
     sources,
     career: {
       ...(summary?.playerId

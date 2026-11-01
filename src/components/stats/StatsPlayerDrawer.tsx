@@ -63,6 +63,7 @@ export interface StatsPlayerDetail {
   overviewMetrics: StatsPlayerMetric[];
   usageMetrics: StatsPlayerMetric[];
   weeks: StatsPlayerWeek[];
+  weeksCoverFullSeason?: boolean;
   sources: StatsPlayerSource[];
   career: {
     playerId?: string;
@@ -75,6 +76,7 @@ export interface StatsPlayerDetail {
 interface StatsPlayerDrawerProps {
   player: StatsPlayerDetail | null;
   onClose: () => void;
+  overviewStatus?: { loading: boolean; error: string | null; onRetry: () => void } | undefined;
 }
 
 const DRAWER_TABS = [
@@ -223,7 +225,7 @@ function withCareerOverviewMetric(metrics: StatsPlayerMetric[], metric: StatsPla
   return next;
 }
 
-export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
+export function StatsPlayerDrawer({ player, onClose, overviewStatus }: StatsPlayerDrawerProps) {
   const [tab, setTab] = useState<DrawerTab>("overview");
   const [careerState, setCareerState] = useState<{ key: string; result: PlayerCareerStatsResult } | null>(null);
   const [careerLoadingKey, setCareerLoadingKey] = useState<string | null>(null);
@@ -284,9 +286,16 @@ export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
 
   useEffect(() => {
     if (tab !== "game-log" || !player) return;
+    const suppliedWeeks = player.weeks.filter((week) => week.season === gameLogSeason);
+    if (player.weeksCoverFullSeason && suppliedWeeks.length) {
+      setGameLogRows(suppliedWeeks); setGameLogLoading(false); setGameLogError(null);
+      return;
+    }
     const controller = new AbortController(); setGameLogLoading(true); setGameLogError(null);
     loadWeeklyPlayerStats({ seasons: [gameLogSeason], seasonType: "REG", scoring: player.career.scoring, signal: controller.signal })
       .then((result) => {
+        if (controller.signal.aborted) return;
+        if (result.unavailableSeasons.includes(gameLogSeason)) throw new Error(`${gameLogSeason} weekly stats could not be loaded. Try again.`);
         const requestedName = normalizeToolName(player.name); const requestedPosition = normalizeToolPosition(player.position);
         const requestedIds = new Set([player.id, player.sleeperId, player.career.playerId].filter((value): value is string => Boolean(value)));
         setGameLogRows(buildPlayerGameLog(result.rows.filter((row) => requestedIds.has(row.playerId) || (normalizeToolName(row.playerName) === requestedName && normalizeToolPosition(row.position) === requestedPosition))));
@@ -328,7 +337,9 @@ export function StatsPlayerDrawer({ player, onClose }: StatsPlayerDrawerProps) {
       <header className="stats-drawer-header"><div className="stats-drawer-player">{player.headshotUrl ? <img className="stats-drawer-headshot" src={player.headshotUrl} alt="" /> : <TeamMark team={player.team} size="sm" />}<div><div className="stats-drawer-kicker"><span>{player.position}</span><span>{player.team || "FA"}</span>{player.opponent ? <span>vs {player.opponent}</span> : null}{player.status ? <span>{player.status}</span> : null}</div><h2 id="stats-player-drawer-title">{player.name}</h2><p>{player.summary}</p></div></div><button ref={closeButtonRef} type="button" className="stats-drawer-close" aria-label="Close player details" onClick={onClose}><X size={20} aria-hidden="true" /></button></header>
       <div className="stats-drawer-tabs" role="tablist" aria-label="Player details">{DRAWER_TABS.map((item, index) => <button id={`stats-player-tab-${item.value}`} key={item.value} type="button" role="tab" aria-selected={tab === item.value} aria-controls={`stats-player-panel-${item.value}`} tabIndex={tab === item.value ? 0 : -1} className={tab === item.value ? "is-active" : ""} onClick={() => setTab(item.value)} onKeyDown={(event) => moveTab(event, index)}>{item.label}</button>)}</div>
       <div id={`stats-player-panel-${tab}`} className="stats-drawer-body" role="tabpanel" aria-labelledby={`stats-player-tab-${tab}`}>
-        {tab === "overview" ? <><section aria-labelledby="stats-overview-heading"><h3 id="stats-overview-heading">Fantasy outlook</h3><MetricGrid metrics={overviewMetrics} /></section><section aria-labelledby="stats-usage-heading"><h3 id="stats-usage-heading">Opportunity and efficiency</h3><MetricGrid metrics={player.usageMetrics} /></section></> : null}
+        {tab === "overview" ? <>
+          {overviewStatus?.loading ? <div className="stats-career-status" role="status" aria-live="polite"><LoaderCircle size={20} className="stats-career-spinner" aria-hidden="true" /><div><strong>Loading {NFLVERSE_CAREER_LATEST_SEASON} season stats</strong><span>Reading regular-season scoring, trends, and usage.</span></div></div> : overviewStatus?.error ? <div className="stats-career-status is-error" role="alert"><AlertCircle size={20} aria-hidden="true" /><div><strong>Season stats are temporarily unavailable</strong><span>{overviewStatus.error}</span><button type="button" onClick={overviewStatus.onRetry}><RotateCw size={14} aria-hidden="true" />Try again</button></div></div> : null}
+          <section aria-labelledby="stats-overview-heading" aria-busy={overviewStatus?.loading ?? false}><h3 id="stats-overview-heading">Fantasy outlook</h3><MetricGrid metrics={overviewMetrics} /></section><section aria-labelledby="stats-usage-heading" aria-busy={overviewStatus?.loading ?? false}><h3 id="stats-usage-heading">Opportunity and efficiency</h3><MetricGrid metrics={player.usageMetrics} /></section></> : null}
         {tab === "game-log" ? <section aria-labelledby="stats-game-log-heading"><div className="stats-drawer-section-head stats-game-log-head"><div><h3 id="stats-game-log-heading">Regular-season game log</h3><span>{gameLogRows.length} games</span></div><label><span className="sr-only">Game log season</span><UniversalSelect aria-label="Game log season" value={String(gameLogSeason)} onValueChange={(value) => setGameLogSeason(Number(value))}>{Array.from({ length: NFLVERSE_CAREER_LATEST_SEASON - 1999 + 1 }, (_, index) => NFLVERSE_CAREER_LATEST_SEASON - index).map((season) => <option value={season} key={season}>{season}</option>)}</UniversalSelect></label></div>
           {gameLogLoading ? <div className="stats-career-status" role="status"><LoaderCircle size={20} className="stats-career-spinner" aria-hidden="true" /><div><strong>Loading {gameLogSeason} game log</strong><span>Reading nflverse weekly player stats.</span></div></div> : gameLogError ? <div className="stats-career-status is-error" role="alert"><AlertCircle size={20} aria-hidden="true" /><div><strong>Game log is temporarily unavailable</strong><span>{gameLogError}</span><button type="button" onClick={() => setGameLogAttempt((attempt) => attempt + 1)}><RotateCw size={14} aria-hidden="true" />Try again</button></div></div> : gameLogRows.length ? <><div className="stats-drawer-table-shell"><table className="stats-drawer-table"><caption className="sr-only">{player.name} {gameLogSeason} regular-season game log</caption><thead><tr>{columns.map((column) => <th key={column.id} scope="col" className={column.align === "left" ? "is-left" : undefined}>{column.label}</th>)}</tr></thead><tbody>{gameLogRows.map((week) => <tr key={week.id}>{columns.map((column) => <td key={column.id} className={column.align === "left" ? "is-left" : undefined}>{column.value(week)}</td>)}</tr>)}</tbody></table></div><p className="stats-career-coverage">nflverse regular-season weekly totals. Most recent game first.</p></> : <p className="stats-drawer-empty">No {gameLogSeason} regular-season game log is available for this player.</p>}</section> : null}
         {tab === "career" ? <section aria-labelledby="stats-career-heading"><div className="stats-drawer-section-head"><h3 id="stats-career-heading">NFL career by season</h3><span>{careerResult?.seasons.length ? `${careerResult.seasons.length} seasons` : "Regular season"}</span></div><CareerPanel player={player} result={careerResult} loading={careerLoading} error={careerError} onRetry={() => setCareerAttempt((attempt) => attempt + 1)} /></section> : null}

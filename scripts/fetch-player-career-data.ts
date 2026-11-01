@@ -1,9 +1,10 @@
 import { gunzipSync } from "node:zlib";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { FANTASY_SEASON } from "../src/config/fantasySeason";
 
 const MIN_SEASON = 1999;
-const MAX_SEASON = 2025;
+const MAX_SEASON = FANTASY_SEASON;
 const OUTPUT_PATH = resolve("public/data/nflverse-player-careers.json");
 const NFLVERSE_URL = "https://github.com/nflverse/nflverse-data/releases/download/stats_player";
 const FANTASY_POSITIONS = new Set(["QB", "RB", "FB", "WR", "TE", "K", "PK"]);
@@ -65,7 +66,8 @@ async function downloadSeason(season: number) {
 }
 
 async function main() {
-  const bundle: CareerBundle = {
+  const currentOnly = process.argv.includes("--current-season");
+  const bundle: CareerBundle = currentOnly ? JSON.parse(readFileSync(OUTPUT_PATH, "utf8")) as CareerBundle : {
     version: 1,
     source: "nflverse",
     generatedAt: new Date().toISOString(),
@@ -73,11 +75,18 @@ async function main() {
     coverageEnd: MAX_SEASON,
     players: {},
   };
+  if (bundle.version !== 1 || !bundle.players || bundle.coverageStart !== MIN_SEASON || bundle.coverageEnd < MAX_SEASON - 1) throw new Error("Refresh the full career bundle before updating the current season.");
+  if (currentOnly) {
+    for (const player of Object.values(bundle.players)) player.s = player.s.filter((row) => Number(row[0]) < MAX_SEASON);
+  }
+  bundle.generatedAt = new Date().toISOString();
+  bundle.coverageEnd = MAX_SEASON;
 
-  for (let season = MIN_SEASON; season <= MAX_SEASON; season += 1) {
+  for (let season = currentOnly ? MAX_SEASON : MIN_SEASON; season <= MAX_SEASON; season += 1) {
     const text = await downloadSeason(season);
     const records = text.split(/\r?\n/).filter(Boolean);
     const headers = parseCsvRecord(records[0] ?? "");
+    if (!["player_id", "season", "games", "fantasy_points_ppr"].every((field) => headers.includes(field)) || records.length < 2) throw new Error(`Invalid nflverse ${season} career CSV`);
     const indexes = new Map(headers.map((header, index) => [header, index]));
     const field = (values: string[], name: string) => {
       const index = indexes.get(name) ?? -1;
@@ -126,6 +135,15 @@ async function main() {
 
     process.stdout.write(`Loaded ${season}\n`);
   }
+
+  const weeklyResponse = await fetch(`${NFLVERSE_URL}/stats_player_week_${MAX_SEASON}.csv`);
+  if (!weeklyResponse.ok) throw new Error(`nflverse weekly ${MAX_SEASON} returned ${weeklyResponse.status}`);
+  const weeklyCsv = await weeklyResponse.text();
+  const weeklyHeaders = parseCsvRecord(weeklyCsv.split(/\r?\n/)[0] ?? "");
+  if (!["player_id", "season", "week", "fantasy_points_ppr"].every((field) => weeklyHeaders.includes(field))) throw new Error("Invalid weekly player stats CSV");
+  const weeklyPath = resolve(`public/data/nflverse-player-stats/stats_player_week_${MAX_SEASON}.csv`);
+  mkdirSync(dirname(weeklyPath), { recursive: true });
+  writeFileSync(weeklyPath, weeklyCsv);
 
   mkdirSync(dirname(OUTPUT_PATH), { recursive: true });
   writeFileSync(OUTPUT_PATH, JSON.stringify(bundle));

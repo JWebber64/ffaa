@@ -210,4 +210,15 @@ describe("loadWeeklyPlayerStats", () => {
     ).rejects.toMatchObject({ name: "AbortError" });
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it('rejects a successful HTML fallback instead of caching it as an empty season', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response('<!doctype html><html>App shell</html>'))
+      .mockResolvedValueOnce(new Response(csv.split('2097').join('2096')));
+    vi.stubGlobal('fetch', fetchMock);
+    const result = await loadWeeklyPlayerStats({ seasons: [2096], seasonType: 'REG', scoring: 'ppr' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result.rows).toHaveLength(3);
+    expect(result.unavailableSeasons).toEqual([]);
+  });
 });

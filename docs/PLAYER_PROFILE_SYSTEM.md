@@ -17,3 +17,12 @@ Every repeated player identity that supports inspection must open a profile with
 5. Run `npx vitest run src/__tests__/playerProfileCoverage.test.ts src/__tests__/playerProfileProvider.test.tsx src/__tests__/nativeOperationalUi.test.tsx` and verify one desktop and one mobile rendered trigger.
 
 The coverage test is intentionally explicit: deleting a trigger or adding a known consumer without updating the contract must be a reviewed change, not an accidental regression.
+
+## Season statistics and source context
+
+- Opening a shared profile loads the configured current season's regular-season weekly rows immediately. Overview does not depend on visiting Game log. Season PPG, recent form, quartiles, usage, and the sampled-game count all use the same season and selected scoring. Connected-league week scores remain authoritative and may legitimately be zero.
+- Overview identifies the season, sample size, and latest recorded week. A missing player sample is distinct from a source failure; failures expose an accessible retry. Late or aborted requests must never replace another player's data.
+- Game log may reuse profile rows only when `weeksCoverFullSeason` is true. Stats Explorer's filtered historical series must continue loading a complete season when Game log opens.
+- Missing position rank may be derived within the existing overall rankings and is labeled as such. Missing ADP may use the imported Sleeper PPR draft snapshot, with its scoring, season, and update date visible. Never substitute an overall rank for ADP or label preseason draft ADP as current in-season rank.
+- `FANTASY_SEASON` sets the supported career/game-log season. `npm run stats:refresh` refreshes that season's nflverse weekly CSV and career totals while preserving completed career seasons; `npm run career-data:pull` rebuilds all career seasons. Commit refreshed assets through the normal master-only release process.
+- Run the profile data/provider, weekly player stats, current-season career, and career statistics tests plus `e2e/player-profile-stats.e2e.ts` on desktop and mobile after changing this flow.
